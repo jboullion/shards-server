@@ -29,7 +29,7 @@ from PIL import Image
 
 import env
 
-DEFAULT_MODELS = {"echo": "none", "comfy": "waiIllustriousSDXL_v160.safetensors",
+DEFAULT_MODELS = {"echo": "none", "comfy": "sd_xl_base_1.0_0.9vae.safetensors",
                   "openai": "gpt-image-2.5-sunburst", "fal": "fal-ai/flux-pro/kontext"}
 COMFY_URL = "http://127.0.0.1:8188"
 TIMEOUT = 600

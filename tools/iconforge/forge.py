@@ -15,6 +15,8 @@ batch options:
     --names a b c                exactly these icons (any status), e.g. for a bake-off
     --shrink 5                   shrink the new BGFs are written at (originals are ~4-7)
     --outline                    add a 1-px dark outline around each sprite
+    --frames inventory           only send the inventory picture to the model (cheap bake-offs);
+                                 ground/worn frames are pixelized from the original
     --opt denoise=0.5 --opt lora=pixel.safetensors   provider options (comfy)
     --workers 4                  parallel model calls
 
@@ -57,6 +59,8 @@ INV_FILE = DATA / "inventory.json"
 
 BASE_PROMPT = ("Redraw the item in the first image as a game inventory icon. Keep it recognisably the same "
                "item: same object, shape, silhouette, proportions, colours and orientation.")
+# The local img2img model (providers.comfy): SDXL base + Pixel Art XL, the LoRA's recommended strength.
+COMFY_DEFAULTS = {"lora": "pixel-art-xl.safetensors", "lora_strength": "1.2", "denoise": "0.6"}
 REF_PROMPT = "The other images are original item sprites from the game: match their style exactly, not their subjects."
 
 
@@ -128,13 +132,24 @@ def style_refs(pal) -> list:
     return imgs
 
 
-def prompt_for(notes: list) -> str:
+def prompt_for(notes: list, provider: str = "openai", item: str = "") -> str:
+    """The request text: the full instruction prompt, or for the local img2img model (comfy) the
+    short tag prompt from style.md's comfy-block."""
+    if provider == "comfy":
+        block = re.search(r"<!-- comfy-block -->(.*?)<!-- /comfy-block -->", STYLE.read_text(encoding="utf-8"), re.S)
+        text = " ".join(block.group(1).split()).replace("{item}", item)
+        return text + (", " + ", ".join(n.rstrip(".") for n in notes) if notes else "")
     style, _ = style_text()
     parts = [BASE_PROMPT, REF_PROMPT]
     if notes:
         parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
     parts.append(style)
     return " ".join(parts)
+
+
+def item_words(classes: list) -> str:
+    """"WolfMask" -> "wolf mask": the item's class name as words, for tag prompts."""
+    return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", classes[0]).lower() if classes else "item"
 
 
 # ------------------------------------------------------------------------------------- batch
@@ -207,17 +222,24 @@ def cmd_batch(a):
         b = BGF.read(Path(inv[n]["source"]))
         frames = unique_frames(b)
         notes = icon_state(state, n)["notes"]
-        sources[n] = (b, frames, prompt_for(notes))
+        texts = {s: prompt_for(notes, providers.split(s)[0], item_words(inv[n]["classes"])) for s in specs}
+        sources[n] = (b, frames, texts)
+        inv_fi = frames[b.bitmaps.index(inv_mod.inventory_bitmap(b))]
         for fi in sorted(set(frames.values())):
+            if a.frames == "inventory" and fi != inv_fi:
+                continue  # pixelized straight from the original below
             src = on_canvas(b.bitmaps[fi].rgba(pal))
             for s in specs:
                 for v in range(a.variants):
-                    jobs.append((n, fi, s, v, src))
+                    o = dict(opts)
+                    if providers.split(s)[0] == "comfy":
+                        o = {**COMFY_DEFAULTS, **o, "seed": int(digest(n, fi, v)[:8], 16)}
+                    jobs.append((n, fi, s, v, src, texts[s], o))
 
     results, failures = {}, []
     with ThreadPoolExecutor(max_workers=a.workers) as pool:
-        futs = {pool.submit(generate, s, [src] + refs, sources[n][2], opts, v): (n, fi, s, v)
-                for n, fi, s, v, src in jobs}
+        futs = {pool.submit(generate, s, [src] + refs, text, o, v): (n, fi, s, v)
+                for n, fi, s, v, src, text, o in jobs}
         for i, f in enumerate(as_completed(futs), 1):
             n, fi, s, v = futs[f]
             try:
@@ -231,8 +253,8 @@ def cmd_batch(a):
 
     manifest, review_items, sheet = {"batch": batch, "providers": specs, "items": []}, [], []
     for n in names:
-        b, frames, text = sources[n]
-        item = {"name": n, "prompt": text, "variants": []}
+        b, frames, texts = sources[n]
+        item = {"name": n, "prompts": texts, "variants": []}
         inv_frame = inv_mod.inventory_bitmap(b)
         variant_imgs = []
         for s in specs:
@@ -240,8 +262,12 @@ def cmd_batch(a):
                 try:
                     new = {}
                     for fi in sorted(set(frames.values())):
-                        new[fi] = pixelize(results[(n, fi, s, v)], b.bitmaps[fi], b.shrink, a.shrink, pal,
-                                           outline=a.outline)
+                        gen = results.get((n, fi, s, v))
+                        if gen is None and a.frames == "inventory":
+                            gen = on_canvas(b.bitmaps[fi].rgba(pal))
+                        if gen is None:
+                            raise KeyError("frame %d failed" % fi)
+                        new[fi] = pixelize(gen, b.bitmaps[fi], b.shrink, a.shrink, pal, outline=a.outline)
                 except (KeyError, ValueError) as e:
                     print("!! %s %s v%d: %s" % (n, s, v, e))
                     continue
@@ -375,6 +401,8 @@ def main():
     p.add_argument("--names", nargs="*")
     p.add_argument("--shrink", type=int, default=5)
     p.add_argument("--outline", action="store_true")
+    p.add_argument("--frames", choices=["all", "inventory"], default="all",
+                   help="inventory: only the inventory picture goes to the model; other frames are pixelized as they are")
     p.add_argument("--opt", action="append", default=[])
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--open", action="store_true", help="open the review page when done")

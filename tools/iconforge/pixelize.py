@@ -92,7 +92,11 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     """The generated image as a new Bitmap the same in-game size and placement as `original`."""
     k = new_shrink / orig_shrink
     W, H = max(1, round(original.w * k)), max(1, round(original.h * k))
-    obox = opaque_box(original.rgba(pal)) or (0, 0, original.w, original.h)
+    hs = [{"num": h["num"], "x": round(h["x"] * k), "y": round(h["y"] * k)} for h in original.hotspots]
+    obox = opaque_box(original.rgba(pal))
+    if obox is None:
+        # an empty frame in the original (some worn views are blank): keep it empty
+        return Bitmap(W, H, round(original.xoff * k), round(original.yoff * k), hs, bytes([TRANSPARENT]) * (W * H))
     bx0, by0 = round(obox[0] * k), round(obox[1] * k)
     bw, bh = max(1, round((obox[2] - obox[0]) * k)), max(1, round((obox[3] - obox[1]) * k))
 
@@ -118,5 +122,4 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     idx = to_palette(canvas, pal, allowed)
     if outline:
         idx = add_outline(idx, pal)
-    hs = [{"num": h["num"], "x": round(h["x"] * k), "y": round(h["y"] * k)} for h in original.hotspots]
     return Bitmap(W, H, round(original.xoff * k), round(original.yoff * k), hs, idx.tobytes())

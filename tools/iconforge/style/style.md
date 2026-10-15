@@ -19,6 +19,16 @@ Background: a single flat solid magenta (#FF00FF) everywhere around the object, 
 floor.
 <!-- /style-block -->
 
+## Local model prompt (comfy)
+
+SDXL img2img sees only the icon, not the references, and reads short tag-style prompts. Pixel Art
+XL (the LoRA) is triggered by "pixel". `{item}` becomes the item's name.
+
+<!-- comfy-block -->
+pixel, {item}, a single fantasy rpg inventory item icon, 1990s game sprite, simple, flat colors,
+limited palette, dark outline, centered, plain flat magenta background
+<!-- /comfy-block -->
+
 ## Style references
 
 Classic client icons sent as style references with each request (providers that accept several
