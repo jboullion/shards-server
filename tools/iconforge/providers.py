@@ -48,14 +48,26 @@ def _png(img: Image.Image) -> bytes:
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) iconforge/1.0"
 
 
-def _request(url, data=None, headers=None, method=None, timeout=TIMEOUT) -> bytes:
+def _transient(code: int, body: str) -> bool:
+    """Busy or throttled, not refused: worth retrying. Out of credits is not transient."""
+    if "insufficient_quota" in body or "credit_balance" in body:
+        return False
+    return code in (502, 503, 504) or (code == 429 and ("throttled" in body or "rate_limit" in body))
+
+
+def _request(url, data=None, headers=None, method=None, timeout=TIMEOUT, tries=5) -> bytes:
     req = urllib.request.Request(url, data=data, headers={"User-Agent": USER_AGENT, **(headers or {})}, method=method)
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.read()
-    except urllib.error.HTTPError as e:
-        # error bodies don't echo keys; keep them short
-        raise RuntimeError("%s: HTTP %d %s" % (url.split("?")[0], e.code, e.read()[:800].decode("utf-8", "replace")))
+    for attempt in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            body = e.read()[:800].decode("utf-8", "replace")
+            if attempt + 1 < tries and _transient(e.code, body):
+                time.sleep(min(60, 5 * 2 ** attempt))
+                continue
+            # error bodies don't echo keys; keep them short
+            raise RuntimeError("%s: HTTP %d %s" % (url.split("?")[0], e.code, body))
 
 
 def _json(url, body=None, headers=None, method=None) -> dict:
