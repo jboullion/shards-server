@@ -1,0 +1,1321 @@
+{
+ "next_batch": 15,
+ "icons": {
+  "apple.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\apple\\v0.bgf"
+   }
+  },
+  "banana.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\banana\\v0.bgf"
+   }
+  },
+  "bersaxe.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\bersaxe\\v0.bgf"
+   }
+  },
+  "blkhyhead.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\blkhyhead\\v0.bgf"
+   }
+  },
+  "bread.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\bread\\v0.bgf"
+   }
+  },
+  "broccoli.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\broccoli\\v0.bgf"
+   }
+  },
+  "btae.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\btae\\v0.bgf"
+   }
+  },
+  "carrot.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\carrot\\v0.bgf"
+   }
+  },
+  "colordust.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\colordust\\v0.bgf"
+   }
+  },
+  "cookie.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\cookie\\v0.bgf"
+   }
+  },
+  "corncob.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\corncob\\v0.bgf"
+   }
+  },
+  "cougarbrew.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\cougarbrew\\v0.bgf"
+   }
+  },
+  "cucumber.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\cucumber\\v0.bgf"
+   }
+  },
+  "cuttomato.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\cuttomato\\v0.bgf"
+   }
+  },
+  "dhelma.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\dhelma\\v0.bgf"
+   }
+  },
+  "doubloon.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\doubloon\\v0.bgf"
+   }
+  },
+  "dyebottle.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\dyebottle\\v0.bgf"
+   }
+  },
+  "dyeremover.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\dyeremover\\v0.bgf"
+   }
+  },
+  "earcorn.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\earcorn\\v0.bgf"
+   }
+  },
+  "eegray1.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "010",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "010",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\010\\eegray1\\v0.bgf"
+   }
+  },
+  "eggs.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\eggs\\v0.bgf"
+   }
+  },
+  "flask.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\flask\\v0.bgf"
+   }
+  },
+  "flour.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\flour\\v0.bgf"
+   }
+  },
+  "frontman.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\frontman\\v0.bgf"
+   }
+  },
+  "frozjewl.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\frozjewl\\v0.bgf"
+   }
+  },
+  "gift1.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\gift1\\v0.bgf"
+   }
+  },
+  "gift2.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\gift2\\v0.bgf"
+   }
+  },
+  "gift3.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\gift3\\v0.bgf"
+   }
+  },
+  "gift4.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\gift4\\v0.bgf"
+   }
+  },
+  "gingermen.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\gingermen\\v0.bgf"
+   }
+  },
+  "goldhyhead.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\goldhyhead\\v0.bgf"
+   }
+  },
+  "grnhyhead.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\grnhyhead\\v0.bgf"
+   }
+  },
+  "hamslices.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\hamslices\\v0.bgf"
+   }
+  },
+  "icescale.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\icescale\\v0.bgf"
+   }
+  },
+  "indianhat.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\indianhat\\v0.bgf"
+   }
+  },
+  "key1.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\key1\\v0.bgf"
+   }
+  },
+  "key3.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\key3\\v0.bgf"
+   }
+  },
+  "key4.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\key4\\v0.bgf"
+   }
+  },
+  "key5.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\key5\\v0.bgf"
+   }
+  },
+  "key6.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "011",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "011",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\011\\key6\\v0.bgf"
+   }
+  },
+  "key7.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\key7\\v0.bgf"
+   }
+  },
+  "khelm.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "legionhelm.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\legionhelm\\v0.bgf"
+   }
+  },
+  "lightsw.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\lightsw\\v0.bgf"
+   }
+  },
+  "lootboxes.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\lootboxes\\v0.bgf"
+   }
+  },
+  "lunchbox.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\lunchbox\\v0.bgf"
+   }
+  },
+  "mashtaters.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\mashtaters\\v0.bgf"
+   }
+  },
+  "masterwand.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\masterwand\\v0.bgf"
+   }
+  },
+  "maul.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\maul\\v0.bgf"
+   }
+  },
+  "mmcarnose.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\mmcarnose\\v0.bgf"
+   }
+  },
+  "mmdrat.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\mmdrat\\v0.bgf"
+   }
+  },
+  "mmforest.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "mmhornskull.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "mmrednose.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "neruaxe.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "nerushld.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "oats.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "onion.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "012",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "012",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\012\\onion\\v0.bgf"
+   }
+  },
+  "orange.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "pear.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "pecanslice.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "013",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "013",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\013\\pecanslice\\v0.bgf"
+   }
+  },
+  "pilgrimhat.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "plaguemaskm.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "platinum.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "playerquiver.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "potatoes.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "prism1.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "pumpkinmaskm.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "pumpslice.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "qorcite.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "qormashelma.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "rawchicken.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "rawsteak.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "redhyhead.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "ricehat.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "rose.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "scale.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "souls.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "spirsword.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "squidc.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "squids.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "squidt.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "steakmeal.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "stuffing.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "telofruit.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "thocircl.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "tikitrib.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "tomato.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "twnblad.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "tyranthorns.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "venom.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "wand.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "warhelm.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "watermelon.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "watermelonslice.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "whelm.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "wizardhat.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  },
+  "wolfmask.bgf": {
+   "status": "pending",
+   "attempts": 0,
+   "notes": [],
+   "history": []
+  }
+ }
+}
