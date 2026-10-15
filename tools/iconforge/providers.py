@@ -44,8 +44,12 @@ def _png(img: Image.Image) -> bytes:
     return buf.getvalue()
 
 
+# Cloudflare (in front of RunPod's proxy) answers Python's default User-Agent with error 1010.
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) iconforge/1.0"
+
+
 def _request(url, data=None, headers=None, method=None, timeout=TIMEOUT) -> bytes:
-    req = urllib.request.Request(url, data=data, headers=headers or {}, method=method)
+    req = urllib.request.Request(url, data=data, headers={"User-Agent": USER_AGENT, **(headers or {})}, method=method)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return r.read()
@@ -176,8 +180,8 @@ def reference_sheet(refs: list, size: int = 1024) -> Image.Image:
 
 def qwen(images, text, model, opts):
     """Qwen-Image-Edit in ComfyUI (QWEN_COMFY_URL, e.g. a RunPod pod). image1 is the icon, image2 the
-    style references as one sheet. opts: steps (30), cfg (4), shift (3.1), seed, lora, lora_strength (1.0),
-    text_encoder, vae."""
+    style references as one sheet. opts: steps (30), cfg (4), shift (3.1), seed, lora and lora_strength
+    (comma-separated lists), text_encoder, vae. forge.QWEN_DEFAULTS adds the 8-step Lightning LoRA."""
     base = _comfy_url("QWEN_COMFY_URL")
     icon = _comfy_upload(base, images[0])
     seed = int(opts.get("seed", int(time.time()) % 2**31))
@@ -208,10 +212,18 @@ def qwen(images, text, model, opts):
         graph["8"] = {"class_type": "LoadImage", "inputs": {"image": sheet}}
         graph["9"]["inputs"]["image2"] = ["8", 0]
         graph["10"]["inputs"]["image2"] = ["8", 0]
-    if opts.get("lora"):
-        graph["15"] = {"class_type": "LoraLoaderModelOnly", "inputs": {"model": ["1", 0], "lora_name": opts["lora"],
-                                                                       "strength_model": float(opts.get("lora_strength", 1.0))}}
-        graph["4"]["inputs"]["model"] = ["15", 0]
+    # LoRAs chain between the model loader and the sampling setup: "lora" and "lora_strength" take
+    # comma-separated lists, e.g. lora=qwen-edit-2511-lightning-8step.safetensors,qwen-pixel-art.safetensors
+    loras = [x.strip() for x in str(opts.get("lora", "")).split(",") if x.strip()]
+    strengths = [float(x) for x in str(opts.get("lora_strength", "")).split(",") if x.strip()]
+    prev = ["1", 0]
+    for i, name in enumerate(loras):
+        node = str(20 + i)
+        graph[node] = {"class_type": "LoraLoaderModelOnly",
+                       "inputs": {"model": prev, "lora_name": name,
+                                  "strength_model": strengths[i] if i < len(strengths) else 1.0}}
+        prev = [node, 0]
+    graph["4"]["inputs"]["model"] = prev
     return _comfy_run(base, graph, {"seed": seed})
 
 

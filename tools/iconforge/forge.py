@@ -61,6 +61,9 @@ BASE_PROMPT = ("Redraw the item in the first image as a game inventory icon. Kee
                "item: same object, shape, silhouette, proportions, colours and orientation.")
 # The local img2img model (providers.comfy): SDXL base + Pixel Art XL, the LoRA's recommended strength.
 COMFY_DEFAULTS = {"lora": "pixel-art-xl.safetensors", "lora_strength": "1.2", "denoise": "0.6"}
+# Qwen-Image-Edit (providers.qwen) with the 8-step Lightning LoRA: 8 steps at cfg 1 instead of 30 at cfg 4,
+# about 10x faster. --opt lora=... replaces the whole list, so keep Lightning in it when adding another.
+QWEN_DEFAULTS = {"lora": "qwen-edit-2511-lightning-8step.safetensors", "lora_strength": "1", "steps": "8", "cfg": "1"}
 # providers.qwen sends the references as one sheet, the second image
 QWEN_REF_PROMPT = ("The second image is a sheet of original item sprites from the game: match their style exactly, "
                    "not their subjects. Output only the one redrawn item.")
@@ -240,6 +243,8 @@ def cmd_batch(a):
                     prov = providers.split(s)[0]
                     if prov == "comfy":
                         o = {**COMFY_DEFAULTS, **o}
+                    if prov == "qwen":
+                        o = {**QWEN_DEFAULTS, **o}
                     if prov in ("comfy", "qwen"):
                         o = {**o, "seed": int(digest(n, fi, v)[:8], 16)}
                     jobs.append((n, fi, s, v, src, texts[s], o))
