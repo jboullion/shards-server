@@ -1,5 +1,5 @@
 {
- "next_batch": 17,
+ "next_batch": 19,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -1959,6 +1959,307 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\016\\wolfmask\\v0.bgf"
+   }
+  },
+  "iappraise.bgf": {
+   "status": "installed",
+   "attempts": 2,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "reject"
+    },
+    {
+     "batch": "018",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iappraise.bgf",
+   "chosen": {
+    "batch": "018",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\018\\iappraise\\v0.bgf"
+   }
+  },
+  "icebolt.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iiceshrd.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\iiceshrd\\v0.bgf"
+   }
+  },
+  "ideathrift.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ideathrift.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\ideathrift\\v0.bgf"
+   }
+  },
+  "ifirestorm.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ifirestorm.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\ifirestorm\\v0.bgf"
+   }
+  },
+  "iholybl.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iholybl.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\iholybl\\v0.bgf"
+   }
+  },
+  "iicenova.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iicenova.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\iicenova\\v0.bgf"
+   }
+  },
+  "imanashld.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "imanashld.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\imanashld\\v0.bgf"
+   }
+  },
+  "imargrace.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "imargrace.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\imargrace\\v0.bgf"
+   }
+  },
+  "iphase.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iphase.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\iphase\\v0.bgf"
+   }
+  },
+  "irift.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "irift.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\irift\\v0.bgf"
+   }
+  },
+  "ispectate.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ispectate.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\ispectate\\v0.bgf"
+   }
+  },
+  "ispirsword.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ispirsword.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\ispirsword\\v0.bgf"
+   }
+  },
+  "iunholyt.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iunholyt.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\iunholyt\\v0.bgf"
+   }
+  },
+  "iwallice.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "017",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "iwallice.bgf",
+   "chosen": {
+    "batch": "017",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\017\\iwallice\\v0.bgf"
    }
   }
  }

@@ -95,6 +95,8 @@ def run() -> dict:
     for root in reversed(SERVED):  # earlier roots win
         served_idx.update(_index(root, recursive=root == REPO / "resource"))
     classic_idx = _index(CLASSIC, False)
+    for k, v in shards.items():  # icons that only exist as our own art (e.g. iiceshrd.bgf)
+        served_idx.setdefault(k, v)
 
     previous = {}
     inv_path = DATA / "inventory.json"

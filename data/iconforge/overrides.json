@@ -1,19 +1,40 @@
 {
  "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it).",
- "icebolt.bgf": {"mode": "generate", "output": "iiceshrd.bgf",
-                 "describe": "a single jagged shard of pale blue ice flying diagonally upward, with a short frosty trail"},
- "iicenova.bgf": {"mode": "generate",
-                  "describe": "a burst of sharp ice crystals exploding outward from a bright blue-white centre, a frost nova"},
- "iholybl.bgf": {"mode": "generate",
-                 "describe": "an open hand raised in blessing, engulfed in a blaze of golden-white holy fire"},
- "irift.bgf": {"mode": "generate",
-               "describe": "a dark swirling purple-black rift torn open in the air like a doorway, with a faint glow at its edges"},
- "ispectate.bgf": {"mode": "generate",
-                   "describe": "a pale translucent ghostly figure of a person fading out of the world"},
- "ispirsword.bgf": {"mode": "generate",
-                    "describe": "a glowing spectral sword made of white-gold light, pointing upward, with a soft halo"},
- "iunholyt.bgf": {"mode": "generate",
-                  "describe": "a dark clawed hand wreathed in sickly green and black unholy energy"},
- "iwallice.bgf": {"mode": "generate",
-                  "describe": "a row of tall jagged ice spikes rising from the ground, forming a wall of ice"}
+ "icebolt.bgf": {
+  "mode": "generate",
+  "output": "iiceshrd.bgf",
+  "describe": "a single jagged shard of pale blue ice flying diagonally upward, with a short frosty trail"
+ },
+ "iicenova.bgf": {
+  "mode": "generate",
+  "describe": "a burst of sharp ice crystals exploding outward from a bright blue-white centre, a frost nova"
+ },
+ "iholybl.bgf": {
+  "mode": "generate",
+  "describe": "an open hand raised in blessing, engulfed in a blaze of golden-white holy fire"
+ },
+ "irift.bgf": {
+  "mode": "generate",
+  "describe": "a dark swirling purple-black rift torn open in the air like a doorway, with a faint glow at its edges"
+ },
+ "ispectate.bgf": {
+  "mode": "generate",
+  "describe": "a pale translucent ghostly figure of a person fading out of the world"
+ },
+ "ispirsword.bgf": {
+  "mode": "generate",
+  "describe": "a glowing spectral sword made of white-gold light, pointing upward, with a soft halo"
+ },
+ "iunholyt.bgf": {
+  "mode": "generate",
+  "describe": "a dark clawed hand wreathed in sickly green and black unholy energy"
+ },
+ "iwallice.bgf": {
+  "mode": "generate",
+  "describe": "a row of tall jagged ice spikes rising from the ground, forming a wall of ice"
+ },
+ "iappraise.bgf": {
+  "mode": "generate",
+  "describe": "a pair of golden merchant's balance scales, gleaming gold with two hanging pans"
+ }
 }

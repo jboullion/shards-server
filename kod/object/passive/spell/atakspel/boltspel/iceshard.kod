@@ -16,8 +16,10 @@ constants:
 resources:
 
    Iceshard_name_rsc = "ice shard"
+   // icebolt.bgf is the projectile; the spell's own icon is iiceshrd.bgf
+   // (resource/graphics/shards, from tools/iconforge).
    Iceshard_icon_rsc = icebolt.bgf
-   Iceshard_look_icon = icebolt.bgf
+   Iceshard_look_icon = iiceshrd.bgf
    Iceshard_desc_rsc = \
       "Sends a ice shard at the target.  "
       "Requires two blue mushrooms and orc teeth to cast."

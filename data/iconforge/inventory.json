@@ -5,7 +5,7 @@
   "fanart": 76,
   "missing": 1
  },
- "selected": 112,
+ "selected": 111,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -6118,7 +6118,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iappraise.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 1,
    "groups": 2,
@@ -6471,25 +6471,6 @@
    "selected": false
   },
   {
-   "name": "icebolt.bgf",
-   "kind": "spell",
-   "status": "check",
-   "classes": [
-    "Iceshard"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\icebolt.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 10,
-   "bitmaps": 3,
-   "groups": 1,
-   "size": [
-    256,
-    96
-   ],
-   "selected": true
-  },
-  {
    "name": "icivilty.bgf",
    "kind": "spell",
    "status": "original",
@@ -6746,7 +6727,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ideathrift.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 2,
    "groups": 2,
@@ -7186,7 +7167,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ifirestorm.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 2,
    "groups": 2,
@@ -7439,7 +7420,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iholybl.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 2,
    "groups": 2,
@@ -7573,7 +7554,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iicenova.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 2,
    "groups": 2,
@@ -7582,6 +7563,25 @@
     64
    ],
    "selected": true
+  },
+  {
+   "name": "iiceshrd.bgf",
+   "kind": "spell",
+   "status": "check",
+   "classes": [
+    "Iceshard"
+   ],
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\iiceshrd.bgf",
+   "in_classic": false,
+   "restyled": true,
+   "shrink": 1,
+   "bitmaps": 2,
+   "groups": 2,
+   "size": [
+    64,
+    64
+   ],
+   "selected": false
   },
   {
    "name": "iicyfing.bgf",
@@ -7859,7 +7859,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\imanashld.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 1,
    "groups": 2,
@@ -7878,7 +7878,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\imargrace.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 2,
    "groups": 2,
@@ -8091,7 +8091,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iphase.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 2,
    "groups": 2,
@@ -8490,7 +8490,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\irift.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 2,
    "groups": 2,
@@ -8778,7 +8778,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ispectate.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 2,
    "groups": 2,
@@ -8816,7 +8816,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ispirsword.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 2,
    "groups": 2,
@@ -9025,7 +9025,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iunholyt.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 2,
    "groups": 2,
@@ -9120,7 +9120,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iwallice.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 1,
    "bitmaps": 2,
    "groups": 2,
