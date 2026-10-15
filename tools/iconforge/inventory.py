@@ -30,7 +30,9 @@ REPO = Path(__file__).resolve().parents[2]
 # the spell/skill lists, the cast bar and (for enchantments) the status bar.
 KINDS = {"item": REPO / "kod" / "object" / "item",
          "spell": REPO / "kod" / "object" / "passive" / "spell",
-         "skill": REPO / "kod" / "object" / "passive" / "skill"}
+         "skill": REPO / "kod" / "object" / "passive" / "skill",
+         # monsters and NPCs: the live sprite (vrIcon) and the corpse (vrDead_icon)
+         "monster": REPO / "kod" / "object" / "active" / "holder" / "nomoveon" / "battler" / "monster"}
 DATA = REPO / "data" / "iconforge"
 BUILD = REPO / "build" / "iconforge"
 
@@ -45,7 +47,7 @@ HIGHRES_SHRINK = 15
 HIGHRES_SIDE = 300
 
 RSC_RE = re.compile(r"^\s*(\w+)\s*=\s*([\w\-]+\.bgf)\b", re.M | re.I)
-ICON_RE = re.compile(r"^\s*(vrIcon\w*)\s*=\s*(\w+)", re.M)
+ICON_RE = re.compile(r"^\s*(vrIcon\w*|vrDead_icon\w*)\s*=\s*(\w+)", re.M)
 CLASS_RE = re.compile(r"^(\w+)\s+is\s+\w+", re.M)
 
 

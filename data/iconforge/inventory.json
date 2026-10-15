@@ -1,8 +1,8 @@
 {
  "counts": {
-  "original": 375,
-  "check": 44,
-  "fanart": 76,
+  "original": 549,
+  "check": 80,
+  "fanart": 198,
   "missing": 1
  },
  "selected": 111,
@@ -472,9 +472,10 @@
   },
   {
    "name": "bta.bgf",
-   "kind": "item",
+   "kind": "item/monster",
    "status": "original",
    "classes": [
+    "Human",
     "ShirtBase",
     "Tanktop"
    ],
@@ -511,9 +512,10 @@
   },
   {
    "name": "btb.bgf",
-   "kind": "item",
+   "kind": "item/monster",
    "status": "original",
    "classes": [
+    "Human",
     "ShirtBase",
     "Tanktop"
    ],
@@ -628,10 +630,12 @@
   },
   {
    "name": "btg.bgf",
-   "kind": "item",
+   "kind": "item/monster",
    "status": "original",
    "classes": [
-    "LeatherArmor"
+    "EvilTwin",
+    "LeatherArmor",
+    "Reflection"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\btg.bgf",
    "in_classic": true,
@@ -647,10 +651,11 @@
   },
   {
    "name": "bth.bgf",
-   "kind": "item",
+   "kind": "item/monster",
    "status": "original",
    "classes": [
-    "LeatherArmor"
+    "LeatherArmor",
+    "ladypheonix"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bth.bgf",
    "in_classic": true,
@@ -3279,9 +3284,11 @@
   },
   {
    "name": "orcpitbx.bgf",
-   "kind": "item",
+   "kind": "item/monster",
    "status": "original",
    "classes": [
+    "OrcPitBoss",
+    "OrcPitBossBody",
     "OrcPitBossHead"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orcpitbX.bgf",
@@ -4050,9 +4057,10 @@
   },
   {
    "name": "rat.bgf",
-   "kind": "item",
+   "kind": "item/monster",
    "status": "original",
    "classes": [
+    "GiantRat",
     "Token"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\rat.bgf",
@@ -5997,9 +6005,11 @@
   },
   {
    "name": "cow.bgf",
-   "kind": "spell",
+   "kind": "spell/monster",
    "status": "original",
    "classes": [
+    "Cow",
+    "Guard",
     "SummonCow"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cow.bgf",
@@ -9645,6 +9655,6361 @@
    "size": [
     64,
     64
+   ],
+   "selected": false
+  },
+  {
+   "name": "amoeba.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Mimic",
+    "NapalmSlime",
+    "Slime"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\amoeba.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 18,
+   "groups": 5,
+   "size": [
+    98,
+    45
+   ],
+   "selected": false
+  },
+  {
+   "name": "amoebax.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "EvilTwin",
+    "GiantEye",
+    "Mimic",
+    "Reflection",
+    "Slime"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\amoebaX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    97,
+    14
+   ],
+   "selected": false
+  },
+  {
+   "name": "angel.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "DarkAngel"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\angel.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 36,
+   "groups": 6,
+   "size": [
+    271,
+    159
+   ],
+   "selected": false
+  },
+  {
+   "name": "angelx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "DarkAngel"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\angelx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    196,
+    50
+   ],
+   "selected": false
+  },
+  {
+   "name": "ant.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Ant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ant.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 18,
+   "groups": 10,
+   "size": [
+    142,
+    90
+   ],
+   "selected": false
+  },
+  {
+   "name": "antr.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "RedAnt"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\antr.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 18,
+   "groups": 10,
+   "size": [
+    139,
+    90
+   ],
+   "selected": false
+  },
+  {
+   "name": "antrx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "RedAnt"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\antrX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    109,
+    68
+   ],
+   "selected": false
+  },
+  {
+   "name": "antx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Ant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\antX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    110,
+    68
+   ],
+   "selected": false
+  },
+  {
+   "name": "assassin.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Assassin"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\assassin.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    214,
+    369
+   ],
+   "selected": false
+  },
+  {
+   "name": "avchief.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "AvarChieftain"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\avchief.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 96,
+   "groups": 16,
+   "size": [
+    237,
+    208
+   ],
+   "selected": false
+  },
+  {
+   "name": "avchiefx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "AvarChieftain"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\avchiefx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    281,
+    85
+   ],
+   "selected": false
+  },
+  {
+   "name": "avsham.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "AvarShaman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\avsham.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 96,
+   "groups": 16,
+   "size": [
+    267,
+    178
+   ],
+   "selected": false
+  },
+  {
+   "name": "avshamx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "AvarShaman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\avshamx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    231,
+    64
+   ],
+   "selected": false
+  },
+  {
+   "name": "avwar.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Avar"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\avwar.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    309,
+    186
+   ],
+   "selected": false
+  },
+  {
+   "name": "avwarx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Avar"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\avwarx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    231,
+    52
+   ],
+   "selected": false
+  },
+  {
+   "name": "banker.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\banker.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 6,
+   "groups": 1,
+   "size": [
+    100,
+    172
+   ],
+   "selected": false
+  },
+  {
+   "name": "basicinn.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BasicInnKeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\basicinn.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    158,
+    390
+   ],
+   "selected": false
+  },
+  {
+   "name": "bentu.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "RazaVaultman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bentu.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    177,
+    300
+   ],
+   "selected": false
+  },
+  {
+   "name": "bergbankerm.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BergBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bergbankerm.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    149,
+    378
+   ],
+   "selected": false
+  },
+  {
+   "name": "berggrocer.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BergVaultman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\berggrocer.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    286,
+    387
+   ],
+   "selected": false
+  },
+  {
+   "name": "berginnk.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BergInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\berginnk.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    269,
+    432
+   ],
+   "selected": false
+  },
+  {
+   "name": "bergleader.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BergLeaderM"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bergleader.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    222,
+    410
+   ],
+   "selected": false
+  },
+  {
+   "name": "bergmerch.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BergMerchant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bergmerch.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    196,
+    376
+   ],
+   "selected": false
+  },
+  {
+   "name": "bergsmith.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BergBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bergsmith.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    168,
+    372
+   ],
+   "selected": false
+  },
+  {
+   "name": "bigslime.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BigSlime"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bigslime.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 30,
+   "groups": 5,
+   "size": [
+    500,
+    311
+   ],
+   "selected": false
+  },
+  {
+   "name": "bigslime2.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BigSlime",
+    "BigSlimeSplit"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bigslime2.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 9,
+   "bitmaps": 30,
+   "groups": 5,
+   "size": [
+    500,
+    311
+   ],
+   "selected": false
+  },
+  {
+   "name": "bigslime2x.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BigSlime",
+    "BigSlimeSplit"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bigslime2X.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 9,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    363,
+    196
+   ],
+   "selected": false
+  },
+  {
+   "name": "blank.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Iceperson"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\blank.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    1,
+    1
+   ],
+   "selected": false
+  },
+  {
+   "name": "blckdrag.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BlackDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\blckdrag.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 176,
+   "groups": 22,
+   "size": [
+    1920,
+    1080
+   ],
+   "selected": false
+  },
+  {
+   "name": "blckdragx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BlackDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\blckdragX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 40,
+   "groups": 5,
+   "size": [
+    1920,
+    1080
+   ],
+   "selected": false
+  },
+  {
+   "name": "blueeyes.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BlueEyesWhiteDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\blueeyes.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 48,
+   "groups": 6,
+   "size": [
+    400,
+    400
+   ],
+   "selected": false
+  },
+  {
+   "name": "blueeyesx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BlueEyesWhiteDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\blueeyesX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    400,
+    400
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqapoth.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueApothecary"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqapoth.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    244,
+    436
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqbart.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueBartender"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqbart.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    168,
+    372
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqclerk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueClerk"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqclerk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    196,
+    376
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqinnk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqinnk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    168,
+    367
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqmerch.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueMerchant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqmerch.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    222,
+    403
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqsmith.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueBlacksmith",
+    "RazaBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqsmith.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    206,
+    411
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqtailor.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Barloquetailor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqtailor.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    143,
+    367
+   ],
+   "selected": false
+  },
+  {
+   "name": "bqvaultm.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueVaultman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bqvaultm.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    286,
+    387
+   ],
+   "selected": false
+  },
+  {
+   "name": "bsmith.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "TosBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bsmith.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 6,
+   "groups": 1,
+   "size": [
+    75,
+    213
+   ],
+   "selected": false
+  },
+  {
+   "name": "bullant.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BullAnt"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bullant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 18,
+   "groups": 10,
+   "size": [
+    452,
+    140
+   ],
+   "selected": false
+  },
+  {
+   "name": "bullantx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "BullAnt"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bullantX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    291,
+    107
+   ],
+   "selected": false
+  },
+  {
+   "name": "bunny2.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Bunny"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunny2.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 18,
+   "bitmaps": 30,
+   "groups": 5,
+   "size": [
+    362,
+    523
+   ],
+   "selected": false
+  },
+  {
+   "name": "bunny2x.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Bunny"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunny2X.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 17,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    391,
+    142
+   ],
+   "selected": false
+  },
+  {
+   "name": "bunnyg.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "EasterBunny"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnyg.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 30,
+   "groups": 5,
+   "size": [
+    362,
+    523
+   ],
+   "selected": false
+  },
+  {
+   "name": "bunnygrey.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "KillerBunny"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygrey.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 14,
+   "bitmaps": 30,
+   "groups": 5,
+   "size": [
+    362,
+    523
+   ],
+   "selected": false
+  },
+  {
+   "name": "bunnygreyx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "KillerBunny"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygreyx.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 15,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    391,
+    142
+   ],
+   "selected": false
+  },
+  {
+   "name": "bunnygx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "EasterBunny"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygx.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    391,
+    142
+   ],
+   "selected": false
+  },
+  {
+   "name": "captain.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BoatCaptain"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\captain.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 15,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    600,
+    853
+   ],
+   "selected": false
+  },
+  {
+   "name": "celegorm.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Celegorm"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\celegorm.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    136,
+    306
+   ],
+   "selected": false
+  },
+  {
+   "name": "centip.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Centipede"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\centip.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 72,
+   "groups": 12,
+   "size": [
+    359,
+    209
+   ],
+   "selected": false
+  },
+  {
+   "name": "centipx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Centipede"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\centipX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    239,
+    65
+   ],
+   "selected": false
+  },
+  {
+   "name": "chimera.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Chimera"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\chimera.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    400,
+    322
+   ],
+   "selected": false
+  },
+  {
+   "name": "chimerax.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Chimera"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\chimeraX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    364,
+    227
+   ],
+   "selected": false
+  },
+  {
+   "name": "chupa.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Chupacabra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\chupa.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 9,
+   "bitmaps": 96,
+   "groups": 12,
+   "size": [
+    400,
+    309
+   ],
+   "selected": false
+  },
+  {
+   "name": "chupax.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Chupacabra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\chupaX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 15,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    834,
+    228
+   ],
+   "selected": false
+  },
+  {
+   "name": "cknight.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "CaptainKnight"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\Cknight.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 80,
+   "groups": 10,
+   "size": [
+    650,
+    650
+   ],
+   "selected": false
+  },
+  {
+   "name": "cknightx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "CaptainKnight"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\CknightX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 17,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    1080,
+    1041
+   ],
+   "selected": false
+  },
+  {
+   "name": "cngrocer.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CornothGrocer",
+    "JasperVaultman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cngrocer.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    212,
+    378
+   ],
+   "selected": false
+  },
+  {
+   "name": "cninnk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CorNothInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cninnk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    199,
+    366
+   ],
+   "selected": false
+  },
+  {
+   "name": "cnmuseumguard.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "CorNothMuseumGuard"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cnmuseumguard.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    230,
+    410
+   ],
+   "selected": false
+  },
+  {
+   "name": "cnsarge.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CorNothSergeant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cnsarge.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    162,
+    339
+   ],
+   "selected": false
+  },
+  {
+   "name": "cntailor.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CorNothTailor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cntailor.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    176,
+    294
+   ],
+   "selected": false
+  },
+  {
+   "name": "cowx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Cow"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cowX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    46,
+    32
+   ],
+   "selected": false
+  },
+  {
+   "name": "croco.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Croco"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\croco.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 88,
+   "groups": 11,
+   "size": [
+    444,
+    448
+   ],
+   "selected": false
+  },
+  {
+   "name": "crocox.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Croco"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\crocoX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    422,
+    264
+   ],
+   "selected": false
+  },
+  {
+   "name": "crusher.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "CrusherSprout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\crusher.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 48,
+   "groups": 6,
+   "size": [
+    386,
+    334
+   ],
+   "selected": false
+  },
+  {
+   "name": "crusherx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "CrusherSprout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\crusherX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    336,
+    154
+   ],
+   "selected": false
+  },
+  {
+   "name": "cyclops.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Cyclops"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cyclops.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 72,
+   "groups": 9,
+   "size": [
+    390,
+    363
+   ],
+   "selected": false
+  },
+  {
+   "name": "cyclopsx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Cyclops"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cyclopsX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    296,
+    172
+   ],
+   "selected": false
+  },
+  {
+   "name": "darkbeas.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "NarthylWorm"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\darkbeas.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 48,
+   "groups": 8,
+   "size": [
+    357,
+    199
+   ],
+   "selected": false
+  },
+  {
+   "name": "dflo.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DragonFlyQueen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dflo.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 54,
+   "groups": 9,
+   "size": [
+    117,
+    101
+   ],
+   "selected": false
+  },
+  {
+   "name": "dflox.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DragonFlyQueen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dfloX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    159,
+    47
+   ],
+   "selected": false
+  },
+  {
+   "name": "dfly.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DragonFly"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dfly.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 54,
+   "groups": 9,
+   "size": [
+    117,
+    101
+   ],
+   "selected": false
+  },
+  {
+   "name": "dflypet.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DragonFlyPet"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dflypet.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 54,
+   "groups": 9,
+   "size": [
+    102,
+    102
+   ],
+   "selected": false
+  },
+  {
+   "name": "dflypetx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DragonFlyPet"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dflypetx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    108,
+    58
+   ],
+   "selected": false
+  },
+  {
+   "name": "dflyx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DragonFly"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dflyX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    159,
+    47
+   ],
+   "selected": false
+  },
+  {
+   "name": "dirtpile.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "WaspHive"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dirtpile.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    419,
+    80
+   ],
+   "selected": false
+  },
+  {
+   "name": "dkbx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "NarthylWorm"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dkbx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    138,
+    90
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmitea.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteTank"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmitea.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    400,
+    383
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmiteax.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteTank"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmiteaX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    344,
+    148
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmiteb.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteSoldier"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmiteb.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    400,
+    383
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmitebx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteSoldier"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmitebX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    344,
+    148
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmitec.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteMage"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmitec.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    400,
+    383
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmitecx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteMage"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmitecX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    344,
+    148
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmited.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteScout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmited.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    400,
+    383
+   ],
+   "selected": false
+  },
+  {
+   "name": "dthmitedx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathMiteScout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dthmitedX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    344,
+    148
+   ],
+   "selected": false
+  },
+  {
+   "name": "duke.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Kailor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\duke.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    179,
+    369
+   ],
+   "selected": false
+  },
+  {
+   "name": "dukegard.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DukeGuard"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dukegard.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    230,
+    405
+   ],
+   "selected": false
+  },
+  {
+   "name": "dukeneph.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DukeLiege"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dukeneph.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    153,
+    385
+   ],
+   "selected": false
+  },
+  {
+   "name": "dulahan.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Dulahan"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dulahan.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    298,
+    400
+   ],
+   "selected": false
+  },
+  {
+   "name": "dulahanx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Dulahan"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\dulahanX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    400,
+    149
+   ],
+   "selected": false
+  },
+  {
+   "name": "duskrat.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "DuskRat"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\duskrat.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    225,
+    89
+   ],
+   "selected": false
+  },
+  {
+   "name": "earthdrag.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "EarthDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\earthdrag.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 152,
+   "groups": 20,
+   "size": [
+    960,
+    540
+   ],
+   "selected": false
+  },
+  {
+   "name": "earthdragx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "EarthDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\earthdragX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    832,
+    275
+   ],
+   "selected": false
+  },
+  {
+   "name": "earthele.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "EarthElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\earthele.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 36,
+   "groups": 7,
+   "size": [
+    444,
+    381
+   ],
+   "selected": false
+  },
+  {
+   "name": "earthelex.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "EarthElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\eartheleX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    394,
+    190
+   ],
+   "selected": false
+  },
+  {
+   "name": "elephant.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Elephant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\elephant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 144,
+   "groups": 18,
+   "size": [
+    483,
+    301
+   ],
+   "selected": false
+  },
+  {
+   "name": "elephantx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Elephant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\elephantX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    400,
+    166
+   ],
+   "selected": false
+  },
+  {
+   "name": "faerie-e.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "EvilFairy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\faerie-e.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 48,
+   "groups": 8,
+   "size": [
+    133,
+    100
+   ],
+   "selected": false
+  },
+  {
+   "name": "faerie-g.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Decorator",
+    "Fairy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\faerie-g.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 48,
+   "groups": 8,
+   "size": [
+    133,
+    100
+   ],
+   "selected": false
+  },
+  {
+   "name": "faeriexe.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "EvilFairy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\faerieXe.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    116,
+    35
+   ],
+   "selected": false
+  },
+  {
+   "name": "faeriexg.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Fairy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\faerieXg.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    116,
+    35
+   ],
+   "selected": false
+  },
+  {
+   "name": "fallenmonk.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "FallenMonk"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fallenmonk.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 56,
+   "groups": 7,
+   "size": [
+    322,
+    287
+   ],
+   "selected": false
+  },
+  {
+   "name": "fallenmonkx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "FallenMonk"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fallenmonkX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    184,
+    127
+   ],
+   "selected": false
+  },
+  {
+   "name": "farnprst.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "FarenPriestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\farnprst.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    234,
+    344
+   ],
+   "selected": false
+  },
+  {
+   "name": "fieleme.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Elemental",
+    "FireElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fieleme.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 36,
+   "groups": 7,
+   "size": [
+    444,
+    381
+   ],
+   "selected": false
+  },
+  {
+   "name": "fielemex.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Elemental",
+    "FireElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fielemeX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    394,
+    190
+   ],
+   "selected": false
+  },
+  {
+   "name": "fivecon.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "FiveCouncilor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fivecon.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    195,
+    394
+   ],
+   "selected": false
+  },
+  {
+   "name": "followerofqor.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "FollowerOfQor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\followerofqor.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    390,
+    295
+   ],
+   "selected": false
+  },
+  {
+   "name": "followerofqorx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "FollowerOfQor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\followerofqorX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    400,
+    400
+   ],
+   "selected": false
+  },
+  {
+   "name": "fortuna.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Fortuna"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fortuna.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 27,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    844,
+    1500
+   ],
+   "selected": false
+  },
+  {
+   "name": "fourcon.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "fourCouncilor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fourcon.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    198,
+    379
+   ],
+   "selected": false
+  },
+  {
+   "name": "frenzy.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "FrenzySprout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\frenzy.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 32,
+   "groups": 4,
+   "size": [
+    576,
+    352
+   ],
+   "selected": false
+  },
+  {
+   "name": "frenzyx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "FrenzySprout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\frenzyX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    364,
+    136
+   ],
+   "selected": false
+  },
+  {
+   "name": "frogman.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Frogman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\frogman.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 34,
+   "groups": 9,
+   "size": [
+    146,
+    134
+   ],
+   "selected": false
+  },
+  {
+   "name": "frogmanx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Frogman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\frogmanX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    104,
+    32
+   ],
+   "selected": false
+  },
+  {
+   "name": "fungbst.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "FungusBeast"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fungbst.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 78,
+   "groups": 13,
+   "size": [
+    141,
+    95
+   ],
+   "selected": false
+  },
+  {
+   "name": "fungx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "FungusBeast"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\fungX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    61
+   ],
+   "selected": false
+  },
+  {
+   "name": "gamos.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "RazaBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gamos.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    173,
+    430
+   ],
+   "selected": false
+  },
+  {
+   "name": "gbeetle.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Beetle"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gbeetle.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 18,
+   "groups": 10,
+   "size": [
+    414,
+    148
+   ],
+   "selected": false
+  },
+  {
+   "name": "gbeetlex.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Beetle"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gbeetleX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    297,
+    136
+   ],
+   "selected": false
+  },
+  {
+   "name": "gcreator.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GuildCreator"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gcreator.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    156,
+    381
+   ],
+   "selected": false
+  },
+  {
+   "name": "ghost.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Ghost"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ghost.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 12,
+   "groups": 2,
+   "size": [
+    192,
+    216
+   ],
+   "selected": false
+  },
+  {
+   "name": "ghostx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Ghost"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ghostX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 2,
+   "groups": 2,
+   "size": [
+    192,
+    216
+   ],
+   "selected": false
+  },
+  {
+   "name": "gianteye.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantEye"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gianteye.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 6,
+   "groups": 1,
+   "size": [
+    238,
+    238
+   ],
+   "selected": false
+  },
+  {
+   "name": "goadx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Goad"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\goadx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    369,
+    450
+   ],
+   "selected": false
+  },
+  {
+   "name": "grandpatrent.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GrandpaTrent"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\grandpatrent.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 48,
+   "groups": 6,
+   "size": [
+    962,
+    805
+   ],
+   "selected": false
+  },
+  {
+   "name": "grandpatrentx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GrandpaTrent"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\grandpatrentX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    536,
+    340
+   ],
+   "selected": false
+  },
+  {
+   "name": "gskelbody.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantDaemonSkeleton"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gskelbody.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 78,
+   "groups": 13,
+   "size": [
+    239,
+    181
+   ],
+   "selected": false
+  },
+  {
+   "name": "gskelx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantDaemonSkeleton"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\gskelX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    116,
+    55
+   ],
+   "selected": false
+  },
+  {
+   "name": "hellwasp.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "HellWasp"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hellwasp.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 80,
+   "groups": 10,
+   "size": [
+    800,
+    626
+   ],
+   "selected": false
+  },
+  {
+   "name": "hellwaspx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "HellWasp"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hellwaspX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    784,
+    233
+   ],
+   "selected": false
+  },
+  {
+   "name": "hermit.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Council"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hermit.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    137,
+    112
+   ],
+   "selected": false
+  },
+  {
+   "name": "hknight.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "HalfKnight"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\Hknight.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 11,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    648,
+    624
+   ],
+   "selected": false
+  },
+  {
+   "name": "hknightx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "HalfKnight"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\HknightX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 11,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    648,
+    624
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydrab.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BlackHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydrab.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 56,
+   "groups": 7,
+   "size": [
+    1080,
+    634
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydrabx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BlackHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydrabX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    526,
+    345
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydrag.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GreenHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydrag.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 56,
+   "groups": 7,
+   "size": [
+    1080,
+    634
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydragx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GreenHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydragX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    526,
+    345
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydrar.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "RedHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydrar.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 56,
+   "groups": 7,
+   "size": [
+    1080,
+    634
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydrarx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "RedHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydrarX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    526,
+    345
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydray.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GoldHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydray.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 56,
+   "groups": 7,
+   "size": [
+    1080,
+    634
+   ],
+   "selected": false
+  },
+  {
+   "name": "hydrayx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GoldHydra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\hydrayX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    526,
+    345
+   ],
+   "selected": false
+  },
+  {
+   "name": "icedrag.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "IceDragon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\icedrag.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 48,
+   "groups": 8,
+   "size": [
+    800,
+    477
+   ],
+   "selected": false
+  },
+  {
+   "name": "iceleme.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "IceElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iceleme.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 36,
+   "groups": 7,
+   "size": [
+    444,
+    381
+   ],
+   "selected": false
+  },
+  {
+   "name": "icelemex.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "IceElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\icelemeX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    394,
+    190
+   ],
+   "selected": false
+  },
+  {
+   "name": "icepert.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Iceperson"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iceperT.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 8,
+   "groups": 3,
+   "size": [
+    40,
+    51
+   ],
+   "selected": false
+  },
+  {
+   "name": "jalaprst.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "JalaPriestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jalaprst.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    179,
+    382
+   ],
+   "selected": false
+  },
+  {
+   "name": "jixadyem.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "JixaDyeM"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jixadyem.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    115,
+    365
+   ],
+   "selected": false
+  },
+  {
+   "name": "jixainnk.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "JixaInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jixainnk.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    156,
+    381
+   ],
+   "selected": false
+  },
+  {
+   "name": "jixasmith.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "JixaBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jixasmith.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    199,
+    355
+   ],
+   "selected": false
+  },
+  {
+   "name": "jsbanker.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JasperBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jsbanker.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    149,
+    310
+   ],
+   "selected": false
+  },
+  {
+   "name": "jsbart.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JasperBartender"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jsbart.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    165,
+    360
+   ],
+   "selected": false
+  },
+  {
+   "name": "jselder.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JasperElder"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jselder.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    211,
+    308
+   ],
+   "selected": false
+  },
+  {
+   "name": "jsinnk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JasperInnKeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jsinnk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    137,
+    352
+   ],
+   "selected": false
+  },
+  {
+   "name": "jsmerch.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JasperMerchant",
+    "RazaInnKeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jsmerch.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    104,
+    365
+   ],
+   "selected": false
+  },
+  {
+   "name": "jssmith.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JasperBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\jssmith.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    160,
+    418
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcapoth.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanApothecary"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcapoth.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    219,
+    380
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcbanker.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcbanker.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    183,
+    396
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcbart.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanBartender"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcbart.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    172,
+    360
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcbonepr.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanBonePriestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcbonepr.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    261,
+    407
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcbowmak.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanBowMaker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcbowmak.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    173,
+    193
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcguarde.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanCaptainEvil"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcguardE.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    192,
+    417
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcguardg.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanCaptainGood"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcguardG.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    199,
+    406
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcinnk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcinnk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    169,
+    417
+   ],
+   "selected": false
+  },
+  {
+   "name": "kclangua.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanLanguageMaster"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kclangua.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    147,
+    378
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcmadsci.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanMadScientist"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcmadsci.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    165,
+    374
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcmerch.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "kocatanTradeMaster"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcmerch.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 8,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    269,
+    432
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcrjgirl.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "RiijaMonk"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcrjgirl.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    116,
+    275
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcrjmonk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "RiijaMonk"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcrjmonk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    208,
+    255
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcsentry.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanSentry"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcsentry.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    279,
+    422
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcshopk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanShopkeeper",
+    "RazaApothecary"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcshopk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    157,
+    365
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcsmith.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcsmith.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    174,
+    388
+   ],
+   "selected": false
+  },
+  {
+   "name": "kctailor.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanTailor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kctailor.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    152,
+    382
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcvault.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanVaultman"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcvault.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    166,
+    392
+   ],
+   "selected": false
+  },
+  {
+   "name": "kcweapon.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KocatanWeaponsMaster"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kcweapon.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    166,
+    401
+   ],
+   "selected": false
+  },
+  {
+   "name": "knight.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "KnightA"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\Knight.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 8,
+   "bitmaps": 80,
+   "groups": 10,
+   "size": [
+    631,
+    620
+   ],
+   "selected": false
+  },
+  {
+   "name": "knightx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "KnightA"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\KnightX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 11,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    546,
+    240
+   ],
+   "selected": false
+  },
+  {
+   "name": "kranprst.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "KraananPriestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kranprst.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    204,
+    382
+   ],
+   "selected": false
+  },
+  {
+   "name": "kriipa.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Kriipa"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kriipa.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 120,
+   "groups": 20,
+   "size": [
+    325,
+    223
+   ],
+   "selected": false
+  },
+  {
+   "name": "kriipax.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Kriipa"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\kriipax.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    217,
+    50
+   ],
+   "selected": false
+  },
+  {
+   "name": "licha.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Lich"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\licha.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 54,
+   "groups": 9,
+   "size": [
+    171,
+    222
+   ],
+   "selected": false
+  },
+  {
+   "name": "lichax.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DeadLich"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lichax.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    127,
+    26
+   ],
+   "selected": false
+  },
+  {
+   "name": "lichb.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Lich"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lichb.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 54,
+   "groups": 9,
+   "size": [
+    171,
+    222
+   ],
+   "selected": false
+  },
+  {
+   "name": "lichbx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DeadLich",
+    "Lich"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lichbx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    127,
+    26
+   ],
+   "selected": false
+  },
+  {
+   "name": "lootmaster.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "QuarterMaster"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lootmaster.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 12,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    495,
+    717
+   ],
+   "selected": false
+  },
+  {
+   "name": "lupking.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "LupoggKing"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lupking.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 114,
+   "groups": 21,
+   "size": [
+    167,
+    151
+   ],
+   "selected": false
+  },
+  {
+   "name": "lupkingx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "LupoggKing"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lupkingx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    165,
+    80
+   ],
+   "selected": false
+  },
+  {
+   "name": "lupogg.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Lupogg"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lupogg.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 48,
+   "groups": 8,
+   "size": [
+    172,
+    172
+   ],
+   "selected": false
+  },
+  {
+   "name": "lupoggx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Lupogg"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lupoggx.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    154,
+    87
+   ],
+   "selected": false
+  },
+  {
+   "name": "minotaurb.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Minotaur",
+    "MinotaurBerserker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\minotaurb.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    340,
+    400
+   ],
+   "selected": false
+  },
+  {
+   "name": "minotaurbx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Minotaur",
+    "MinotaurBerserker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\minotaurbX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    344,
+    262
+   ],
+   "selected": false
+  },
+  {
+   "name": "mollusk.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "MolluskMonster"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mollusk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 114,
+   "groups": 19,
+   "size": [
+    219,
+    157
+   ],
+   "selected": false
+  },
+  {
+   "name": "molx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "MolluskMonster"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\molX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    159,
+    85
+   ],
+   "selected": false
+  },
+  {
+   "name": "mrbart.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "MarionBartender"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mrbart.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    233,
+    378
+   ],
+   "selected": false
+  },
+  {
+   "name": "mrelder.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "MarionElder",
+    "RazaElder"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mrelder.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    214,
+    331
+   ],
+   "selected": false
+  },
+  {
+   "name": "mrhealer.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "MarionHealer"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mrhealer.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    112,
+    378
+   ],
+   "selected": false
+  },
+  {
+   "name": "mrinnk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "MarionInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mrinnk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    134,
+    340
+   ],
+   "selected": false
+  },
+  {
+   "name": "mrsmith.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "MarionBlacksmith"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mrsmith.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    150,
+    352
+   ],
+   "selected": false
+  },
+  {
+   "name": "mummy.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Mummy",
+    "SpectralMummy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mummy.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 54,
+   "groups": 9,
+   "size": [
+    200,
+    150
+   ],
+   "selected": false
+  },
+  {
+   "name": "mummyx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Mummy",
+    "SpectralMummy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mummyX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    164,
+    42
+   ],
+   "selected": false
+  },
+  {
+   "name": "necroeffigy.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "NecromancerEffigy"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\necroeffigy.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    400,
+    400
+   ],
+   "selected": false
+  },
+  {
+   "name": "neeleme.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "NeruElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\neeleme.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 36,
+   "groups": 7,
+   "size": [
+    444,
+    381
+   ],
+   "selected": false
+  },
+  {
+   "name": "neelemex.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "NeruElemental"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\neelemeX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    394,
+    190
+   ],
+   "selected": false
+  },
+  {
+   "name": "nnm01.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "HunterGhost"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\nnm01.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    139,
+    383
+   ],
+   "selected": false
+  },
+  {
+   "name": "nyrphling.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Nyrphling"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\nyrphling.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 264,
+   "groups": 33,
+   "size": [
+    305,
+    171
+   ],
+   "selected": false
+  },
+  {
+   "name": "nyrphlingx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Nyrphling"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\nyrphlingX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    384,
+    116
+   ],
+   "selected": false
+  },
+  {
+   "name": "ogre.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Ogre"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ogre.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 88,
+   "groups": 11,
+   "size": [
+    452,
+    648
+   ],
+   "selected": false
+  },
+  {
+   "name": "ogrex.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Ogre"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ogreX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    1152,
+    648
+   ],
+   "selected": false
+  },
+  {
+   "name": "onecon.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "OneCouncilor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\onecon.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    137,
+    423
+   ],
+   "selected": false
+  },
+  {
+   "name": "orc.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Orc"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orc.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    237,
+    198
+   ],
+   "selected": false
+  },
+  {
+   "name": "orccave.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CaveOrc"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orccave.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    235,
+    187
+   ],
+   "selected": false
+  },
+  {
+   "name": "orccavex.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CaveOrc"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orccaveX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    189,
+    55
+   ],
+   "selected": false
+  },
+  {
+   "name": "orcpitb.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "OrcPitBoss"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orcpitb.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 72,
+   "groups": 12,
+   "size": [
+    207,
+    190
+   ],
+   "selected": false
+  },
+  {
+   "name": "orcwiza.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "OrcWizard"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orcwiza.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 114,
+   "groups": 19,
+   "size": [
+    277,
+    221
+   ],
+   "selected": false
+  },
+  {
+   "name": "orcwizax.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "OrcWizard"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orcwizaX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    199,
+    55
+   ],
+   "selected": false
+  },
+  {
+   "name": "orcx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Orc"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orcX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    249,
+    89
+   ],
+   "selected": false
+  },
+  {
+   "name": "priestes.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Priestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\priestes.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 24,
+   "groups": 4,
+   "size": [
+    153,
+    249
+   ],
+   "selected": false
+  },
+  {
+   "name": "princess.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "PrincessLiege"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\princess.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    147,
+    372
+   ],
+   "selected": false
+  },
+  {
+   "name": "pringard.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "PrincessGuard"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\pringard.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    234,
+    418
+   ],
+   "selected": false
+  },
+  {
+   "name": "qorprst.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "QorPriestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\qorprst.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    316,
+    409
+   ],
+   "selected": false
+  },
+  {
+   "name": "qroq.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "CeresofQor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\qroq.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    152,
+    390
+   ],
+   "selected": false
+  },
+  {
+   "name": "qw01i.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Amerantha",
+    "DesertInnkeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\qw01i.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 8,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    185,
+    402
+   ],
+   "selected": false
+  },
+  {
+   "name": "qw04i.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Joline"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\qw04i.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    222,
+    371
+   ],
+   "selected": false
+  },
+  {
+   "name": "qw05i.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Beelzebub"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\qw05i.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    168,
+    408
+   ],
+   "selected": false
+  },
+  {
+   "name": "qw06i.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DeathBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\qw06i.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    308,
+    634
+   ],
+   "selected": false
+  },
+  {
+   "name": "ranu.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Ranuculus"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ranu.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 18,
+   "groups": 10,
+   "size": [
+    228,
+    228
+   ],
+   "selected": false
+  },
+  {
+   "name": "ranux.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Ranuculus"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ranuX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    194,
+    171
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratking.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantRatKing"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratking.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    225,
+    89
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratkingx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantRatKing"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratkingX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    41
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratsm.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "SmallRat"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratsm.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    225,
+    89
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratsmx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "SmallRat"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratsmX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    41
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratsold.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantRatSoldier"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratsold.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    225,
+    89
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratsoldx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GiantRatSoldier"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratsoldX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    41
+   ],
+   "selected": false
+  },
+  {
+   "name": "ratx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DuskRat",
+    "GiantRat"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    41
+   ],
+   "selected": false
+  },
+  {
+   "name": "reavera.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "StoneReaver"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\reavera.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 80,
+   "groups": 10,
+   "size": [
+    398,
+    284
+   ],
+   "selected": false
+  },
+  {
+   "name": "reaverax.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "StoneReaver"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\reaveraX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    210,
+    125
+   ],
+   "selected": false
+  },
+  {
+   "name": "reaverb.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "IceReaver"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\reaverb.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 80,
+   "groups": 10,
+   "size": [
+    398,
+    284
+   ],
+   "selected": false
+  },
+  {
+   "name": "reaverbx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "IceReaver"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\reaverbX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    210,
+    125
+   ],
+   "selected": false
+  },
+  {
+   "name": "reaverc.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "ObsidianReaver"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\reaverc.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 80,
+   "groups": 10,
+   "size": [
+    398,
+    284
+   ],
+   "selected": false
+  },
+  {
+   "name": "reavercx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "ObsidianReaver"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\reavercX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    210,
+    125
+   ],
+   "selected": false
+  },
+  {
+   "name": "res0001a.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Thrasher"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\res0001a.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 72,
+   "groups": 9,
+   "size": [
+    235,
+    355
+   ],
+   "selected": false
+  },
+  {
+   "name": "res0001b.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Thrasher"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\res0001b.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    318,
+    79
+   ],
+   "selected": false
+  },
+  {
+   "name": "res0003a.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Ent",
+    "EvilEnt"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\res0003a.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 32,
+   "groups": 4,
+   "size": [
+    316,
+    458
+   ],
+   "selected": false
+  },
+  {
+   "name": "res0003d.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Ent",
+    "EvilEnt"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\res0003d.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    330,
+    192
+   ],
+   "selected": false
+  },
+  {
+   "name": "scorp.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Scorpion"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\scorp.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 36,
+   "groups": 6,
+   "size": [
+    99,
+    90
+   ],
+   "selected": false
+  },
+  {
+   "name": "scorpx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Scorpion"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\scorpX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    89,
+    67
+   ],
+   "selected": false
+  },
+  {
+   "name": "seekera.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GreySeeker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\seekera.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    360,
+    487
+   ],
+   "selected": false
+  },
+  {
+   "name": "seekerax.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GreySeeker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\seekeraX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    284,
+    162
+   ],
+   "selected": false
+  },
+  {
+   "name": "seekerb.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "GreenSeeker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\seekerb.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    360,
+    487
+   ],
+   "selected": false
+  },
+  {
+   "name": "seekerbx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "GreenSeeker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\seekerbX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    284,
+    162
+   ],
+   "selected": false
+  },
+  {
+   "name": "seekerc.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "BrownSeeker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\seekerc.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    360,
+    487
+   ],
+   "selected": false
+  },
+  {
+   "name": "seekercx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "BrownSeeker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\seekercX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    284,
+    162
+   ],
+   "selected": false
+  },
+  {
+   "name": "shadow.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Shadowbeast"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\shadow.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 72,
+   "groups": 12,
+   "size": [
+    192,
+    173
+   ],
+   "selected": false
+  },
+  {
+   "name": "shadowx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Shadowbeast"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\shadowX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    161,
+    52
+   ],
+   "selected": false
+  },
+  {
+   "name": "shalprst.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "ShalillePriestess"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\shalprst.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    180,
+    364
+   ],
+   "selected": false
+  },
+  {
+   "name": "skelbody.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BatteredSkeleton",
+    "DaemonSkeleton",
+    "HeadlessSkeleton",
+    "Skeleton",
+    "TuskedSkeleton"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\skelbody.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 78,
+   "groups": 13,
+   "size": [
+    239,
+    181
+   ],
+   "selected": false
+  },
+  {
+   "name": "skelx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BatteredSkeleton",
+    "DaemonSkeleton",
+    "HeadlessSkeleton",
+    "Skeleton",
+    "TuskedSkeleton"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\skelX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    116,
+    55
+   ],
+   "selected": false
+  },
+  {
+   "name": "snake.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Snake"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\snake.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    114,
+    91
+   ],
+   "selected": false
+  },
+  {
+   "name": "snakex.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Snake"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\snakeX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    42
+   ],
+   "selected": false
+  },
+  {
+   "name": "spdrby.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "SpiderBaby"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spdrby.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    205,
+    95
+   ],
+   "selected": false
+  },
+  {
+   "name": "spdrbyx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "SpiderBaby"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spdrbyX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    102,
+    62
+   ],
+   "selected": false
+  },
+  {
+   "name": "spdrqu.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "SpiderQueen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spdrqu.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    302,
+    92
+   ],
+   "selected": false
+  },
+  {
+   "name": "spdrqux.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "SpiderQueen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spdrquX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    128,
+    83
+   ],
+   "selected": false
+  },
+  {
+   "name": "spider.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Spider"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spider.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    259,
+    128
+   ],
+   "selected": false
+  },
+  {
+   "name": "spiderx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Spider"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spiderX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    128,
+    91
+   ],
+   "selected": false
+  },
+  {
+   "name": "spidmagc.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DeathSpider"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spidmagc.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 72,
+   "groups": 12,
+   "size": [
+    353,
+    186
+   ],
+   "selected": false
+  },
+  {
+   "name": "spidmagx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DeathSpider"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spidmagX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    258,
+    102
+   ],
+   "selected": false
+  },
+  {
+   "name": "spinebeast.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Spinebeast"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spinebeast.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 208,
+   "groups": 26,
+   "size": [
+    372,
+    268
+   ],
+   "selected": false
+  },
+  {
+   "name": "spinebeastbehemoth.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "SpinebeastBoss"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spinebeastbehemoth.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 208,
+   "groups": 26,
+   "size": [
+    372,
+    268
+   ],
+   "selected": false
+  },
+  {
+   "name": "spinebeastbehemothx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "SpinebeastBoss"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spinebeastbehemothX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    223,
+    195
+   ],
+   "selected": false
+  },
+  {
+   "name": "spinebeastsmall.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "SpinebeastSmall"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spinebeastsmall.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 208,
+   "groups": 26,
+   "size": [
+    372,
+    268
+   ],
+   "selected": false
+  },
+  {
+   "name": "spinebeastsmallx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "SpinebeastSmall"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spinebeastsmallX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    223,
+    195
+   ],
+   "selected": false
+  },
+  {
+   "name": "spinebeastx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Spinebeast"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spinebeastX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    223,
+    195
+   ],
+   "selected": false
+  },
+  {
+   "name": "spitter.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "SpitterSprout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spitter.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 48,
+   "groups": 6,
+   "size": [
+    392,
+    299
+   ],
+   "selected": false
+  },
+  {
+   "name": "spitterx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "SpitterSprout"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spitterX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    228,
+    121
+   ],
+   "selected": false
+  },
+  {
+   "name": "srat.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "SnowRat"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\srat.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 66,
+   "groups": 11,
+   "size": [
+    215,
+    92
+   ],
+   "selected": false
+  },
+  {
+   "name": "sratx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "SnowRat"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\sratX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    89,
+    41
+   ],
+   "selected": false
+  },
+  {
+   "name": "test1.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GraphicTester"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\test1.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 5,
+   "groups": 6,
+   "size": [
+    100,
+    75
+   ],
+   "selected": false
+  },
+  {
+   "name": "test2.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GraphicTester"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\test2.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 5,
+   "groups": 6,
+   "size": [
+    200,
+    150
+   ],
+   "selected": false
+  },
+  {
+   "name": "test3.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GraphicTester"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\test3.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 5,
+   "groups": 6,
+   "size": [
+    267,
+    200
+   ],
+   "selected": false
+  },
+  {
+   "name": "test4.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GraphicTester"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\test4.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 5,
+   "groups": 6,
+   "size": [
+    333,
+    250
+   ],
+   "selected": false
+  },
+  {
+   "name": "thieft.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Thief"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\thiefT.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    36,
+    88
+   ],
+   "selected": false
+  },
+  {
+   "name": "threecon.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "ThreeCouncilor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\threecon.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    227,
+    391
+   ],
+   "selected": false
+  },
+  {
+   "name": "treant2.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "SwampTree"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\treant2.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    281,
+    306
+   ],
+   "selected": false
+  },
+  {
+   "name": "troll.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "StoneTroll",
+    "Troll"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\troll.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 36,
+   "groups": 7,
+   "size": [
+    176,
+    138
+   ],
+   "selected": false
+  },
+  {
+   "name": "trollx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "StoneTroll",
+    "Troll"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\trollX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    118,
+    47
+   ],
+   "selected": false
+  },
+  {
+   "name": "tsapoth.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "TosApothecary"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tsapoth.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    116,
+    406
+   ],
+   "selected": false
+  },
+  {
+   "name": "tsbanker.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "TosBanker"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tsbanker.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    126,
+    406
+   ],
+   "selected": false
+  },
+  {
+   "name": "tsdeatharenawatcher.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "DeathArenaWatcher"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tsdeatharenawatcher.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    205,
+    420
+   ],
+   "selected": false
+  },
+  {
+   "name": "tsinnk.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "RazaBartender",
+    "TosInnKeeper"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tsinnk.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    156,
+    383
+   ],
+   "selected": false
+  },
+  {
+   "name": "tswatch.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "TosWatcher"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tswatch.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    220,
+    432
+   ],
+   "selected": false
+  },
+  {
+   "name": "twocon.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "TwoCouncilor"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\twocon.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    278,
+    357
+   ],
+   "selected": false
+  },
+  {
+   "name": "tyrant.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Tyrant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tyrant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    384,
+    268
+   ],
+   "selected": false
+  },
+  {
+   "name": "tyrantx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Tyrant"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tyrantX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    376,
+    190
+   ],
+   "selected": false
+  },
+  {
+   "name": "urchin.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueUrchin",
+    "CorNothUrchin",
+    "JasperUrchin",
+    "MarionUrchin",
+    "TosUrchin"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\urchin.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 24,
+   "groups": 4,
+   "size": [
+    53,
+    90
+   ],
+   "selected": false
+  },
+  {
+   "name": "urchinx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "BarloqueUrchin",
+    "CorNothUrchin",
+    "JasperUrchin",
+    "MarionUrchin",
+    "TosUrchin"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\urchinX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    59,
+    16
+   ],
+   "selected": false
+  },
+  {
+   "name": "vajra.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Vajra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\vajra.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 88,
+   "groups": 11,
+   "size": [
+    302,
+    398
+   ],
+   "selected": false
+  },
+  {
+   "name": "vajrax.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Vajra"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\vajraX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    378,
+    147
+   ],
+   "selected": false
+  },
+  {
+   "name": "veydran.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Veydran"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\Veydran.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 11,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    358,
+    638
+   ],
+   "selected": false
+  },
+  {
+   "name": "vozun.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Vozun"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\vozun.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 88,
+   "groups": 11,
+   "size": [
+    444,
+    448
+   ],
+   "selected": false
+  },
+  {
+   "name": "vozunx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Vozun"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\vozunX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    422,
+    264
+   ],
+   "selected": false
+  },
+  {
+   "name": "wasphive.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "WaspHive"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wasphive.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    359,
+    306
+   ],
+   "selected": false
+  },
+  {
+   "name": "watchersurvival.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "SurvivalWatcher"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\watchersurvival.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    220,
+    432
+   ],
+   "selected": false
+  },
+  {
+   "name": "wendigo.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Wendigo"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wendigo.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 208,
+   "groups": 26,
+   "size": [
+    503,
+    426
+   ],
+   "selected": false
+  },
+  {
+   "name": "wendigox.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "Wendigo"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wendigoX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    299,
+    181
+   ],
+   "selected": false
+  },
+  {
+   "name": "wndarkwi.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "DarkWizard"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wndarkwi.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    249,
+    401
+   ],
+   "selected": false
+  },
+  {
+   "name": "wngenera.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "JealousGeneral",
+    "RebelLiege"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wngenera.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    139,
+    389
+   ],
+   "selected": false
+  },
+  {
+   "name": "wnheret2.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Heretic"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wnheret2.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 4,
+   "groups": 8,
+   "size": [
+    152,
+    320
+   ],
+   "selected": false
+  },
+  {
+   "name": "wnhereti.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Heretic"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wnhereti.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 4,
+   "groups": 8,
+   "size": [
+    148,
+    320
+   ],
+   "selected": false
+  },
+  {
+   "name": "wnizzio.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Izzio"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wnizzio.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    299,
+    314
+   ],
+   "selected": false
+  },
+  {
+   "name": "wnminstr.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Minstrel"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wnminstr.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    159,
+    353
+   ],
+   "selected": false
+  },
+  {
+   "name": "wolf.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Wolf"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wolf.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 14,
+   "bitmaps": 136,
+   "groups": 18,
+   "size": [
+    704,
+    446
+   ],
+   "selected": false
+  },
+  {
+   "name": "wolfx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Wolf"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wolfX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 12,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    487,
+    153
+   ],
+   "selected": false
+  },
+  {
+   "name": "worml.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GroundWormQueen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wormL.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 61,
+   "groups": 14,
+   "size": [
+    307,
+    213
+   ],
+   "selected": false
+  },
+  {
+   "name": "wormlx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GroundWormQueen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wormLX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    273,
+    73
+   ],
+   "selected": false
+  },
+  {
+   "name": "wormm.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GroundWorm"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wormM.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 61,
+   "groups": 14,
+   "size": [
+    429,
+    213
+   ],
+   "selected": false
+  },
+  {
+   "name": "wormmx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GroundWorm"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wormMX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    211,
+    61
+   ],
+   "selected": false
+  },
+  {
+   "name": "worms.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GroundWormLarva"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wormS.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 49,
+   "groups": 12,
+   "size": [
+    367,
+    213
+   ],
+   "selected": false
+  },
+  {
+   "name": "wormsx.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "GroundWormLarva"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wormSX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    147,
+    37
+   ],
+   "selected": false
+  },
+  {
+   "name": "wothorns.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Brambles"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wothorns.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 4,
+   "bitmaps": 5,
+   "groups": 5,
+   "size": [
+    290,
+    146
+   ],
+   "selected": false
+  },
+  {
+   "name": "xeo.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Xeochicatl"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\xeo.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 60,
+   "groups": 10,
+   "size": [
+    315,
+    186
+   ],
+   "selected": false
+  },
+  {
+   "name": "xeoneru.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "XeoNeru"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\xeoneru.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 60,
+   "groups": 10,
+   "size": [
+    315,
+    186
+   ],
+   "selected": false
+  },
+  {
+   "name": "xeonerux.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "XeoNeru"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\xeoneruX.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    255,
+    93
+   ],
+   "selected": false
+  },
+  {
+   "name": "xeox.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Xeochicatl"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\xeoX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    255,
+    93
+   ],
+   "selected": false
+  },
+  {
+   "name": "yeti.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Yeti"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\yeti.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 36,
+   "groups": 6,
+   "size": [
+    193,
+    160
+   ],
+   "selected": false
+  },
+  {
+   "name": "yetix.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Yeti"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\yetiX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    156,
+    43
+   ],
+   "selected": false
+  },
+  {
+   "name": "zimmucas.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "Zimmucas"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\zimmucas.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 11,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    288,
+    595
+   ],
+   "selected": false
+  },
+  {
+   "name": "zombie.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Revenant",
+    "Revenantb",
+    "Zombie"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\zombie.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 18,
+   "groups": 3,
+   "size": [
+    118,
+    176
+   ],
+   "selected": false
+  },
+  {
+   "name": "zombiex.bgf",
+   "kind": "monster",
+   "status": "original",
+   "classes": [
+    "Zombie"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\zombieX.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    118,
+    41
    ],
    "selected": false
   }
