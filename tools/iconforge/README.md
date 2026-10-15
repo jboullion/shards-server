@@ -58,6 +58,7 @@ Needs Python 3.12+ with Pillow and numpy. Everything else is the standard librar
 |---|---|---|
 | `echo` | no model: the original goes straight to pixelize. Free; use it to try the loop. | none |
 | `comfy[@checkpoint]` | local SDXL img2img in ComfyUI at 127.0.0.1:8188. Options: `--opt denoise=0.55 --opt lora=<file> --opt lora_strength=0.9 --opt steps=28 --opt cfg=6`. No style references (img2img sees only the icon). | ComfyUI running; a pixel-art LoRA helps a lot |
+| `qwen[@model]` | Qwen-Image-Edit (2511, 8-bit) in a ComfyUI with a big GPU, e.g. a RunPod 5090 pod. Gets the icon plus the style references as one sheet. Options: `--opt steps=30 --opt cfg=4 --opt lora=qwen-pixel-art.safetensors`. | `QWEN_COMFY_URL` (in `.env` or the environment), e.g. `https://<pod-id>-8188.proxy.runpod.net`; the pod needs the model, its text encoder and VAE in `models/` |
 | `openai[@model]` | GPT Image edits with the style references. | `OPENAI_API_KEY` in the repo-root `.env` |
 | `fal[@model]` | any fal.ai edit model (Flux Kontext, Qwen-Image-Edit). | `FAL_AI_API_KEY` in `.env` |
 

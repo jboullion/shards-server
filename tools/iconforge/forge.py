@@ -61,6 +61,9 @@ BASE_PROMPT = ("Redraw the item in the first image as a game inventory icon. Kee
                "item: same object, shape, silhouette, proportions, colours and orientation.")
 # The local img2img model (providers.comfy): SDXL base + Pixel Art XL, the LoRA's recommended strength.
 COMFY_DEFAULTS = {"lora": "pixel-art-xl.safetensors", "lora_strength": "1.2", "denoise": "0.6"}
+# providers.qwen sends the references as one sheet, the second image
+QWEN_REF_PROMPT = ("The second image is a sheet of original item sprites from the game: match their style exactly, "
+                   "not their subjects. Output only the one redrawn item.")
 REF_PROMPT = "The other images are original item sprites from the game: match their style exactly, not their subjects."
 
 
@@ -140,7 +143,7 @@ def prompt_for(notes: list, provider: str = "openai", item: str = "") -> str:
         text = " ".join(block.group(1).split()).replace("{item}", item)
         return text + (", " + ", ".join(n.rstrip(".") for n in notes) if notes else "")
     style, _ = style_text()
-    parts = [BASE_PROMPT, REF_PROMPT]
+    parts = [BASE_PROMPT, QWEN_REF_PROMPT if provider == "qwen" else REF_PROMPT]
     if notes:
         parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
     parts.append(style)
@@ -234,8 +237,11 @@ def cmd_batch(a):
             for s in specs:
                 for v in range(a.variants):
                     o = dict(opts)
-                    if providers.split(s)[0] == "comfy":
-                        o = {**COMFY_DEFAULTS, **o, "seed": int(digest(n, fi, v)[:8], 16)}
+                    prov = providers.split(s)[0]
+                    if prov == "comfy":
+                        o = {**COMFY_DEFAULTS, **o}
+                    if prov in ("comfy", "qwen"):
+                        o = {**o, "seed": int(digest(n, fi, v)[:8], 16)}
                     jobs.append((n, fi, s, v, src, texts[s], o))
 
     results, failures = {}, []
