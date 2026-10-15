@@ -181,8 +181,9 @@ def reference_sheet(refs: list, size: int = 1024) -> Image.Image:
 def qwen(images, text, model, opts):
     """Qwen-Image-Edit in ComfyUI (QWEN_COMFY_URL, e.g. a RunPod pod). image1 is the icon, image2 the
     style references as one sheet. opts: steps (30), cfg (4), shift (3.1), seed, lora and lora_strength
-    (comma-separated lists), text_encoder, vae. forge.QWEN_DEFAULTS adds the 8-step Lightning LoRA."""
+    (comma-separated lists), prefix (put before the prompt: a LoRA's trigger), text_encoder, vae. forge.QWEN_DEFAULTS adds the 8-step Lightning LoRA."""
     base = _comfy_url("QWEN_COMFY_URL")
+    text = opts.get("prefix", "") + text  # e.g. a LoRA's trigger words ("Pixel Art, ")
     icon = _comfy_upload(base, images[0])
     seed = int(opts.get("seed", int(time.time()) % 2**31))
     graph = {

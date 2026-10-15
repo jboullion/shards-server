@@ -17,7 +17,8 @@ batch options:
     --outline                    add a 1-px dark outline around each sprite
     --frames inventory           only send the inventory picture to the model (cheap bake-offs);
                                  ground/worn frames are pixelized from the original
-    --opt denoise=0.5 --opt lora=pixel.safetensors   provider options (comfy)
+    --opt qwen:lora=a,b --opt qwen:prefix="Pixel Art, "   provider options; "provider:" scopes one
+                                 to that provider (unscoped ones go to all and change their cache keys)
     --workers 4                  parallel model calls
 
 State lives in data/iconforge/ (inventory.json, state.json; commit these). Generated images,
@@ -64,9 +65,13 @@ COMFY_DEFAULTS = {"lora": "pixel-art-xl.safetensors", "lora_strength": "1.2", "d
 # Qwen-Image-Edit (providers.qwen) with the 8-step Lightning LoRA: 8 steps at cfg 1 instead of 30 at cfg 4,
 # about 10x faster. --opt lora=... replaces the whole list, so keep Lightning in it when adding another.
 QWEN_DEFAULTS = {"lora": "qwen-edit-2511-lightning-8step.safetensors", "lora_strength": "1", "steps": "8", "cfg": "1"}
-# providers.qwen sends the references as one sheet, the second image
-QWEN_REF_PROMPT = ("The second image is a sheet of original item sprites from the game: match their style exactly, "
-                   "not their subjects. Output only the one redrawn item.")
+# providers.qwen sends the references as one sheet, the second image. Qwen tends to keep the input's
+# photographic rendering, so its prompt asks for a repaint in the sheet's style rather than a redraw.
+QWEN_PROMPT = ("Repaint the item in the first image as a small hand-painted pixel-art inventory sprite, in exactly "
+               "the style of the item sprites on the sheet in the second image: chunky visible pixels, a limited "
+               "palette with few shades per colour, flat cel shading lit from the top left, a dark outline. Keep "
+               "the same item, shape, silhouette, colours and orientation, but none of its photographic texture "
+               "or smooth 3D shading. Do not copy the subjects of the second image. Output only the one item.")
 REF_PROMPT = "The other images are original item sprites from the game: match their style exactly, not their subjects."
 
 
@@ -146,7 +151,7 @@ def prompt_for(notes: list, provider: str = "openai", item: str = "") -> str:
         text = " ".join(block.group(1).split()).replace("{item}", item)
         return text + (", " + ", ".join(n.rstrip(".") for n in notes) if notes else "")
     style, _ = style_text()
-    parts = [BASE_PROMPT, QWEN_REF_PROMPT if provider == "qwen" else REF_PROMPT]
+    parts = [QWEN_PROMPT] if provider == "qwen" else [BASE_PROMPT, REF_PROMPT]
     if notes:
         parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
     parts.append(style)
@@ -203,7 +208,13 @@ def cmd_batch(a):
     specs = [s.strip() for s in a.provider.split(",") if s.strip()]
     for s in specs:
         providers.split(s)
-    opts = dict(o.split("=", 1) for o in a.opt)
+    # --opt key=value applies to every provider; --opt qwen:key=value only to that one (so a LoRA
+    # setting never changes another provider's requests or their cache keys)
+    opts = {}
+    for o in a.opt:
+        k, v = o.split("=", 1)
+        prov, _, key = k.rpartition(":")
+        opts.setdefault(prov, {})[key] = v
 
     if a.names:
         names = [normalise(n) for n in a.names]
@@ -239,8 +250,8 @@ def cmd_batch(a):
             src = on_canvas(b.bitmaps[fi].rgba(pal))
             for s in specs:
                 for v in range(a.variants):
-                    o = dict(opts)
                     prov = providers.split(s)[0]
+                    o = {**opts.get("", {}), **opts.get(prov, {})}
                     if prov == "comfy":
                         o = {**COMFY_DEFAULTS, **o}
                     if prov == "qwen":

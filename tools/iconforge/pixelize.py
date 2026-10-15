@@ -6,6 +6,7 @@ Step 4: turn a model's output into a game bitmap. Deterministic, no model involv
     crop     to the object
     fit      into the original bitmap's object box, scaled to the new shrink, keeping aspect
     shrink   area-average down to the target size; alpha cut at ALPHA_CUT (BGFs are 1-bit)
+    clean    peel background-coloured fringe off the edge and pull the key's tint out of the rest
     palette  every pixel to its nearest blakston.pal colour, no dithering; index 254 is transparency
     outline  optional 1-px dark edge around the silhouette
 
@@ -34,6 +35,56 @@ def _rgb_to_lab(rgb: np.ndarray) -> np.ndarray:
     return np.stack([116 * f[..., 1] - 16, 500 * (f[..., 0] - f[..., 1]), 200 * (f[..., 1] - f[..., 2])], -1)
 
 
+def background_key(img: Image.Image) -> np.ndarray:
+    """The median colour of the four corners: the flat background the model painted."""
+    rgb = np.asarray(img.convert("RGB")).astype(np.float32)
+    h, w = rgb.shape[:2]
+    k = max(4, min(h, w) // 32)
+    corners = np.concatenate([rgb[:k, :k].reshape(-1, 3), rgb[:k, -k:].reshape(-1, 3),
+                              rgb[-k:, :k].reshape(-1, 3), rgb[-k:, -k:].reshape(-1, 3)])
+    return np.median(corners, axis=0)
+
+
+def clean_edges(rgba: np.ndarray, key, passes: int = 3, near: float = 110.0) -> np.ndarray:
+    """Peel background-coloured fringe off the sprite: up to `passes` times, an opaque pixel that touches
+    transparency and is within `near` of the key colour (or, for a magenta key, has its hue) goes
+    transparent. Edge-only, so a purple item loses at most `passes` pixels of rim. Then any edge pixel left gets the
+    key's hue pulled out (de-spill): models leave magenta halos and tinted shadows around objects."""
+    out = rgba.copy()
+    key = np.asarray(key, np.float32)
+
+    def edge(solid):
+        e = np.zeros_like(solid)
+        e[1:] |= ~solid[:-1]; e[:-1] |= ~solid[1:]; e[:, 1:] |= ~solid[:, :-1]; e[:, :-1] |= ~solid[:, 1:]
+        e[0, :] = e[-1, :] = True; e[:, 0] = e[:, -1] = True
+        return e & solid
+
+    magenta_key = key[0] > key[1] + 60 and key[2] > key[1] + 60
+    for _ in range(passes):
+        solid = out[..., 3] >= ALPHA_CUT
+        rgb = out[..., :3].astype(np.float32)
+        dist = np.sqrt(((rgb - key) ** 2).sum(-1))
+        peel = dist < near
+        if magenta_key:
+            # same hue as the key but darker: the drop shadow a model paints on its magenta floor
+            rg, bg = rgb[..., 0] - rgb[..., 1], rgb[..., 2] - rgb[..., 1]
+            peel |= (rg > 25) & (bg > 25) & (np.abs(rg - bg) < 0.45 * np.maximum(rg, bg))
+        peel &= edge(solid)
+        if not peel.any():
+            break
+        out[peel, 3] = 0
+    # de-spill: for a magenta-ish key (red and blue above green) pull red/blue down toward green on the edge
+    solid = out[..., 3] >= ALPHA_CUT
+    e = edge(solid)
+    if magenta_key:
+        rgb = out[..., :3].astype(np.float32)
+        spill = np.clip(np.minimum(rgb[..., 0], rgb[..., 2]) - rgb[..., 1], 0, None) * 0.5
+        rgb[..., 0] -= np.where(e, spill, 0)
+        rgb[..., 2] -= np.where(e, spill, 0)
+        out[..., :3] = np.clip(rgb, 0, 255).astype(np.uint8)
+    return out
+
+
 def matte(img: Image.Image, key=None, tolerance: float = 60.0) -> Image.Image:
     """RGBA with the background removed. Uses the image's alpha if it has any transparency,
     otherwise keys out `key` (default: the median colour of the four corners)."""
@@ -42,11 +93,7 @@ def matte(img: Image.Image, key=None, tolerance: float = 60.0) -> Image.Image:
         return Image.fromarray(rgba.astype(np.uint8), "RGBA")
     rgb = rgba[..., :3]
     if key is None:
-        h, w = rgb.shape[:2]
-        k = max(4, min(h, w) // 32)
-        corners = np.concatenate([rgb[:k, :k].reshape(-1, 3), rgb[:k, -k:].reshape(-1, 3),
-                                  rgb[-k:, :k].reshape(-1, 3), rgb[-k:, -k:].reshape(-1, 3)])
-        key = np.median(corners, axis=0)
+        key = background_key(img)
     dist = np.sqrt(((rgb - np.asarray(key, np.float32)) ** 2).sum(-1))
     # soft edge between tolerance and 2x tolerance, then de-spill the key colour from the edge
     alpha = np.clip((dist - tolerance) / tolerance, 0, 1)
@@ -93,7 +140,7 @@ def add_outline(idx: np.ndarray, pal: np.ndarray) -> np.ndarray:
 
 
 def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shrink: int, pal: np.ndarray,
-             outline: bool = False, allowed=None, key=None) -> Bitmap:
+             outline: bool = False, allowed=None, key=None, clean: bool = True) -> Bitmap:
     """The generated image as a new Bitmap the same in-game size and placement as `original`.
     key: the background colour to remove; None reads it from the corners (models never paint exact #FF00FF)."""
     k = new_shrink / orig_shrink
@@ -106,6 +153,8 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     bx0, by0 = round(obox[0] * k), round(obox[1] * k)
     bw, bh = max(1, round((obox[2] - obox[0]) * k)), max(1, round((obox[3] - obox[1]) * k))
 
+    if key is None:
+        key = background_key(generated)
     cut = matte(generated, key=key)
     gbox = opaque_box(cut)
     if gbox is None:
@@ -125,6 +174,8 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     x0 = min(max(0, bx0 + (bw - tw) // 2), max(0, W - tw))
     y0 = min(max(0, by0 + (bh - th)), max(0, H - th))  # bottom-aligned, like an object resting in its box
     canvas[y0:y0 + th, x0:x0 + tw] = small[:H - y0, :W - x0]
+    if clean:
+        canvas = clean_edges(canvas, key)
     idx = to_palette(canvas, pal, allowed)
     if outline:
         idx = add_outline(idx, pal)
