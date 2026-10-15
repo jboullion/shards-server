@@ -1,5 +1,5 @@
 {
- "next_batch": 15,
+ "next_batch": 17,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -822,10 +822,24 @@
    }
   },
   "khelm.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\khelm\\v0.bgf"
+   }
   },
   "legionhelm.bgf": {
    "status": "installed",
@@ -1008,40 +1022,124 @@
    }
   },
   "mmforest.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\mmforest\\v0.bgf"
+   }
   },
   "mmhornskull.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\mmhornskull\\v0.bgf"
+   }
   },
   "mmrednose.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\mmrednose\\v0.bgf"
+   }
   },
   "neruaxe.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\neruaxe\\v0.bgf"
+   }
   },
   "nerushld.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\nerushld\\v0.bgf"
+   }
   },
   "oats.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "015",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "015",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\015\\oats\\v0.bgf"
+   }
   },
   "onion.bgf": {
    "status": "installed",
@@ -1064,16 +1162,44 @@
    }
   },
   "orange.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\orange\\v0.bgf"
+   }
   },
   "pear.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\pear\\v0.bgf"
+   }
   },
   "pecanslice.bgf": {
    "status": "installed",
@@ -1096,226 +1222,744 @@
    }
   },
   "pilgrimhat.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\pilgrimhat\\v0.bgf"
+   }
   },
   "plaguemaskm.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\plaguemaskm\\v0.bgf"
+   }
   },
   "platinum.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\platinum\\v0.bgf"
+   }
   },
   "playerquiver.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\playerquiver\\v0.bgf"
+   }
   },
   "potatoes.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\potatoes\\v0.bgf"
+   }
   },
   "prism1.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\prism1\\v0.bgf"
+   }
   },
   "pumpkinmaskm.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\pumpkinmaskm\\v0.bgf"
+   }
   },
   "pumpslice.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\pumpslice\\v0.bgf"
+   }
   },
   "qorcite.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\qorcite\\v0.bgf"
+   }
   },
   "qormashelma.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\qormashelma\\v0.bgf"
+   }
   },
   "rawchicken.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\rawchicken\\v0.bgf"
+   }
   },
   "rawsteak.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\rawsteak\\v0.bgf"
+   }
   },
   "redhyhead.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\redhyhead\\v0.bgf"
+   }
   },
   "ricehat.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\ricehat\\v0.bgf"
+   }
   },
   "rose.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\rose\\v0.bgf"
+   }
   },
   "scale.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\scale\\v0.bgf"
+   }
   },
   "souls.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\souls\\v0.bgf"
+   }
   },
   "spirsword.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\spirsword\\v0.bgf"
+   }
   },
   "squidc.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\squidc\\v0.bgf"
+   }
   },
   "squids.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\squids\\v0.bgf"
+   }
   },
   "squidt.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\squidt\\v0.bgf"
+   }
   },
   "steakmeal.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\steakmeal\\v0.bgf"
+   }
   },
   "stuffing.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\stuffing\\v0.bgf"
+   }
   },
   "telofruit.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\telofruit\\v0.bgf"
+   }
   },
   "thocircl.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\thocircl\\v0.bgf"
+   }
   },
   "tikitrib.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\tikitrib\\v0.bgf"
+   }
   },
   "tomato.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\tomato\\v0.bgf"
+   }
   },
   "twnblad.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\twnblad\\v0.bgf"
+   }
   },
   "tyranthorns.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\tyranthorns\\v0.bgf"
+   }
   },
   "venom.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\venom\\v0.bgf"
+   }
   },
   "wand.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\wand\\v0.bgf"
+   }
   },
   "warhelm.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\warhelm\\v0.bgf"
+   }
   },
   "watermelon.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\watermelon\\v0.bgf"
+   }
   },
   "watermelonslice.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\watermelonslice\\v0.bgf"
+   }
   },
   "whelm.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\whelm\\v0.bgf"
+   }
   },
   "wizardhat.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\wizardhat\\v0.bgf"
+   }
   },
   "wolfmask.bgf": {
-   "status": "pending",
-   "attempts": 0,
+   "status": "installed",
+   "attempts": 1,
    "notes": [],
-   "history": []
+   "history": [
+    {
+     "batch": "016",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "chosen": {
+    "batch": "016",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\016\\wolfmask\\v0.bgf"
+   }
   }
  }
 }
