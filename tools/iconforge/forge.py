@@ -5,6 +5,7 @@ iconforge: restyle the fan-art item icons into sprites that match the original M
     python tools/iconforge/forge.py select carrot onion       #    add icons to the work set (--off removes)
     python tools/iconforge/forge.py batch --provider openai   # 2-5. next 20 icons -> candidates + review page
     python tools/iconforge/forge.py apply decisions-003.json  # 6. record keeps/rejects from the review page
+    python tools/iconforge/forge.py accept 003                #    or keep the whole batch as it is
     python tools/iconforge/forge.py install                   # 7. kept icons -> resource/graphics/shards/
     python tools/iconforge/forge.py status
 
@@ -368,6 +369,18 @@ def cmd_apply(a):
     print("batch %s: %s" % (batch, counts))
 
 
+def cmd_accept(a):
+    """Keep every icon of a batch with its first candidate, as if each were kept on the review page."""
+    manifest = load_json(BUILD / "batches" / a.batch / "manifest.json", None)
+    if manifest is None:
+        raise SystemExit("no manifest for batch %s" % a.batch)
+    path = BUILD / "batches" / a.batch / ("decisions-%s-accepted.json" % a.batch)
+    save_json(path, {"batch": a.batch, "decisions": [{"name": it["name"], "decision": "keep", "variant": 0, "note": ""}
+                                                     for it in manifest["items"] if it["variants"]]})
+    a.decisions = str(path)
+    cmd_apply(a)
+
+
 def cmd_install(a):
     state = load_state()
     INSTALL.mkdir(parents=True, exist_ok=True)
@@ -439,11 +452,13 @@ def main():
                    help="no model calls: build the page from results already generated (e.g. after stopping a batch)")
     p = sub.add_parser("apply")
     p.add_argument("decisions")
+    p = sub.add_parser("accept", help="keep every icon of a batch (first candidate) without reviewing")
+    p.add_argument("batch", help="batch number, e.g. 010")
     sub.add_parser("install")
     p = sub.add_parser("status")
     p.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args()
-    {"inventory": lambda a: inv_mod.run(), "select": cmd_select, "batch": cmd_batch, "apply": cmd_apply,
+    {"inventory": lambda a: inv_mod.run(), "select": cmd_select, "batch": cmd_batch, "apply": cmd_apply, "accept": cmd_accept,
      "install": cmd_install, "status": cmd_status}[a.cmd](a)
 
 
