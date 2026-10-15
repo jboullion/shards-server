@@ -35,6 +35,7 @@ import json
 import re
 import shutil
 import sys
+import threading
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -178,6 +179,11 @@ def digest(*parts) -> str:
     return h.hexdigest()[:24]
 
 
+# Set when a provider says the account is out of credits: queued requests stop instead of all failing.
+STOP = threading.Event()
+OUT_OF_CREDITS = ("insufficient_quota", "credit_balance_exhausted", "billing_hard_limit")
+
+
 def generate(spec, images, text, opts, variant, cached_only=False) -> tuple:
     """A cached model call -> (image, info). cached_only: never call the model."""
     key = digest(spec, variant, text, json.dumps(opts, sort_keys=True), *images)
@@ -186,6 +192,8 @@ def generate(spec, images, text, opts, variant, cached_only=False) -> tuple:
         return Image.open(png).copy(), json.loads(meta.read_text()) if meta.exists() else {}
     if cached_only:
         raise LookupError("not cached")
+    if STOP.is_set():
+        raise LookupError("stopped: out of credits")
     img, info = providers.run(spec, images, text, opts)
     CACHE.mkdir(parents=True, exist_ok=True)
     img.save(png)
@@ -269,13 +277,16 @@ def cmd_batch(a):
             n, fi, s, v = futs[f]
             try:
                 results[(n, fi, s, v)] = f.result()[0]
-            except LookupError:
-                failures.append("%s %s v%d: not generated yet (--cached-only)" % (n, s, v))
+            except LookupError as e:
+                failures.append("%s %s v%d: not generated (%s)" % (n, s, v, e))
             except Exception as e:  # keep the rest of the batch going
+                if any(k in str(e) for k in OUT_OF_CREDITS) and not STOP.is_set():
+                    STOP.set()
+                    print("\n!! the %s account is out of credits: stopping this batch" % s)
                 failures.append("%s frame %d %s v%d: %s" % (n, fi, s, v, e))
             print("  %d/%d" % (i, len(jobs)), end="\r")
     print()
-    for msg in failures:
+    for msg in failures if len(failures) <= 20 else failures[:20] + ["... and %d more" % (len(failures) - 20)]:
         print("!! " + msg)
 
     manifest, review_items, sheet = {"batch": batch, "providers": specs, "items": []}, [], []
