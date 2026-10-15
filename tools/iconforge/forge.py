@@ -45,7 +45,7 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import inventory as inv_mod  # noqa: E402
 import providers  # noqa: E402
-from bgf import BGF, TRANSPARENT, load_palette  # noqa: E402
+from bgf import BGF, TRANSPARENT, Bitmap, load_palette  # noqa: E402
 from pixelize import KEY_COLOR, pixelize  # noqa: E402
 from review import contact_sheet, fit, review_page  # noqa: E402
 
@@ -160,6 +160,63 @@ def prompt_for(notes: list, provider: str = "openai", item: str = "") -> str:
     return " ".join(parts)
 
 
+# ------------------------------------------------------------------------------------- spells
+
+OVERRIDES_FILE = DATA / "overrides.json"
+SPELL_SIZES = (16, 64)  # classic spell icons: a 16x16 frame (group 1) and a 64x64 frame (group 2), shrink 1
+SPELL_RESTYLE = ("Redraw the spell icon in the first image as a classic game spell icon. Keep its subject, "
+                 "composition and colours. The other images are original spell icons from the game: match their "
+                 "style exactly, not their subjects.")
+SPELL_GENERATE = ("Draw a new spell icon for a fantasy RPG spell, showing %s. The images are original spell icons "
+                  "from the game: match their style exactly, but draw this spell's own subject.")
+
+
+def overrides() -> dict:
+    return {k: v for k, v in load_json(OVERRIDES_FILE, {}).items() if not k.startswith("_")}
+
+
+def is_spell(entry: dict) -> bool:
+    return "spell" in entry.get("kind", "item").split("/")
+
+
+def spell_style() -> tuple:
+    text = STYLE.read_text(encoding="utf-8")
+    block = re.search(r"<!-- spell-block -->(.*?)<!-- /spell-block -->", text, re.S)
+    refs = re.search(r"<!-- spell-refs -->(.*?)<!-- /spell-refs -->", text, re.S)
+    style = " ".join(line.strip() for line in block.group(1).strip().splitlines() if line.strip())
+    return style, [line.strip() for line in refs.group(1).splitlines() if line.strip()]
+
+
+def spell_refs(pal) -> list:
+    imgs = []
+    for n in spell_style()[1]:
+        p = inv_mod.CLASSIC / n
+        if not p.exists():
+            print("!! spell reference %s not found in %s" % (n, inv_mod.CLASSIC))
+            continue
+        b = BGF.read(p)
+        big = b.bitmaps[b.groups[1][0]] if len(b.groups) > 1 else max(b.bitmaps, key=lambda x: x.w * x.h)
+        imgs.append(on_canvas(big.rgba(pal), 512))
+    return imgs
+
+
+def spell_prompt(override: dict, notes: list) -> str:
+    parts = [SPELL_GENERATE % override["describe"].rstrip(".") if override.get("mode") == "generate" else SPELL_RESTYLE]
+    if notes:
+        parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
+    parts.append(spell_style()[0])
+    return " ".join(parts)
+
+
+def spell_bitmaps(gen: Image.Image, pal) -> list:
+    """The 16x16 and 64x64 frames of a classic spell icon, both from one generated image."""
+    out = []
+    for size in SPELL_SIZES:
+        box = Bitmap(size, size, 0, 0, [], bytes(size * size))  # an all-opaque stand-in: fit to the whole square
+        out.append(pixelize(gen, box, 1, 1, pal))
+    return out
+
+
 def item_words(classes: list) -> str:
     """"WolfMask" -> "wolf mask": the item's class name as words, for tag prompts."""
     return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", classes[0]).lower() if classes else "item"
@@ -242,12 +299,27 @@ def cmd_batch(a):
     batch = "%03d" % state["next_batch"]
     out = BUILD / "batches" / batch
     refs = style_refs(pal)
+    srefs = spell_refs(pal) if any(is_spell(inv[n]) for n in names) else []
+    ovr = overrides()
     print("batch %s: %d icons x %s x %d variants, %d style refs" % (batch, len(names), ",".join(specs), a.variants, len(refs)))
 
-    # one job per (icon, distinct frame, provider, variant)
+    # one job per (icon, distinct frame, provider, variant); a spell icon is one job (frame -1)
     sources, jobs, inv_fi_of = {}, [], {}
     for n in names:
         b = BGF.read(Path(inv[n]["source"]))
+        if is_spell(inv[n]):
+            o_n = ovr.get(n, {})
+            text = spell_prompt(o_n, icon_state(state, n)["notes"])
+            sources[n] = (b, None, {s: text for s in specs})
+            inv_fi_of[n] = -1
+            if o_n.get("mode") == "generate":
+                images = list(srefs)  # a fresh icon: the current art is not sent
+            else:
+                images = [on_canvas(max(b.bitmaps, key=lambda x: x.w * x.h).rgba(pal))] + srefs
+            for s in specs:
+                for v in range(a.variants):
+                    jobs.append((n, -1, s, v, images, text, {**opts.get("", {}), **opts.get(providers.split(s)[0], {})}))
+            continue
         frames = unique_frames(b)
         notes = icon_state(state, n)["notes"]
         texts = {s: prompt_for(notes, providers.split(s)[0], item_words(inv[n]["classes"])) for s in specs}
@@ -267,12 +339,12 @@ def cmd_batch(a):
                         o = {**QWEN_DEFAULTS, **o}
                     if prov in ("comfy", "qwen"):
                         o = {**o, "seed": int(digest(n, fi, v)[:8], 16)}
-                    jobs.append((n, fi, s, v, src, texts[s], o))
+                    jobs.append((n, fi, s, v, [src] + refs, texts[s], o))
 
     results, failures = {}, []
     with ThreadPoolExecutor(max_workers=a.workers) as pool:
-        futs = {pool.submit(generate, s, [src] + refs, text, o, v, a.cached_only): (n, fi, s, v)
-                for n, fi, s, v, src, text, o in jobs}
+        futs = {pool.submit(generate, s, images, text, o, v, a.cached_only): (n, fi, s, v)
+                for n, fi, s, v, images, text, o in jobs}
         for i, f in enumerate(as_completed(futs), 1):
             n, fi, s, v = futs[f]
             try:
@@ -292,13 +364,25 @@ def cmd_batch(a):
     manifest, review_items, sheet = {"batch": batch, "providers": specs, "items": []}, [], []
     for n in names:
         b, frames, texts = sources[n]
-        item = {"name": n, "prompts": texts, "variants": []}
-        inv_frame = inv_mod.inventory_bitmap(b)
+        output = ovr.get(n, {}).get("output", n)
+        item = {"name": n, "output": output, "prompts": texts, "variants": []}
+        inv_frame = inv_mod.inventory_bitmap(b) if frames is not None else max(b.bitmaps, key=lambda x: x.w * x.h)
         variant_imgs, variant_labels = [], []
         for s in specs:
             for v in range(a.variants):
                 if (n, inv_fi_of[n], s, v) not in results:
                     continue  # the model call failed or wasn't made: no candidate
+                if frames is None:  # spell icon: 16x16 + 64x64 from one image
+                    gen = results[(n, -1, s, v)]
+                    small, big = spell_bitmaps(gen, pal)
+                    cand = BGF(name=output.removesuffix(".bgf"), shrink=1, groups=[[0], [1]], bitmaps=[small, big])
+                    path = out / output.removesuffix(".bgf") / ("v%d.bgf" % len(item["variants"]))
+                    cand.write(path)
+                    gen.convert("RGB").resize((256, 256)).save(path.with_suffix(".raw.png"))
+                    item["variants"].append({"spec": s, "variant": v, "bgf": str(path.relative_to(REPO))})
+                    variant_imgs.append([big.rgba(pal), small.rgba(pal)])
+                    variant_labels.append("%s %d" % (s, v + 1))
+                    continue
                 try:
                     new = {}
                     for fi in sorted(set(frames.values())):
@@ -364,8 +448,9 @@ def cmd_apply(a):
         if decision == "keep" and item["variants"]:
             v = item["variants"][min(int(d.get("variant") or 0), len(item["variants"]) - 1)]
             KEPT.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(REPO / v["bgf"], KEPT / n)
-            st.update(status="kept", chosen={"batch": batch, **v})
+            output = item.get("output", n)
+            shutil.copyfile(REPO / v["bgf"], KEPT / output)
+            st.update(status="kept", output=output, chosen={"batch": batch, **v})
         elif decision == "reject":
             st["status"] = "rejected"
             if (d.get("note") or "").strip():
@@ -397,9 +482,10 @@ def cmd_install(a):
     INSTALL.mkdir(parents=True, exist_ok=True)
     done = 0
     for n, st in sorted(state["icons"].items()):
-        src = KEPT / n
+        output = st.get("output", n)
+        src = KEPT / output
         if st["status"] in ("kept", "installed") and src.exists():
-            shutil.copyfile(src, INSTALL / n)
+            shutil.copyfile(src, INSTALL / output)
             st["status"] = "installed"
             done += 1
     save_json(STATE_FILE, state)

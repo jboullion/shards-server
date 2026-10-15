@@ -29,6 +29,29 @@ pixel, {item}, a single fantasy rpg inventory item icon, 1990s game sprite, simp
 limited palette, dark outline, centered, plain flat magenta background
 <!-- /comfy-block -->
 
+## Spell icons
+
+Spell icons are a different look from items: small bold symbols, 16×16 and 64×64, at shrink 1.
+
+<!-- spell-block -->
+Style: a classic 1990s fantasy RPG spell icon like the reference images (the original Meridian 59
+spell icons): one bold, simple symbol that reads instantly even at 16 pixels, chunky low-resolution
+pixel art with saturated colours, a few shades per colour and hard edges. No text, no frame or
+border, no photographic or 3D-rendered look, no gradients in the background. The symbol fills most
+of the square. Background: a single flat solid magenta (#FF00FF) everywhere around the symbol.
+<!-- /spell-block -->
+
+Classic spell icons sent as references (their 64×64 frame):
+
+<!-- spell-refs -->
+ifirebal.bgf
+iblink.bgf
+imirth.bgf
+idarknes.bgf
+ihaste.bgf
+ilitning.bgf
+<!-- /spell-refs -->
+
 ## Style references
 
 Classic client icons sent as style references with each request (providers that accept several

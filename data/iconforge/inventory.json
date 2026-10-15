@@ -5,7 +5,7 @@
   "fanart": 76,
   "missing": 1
  },
- "selected": 98,
+ "selected": 112,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -6126,7 +6126,7 @@
     521,
     421
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iartific.bgf",
@@ -6487,7 +6487,7 @@
     256,
     96
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "icivilty.bgf",
@@ -6754,7 +6754,7 @@
     256,
     256
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "idefile.bgf",
@@ -7194,7 +7194,7 @@
     256,
     256
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iflash.bgf",
@@ -7447,7 +7447,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iholyres.bgf",
@@ -7581,7 +7581,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iicyfing.bgf",
@@ -7867,7 +7867,7 @@
     142,
     112
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "imargrace.bgf",
@@ -7886,7 +7886,7 @@
     256,
     256
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "imarkdis.bgf",
@@ -8099,7 +8099,7 @@
     256,
     256
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ipoiscld.bgf",
@@ -8498,7 +8498,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iringfir.bgf",
@@ -8786,7 +8786,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ispirith.bgf",
@@ -8824,7 +8824,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "isplacid.bgf",
@@ -9033,7 +9033,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iunholyw.bgf",
@@ -9128,7 +9128,7 @@
     64,
     64
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "iwallill.bgf",
