@@ -105,7 +105,7 @@ function render() {
     const row = el("div", { className: "row" });
     row.append(fig("original", it.original, false));
     it.variants.forEach((v, i) => {
-      const f = fig("variant " + (i + 1), v, true);
+      const f = fig((it.labels && it.labels[i]) || "variant " + (i + 1), v, true);
       if (s.variant === i) f.classList.add("chosen");
       f.onclick = () => { s.variant = i; s.decision = "keep"; save(); };
       row.append(f);
@@ -149,7 +149,8 @@ def review_page(batch: str, items: list, path: Path):
             out.append({"src": _data_url(im), "w": im.width * 3, "h": im.height * 3})
         return out
     data = [{"name": it["name"], "classes": it["classes"], "attempt": it["attempt"],
-             "original": views(it["original"]), "variants": [views(v) for v in it["variants"]]} for it in items]
+             "original": views(it["original"]), "variants": [views(v) for v in it["variants"]],
+             "labels": it.get("labels", [])} for it in items]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(PAGE % {"batch": html.escape(batch), "batch_json": json.dumps(batch),
                             "items_json": json.dumps(data)}, encoding="utf-8")

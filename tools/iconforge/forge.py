@@ -166,12 +166,14 @@ def digest(*parts) -> str:
     return h.hexdigest()[:24]
 
 
-def generate(spec, images, text, opts, variant) -> tuple:
-    """A cached model call -> (image, info)."""
+def generate(spec, images, text, opts, variant, cached_only=False) -> tuple:
+    """A cached model call -> (image, info). cached_only: never call the model."""
     key = digest(spec, variant, text, json.dumps(opts, sort_keys=True), *images)
     png, meta = CACHE / (key + ".png"), CACHE / (key + ".json")
     if png.exists():
         return Image.open(png).copy(), json.loads(meta.read_text()) if meta.exists() else {}
+    if cached_only:
+        raise LookupError("not cached")
     img, info = providers.run(spec, images, text, opts)
     CACHE.mkdir(parents=True, exist_ok=True)
     img.save(png)
@@ -217,14 +219,14 @@ def cmd_batch(a):
     print("batch %s: %d icons x %s x %d variants, %d style refs" % (batch, len(names), ",".join(specs), a.variants, len(refs)))
 
     # one job per (icon, distinct frame, provider, variant)
-    sources, jobs = {}, []
+    sources, jobs, inv_fi_of = {}, [], {}
     for n in names:
         b = BGF.read(Path(inv[n]["source"]))
         frames = unique_frames(b)
         notes = icon_state(state, n)["notes"]
         texts = {s: prompt_for(notes, providers.split(s)[0], item_words(inv[n]["classes"])) for s in specs}
         sources[n] = (b, frames, texts)
-        inv_fi = frames[b.bitmaps.index(inv_mod.inventory_bitmap(b))]
+        inv_fi = inv_fi_of[n] = frames[b.bitmaps.index(inv_mod.inventory_bitmap(b))]
         for fi in sorted(set(frames.values())):
             if a.frames == "inventory" and fi != inv_fi:
                 continue  # pixelized straight from the original below
@@ -238,12 +240,14 @@ def cmd_batch(a):
 
     results, failures = {}, []
     with ThreadPoolExecutor(max_workers=a.workers) as pool:
-        futs = {pool.submit(generate, s, [src] + refs, text, o, v): (n, fi, s, v)
+        futs = {pool.submit(generate, s, [src] + refs, text, o, v, a.cached_only): (n, fi, s, v)
                 for n, fi, s, v, src, text, o in jobs}
         for i, f in enumerate(as_completed(futs), 1):
             n, fi, s, v = futs[f]
             try:
                 results[(n, fi, s, v)] = f.result()[0]
+            except LookupError:
+                failures.append("%s %s v%d: not generated yet (--cached-only)" % (n, s, v))
             except Exception as e:  # keep the rest of the batch going
                 failures.append("%s frame %d %s v%d: %s" % (n, fi, s, v, e))
             print("  %d/%d" % (i, len(jobs)), end="\r")
@@ -256,9 +260,11 @@ def cmd_batch(a):
         b, frames, texts = sources[n]
         item = {"name": n, "prompts": texts, "variants": []}
         inv_frame = inv_mod.inventory_bitmap(b)
-        variant_imgs = []
+        variant_imgs, variant_labels = [], []
         for s in specs:
             for v in range(a.variants):
+                if (n, inv_fi_of[n], s, v) not in results:
+                    continue  # the model call failed or wasn't made: no candidate
                 try:
                     new = {}
                     for fi in sorted(set(frames.values())):
@@ -276,17 +282,18 @@ def cmd_batch(a):
                 k = len(item["variants"])
                 path = out / n.removesuffix(".bgf") / ("v%d.bgf" % k)
                 cand.write(path)
-                raw = results[(n, frames[b.bitmaps.index(inv_frame)], s, v)]
+                raw = results[(n, inv_fi_of[n], s, v)]
                 raw.convert("RGB").resize((256, 256)).save(path.with_suffix(".raw.png"))
                 item["variants"].append({"spec": s, "variant": v, "bgf": str(path.relative_to(REPO))})
                 variant_imgs.append([inv_mod.inventory_bitmap(cand).rgba(pal)])
+                variant_labels.append("%s %d" % (s, v + 1))
         manifest["items"].append(item)
         if variant_imgs:
             ref_size = variant_imgs[0][0].size
             orig = inv_frame.rgba(pal)
             orig = orig.resize(ref_size, Image.LANCZOS) if orig.width > ref_size[0] * 2 else orig
             review_items.append({"name": n, "classes": inv[n]["classes"], "attempt": icon_state(state, n)["attempts"] + 1,
-                                 "original": [orig], "variants": variant_imgs})
+                                 "original": [orig], "variants": variant_imgs, "labels": variant_labels})
             sheet.append((n.removesuffix(".bgf"), [orig] + [vi[0] for vi in variant_imgs]))
             st = icon_state(state, n)
             st["status"] = "review"
@@ -406,6 +413,8 @@ def main():
     p.add_argument("--opt", action="append", default=[])
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--open", action="store_true", help="open the review page when done")
+    p.add_argument("--cached-only", action="store_true",
+                   help="no model calls: build the page from results already generated (e.g. after stopping a batch)")
     p = sub.add_parser("apply")
     p.add_argument("decisions")
     sub.add_parser("install")

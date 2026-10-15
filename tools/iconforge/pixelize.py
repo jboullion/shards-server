@@ -5,7 +5,7 @@ Step 4: turn a model's output into a game bitmap. Deterministic, no model involv
              becomes transparent; a real alpha channel is used as is
     crop     to the object
     fit      into the original bitmap's object box, scaled to the new shrink, keeping aspect
-    shrink   area-average down to the target size; alpha cut at 50% (BGFs are 1-bit)
+    shrink   area-average down to the target size; alpha cut at ALPHA_CUT (BGFs are 1-bit)
     palette  every pixel to its nearest blakston.pal colour, no dithering; index 254 is transparency
     outline  optional 1-px dark edge around the silhouette
 
@@ -62,6 +62,11 @@ def opaque_box(img: Image.Image, threshold: int = 128):
     return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
 
 
+# Coverage below which a downscaled pixel turns transparent. Under half keeps thin parts (stems,
+# blades, speckled pixel-art edges) that a 50% cut erases at icon size.
+ALPHA_CUT = 64
+
+
 def to_palette(rgba: np.ndarray, pal: np.ndarray, allowed=None) -> np.ndarray:
     """(h, w, 4) uint8 -> (h, w) palette indices; transparent pixels -> 254."""
     idx_pool = np.array([i for i in range(256) if i != TRANSPARENT and (allowed is None or i in allowed)])
@@ -69,7 +74,7 @@ def to_palette(rgba: np.ndarray, pal: np.ndarray, allowed=None) -> np.ndarray:
     lab = _rgb_to_lab(rgba[..., :3].astype(np.float32) / 255.0)
     d = ((lab[..., None, :] - lab_pal[None, None, :, :]) ** 2).sum(-1)
     out = idx_pool[d.argmin(-1)].astype(np.uint8)
-    out[rgba[..., 3] < 128] = TRANSPARENT
+    out[rgba[..., 3] < ALPHA_CUT] = TRANSPARENT
     return out
 
 
@@ -88,8 +93,9 @@ def add_outline(idx: np.ndarray, pal: np.ndarray) -> np.ndarray:
 
 
 def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shrink: int, pal: np.ndarray,
-             outline: bool = False, allowed=None, key=KEY_COLOR) -> Bitmap:
-    """The generated image as a new Bitmap the same in-game size and placement as `original`."""
+             outline: bool = False, allowed=None, key=None) -> Bitmap:
+    """The generated image as a new Bitmap the same in-game size and placement as `original`.
+    key: the background colour to remove; None reads it from the corners (models never paint exact #FF00FF)."""
     k = new_shrink / orig_shrink
     W, H = max(1, round(original.w * k)), max(1, round(original.h * k))
     hs = [{"num": h["num"], "x": round(h["x"] * k), "y": round(h["y"] * k)} for h in original.hotspots]
