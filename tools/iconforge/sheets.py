@@ -91,6 +91,28 @@ def slice_back(gen: Image.Image, b: BGF, frames: list) -> list:
     return [gen.crop(r) for r in cells(len(frames), w / h)]
 
 
+def _many_rects(items: list) -> list:
+    aspect = sum(b.bitmaps[f[0]].w / max(1, b.bitmaps[f[0]].h) for b, f in items) / len(items)
+    return [(0, 0, SHEET, SHEET)] if len(items) == 1 else cells(len(items), aspect)
+
+
+def compose_many(items: list, pal) -> Image.Image:
+    """Several different single-image creatures (e.g. corpses) on one sheet, each fitted to its own cell.
+    items: [(bgf, [bitmap index])]."""
+    sheet = Image.new("RGBA", (SHEET, SHEET), KEY_COLOR + (255,))
+    for (b, frames), (x0, y0, x1, y1) in zip(items, _many_rects(items)):
+        im = b.bitmaps[frames[0]].rgba(pal)
+        s = FILL * min((x1 - x0) / im.width, (y1 - y0) / im.height)
+        t = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)
+        sheet.alpha_composite(t, (x0 + (x1 - x0 - t.width) // 2, y0 + (y1 - y0 - t.height) // 2))
+    return sheet.convert("RGB")
+
+
+def slice_many(gen: Image.Image, items: list) -> list:
+    gen = gen.convert("RGB").resize((SHEET, SHEET), Image.LANCZOS)
+    return [gen.crop(r) for r in _many_rects(items)]
+
+
 def rebuild(b: BGF, sheets: list, results: list, pal) -> BGF:
     """A new BGF: each frame pixelized from its cell into its original box (same size, offsets, hotspots)."""
     new = {}

@@ -96,6 +96,56 @@ def openai(images, text, model, opts):
     return Image.open(io.BytesIO(base64.b64decode(out["data"][0]["b64_json"]))), {"usage": out.get("usage")}
 
 
+# --- OpenAI Batch API: the same /v1/images/edits requests at half price, answered within 24 hours.
+# (Follows meridian-unreal/tools/aigen/restyle.py: JSON bodies with the images as data URLs.)
+
+def openai_batch_line(custom_id: str, images: list, text: str, model: str, opts: dict) -> dict:
+    return {"custom_id": custom_id, "method": "POST", "url": "/v1/images/edits",
+            "body": {"model": model, "prompt": text, "size": "1024x1024", "quality": opts.get("quality", "high"),
+                     "output_format": "png", "n": 1,
+                     "images": [{"image_url": "data:image/png;base64," + base64.b64encode(_png(im)).decode()}
+                                for im in images]}}
+
+
+def _openai_auth() -> dict:
+    return {"Authorization": "Bearer " + env.require("OPENAI_API_KEY")}
+
+
+def openai_batch_create(lines: list) -> dict:
+    """Upload the requests as JSONL and start a batch -> the batch object (id, status, ...)."""
+    body = "\n".join(json.dumps(line) for line in lines).encode()
+    form, ctype = _multipart({"purpose": "batch"}, [("file", "iconforge_batch.jsonl", body, "application/jsonl")])
+    up = json.loads(_request("https://api.openai.com/v1/files", form, {**_openai_auth(), "Content-Type": ctype}))
+    return _json("https://api.openai.com/v1/batches",
+                 {"input_file_id": up["id"], "endpoint": "/v1/images/edits", "completion_window": "24h"},
+                 _openai_auth())
+
+
+def openai_batch_get(batch_id: str) -> dict:
+    return _json("https://api.openai.com/v1/batches/" + batch_id, headers=_openai_auth())
+
+
+def openai_batch_results(batch: dict) -> dict:
+    """custom_id -> {"image", "usage"} or {"error"} for a finished batch."""
+    out = {}
+    for fid in (batch.get("output_file_id"), batch.get("error_file_id")):
+        if not fid:
+            continue
+        text = _request("https://api.openai.com/v1/files/%s/content" % fid, headers=_openai_auth()).decode()
+        for line in text.splitlines():
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            resp = row.get("response") or {}
+            body = resp.get("body") or {}
+            if row.get("error") or resp.get("status_code", 200) >= 400 or not body.get("data"):
+                out[row["custom_id"]] = {"error": row.get("error") or body.get("error") or resp.get("status_code")}
+            else:
+                out[row["custom_id"]] = {"image": Image.open(io.BytesIO(base64.b64decode(body["data"][0]["b64_json"]))),
+                                         "usage": body.get("usage")}
+    return out
+
+
 def fal(images, text, model, opts):
     key = env.require("FAL_AI_API_KEY")
     uris = ["data:image/png;base64," + base64.b64encode(_png(im)).decode() for im in images]

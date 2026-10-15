@@ -36,6 +36,7 @@ import re
 import shutil
 import sys
 import threading
+import time
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -75,7 +76,8 @@ QWEN_PROMPT = ("Repaint the item in the first image as a small hand-painted pixe
                "palette with few shades per colour, flat cel shading lit from the top left, a dark outline. Keep "
                "the same item, shape, silhouette, colours and orientation, but none of its photographic texture "
                "or smooth 3D shading. Do not copy the subjects of the second image. Output only the one item.")
-REF_PROMPT = "The other images are original item sprites from the game: match their style exactly, not their subjects."
+REF_PROMPT = ("The last image is a sheet of original item sprites from the game: match their style exactly, "
+              "not their subjects.")
 
 
 # ------------------------------------------------------------------------------------- state
@@ -166,10 +168,10 @@ def prompt_for(notes: list, provider: str = "openai", item: str = "") -> str:
 OVERRIDES_FILE = DATA / "overrides.json"
 SPELL_SIZES = (16, 64)  # classic spell icons: a 16x16 frame (group 1) and a 64x64 frame (group 2), shrink 1
 SPELL_RESTYLE = ("Redraw the spell icon in the first image as a classic game spell icon. Keep its subject, "
-                 "composition and colours. The other images are original spell icons from the game: match their "
-                 "style exactly, not their subjects.")
-SPELL_GENERATE = ("Draw a new spell icon for a fantasy RPG spell, showing %s. The images are original spell icons "
-                  "from the game: match their style exactly, but draw this spell's own subject.")
+                 "composition and colours. The last image is a sheet of original spell icons from the game: match "
+                 "their style exactly, not their subjects.")
+SPELL_GENERATE = ("Draw a new spell icon for a fantasy RPG spell, showing %s. The image is a sheet of original spell "
+                  "icons from the game: match their style exactly, but draw this spell's own subject.")
 
 
 def overrides() -> dict:
@@ -220,15 +222,18 @@ def spell_bitmaps(gen: Image.Image, pal) -> list:
 
 # ------------------------------------------------------------------------------------- creatures
 
-MONSTER_SHEET = ("The first image is a sheet of %d animation frames of one creature, all seen from the same angle, "
-                 "one frame per cell on a magenta background. Redraw every frame in place as %s. Keep each frame "
-                 "in its own cell with the same pose, position, size and facing as the original, so the frames "
-                 "still animate together, and make the creature look identical from frame to frame. The other "
-                 "images are original creature sprites from the game: match their rendering style, not their "
-                 "subjects.")
+MONSTER_SHEET = ("The first image is a sheet of %d animation frames of one creature (%s), one frame per cell on a "
+                 "magenta background. Redraw every frame in place as %s. Keep each frame in its own cell with the "
+                 "same pose, position, size and facing as the original, so the frames still animate together, and "
+                 "make the creature look identical from frame to frame. The last image is a sheet of original "
+                 "creature sprites from the game: match their rendering style, not their subjects.")
 MONSTER_SINGLE = ("Redraw the creature in the first image as %s, in the same pose, position, size and facing. The "
-                  "other images are original creature sprites from the game: match their rendering style, not "
-                  "their subjects.")
+                  "last image is a sheet of original creature sprites from the game: match their rendering style, "
+                  "not their subjects.")
+MONSTER_PACK = ("The first image is a sheet of %d different creatures, one per cell on a magenta background, in "
+                "reading order (left to right, top to bottom): %s. Redraw each one in its own cell, in the same pose, "
+                "position, size and facing; keep every cell separate. The last image is a sheet of original creature "
+                "sprites from the game: match their rendering style, not their subjects.")
 
 
 def is_monster(entry: dict) -> bool:
@@ -256,9 +261,15 @@ def monster_refs(pal) -> list:
     return imgs
 
 
-def monster_prompt(override: dict, classes: list, n_frames: int, notes: list) -> str:
-    what = override.get("describe") or "the same creature (%s)" % item_words(classes)
-    parts = [MONSTER_SHEET % (n_frames, what) if n_frames > 1 else MONSTER_SINGLE % what]
+def monster_what(override: dict, classes: list) -> str:
+    return override.get("describe") or "the same creature (%s)" % item_words(classes)
+
+
+def monster_prompt(override: dict, classes: list, n_frames: int, notes: list, n_angles: int = 1) -> str:
+    what = monster_what(override, classes)
+    seen = ("all seen from the same angle" if n_angles == 1 else
+            "seen from %d angles, the frames grouped by angle in reading order" % n_angles)
+    parts = [MONSTER_SHEET % (n_frames, seen, what) if n_frames > 1 else MONSTER_SINGLE % what]
     if notes:
         parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
     parts.append(monster_style()[0])
@@ -289,9 +300,19 @@ STOP = threading.Event()
 OUT_OF_CREDITS = ("insufficient_quota", "credit_balance_exhausted", "billing_hard_limit")
 
 
+def cache_key(spec, images, text, opts, variant) -> str:
+    return digest(spec, variant, text, json.dumps(opts, sort_keys=True), *images)
+
+
+def store(key: str, img: Image.Image, info: dict):
+    CACHE.mkdir(parents=True, exist_ok=True)
+    img.save(CACHE / (key + ".png"))
+    (CACHE / (key + ".json")).write_text(json.dumps(info))
+
+
 def generate(spec, images, text, opts, variant, cached_only=False) -> tuple:
     """A cached model call -> (image, info). cached_only: never call the model."""
-    key = digest(spec, variant, text, json.dumps(opts, sort_keys=True), *images)
+    key = cache_key(spec, images, text, opts, variant)
     png, meta = CACHE / (key + ".png"), CACHE / (key + ".json")
     if png.exists():
         return Image.open(png).copy(), json.loads(meta.read_text()) if meta.exists() else {}
@@ -300,10 +321,71 @@ def generate(spec, images, text, opts, variant, cached_only=False) -> tuple:
     if STOP.is_set():
         raise LookupError("stopped: out of credits")
     img, info = providers.run(spec, images, text, opts)
-    CACHE.mkdir(parents=True, exist_ok=True)
-    img.save(png)
-    meta.write_text(json.dumps(info))
+    store(key, img, info)
     return img, info
+
+
+BATCHES = BUILD / "openai_batches"
+
+
+def run_openai_batch(jobs: list, wait_minutes: float) -> bool:
+    """Send every uncached OpenAI job as one Batch API request (half price), wait for it and store the
+    results in the cache, so the normal pass then finds them. A batch already submitted for the same
+    requests is resumed rather than paid for again. False when it hasn't finished within the wait."""
+    todo = {}
+    for n, fi, s, v, images, text, o in jobs:
+        prov, model = providers.split(s)
+        if prov != "openai":
+            continue
+        key = cache_key(s, images, text, o, v)
+        if not (CACHE / (key + ".png")).exists():
+            todo[key] = (images, text, model, o)
+    if not todo:
+        return True
+    BATCHES.mkdir(parents=True, exist_ok=True)
+    pending = None
+    for p in sorted(BATCHES.glob("*.json")):
+        rec = json.loads(p.read_text())
+        if not rec.get("collected") and set(todo) <= set(rec["keys"]):
+            pending = (p, rec)
+            break
+    if pending is None:
+        lines = [providers.openai_batch_line(k, im, t, m, o) for k, (im, t, m, o) in todo.items()]
+        b = providers.openai_batch_create(lines)
+        p = BATCHES / ("%s.json" % b["id"])
+        rec = {"id": b["id"], "keys": sorted(todo), "submitted": time.strftime("%Y-%m-%d %H:%M"), "collected": False}
+        save_json(p, rec)
+        pending = (p, rec)
+        print("submitted OpenAI batch %s: %d requests (half price; results within 24 h)" % (b["id"], len(lines)))
+    else:
+        print("resuming OpenAI batch %s (%d requests)" % (pending[1]["id"], len(pending[1]["keys"])))
+    p, rec = pending
+    deadline = time.time() + wait_minutes * 60
+    while True:
+        b = providers.openai_batch_get(rec["id"])
+        counts = b.get("request_counts") or {}
+        print("  batch %s: %s (%s/%s done, %s failed)" % (rec["id"], b["status"], counts.get("completed", 0),
+                                                         counts.get("total", "?"), counts.get("failed", 0)))
+        if b["status"] in ("completed", "failed", "expired", "cancelled"):
+            break
+        if time.time() > deadline:
+            print("still running; run the same command again later to collect it (no new charge)")
+            return False
+        time.sleep(30)
+    got = providers.openai_batch_results(b)
+    errors = 0
+    for k, r in got.items():
+        if "image" in r:
+            store(k, r["image"], {"provider": "openai", "model": todo.get(k, (None, None, "?"))[2],
+                                  "usage": r.get("usage"), "batch": rec["id"]})
+        else:
+            errors += 1
+            if errors <= 5:
+                print("!! batch request %s: %s" % (k, str(r["error"])[:300]))
+    rec.update(collected=True, status=b["status"], errors=errors)
+    save_json(p, rec)
+    print("collected %d images from batch %s (%d errors)" % (len(got) - errors, rec["id"], errors))
+    return True
 
 
 def unique_frames(b: BGF) -> dict:
@@ -346,23 +428,34 @@ def cmd_batch(a):
 
     batch = "%03d" % state["next_batch"]
     out = BUILD / "batches" / batch
-    refs = style_refs(pal)
-    srefs = spell_refs(pal) if any(is_spell(inv[n]) for n in names) else []
-    mrefs = monster_refs(pal) if any(is_monster(inv[n]) for n in names) else []
+    # the classic references go as ONE tiled image: six separate images were most of a request's input tokens
+    refs = [providers.reference_sheet(style_refs(pal))]
+    srefs = [providers.reference_sheet(spell_refs(pal))] if any(is_spell(inv[n]) for n in names) else []
+    mrefs = [providers.reference_sheet(monster_refs(pal))] if any(is_monster(inv[n]) for n in names) else []
     plans = {}
     ovr = overrides()
     print("batch %s: %d icons x %s x %d variants, %d style refs" % (batch, len(names), ",".join(specs), a.variants, len(refs)))
 
     # one job per (icon, distinct frame, provider, variant); a spell icon is one job (frame -1)
     sources, jobs, inv_fi_of = {}, [], {}
+    singles = []  # one-bitmap creatures (corpses): packed several to a request below
     for n in names:
         b = BGF.read(Path(inv[n]["source"]))
         if is_monster(inv[n]):
             plan = plans[n] = sheets.plan(b)
+            sources[n] = (b, "monster", {})
+            inv_fi_of[n] = 1000
+            if len(plan) == 1 and len(plan[0]) == 1 and a.pack_singles > 1:
+                singles.append(n)
+                continue
+            per = max(1, a.angles_per_sheet)
+            packed = [sum(plan[i:i + per], []) for i in range(0, len(plan), per)]
+            angles = [len(plan[i:i + per]) for i in range(0, len(plan), per)]
+            plan = plans[n] = packed
             notes = icon_state(state, n)["notes"]
             texts = {}
             for si, frames in enumerate(plan):
-                text = monster_prompt(ovr.get(n, {}), inv[n]["classes"], len(frames), notes)
+                text = monster_prompt(ovr.get(n, {}), inv[n]["classes"], len(frames), notes, angles[si])
                 texts[si] = text
                 images = [sheets.compose(b, frames, pal)] + mrefs
                 for s in specs:
@@ -370,7 +463,6 @@ def cmd_batch(a):
                         jobs.append((n, 1000 + si, s, v, images, text,
                                      {**opts.get("", {}), **opts.get(providers.split(s)[0], {})}))
             sources[n] = (b, "monster", {s: texts.get(0, "") for s in specs})
-            inv_fi_of[n] = 1000
             continue
         if is_spell(inv[n]):
             o_n = ovr.get(n, {})
@@ -406,6 +498,27 @@ def cmd_batch(a):
                         o = {**o, "seed": int(digest(n, fi, v)[:8], 16)}
                     jobs.append((n, fi, s, v, [src] + refs, texts[s], o))
 
+    packs = {}
+    for k in range(0, len(singles), max(1, a.pack_singles)):
+        group = singles[k:k + a.pack_singles]
+        pid = "pack%d" % (k // a.pack_singles)
+        packs[pid] = group
+        cells = [(sources[n][0], [0]) for n in group]
+        listing = "; ".join("%d) %s" % (i + 1, monster_what(ovr.get(n, {}), inv[n]["classes"])) for i, n in enumerate(group))
+        text = " ".join([MONSTER_PACK % (len(group), listing) if len(group) > 1 else
+                         MONSTER_SINGLE % monster_what(ovr.get(group[0], {}), inv[group[0]]["classes"]),
+                         monster_style()[0]])
+        for n in group:
+            sources[n] = (sources[n][0], "monster", {s: text for s in specs})
+        images = [sheets.compose_many(cells, pal)] + mrefs
+        for s in specs:
+            for v in range(a.variants):
+                jobs.append((pid, 1000, s, v, images, text, {**opts.get("", {}), **opts.get(providers.split(s)[0], {})}))
+
+    if a.batch_api and not a.cached_only:
+        if not run_openai_batch(jobs, a.batch_wait):
+            return
+
     results, failures = {}, []
     with ThreadPoolExecutor(max_workers=a.workers) as pool:
         futs = {pool.submit(generate, s, images, text, o, v, a.cached_only): (n, fi, s, v)
@@ -423,6 +536,15 @@ def cmd_batch(a):
                 failures.append("%s frame %d %s v%d: %s" % (n, fi, s, v, e))
             print("  %d/%d" % (i, len(jobs)), end="\r")
     print()
+    # a packed sheet of several creatures: give each its own cell
+    for pid, group in packs.items():
+        for s in specs:
+            for v in range(a.variants):
+                gen = results.pop((pid, 1000, s, v), None)
+                if gen is None:
+                    continue
+                for n, cell in zip(group, sheets.slice_many(gen, [(sources[n][0], [0]) for n in group])):
+                    results[(n, 1000, s, v)] = cell
     for msg in failures if len(failures) <= 20 else failures[:20] + ["... and %d more" % (len(failures) - 20)]:
         print("!! " + msg)
 
@@ -636,6 +758,13 @@ def main():
     p.add_argument("--opt", action="append", default=[])
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--open", action="store_true", help="open the review page when done")
+    p.add_argument("--angles-per-sheet", type=int, default=2,
+                   help="creatures: viewing angles drawn together in one request (fewer requests, smaller cells)")
+    p.add_argument("--pack-singles", type=int, default=4,
+                   help="creatures with one image (corpses): this many share one request")
+    p.add_argument("--batch-api", action="store_true",
+                   help="OpenAI: send the requests as one Batch API job (half price, may take hours)")
+    p.add_argument("--batch-wait", type=float, default=180, help="minutes to wait for a Batch API job (default 180)")
     p.add_argument("--cached-only", action="store_true",
                    help="no model calls: build the page from results already generated (e.g. after stopping a batch)")
     p = sub.add_parser("apply")
