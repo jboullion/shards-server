@@ -1,5 +1,5 @@
 {
- "next_batch": 19,
+ "next_batch": 21,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2260,6 +2260,111 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\017\\iwallice\\v0.bgf"
+   }
+  },
+  "duskrat.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "019",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "duskrat.bgf",
+   "chosen": {
+    "batch": "019",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\019\\duskrat\\v0.bgf"
+   }
+  },
+  "ratking.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "019",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ratking.bgf",
+   "chosen": {
+    "batch": "019",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\019\\ratking\\v0.bgf"
+   }
+  },
+  "ratkingx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "020",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ratkingx.bgf",
+   "chosen": {
+    "batch": "020",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\020\\ratkingx\\v0.bgf"
+   }
+  },
+  "ratsold.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "020",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ratsold.bgf",
+   "chosen": {
+    "batch": "020",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\020\\ratsold\\v0.bgf"
+   }
+  },
+  "ratsoldx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "020",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ratsoldx.bgf",
+   "chosen": {
+    "batch": "020",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\020\\ratsoldx\\v0.bgf"
    }
   }
  }

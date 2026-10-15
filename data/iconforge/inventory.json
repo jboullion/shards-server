@@ -5,7 +5,7 @@
   "fanart": 184,
   "missing": 1
  },
- "selected": 111,
+ "selected": 116,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -11241,7 +11241,7 @@
     225,
     89
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "earthdrag.bgf",
@@ -13780,7 +13780,7 @@
     225,
     89
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ratkingx.bgf",
@@ -13799,7 +13799,7 @@
     91,
     41
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ratsm.bgf",
@@ -13856,7 +13856,7 @@
     225,
     89
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ratsoldx.bgf",
@@ -13875,7 +13875,7 @@
     91,
     41
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ratx.bgf",
