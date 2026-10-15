@@ -36,5 +36,20 @@
  "iappraise.bgf": {
   "mode": "generate",
   "describe": "a pair of golden merchant's balance scales, gleaming gold with two hanging pans"
+ },
+ "duskrat.bgf": {
+  "describe": "a dusk rat: a sleek, sinister giant rat with dark slate-purple fur, a sickly pale belly, a few glowing violet eyes and wisps of dark poisonous vapour around its fangs"
+ },
+ "ratking.bgf": {
+  "describe": "the rat king: a huge, bloated giant rat with mangy grey-brown fur, a battered golden crown on its head and a ragged royal red cape over its back"
+ },
+ "ratkingx.bgf": {
+  "describe": "the dead rat king: a huge, bloated giant rat lying dead on its side, with mangy grey-brown fur, its battered golden crown fallen beside it and a ragged red cape"
+ },
+ "ratsold.bgf": {
+  "describe": "a rat soldier: a giant rat wearing a dented iron helmet and a battered leather jerkin with rusty iron plates strapped to its shoulders"
+ },
+ "ratsoldx.bgf": {
+  "describe": "a dead rat soldier: a giant rat lying dead on its side, still wearing its dented iron helmet and battered leather jerkin with rusty iron plates"
  }
 }

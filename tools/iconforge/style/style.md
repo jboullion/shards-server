@@ -52,6 +52,30 @@ ihaste.bgf
 ilitning.bgf
 <!-- /spell-refs -->
 
+## Creatures (monsters, NPCs)
+
+Animated sprites go to the model one angle at a time: a sheet with every pose of that angle (see
+tools/iconforge/sheets.py). The original creatures are pre-rendered, clay-model-like figures.
+
+<!-- monster-block -->
+Style: an original 1996 Meridian 59 creature sprite like the reference images: a pre-rendered,
+hand-sculpted clay-model look with saturated colours, simple strong lighting from the top left, clear
+readable shapes and crisp edges against the background. No photographic texture, no glossy modern 3D
+render, no motion blur, no text. Background: a single flat solid magenta (#FF00FF) everywhere around
+the creature, with no grid lines, cell borders, shadows or floor.
+<!-- /monster-block -->
+
+Classic creature sprites sent as references (their first frame):
+
+<!-- monster-refs -->
+orc.bgf
+troll.bgf
+kriipa.bgf
+lupogg.bgf
+avchief.bgf
+spdrqu.bgf
+<!-- /monster-refs -->
+
 ## Style references
 
 Classic client icons sent as style references with each request (providers that accept several

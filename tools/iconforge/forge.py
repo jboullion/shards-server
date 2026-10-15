@@ -44,6 +44,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import inventory as inv_mod  # noqa: E402
+import sheets  # noqa: E402
 import providers  # noqa: E402
 from bgf import BGF, TRANSPARENT, Bitmap, load_palette  # noqa: E402
 from pixelize import KEY_COLOR, pixelize  # noqa: E402
@@ -217,6 +218,53 @@ def spell_bitmaps(gen: Image.Image, pal) -> list:
     return out
 
 
+# ------------------------------------------------------------------------------------- creatures
+
+MONSTER_SHEET = ("The first image is a sheet of %d animation frames of one creature, all seen from the same angle, "
+                 "one frame per cell on a magenta background. Redraw every frame in place as %s. Keep each frame "
+                 "in its own cell with the same pose, position, size and facing as the original, so the frames "
+                 "still animate together, and make the creature look identical from frame to frame. The other "
+                 "images are original creature sprites from the game: match their rendering style, not their "
+                 "subjects.")
+MONSTER_SINGLE = ("Redraw the creature in the first image as %s, in the same pose, position, size and facing. The "
+                  "other images are original creature sprites from the game: match their rendering style, not "
+                  "their subjects.")
+
+
+def is_monster(entry: dict) -> bool:
+    return "monster" in entry.get("kind", "item").split("/")
+
+
+def monster_style() -> tuple:
+    text = STYLE.read_text(encoding="utf-8")
+    block = re.search(r"<!-- monster-block -->(.*?)<!-- /monster-block -->", text, re.S)
+    refs = re.search(r"<!-- monster-refs -->(.*?)<!-- /monster-refs -->", text, re.S)
+    style = " ".join(line.strip() for line in block.group(1).strip().splitlines() if line.strip())
+    return style, [line.strip() for line in refs.group(1).splitlines() if line.strip()]
+
+
+def monster_refs(pal) -> list:
+    imgs = []
+    for n in monster_style()[1]:
+        p = inv_mod.CLASSIC / n
+        if not p.exists():
+            print("!! creature reference %s not found in %s" % (n, inv_mod.CLASSIC))
+            continue
+        b = BGF.read(p)
+        first = b.bitmaps[b.groups[0][0]] if b.groups and b.groups[0] else b.bitmaps[0]
+        imgs.append(on_canvas(first.rgba(pal), 512))
+    return imgs
+
+
+def monster_prompt(override: dict, classes: list, n_frames: int, notes: list) -> str:
+    what = override.get("describe") or "the same creature (%s)" % item_words(classes)
+    parts = [MONSTER_SHEET % (n_frames, what) if n_frames > 1 else MONSTER_SINGLE % what]
+    if notes:
+        parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
+    parts.append(monster_style()[0])
+    return " ".join(parts)
+
+
 def item_words(classes: list) -> str:
     """"WolfMask" -> "wolf mask": the item's class name as words, for tag prompts."""
     return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", classes[0]).lower() if classes else "item"
@@ -300,6 +348,8 @@ def cmd_batch(a):
     out = BUILD / "batches" / batch
     refs = style_refs(pal)
     srefs = spell_refs(pal) if any(is_spell(inv[n]) for n in names) else []
+    mrefs = monster_refs(pal) if any(is_monster(inv[n]) for n in names) else []
+    plans = {}
     ovr = overrides()
     print("batch %s: %d icons x %s x %d variants, %d style refs" % (batch, len(names), ",".join(specs), a.variants, len(refs)))
 
@@ -307,6 +357,21 @@ def cmd_batch(a):
     sources, jobs, inv_fi_of = {}, [], {}
     for n in names:
         b = BGF.read(Path(inv[n]["source"]))
+        if is_monster(inv[n]):
+            plan = plans[n] = sheets.plan(b)
+            notes = icon_state(state, n)["notes"]
+            texts = {}
+            for si, frames in enumerate(plan):
+                text = monster_prompt(ovr.get(n, {}), inv[n]["classes"], len(frames), notes)
+                texts[si] = text
+                images = [sheets.compose(b, frames, pal)] + mrefs
+                for s in specs:
+                    for v in range(a.variants):
+                        jobs.append((n, 1000 + si, s, v, images, text,
+                                     {**opts.get("", {}), **opts.get(providers.split(s)[0], {})}))
+            sources[n] = (b, "monster", {s: texts.get(0, "") for s in specs})
+            inv_fi_of[n] = 1000
+            continue
         if is_spell(inv[n]):
             o_n = ovr.get(n, {})
             text = spell_prompt(o_n, icon_state(state, n)["notes"])
@@ -366,12 +431,35 @@ def cmd_batch(a):
         b, frames, texts = sources[n]
         output = ovr.get(n, {}).get("output", n)
         item = {"name": n, "output": output, "prompts": texts, "variants": []}
-        inv_frame = inv_mod.inventory_bitmap(b) if frames is not None else max(b.bitmaps, key=lambda x: x.w * x.h)
+        if frames == "monster":
+            inv_frame = b.bitmaps[plans[n][0][0]]
+        elif frames is None:
+            inv_frame = max(b.bitmaps, key=lambda x: x.w * x.h)
+        else:
+            inv_frame = inv_mod.inventory_bitmap(b)
         variant_imgs, variant_labels = [], []
         for s in specs:
             for v in range(a.variants):
                 if (n, inv_fi_of[n], s, v) not in results:
                     continue  # the model call failed or wasn't made: no candidate
+                if frames == "monster":  # creature: every angle sheet, rebuilt frame by frame
+                    plan = plans[n]
+                    got = [results.get((n, 1000 + si, s, v)) for si in range(len(plan))]
+                    if any(g is None for g in got):
+                        print("!! %s %s v%d: %d of %d sheets missing" % (n, s, v, sum(g is None for g in got), len(plan)))
+                        continue
+                    cand = sheets.rebuild(b, plan, got, pal)
+                    path = out / output.removesuffix(".bgf") / ("v%d.bgf" % len(item["variants"]))
+                    cand.write(path)
+                    got[0].convert("RGB").resize((512, 512)).save(path.with_suffix(".raw.png"))
+                    if cand.groups:
+                        for slot in sorted({0, min(2, max(len(g) for g in cand.groups) - 1)}):
+                            sheets.animation_gif(cand, pal, path.with_name("%s.angle%d.gif" % (path.stem, slot)), slot)
+                            sheets.animation_gif(b, pal, path.with_name("original.angle%d.gif" % slot), slot)
+                    item["variants"].append({"spec": s, "variant": v, "bgf": str(path.relative_to(REPO))})
+                    variant_imgs.append([cand.bitmaps[i].rgba(pal) for i in plan[0][:12]])
+                    variant_labels.append("%s %d" % (s, v + 1))
+                    continue
                 if frames is None:  # spell icon: 16x16 + 64x64 from one image
                     gen = results[(n, -1, s, v)]
                     small, big = spell_bitmaps(gen, pal)
@@ -408,11 +496,14 @@ def cmd_batch(a):
         manifest["items"].append(item)
         if variant_imgs:
             ref_size = variant_imgs[0][0].size
-            orig = inv_frame.rgba(pal)
-            orig = orig.resize(ref_size, Image.LANCZOS) if orig.width > ref_size[0] * 2 else orig
+            if frames == "monster":
+                orig = [b.bitmaps[i].rgba(pal) for i in plans[n][0][:12]]
+            else:
+                orig = inv_frame.rgba(pal)
+                orig = [orig.resize(ref_size, Image.LANCZOS) if orig.width > ref_size[0] * 2 else orig]
             review_items.append({"name": n, "classes": inv[n]["classes"], "attempt": icon_state(state, n)["attempts"] + 1,
-                                 "original": [orig], "variants": variant_imgs, "labels": variant_labels})
-            sheet.append((n.removesuffix(".bgf"), [orig] + [vi[0] for vi in variant_imgs]))
+                                 "original": orig, "variants": variant_imgs, "labels": variant_labels})
+            sheet.append((n.removesuffix(".bgf"), [orig[0]] + [vi[0] for vi in variant_imgs]))
             st = icon_state(state, n)
             st["status"] = "review"
             st["attempts"] += 1
