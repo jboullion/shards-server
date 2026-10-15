@@ -104,17 +104,10 @@ messages:
             Create(&GoldShield),
             Create(&NeruditeSword),
             Create(&Axe),
-            Create(&Hammer),
-            Create(&PickAxe),
-            Create(&BlacksmithsHammer),
-            Create(&MinersBag)
+            Create(&Hammer)
          ],
          $,
-         [
-            SID_CRAFTNERUDITEARMOR,
-            SID_CRAFTNERUDITESHIELD,
-            SID_CRAFTNERUDITESWORD
-         ],
+         $,
          $];
 
       return;

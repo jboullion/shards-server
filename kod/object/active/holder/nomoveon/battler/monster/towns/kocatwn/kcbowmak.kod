@@ -107,15 +107,10 @@ messages:
          [ 
             Create(&Arrow),
             Create(&LongBow),
-            Create(&DrawKnife),
             Create(&Quiver)
          ],
          $,
-         [
-            SID_CRAFTBATTLEBOW,
-            SID_CRAFTLONGBOW,
-            SID_CRAFTNERUBOW
-         ],
+         $,
          $];
 
       return;

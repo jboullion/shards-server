@@ -39,7 +39,7 @@ resources:
    BQsmith_already_have_spell = \
       "You already have knowledge of the %s spell.  You waste my time."
    BQsmith_not_ready = \
-      "You are not ready to learn how to craft that.  "
+      "You are not ready to learn that.  "
 
 classvars:
 
@@ -82,11 +82,7 @@ messages:
          ],
          $,
          [
-            SID_MAGICSHIELD,
-            SID_SMELTING,
-            SID_CRAFTPLATEARMOR,
-            SID_CRAFTGUILDSHIELD,
-            SID_TANNING
+            SID_MAGICSHIELD
          ],
       $];
 

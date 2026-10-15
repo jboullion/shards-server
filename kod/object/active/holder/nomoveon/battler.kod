@@ -732,7 +732,7 @@ messages:
          + Send(SETTINGS_OBJECT,@GetBaseRating);
       iChanceToHit = iOffense * Send(SETTINGS_OBJECT,@GetEqualChanceToHit) / iDefense;
       iChanceToHit = bound(iChanceToHit,125,2000);
-      if iChanceToHit >= random(1,1000) OR ISClass(what,&Resource)
+      if iChanceToHit >= random(1,1000)
       {
          // We hit!
          iDamage = Send(self,@GetDamage,#what=what,#stroke_obj=stroke_obj);

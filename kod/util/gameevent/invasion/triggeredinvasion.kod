@@ -87,12 +87,10 @@ messages:
                          &KriipaClaw,  &Ruby,    &BlueDragonScale,  &DarkAngelFeather ];
 
       plRewards_Medium = [ &PurpleMushroom, &BlueMushroom, &RainbowFern, &InkyCap,
-                           &DragonflyEye,   &WebMoss,      &Fairywing,   &OrcTooth, &Solagh,
-                           &DenseWood,      &TrollHide,    &Wood,        &RawSilk,  &KriipaHide ];
+                           &DragonflyEye,   &WebMoss,      &Fairywing,   &OrcTooth, &Solagh ];
 
-      plRewards_Common = [ &Mushroom, &EntrootBerry, &Elderberry, &Herbs,       &Emerald, 
-                           &Sapphire, &Diamond,      &InkyCap,    &RedMushroom, &IronOre,
-                           &NeruditeOre ];
+      plRewards_Common = [ &Mushroom, &EntrootBerry, &Elderberry, &Herbs,       &Emerald,
+                           &Sapphire, &Diamond,      &InkyCap,    &RedMushroom ];
 
       plRewards_Special = [ &LongSword,  &NeruditeSword, &Scimitar, &Hammer, &Axe,
                             &ShortSword, &MysticSword, &PolishedSeraphym, &PurpleMushroom,

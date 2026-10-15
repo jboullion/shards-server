@@ -178,11 +178,6 @@ messages:
 
       Send(oApparition,@SetMaxHitPoints,#amount=i);
 
-      if IsClass(oApparition,&Resource)
-      {
-         Send(oApparition,@Delete);
-      }
-
       propagate;
    }
 

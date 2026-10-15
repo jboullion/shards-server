@@ -114,8 +114,7 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [&GiantRatSoldier, 85],
-                     [&Ore, 15] ];
+      plMonsters = [ [&GiantRatSoldier, 100] ];
 
       Send(self,@ResetTreasureList);
 

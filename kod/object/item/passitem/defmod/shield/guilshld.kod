@@ -696,8 +696,7 @@ messages:
          return 6;
       }
       
-      if    (piInsigniaType = INSIG_REBEL AND iSchool = SS_CRAFTING)
-         OR (piInsigniaType = INSIG_REBEL AND iSchool = SS_KRAANAN)
+      if piInsigniaType = INSIG_REBEL AND iSchool = SS_KRAANAN
       {
          return 6;
       }

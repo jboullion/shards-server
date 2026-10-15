@@ -831,13 +831,9 @@ resources:
    bad_line_of_sight = \
       "Your hindered line of sight makes a successful hit more difficult."
 
-   cant_fight_tool   = "You can't fight with a harvesting tool!"
-   cant_Harvest         = "You can't harvest with this weapon!"
-   killed_resource      = "You depleted this resource."
       
    pvp_notify_wav = gong.ogg
 
-   cant_cast_resources = "You cannot cast on resources!"
    
 classvars:
 
@@ -4473,16 +4469,6 @@ messages:
          }
       }
 
-      if victim <> $
-         AND IsClass(victim,&Resource)
-         AND stroke_obj <> $
-         AND IsClass(stroke_obj,&Spell)
-      {
-         Send(self,@MsgSendUser,#message_rsc=cant_cast_resources);
-
-         return FALSE;
-      }
-
       // No attacking logged out players under any circumstances
       if Send(victim,@GetOwner) = $
       {
@@ -5091,7 +5077,7 @@ messages:
 
    TryAttack(what = $,use_weapon = $,stroke_obj=$)
    {
-      local i, iRange, oSpell, state, oTool, oWeapon;
+      local i, iRange, oSpell, state, oWeapon;
 
       oWeapon = Send(self,@GetWeapon);
 
@@ -5101,30 +5087,6 @@ messages:
          Send(self,@MsgSendUser,#message_rsc=player_no_target_self);
          
          return FALSE;
-      }
-
-      if IsClass(what,&Resource)
-      {
-         oTool = Send(what,@GetTool);
-
-         if oWeapon = $
-            OR NOT IsClass(oWeapon,oTool)
-         {
-            Send(self,@MsgSendUser,#message_rsc=cant_Harvest);
-            return FALSE;
-         }
-      }
-
-      if IsClass(what,&Monster) AND NOT IsClass(what,&Resource)
-      {
-         if oWeapon <> $
-         {
-            if IsClass(oWeapon,&Tool)
-            {
-               Send(self,@MsgSendUser,#message_rsc=cant_fight_tool);
-               return FALSE;
-            }
-         }
       }
 
       // Check attack time.
@@ -6075,22 +6037,12 @@ messages:
 
       piWeaponSwings = piWeaponSwings + times;
 
-      if oWeapon <> $ AND IsClass(oWeapon,&Tool)
+      if (piWeaponSwings % Send(SETTINGS_OBJECT,
+                                 @GetSwingsPerImproveCheck)) = 0
       {
-         if (piWeaponSwings % 5) = 0
-         {
-            piWeaponInfo = piWeaponInfo + 1000;
-         }
-      }
-      else
-      {
-         if (piWeaponSwings % Send(SETTINGS_OBJECT,
-                                    @GetSwingsPerImproveCheck)) = 0
-         {
-            // Increase this number. Allows us to advance, and
-            // get bonuses for advancement.
-            piWeaponInfo = piWeaponInfo + 1000;
-         }
+         // Increase this number. Allows us to advance, and
+         // get bonuses for advancement.
+         piWeaponInfo = piWeaponInfo + 1000;
       }
 
       return;
@@ -6147,13 +6099,13 @@ messages:
          if stroke_obj
          {
             if NOT Send(stroke_obj,@PlayerKilledSomethingMsg,#who=self,#victim=what)
-               AND self <> what AND NOT IsClass(what, &Resource)
+               AND self <> what
             {
                Send(self,@MsgSendUser,#message_rsc=player_killed_something,
                     #parm1=Send(what,@GetDef),#parm2=Send(what,@GetName));
             }
          }
-         else if self <> what AND NOT IsClass(what, &Resource)
+         else if self <> what
          {
             Send(self,@MsgSendUser,#message_rsc=player_killed_something,
                  #parm1=Send(what,@GetDef),#parm2=Send(what,@GetName));
@@ -9066,13 +9018,6 @@ messages:
          propagate;
       }
 
-      if IsClass(victim,&Resource)
-      {
-         Send(self,@MsgSendUser,#message_rsc=killed_resource);
-
-         return;
-      }
-
       // If we have death link up, give a vigor boost
       oSpellDeathLink = Send(SYS,@FindSpellByNum,#Num=SID_DEATH_LINK);
 
@@ -9269,8 +9214,7 @@ messages:
                iXP = monster_level / 10;
             }
          }
-         else if Random(1,100) < 30 AND killing_blow AND 
-         (what = $ OR (what <> $ AND NOT IsClass(what, &Resource)))
+         else if Random(1,100) < 30 AND killing_blow
          {
             // Monster was too easy for player to kill!
             Send(self,@MsgSendUser,#message_rsc=player_spits);
@@ -9397,8 +9341,7 @@ messages:
 
          // Let the player know how many training points they have, if they
          // either reached the max, or a multiple of 100.
-         if piTraining_points > 9999 AND 
-         (what = $ OR (what <> $ AND NOT IsClass(what, &Resource)))
+         if piTraining_points > 9999
          {
             if piInform
             {
@@ -12530,7 +12473,7 @@ messages:
             iSamediv, iOtherdiv, aHigh, bHigh, cHigh, iBase, i, temp,
             nObj, nSID, index, iNeed, nSchool, nLevel, msg, bKnowOne,
             iWeapon, iKraanan, iShalille, iQor, iFaren, iRiija, iJala,
-            iPoints, iCrafting;
+            iPoints;
 
       // Phase one. Assert our data. Be sure we have been fed a valid spell
       // and skill num for a spell item that actually exists.
@@ -12636,7 +12579,6 @@ messages:
       iFaren = 0;
       iRiija = 0;
       iJala = 0;
-      iCrafting = 0;
 
       foreach i in plSkills
       {
@@ -12681,18 +12623,10 @@ messages:
             }
          }
 
-         if Send(nobj,@GetSchool) = SS_CRAFTING
-         {
-            if nLevel > iCrafting
-            {
-               iCrafting = nLevel;
-            }
-         }
-         else if nLevel > iWeapon
+         if nLevel > iWeapon
          {
             iWeapon = nLevel;
          }
-
       }
 
       foreach i in plSpells
@@ -12787,12 +12721,6 @@ messages:
                   iJala = nLevel;
                }
                break;
-            case SS_CRAFTING:
-               if nLevel > iCrafting
-               {
-                  iCrafting = nLevel;
-               }
-               break;
             }
          }
       }
@@ -12838,8 +12766,7 @@ messages:
                + Send(SYS,@GetLevelLearnPoints,#level=iQor)
                + Send(SYS,@GetLevelLearnPoints,#level=iFaren)
                + Send(SYS,@GetLevelLearnPoints,#level=iRiija)
-               + Send(SYS,@GetLevelLearnPoints,#level=iJala)
-               + Send(SYS,@GetLevelLearnPoints,#level=iCrafting);
+               + Send(SYS,@GetLevelLearnPoints,#level=iJala);
 
       // Okay, we're going into new territory if we don't already know one
       //  spell in the school, so we're increasing the level of our
@@ -12898,10 +12825,6 @@ messages:
          else if school = SS_JALA
          {
             nSchool = iJala;
-         }
-         else if school = SS_CRAFTING
-         {
-            nSchool = iCrafting;
          }
 
          // Bring the points back down to the original total, before learning.
@@ -12975,7 +12898,7 @@ messages:
    GetTotalLearnPoints(except = $)
    {
       local iSpell, iSID, oSpellObj, iSchool, iLevel, iKraanan, iShalille,
-            iQor, iFaren, iRiija, iJala, iWeapon, iCrafting, iTotalLearnPoints;
+            iQor, iFaren, iRiija, iJala, iWeapon, iTotalLearnPoints;
 
       iKraanan = 0;
       iShalille = 0;
@@ -12984,7 +12907,6 @@ messages:
       iRiija = 0;
       iJala = 0;
       iWeapon = 0;
-      iCrafting = 0;
 
       foreach iSpell in plSpells
       {
@@ -13037,12 +12959,6 @@ messages:
                   iJala = iLevel;
                }
                break;
-            case SS_CRAFTING:
-               if iLevel > iCrafting
-               {
-                  iCrafting = iLevel;
-               }
-               break;
             }
          }
       }
@@ -13065,12 +12981,6 @@ messages:
                   iWeapon = iLevel;
                }
                break;
-            case SS_CRAFTING:
-               if iLevel > iCrafting
-               {
-                  iCrafting = iLevel;
-               }
-               break;
             }
          }
       }
@@ -13081,8 +12991,7 @@ messages:
                          + Send(SYS,@GetLevelLearnPoints,#level=iQor)
                          + Send(SYS,@GetLevelLearnPoints,#level=iFaren)
                          + Send(SYS,@GetLevelLearnPoints,#level=iRiija)
-                         + Send(SYS,@GetLevelLearnPoints,#level=iJala)
-                         + Send(SYS,@GetLevelLearnPoints,#level=iCrafting);
+                         + Send(SYS,@GetLevelLearnPoints,#level=iJala);
 
       return iTotalLearnPoints;
    }
@@ -14167,11 +14076,9 @@ messages:
    // is added later and this needs to be extended.
    GetSkillSchoolLevels()
    {
-      local i, lSchoolLevels, oSkill, iLevel, iSchool, weaponcraft_level,
-            crafting_level;
+      local i, lSchoolLevels, oSkill, iLevel, iSchool, weaponcraft_level;
 
       weaponcraft_level = 0;
-      crafting_level = 0;
       iLevel = 0;
 
       foreach i in plSkills
@@ -14187,16 +14094,11 @@ messages:
                weaponcraft_level = iLevel;
             }
          }
-         else if (iSchool = SS_CRAFTING)
-         {
-            if iLevel > crafting_level
-            {
-               crafting_level = iLevel;
-            }
-         }
       }
 
-      lSchoolLevels = [weaponcraft_level, crafting_level];
+      // The second skill school was crafting; it is kept at 0 so the
+      // stat change packet keeps its shape.
+      lSchoolLevels = [weaponcraft_level, 0];
 
       return lSchoolLevels;
    }
@@ -14205,7 +14107,7 @@ messages:
    {
       local i, lSchoolLevels, oSpell, iSchool, iLevel, iCanForget,
             shalille_level, qor_level, kraanan_level, faren_level,
-            riija_level, jala_level, crafting_level;
+            riija_level, jala_level;
 
       shalille_level = 0;
       qor_level = 0;
@@ -14213,7 +14115,6 @@ messages:
       faren_level = 0;
       riija_level = 0;
       jala_level = 0;
-      crafting_level = 0;
       iCanForget = TRUE;
 
       // Get max level in each school. Yes, this is ugly but I'm trying for
@@ -14272,19 +14173,13 @@ messages:
                   jala_level = iLevel;
                }
             }
-            else if (iSchool = SS_CRAFTING)
-            {
-               if (iLevel > crafting_level)
-               {
-                  crafting_level = iLevel;
-               }
-            }
          }
       }
 
       // Order matters here, they appear in the order listed in blakston.khd.
+      // Slot 7 (SS_CRAFTING) is reserved and always 0.
       lSchoolLevels = [shalille_level,qor_level,kraanan_level,
-                       faren_level,riija_level,jala_level,crafting_level];
+                       faren_level,riija_level,jala_level,0];
 
       return lSchoolLevels;
    }

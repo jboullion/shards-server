@@ -66,8 +66,7 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [&GiantRatSoldier, 85],
-                     [&Ore, 15] ];
+      plMonsters = [ [&GiantRatSoldier, 100] ];
 
       propagate;
    }

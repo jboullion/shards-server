@@ -95,7 +95,6 @@ messages:
    IsAltered(what=$)
    {
       if what = $
-         OR Send(what,@GetSchool) = SS_CRAFTING
       {
          return FALSE;
       }

@@ -172,11 +172,7 @@ messages:
             Create(&ReagentBag)
          ],         
          $,
-         [
-            SID_CRAFTMAGICROBES, 
-            SID_CRAFTLIGHTMAGICROBES, 
-            SID_CRAFTWIZARDHAT
-         ],
+         $,
          $];
 
       return;

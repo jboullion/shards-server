@@ -240,9 +240,7 @@ messages:
             Create(&Gingermen)
          ],
          $,
-         [
-            SID_HEWING
-         ],
+         $,
          $];
 
       return;

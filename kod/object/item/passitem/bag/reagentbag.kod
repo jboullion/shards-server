@@ -48,9 +48,7 @@ messages:
 
       plBlackList = [ &Food,
                       &Ammo,
-                      &Money,
-                      &IronOre,
-                      &NeruditeOre ];
+                      &Money ];
 
       propagate;
    }

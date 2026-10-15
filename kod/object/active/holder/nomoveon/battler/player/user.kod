@@ -189,7 +189,6 @@ resources:
    user_kraanan_power = "Kraanan"
    user_riija_power = "Riija"
    user_jala_power = "Jala"
-   user_crafting_power = "Crafting"
 
    user_stat_health = heal.bgf
    user_stat_mana = ankh.bgf
@@ -338,7 +337,9 @@ resources:
    user_school_faren = "School of Faren"
    user_school_riija = "School of Riija"
    user_school_jala = "School of Jala"
-   user_school_crafting = "School of Crafting"
+   // School 7 was crafting. Clients list schools by position, so the slot
+   // stays with an empty name; clients skip schools with no name.
+   user_school_reserved = ""
    user_school_dm = "DM spells"
 
    user_admin_message = "%q"
@@ -2107,8 +2108,8 @@ messages:
                                        #faren_lvl=Nth(client_msg,11),
                                        #riija_lvl=Nth(client_msg,12),
                                        #jala_lvl=Nth(client_msg,13),
-                                       #weaponcraft_lvl=Nth(client_msg,14),
-                                       #crafting_lvl=Nth(client_msg,15));
+                                       #weaponcraft_lvl=Nth(client_msg,14));
+         // Field 15 was the crafting level; clients still send it (as 0).
          return;
       }
 
@@ -3227,11 +3228,6 @@ messages:
          return MM_NONE;
       }
 
-      if IsClass(what,&Resource)
-      {
-         return MM_TEMPSAFE;
-      }
-
       // Choose our own line color on minimap.
       if (what = self)
       {
@@ -3894,7 +3890,7 @@ messages:
                 4,user_school_shallile, 4,user_school_qor,
                 4,user_school_kraanan, 4,user_school_faren,
                 4,user_school_riija, 4,user_school_jala, 
-                4,user_school_crafting);
+                4,user_school_reserved);
 
       if viDM
       {
@@ -11036,7 +11032,7 @@ messages:
    SendStatChange()
    "Sends a stat change request to the client"
    {
-      local lSpellLevels, lSkillLevels, iCrafting;
+      local lSpellLevels, lSkillLevels;
 
       // if stats reset is turned off, ignore the request
       if NOT Send(SETTINGS_OBJECT,@GetStatsResetEnabled)
@@ -11053,13 +11049,6 @@ messages:
 
       lSpellLevels = Send(self, @GetSpellSchoolLevels);
       lSkillLevels = Send(self, @GetSkillSchoolLevels);
-      
-      //Crafting lvl should be the highest among skills/spells
-      iCrafting = Nth(lSkillLevels,2);
-      
-      if(Nth(lSkillLevels,2) < Nth(lSpellLevels,7)){
-         iCrafting = Nth(lSpellLevels,7);
-      }
 
       // TODO: don't load module if it is already loaded
       Send(self,@UserLoadModule,#module=user_statchange_module);
@@ -11069,7 +11058,8 @@ messages:
                 1,Nth(lSpellLevels,2), 1,Nth(lSpellLevels,3),
                 1,Nth(lSpellLevels,4), 1,Nth(lSpellLevels,5),
                 1,Nth(lSpellLevels,6), 1,First(lSkillLevels),
-                1,iCrafting);
+                // The crafting level byte; crafting was removed.
+                1,0);
       SendPacket(poSession);
 
       return;
@@ -11077,11 +11067,11 @@ messages:
 
    UserChangedStats(might=25,intellect=25,stamina=25,agility=25,mysticism=25,
                      aim=25,shallile_lvl=0,qor_lvl=0,kraanan_lvl=0,faren_lvl=0,
-                     riija_lvl=0,jala_lvl=0,weaponcraft_lvl=0,crafting_lvl=0)
+                     riija_lvl=0,jala_lvl=0,weaponcraft_lvl=0)
    "Processes a stat change request from the client"
    {
       local i, lSpellLevels, lSkillLevels, lSpellLevels_new, lSkillLevels_new,
-            iPrimaryStat, oAbility, iAbilityPct, iAbilityNum, iTotalLearnPoints, current_crafting_lvl_spells;
+            iPrimaryStat, oAbility, iAbilityPct, iAbilityNum, iTotalLearnPoints;
 
       // if stats reset is turned off, ignore the request
       if NOT Send(SETTINGS_OBJECT,@GetStatsResetEnabled)
@@ -11097,19 +11087,12 @@ messages:
       
       iTotalLearnPoints = 0;
       lSpellLevels = Send(self, @GetSpellSchoolLevels);
+      // Slot 7 of the spell schools and slot 2 of the skill schools were
+      // crafting; they stay 0.
       lSpellLevels_new = [shallile_lvl,qor_lvl,kraanan_lvl,
-                          faren_lvl,riija_lvl,jala_lvl, crafting_lvl];
-      
-      current_crafting_lvl_spells=Nth(lSpellLevels,7);
-
+                          faren_lvl,riija_lvl,jala_lvl,0];
       lSkillLevels = Send(self, @GetSkillSchoolLevels);
-
-      //Current Crafting highest lvl depends on both skill and spells, overwrite skills with spells if it's higher
-      if(Nth(lSkillLevels,2) < current_crafting_lvl_spells){
-        lSkillLevels = [Nth(lSkillLevels,1),current_crafting_lvl_spells];
-      }
-
-      lSkillLevels_new = [weaponcraft_lvl, crafting_lvl];
+      lSkillLevels_new = [weaponcraft_lvl, 0];
    
       // Range Checks, no client hacking negative stats funny business!
       if (might < 1 OR might > 50)
@@ -11131,7 +11114,6 @@ messages:
          OR (riija_lvl < 0 OR riija_lvl > 6)
          OR (jala_lvl < 0 OR jala_lvl > 6)
          OR (weaponcraft_lvl < 0 OR weaponcraft_lvl > 6)
-         OR (crafting_lvl < 0 OR crafting_lvl > 6)
       {
          Debug("School Range Check: Failed!");
          return FALSE;
@@ -11223,17 +11205,7 @@ messages:
             SetNth(lSkillLevels,1,Nth(lSkillLevels,1) - 1);
          }
       }
-         if (Nth(lSkillLevels,2) > 0)
-      {
-         while(Nth(lSkillLevels,2) > Nth(lSkillLevels_new,2))
-         {
-            // SS_CRAFTING id is 7
-            Send(self,@StripSkillsOfSchoolByLevel,#school=7,
-                  #level=Nth(lSkillLevels,2));
-            SetNth(lSkillLevels,2,Nth(lSkillLevels,2) - 1);
-         }
-      }
-     
+
       // Now iterate through the player's spells and strip 2// per stat loss
       foreach i in plSpells
       {

@@ -61,8 +61,7 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [ &Dragonfly, 80], [&DragonflyQueen, 10], 
-                     [&DenseTree, 10] ];
+      plMonsters = [ [&Dragonfly, 89], [&DragonflyQueen, 11] ];
 
       plGenerators = [ [27,48], [14,37], [14,25], [19,34], [11,31], 
                        [23,27], [31,48], [13,48], [16,44], [36,34], 

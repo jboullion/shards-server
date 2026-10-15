@@ -300,11 +300,7 @@ messages:
             Create(&HunterSword),
             Create(&NecromancerAmulet)
          ],$,
-         [
-            SID_CRAFTCIRCLET,
-            SID_CRAFTDAEMONHELM,
-            SID_CRAFTMSH
-         ],
+         $,
          $];
 
       return;

@@ -188,9 +188,7 @@ messages:
             Create(&BeerMug),
             Create(&BrawlGloves)
          ],
-         [
-            SKID_LOGGING
-         ], 
+         $, 
       $,$];
 
       return;

@@ -74,15 +74,7 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [&CaveOrc, 57],
-                     [&GroundwormQueen, 22],
-                     [&Ore, 6],
-                     [&DiamondVein, 2],
-                     [&EmeraldVein, 2],
-                     [&NeruditeVein, 5],
-                     [&RubyVein, 2],
-                     [&SapphireVein, 2],
-                     [&UncutVein, 2] ];
+      plMonsters = [ [&CaveOrc, 72], [&GroundwormQueen, 28] ];
       //plGenerators = [[50,43], [36,31], [28,39], [15,35], [21,19], [15,12], [39,17], [44,29],
       //		     [44,34], [27,8],   [36,28], [48,22], [47,23], [45,31], [24,33], [20,39]];
     

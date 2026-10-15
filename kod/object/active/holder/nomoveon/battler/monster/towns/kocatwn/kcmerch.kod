@@ -151,8 +151,7 @@ messages:
             Create(&WineGoblet,#number=4),
             Create(&KocatanMug,#number=4),
             Create(&Bread,#number=4),
-            Create(&Apple),
-            Create(&CuttingAxe)
+            Create(&Apple)
          ],
          $,
          [ 
