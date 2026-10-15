@@ -51,5 +51,35 @@
  },
  "ratsoldx.bgf": {
   "describe": "a dead rat soldier: a giant rat lying dead on its side, still wearing its dented iron helmet and battered leather jerkin with rusty iron plates"
+ },
+ "wolf.bgf": {
+  "describe": "a lean grey timber wolf with a thick brown-grey coat and a pale belly (keep its colours, gear and proportions)"
+ },
+ "wolfx.bgf": {
+  "describe": "a dead grey timber wolf lying on its side, with a thick brown-grey coat and a pale belly"
+ },
+ "ogre.bgf": {
+  "describe": "a huge, hulking, brutish ogre (keep its colours, gear and proportions)"
+ },
+ "ogrex.bgf": {
+  "describe": "a dead huge, hulking ogre sprawled on the ground (keep its colours, gear and proportions)"
+ },
+ "knight.bgf": {
+  "describe": "an undead knight of a long-forgotten legion in battered plate armour (keep its colours, gear and proportions)"
+ },
+ "knightx.bgf": {
+  "describe": "a fallen undead knight in battered plate armour lying dead on the ground (keep its colours, gear and proportions)"
+ },
+ "cknight.bgf": {
+  "describe": "an undead captain: a commanding knight in ornate, battered plate armour (keep its colours, gear and proportions)"
+ },
+ "cknightx.bgf": {
+  "describe": "a fallen undead captain in ornate, battered plate armour lying dead on the ground (keep its colours, gear and proportions)"
+ },
+ "hknight.bgf": {
+  "describe": "an undead half knight: a gruesome knight who met a terrible death, in broken plate armour (keep its colours, gear and proportions)"
+ },
+ "hknightx.bgf": {
+  "describe": "a fallen undead half knight in broken plate armour lying dead on the ground (keep its colours, gear and proportions)"
  }
 }

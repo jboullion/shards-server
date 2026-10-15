@@ -448,9 +448,17 @@ def cmd_batch(a):
             if len(plan) == 1 and len(plan[0]) == 1 and a.pack_singles > 1:
                 singles.append(n)
                 continue
-            per = max(1, a.angles_per_sheet)
-            packed = [sum(plan[i:i + per], []) for i in range(0, len(plan), per)]
-            angles = [len(plan[i:i + per]) for i in range(0, len(plan), per)]
+            # pack whole angles into a sheet until it holds about --sheet-frames frames (at least one angle)
+            packed, angles, cur, cur_angles = [], [], [], 0
+            for frames in plan:
+                if cur and len(cur) + len(frames) > a.sheet_frames:
+                    packed.append(cur)
+                    angles.append(cur_angles)
+                    cur, cur_angles = [], 0
+                cur = cur + frames
+                cur_angles += 1
+            packed.append(cur)
+            angles.append(cur_angles)
             plan = plans[n] = packed
             notes = icon_state(state, n)["notes"]
             texts = {}
@@ -758,8 +766,8 @@ def main():
     p.add_argument("--opt", action="append", default=[])
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--open", action="store_true", help="open the review page when done")
-    p.add_argument("--angles-per-sheet", type=int, default=2,
-                   help="creatures: viewing angles drawn together in one request (fewer requests, smaller cells)")
+    p.add_argument("--sheet-frames", type=int, default=24,
+                   help="creatures: whole angles go into one request until it holds about this many frames")
     p.add_argument("--pack-singles", type=int, default=4,
                    help="creatures with one image (corpses): this many share one request")
     p.add_argument("--batch-api", action="store_true",
