@@ -14,8 +14,8 @@ BOFS = wimptres.bof notres.bof spquent.bof med-tght.bof wmp-medt.bof \
    dethspdt.bof skel2t.bof skel3t.bof skel4t.bof narthylt.bof \
    wrmlarvt.bof wrmquent.bof dangelt.bof newbietrs.bof thrasht.bof \
    statuet.bof kriipat.bof molluskt.bof shadowbeastt.bof ratktres.bof \
-   earthelet.bof fireelet.bof iceelet.bof neruelet.bof easterbunnyt.bof \
-   killerbunnyt.bof xeoairt.bof xeoeartht.bof xeofiret.bof xeowatert.bof \
+   earthelet.bof fireelet.bof iceelet.bof neruelet.bof \
+   xeoairt.bof xeoeartht.bof xeofiret.bof xeowatert.bof \
    xeoacidt.bof xeounholyt.bof xeoholyt.bof xeonerut.bof xeoillt.bof lupoggt.bof necrot.bof \
    earthdragt.bof mimict.bof minotaurt.bof knightt.bof ogret.bof \
    trollt.bof \

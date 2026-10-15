@@ -1,8 +1,8 @@
 {
  "counts": {
   "original": 549,
-  "check": 80,
-  "fanart": 198,
+  "check": 79,
+  "fanart": 184,
   "missing": 1
  },
  "selected": 111,
@@ -10121,65 +10121,6 @@
    "selected": false
   },
   {
-   "name": "bigslime.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "BigSlime"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bigslime.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 4,
-   "bitmaps": 30,
-   "groups": 5,
-   "size": [
-    500,
-    311
-   ],
-   "selected": false
-  },
-  {
-   "name": "bigslime2.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "BigSlime",
-    "BigSlimeSplit"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bigslime2.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 9,
-   "bitmaps": 30,
-   "groups": 5,
-   "size": [
-    500,
-    311
-   ],
-   "selected": false
-  },
-  {
-   "name": "bigslime2x.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "BigSlime",
-    "BigSlimeSplit"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bigslime2X.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 9,
-   "bitmaps": 1,
-   "groups": 1,
-   "size": [
-    363,
-    196
-   ],
-   "selected": false
-  },
-  {
    "name": "blank.bgf",
    "kind": "monster",
    "status": "original",
@@ -10443,158 +10384,6 @@
    "size": [
     75,
     213
-   ],
-   "selected": false
-  },
-  {
-   "name": "bullant.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "BullAnt"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bullant.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 3,
-   "bitmaps": 18,
-   "groups": 10,
-   "size": [
-    452,
-    140
-   ],
-   "selected": false
-  },
-  {
-   "name": "bullantx.bgf",
-   "kind": "monster",
-   "status": "check",
-   "classes": [
-    "BullAnt"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bullantX.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 3,
-   "bitmaps": 1,
-   "groups": 1,
-   "size": [
-    291,
-    107
-   ],
-   "selected": false
-  },
-  {
-   "name": "bunny2.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "Bunny"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunny2.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 18,
-   "bitmaps": 30,
-   "groups": 5,
-   "size": [
-    362,
-    523
-   ],
-   "selected": false
-  },
-  {
-   "name": "bunny2x.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "Bunny"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunny2X.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 17,
-   "bitmaps": 8,
-   "groups": 1,
-   "size": [
-    391,
-    142
-   ],
-   "selected": false
-  },
-  {
-   "name": "bunnyg.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "EasterBunny"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnyg.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 3,
-   "bitmaps": 30,
-   "groups": 5,
-   "size": [
-    362,
-    523
-   ],
-   "selected": false
-  },
-  {
-   "name": "bunnygrey.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "KillerBunny"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygrey.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 14,
-   "bitmaps": 30,
-   "groups": 5,
-   "size": [
-    362,
-    523
-   ],
-   "selected": false
-  },
-  {
-   "name": "bunnygreyx.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "KillerBunny"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygreyx.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 15,
-   "bitmaps": 8,
-   "groups": 1,
-   "size": [
-    391,
-    142
-   ],
-   "selected": false
-  },
-  {
-   "name": "bunnygx.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "EasterBunny"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygx.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 4,
-   "bitmaps": 8,
-   "groups": 1,
-   "size": [
-    391,
-    142
    ],
    "selected": false
   },
@@ -11527,44 +11316,6 @@
    "size": [
     394,
     190
-   ],
-   "selected": false
-  },
-  {
-   "name": "elephant.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "Elephant"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\elephant.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 4,
-   "bitmaps": 144,
-   "groups": 18,
-   "size": [
-    483,
-    301
-   ],
-   "selected": false
-  },
-  {
-   "name": "elephantx.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "Elephant"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\elephantX.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 4,
-   "bitmaps": 1,
-   "groups": 1,
-   "size": [
-    400,
-    166
    ],
    "selected": false
   },
@@ -13609,44 +13360,6 @@
    "size": [
     139,
     383
-   ],
-   "selected": false
-  },
-  {
-   "name": "nyrphling.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "Nyrphling"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\nyrphling.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 5,
-   "bitmaps": 264,
-   "groups": 33,
-   "size": [
-    305,
-    171
-   ],
-   "selected": false
-  },
-  {
-   "name": "nyrphlingx.bgf",
-   "kind": "monster",
-   "status": "fanart",
-   "classes": [
-    "Nyrphling"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\nyrphlingX.bgf",
-   "in_classic": false,
-   "restyled": false,
-   "shrink": 10,
-   "bitmaps": 1,
-   "groups": 1,
-   "size": [
-    384,
-    116
    ],
    "selected": false
   },

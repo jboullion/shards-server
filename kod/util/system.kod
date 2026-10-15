@@ -4170,8 +4170,6 @@ messages:
       Create(&IceElementalTreasure);
       Create(&NeruditeElementalTreasure);
 
-      Create(&EasterBunnyTreasure);
-      Create(&KillerBunnyTreasure);
 
       Create(&XeoAirTreasure);
       Create(&XeoEarthTreasure);
@@ -5607,10 +5605,6 @@ messages:
       plMonsterTemplates = cons(create(&DragonFlyQueen),plMonsterTemplates);
       plMonsterTemplates = cons(create(&DragonFlyPet),plMonsterTemplates);
       plMonsterTemplates = cons(create(&Kriipa),plMonsterTemplates);
-      plMonsterTemplates = cons(create(&Elephant),plMonsterTemplates);
-      plMonsterTemplates = cons(create(&Bunny),plMonsterTemplates);
-      plMonsterTemplates = cons(create(&KillerBunny),plMonsterTemplates);
-      plMonsterTemplates = cons(create(&EasterBunny),plMonsterTemplates);
       plMonsterTemplates = cons(create(&Wolf),plMonsterTemplates);
       plMonsterTemplates = cons(create(&Chupacabra),plMonsterTemplates);
       plMonsterTemplates = cons(create(&Minotaur),plMonsterTemplates);
@@ -5716,15 +5710,11 @@ messages:
       plMonsterTemplates = Cons(Create(&BanditSniper,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&BanditCaptain,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&Beetle,#template=TRUE),plMonsterTemplates);
-      plMonsterTemplates = Cons(Create(&Bullant,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&Wendigo,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&Spinebeast,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&SpinebeastSmall,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&SpinebeastBoss,#template=TRUE),plMonsterTemplates);
-      plMonsterTemplates = Cons(Create(&BigSlime,#template=TRUE),plMonsterTemplates);
-      plMonsterTemplates = Cons(Create(&BigSlimeSplit,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&GiantEye,#template=TRUE),plMonsterTemplates);
-      plMonsterTemplates = Cons(Create(&Nyrphling,#template=TRUE),plMonsterTemplates);
       plMonsterTemplates = Cons(Create(&Ranuculus,#template=TRUE),plMonsterTemplates);
 
       return;

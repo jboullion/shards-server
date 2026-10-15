@@ -1954,8 +1954,7 @@
    TID_ICE_ELE       = 61
    TID_NERU_ELE      = 62
 
-   TID_EASTER_BUNNY  = 63
-   TID_KILLER_BUNNY  = 64
+   // 63-64 were the easter and killer bunnies.
 
    TID_XEO_AIR       = 65
    TID_XEO_EARTH     = 66

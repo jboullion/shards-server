@@ -16,10 +16,10 @@ BOFS  = ant.bof centip.bof cow.bof ent.bof fairy.bof fungbst.bof ghost.bof \
         stntroll.bof snowrat.bof lich.bof deadlich.bof duskrat.bof thrasher.bof \
         nrthlwrm.bof bramble.bof eviltwin.bof dethspid.bof grdworm.bof human.bof \
         xeochctl.bof dflypet.bof dangel.bof mollusk.bof specmum.bof \
-        evilent.bof elephant.bof bunny.bof wolf.bof chupacabra.bof minotaur.bof \
+        evilent.bof wolf.bof chupacabra.bof minotaur.bof \
         earthdrag.bof mimic.bof blackdrag.bof knight.bof ogre.bof \
 	deathrealmM.bof blueeyesdrag.bof wasphive.bof icedrag.bof necroeffigy.bof \
-        beetle.bof bullant.bof bigslime.bof spinebeast.bof wendigo.bof giaeye.bof \
-        nyrphling.bof ranu.bof
+        beetle.bof spinebeast.bof wendigo.bof giaeye.bof \
+        ranu.bof
 
 !include $(KODDIR)\kod.mak
