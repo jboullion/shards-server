@@ -3,8 +3,8 @@ Step 1: find every item icon and flag the ones that look like fan art.
 
     python tools/iconforge/forge.py inventory
 
-Reads the item classes (kod/object/item/**/*.kod) for the .bgf each one shows as its icon
-(vrIcon, vrIcon_male, vrIcon_female), finds the file the game serves for each, and compares it
+Reads the item, spell and skill classes (kod/object/item, kod/object/passive/spell and /skill) for
+the .bgf each one shows as its icon (vrIcon, vrIcon_male, vrIcon_female), finds the file the game serves for each, and compares it
 with the classic Steam client's copy:
 
     fanart    not in the classic client (or changed since) AND high-res: shrink >= 15 or a side >= 300 px.
@@ -13,8 +13,8 @@ with the classic Steam client's copy:
     original  byte-identical art to the classic client.
     missing   no file anywhere.
 
-Writes data/iconforge/inventory.json and build/iconforge/inventory/<status>.png contact sheets.
-Icons get "selected": true when fanart; edit the JSON (or use `forge.py select`) to change the set.
+Writes data/iconforge/inventory.json and build/iconforge/inventory/<kind>-<status>.png contact sheets.
+Fan-art items start selected; spell and skill icons only when chosen with `forge.py select`.
 """
 from __future__ import annotations
 
@@ -26,7 +26,11 @@ from bgf import BGF, load_palette, same_content
 from review import contact_sheet
 
 REPO = Path(__file__).resolve().parents[2]
-ITEM_DIR = REPO / "kod" / "object" / "item"
+# Where icon-bearing classes live, by kind. Items are inventory icons; spell and skill icons show in
+# the spell/skill lists, the cast bar and (for enchantments) the status bar.
+KINDS = {"item": REPO / "kod" / "object" / "item",
+         "spell": REPO / "kod" / "object" / "passive" / "spell",
+         "skill": REPO / "kod" / "object" / "passive" / "skill"}
 DATA = REPO / "data" / "iconforge"
 BUILD = REPO / "build" / "iconforge"
 
@@ -52,10 +56,10 @@ def _index(root: Path, recursive: bool) -> dict:
     return {p.name.lower(): p for p in it if p.suffix.lower() == ".bgf"}
 
 
-def item_icons() -> dict:
-    """bgf name (lower case) -> sorted list of item classes that show it as an icon."""
+def class_icons(root: Path) -> dict:
+    """bgf name (lower case) -> sorted list of classes under `root` that show it as an icon."""
     out: dict[str, set] = {}
-    for kod in ITEM_DIR.rglob("*.kod"):
+    for kod in root.rglob("*.kod"):
         text = kod.read_text(encoding="latin-1")
         m = CLASS_RE.search(text)
         cls = m.group(1) if m else kod.stem
@@ -79,7 +83,13 @@ def classify(served: BGF | None, classic: BGF | None) -> str:
 
 
 def run() -> dict:
-    icons = item_icons()
+    icons, kinds = {}, {}
+    for kind, root in KINDS.items():
+        for name, classes in class_icons(root).items():
+            icons.setdefault(name, []).extend(classes)
+            kinds.setdefault(name, [])
+            if kind not in kinds[name]:
+                kinds[name].append(kind)
     shards = _index(SHARDS_DIR, False)
     served_idx = {}
     for root in reversed(SERVED):  # earlier roots win
@@ -101,14 +111,15 @@ def run() -> dict:
         except ValueError as e:
             print("!! %s: %s" % (name, e))
         status = classify(served, classic)
-        e = {"name": name, "status": status, "classes": classes,
+        e = {"name": name, "kind": "/".join(kinds[name]), "status": status, "classes": sorted(set(classes)),
              "source": str(src) if src else None,
              "in_classic": name in classic_idx,
              "restyled": name in shards}
         if served:
             e.update(shrink=served.shrink, bitmaps=len(served.bitmaps), groups=len(served.groups),
                      size=[max(b.w for b in served.bitmaps), max(b.h for b in served.bitmaps)])
-        e["selected"] = previous.get(name, {}).get("selected", status == "fanart")
+        # Fan-art items start selected; spell and skill icons wait until chosen (`forge.py select`).
+        e["selected"] = previous.get(name, {}).get("selected", status == "fanart" and kinds[name] == ["item"])
         entries.append(e)
 
     DATA.mkdir(parents=True, exist_ok=True)
@@ -120,16 +131,23 @@ def run() -> dict:
 
     pal = load_palette()
     out = BUILD / "inventory"
-    for status in ("fanart", "check", "original"):
-        group = [e for e in entries if e["status"] == status and e.get("source")]
-        if not group:
-            continue
-        tiles = []
-        for e in group:
-            b = BGF.read(Path(e["source"]))
-            tiles.append(("%s (s%d)" % (e["name"].removesuffix(".bgf"), b.shrink), [inventory_bitmap(b).rgba(pal)]))
-        contact_sheet(tiles, out / ("%s.png" % status), cell=96)
-    print("icons: %d  %s  selected: %d" % (len(entries), counts, inv["selected"]))
+    for kind in KINDS:
+        for status in ("fanart", "check", "original"):
+            group = [e for e in entries if e["status"] == status and e.get("source") and kind in e["kind"].split("/")]
+            if not group:
+                continue
+            tiles = []
+            for e in group:
+                b = BGF.read(Path(e["source"]))
+                tiles.append(("%s (s%d)" % (e["name"].removesuffix(".bgf"), b.shrink), [inventory_bitmap(b).rgba(pal)]))
+            contact_sheet(tiles, out / ("%s-%s.png" % (kind, status)), cell=96)
+    for kind in KINDS:
+        k = [e for e in entries if kind in e["kind"].split("/")]
+        c = {}
+        for e in k:
+            c[e["status"]] = c.get(e["status"], 0) + 1
+        print("%-5s icons: %3d  %s" % (kind, len(k), c))
+    print("selected: %d" % inv["selected"])
     print("wrote %s and contact sheets in %s" % (inv_path, out))
     return inv
 
