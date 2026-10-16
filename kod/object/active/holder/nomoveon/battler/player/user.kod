@@ -540,6 +540,20 @@ properties:
    // Ours: the words of the UC_SHARDS command being read (ShardsCommand); $ between commands
    plShardsWords = $
 
+   // Ours (util/shardssocial.kod): this player's friends, the players who asked to be and
+   // those this player asked, their options (SF_*), when they last left the game (Kod time),
+   // whom they follow and who follows them (both cleared on entering the game), and their pet
+   plFriends = $
+   plFriendsIn = $
+   plFriendsOut = $
+   piSocialFlags = 0
+   piLastSeen = 0
+   poFollowing = $
+   plFollowers = $
+   psPetKind = $
+   piPetColour = 0
+   psPetName = $
+
    piLogoffPenaltyCount = 0
 
    piTimeNewsPosted = 0
@@ -846,6 +860,9 @@ messages:
       poSession = session_id;
       pbLogged_on = TRUE;
 
+      // Ours: nobody follows anybody across a logon (util/shardssocial.kod)
+      Send(Send(SYS,@GetShardsSocial),@UserEntered,#who=self);
+
       piLastLoginTime = GetTime();
       // Gotta load interface early!
       Send(self,@UserLoadModule,#module=user_interface_module);
@@ -1003,6 +1020,10 @@ messages:
       piTimeLoggedIn = Send(self,@GetTimeLoggedIn);
       Send(self,@BreakTrance);
       pbLogged_on = FALSE;
+
+      // Ours: friends see when we were last here, and our follows end (util/shardssocial.kod)
+      piLastSeen = GetTime();
+      Send(Send(SYS,@GetShardsSocial),@UserLeaving,#who=self);
 
       Send(self,@CancelIfOffer);
       Send(self,@UserLogoffHook);
@@ -1534,6 +1555,9 @@ messages:
             Send(self,@MsgSendUser,#message_rsc=user_guildmate_logon,
                  #parm1=rName);
          }
+
+         // Ours: a friend came (util/shardssocial.kod)
+         Send(Send(SYS,@GetShardsSocial),@FriendCameOrWent,#who=self,#other=what,#came=TRUE);
       }
 
       return;
@@ -1558,6 +1582,9 @@ messages:
             Send(self,@MsgSendUser,#message_rsc=user_guildmate_logoff,
                  #parm1=rName);
          }
+
+         // Ours: a friend went (util/shardssocial.kod)
+         Send(Send(SYS,@GetShardsSocial),@FriendCameOrWent,#who=self,#other=what,#came=FALSE);
 
          AddPacket(1,BP_PLAYER_REMOVE,4,what);
          SendPacket(poSession);
@@ -4400,6 +4427,9 @@ messages:
    // client, as UC_SHARDS lines: a verb and its arguments, separated by spaces. Each verb
    // goes to its feature. Nothing is spoken, so there's nothing for the client to hide.
    //   travel <id>   fast travel from the portal we stand by (util/travelnet.kod)
+   //   friend ...    friends, requests, following (util/shardssocial.kod)
+   //   pet ...       our pet, and the room's
+   //   ambient       the crowd our client should show in this room
 
    ShardsCommand(string = $)
    {
@@ -4424,6 +4454,27 @@ messages:
       if StringEqual(sVerb,"travel")
       {
          Send(Send(SYS,@GetTravelNetwork),@TravelCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"friend")
+      {
+         Send(Send(SYS,@GetShardsSocial),@FriendCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"pet")
+      {
+         Send(Send(SYS,@GetShardsSocial),@PetCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"ambient")
+      {
+         Send(Send(SYS,@GetShardsSocial),@AmbientCommand,#who=self);
 
          return;
       }
@@ -4510,6 +4561,131 @@ messages:
 
       AddPacket(1,BP_USERCOMMAND,1,UC_PVP_UNTIL,4,Send(self,@PvPSecondsLeft));
       SendPacket(poSession);
+
+      return;
+   }
+
+   // Ours: what util/shardssocial.kod keeps on each player
+
+   GetShardsSession()
+   "The session to send our client's packets to, or $ while out of the game."
+   {
+      if NOT pbLogged_on
+      {
+         return $;
+      }
+
+      return poSession;
+   }
+
+   GetFriends()
+   {
+      return plFriends;
+   }
+
+   SetFriends(members = $)
+   {
+      plFriends = members;
+
+      return;
+   }
+
+   GetFriendsIn()
+   {
+      return plFriendsIn;
+   }
+
+   SetFriendsIn(members = $)
+   {
+      plFriendsIn = members;
+
+      return;
+   }
+
+   GetFriendsOut()
+   {
+      return plFriendsOut;
+   }
+
+   SetFriendsOut(members = $)
+   {
+      plFriendsOut = members;
+
+      return;
+   }
+
+   GetSocialFlags()
+   {
+      return piSocialFlags;
+   }
+
+   SetSocialFlags(flags = 0)
+   {
+      piSocialFlags = flags;
+
+      return;
+   }
+
+   GetLastSeen()
+   "When this player last left the game (Kod time), 0 if never."
+   {
+      return piLastSeen;
+   }
+
+   GetFollowing()
+   {
+      return poFollowing;
+   }
+
+   SetFollowing(what = $)
+   {
+      poFollowing = what;
+
+      return;
+   }
+
+   GetFollowers()
+   {
+      return plFollowers;
+   }
+
+   SetFollowers(members = $)
+   {
+      plFollowers = members;
+
+      return;
+   }
+
+   GetPetKind()
+   {
+      return psPetKind;
+   }
+
+   GetPetColour()
+   {
+      return piPetColour;
+   }
+
+   GetPetName()
+   {
+      return psPetName;
+   }
+
+   SetPet(kind = $,colour = 0,name = $)
+   "Our pet: a kind ($ for none), a colour and a name (strings of their own)."
+   {
+      psPetKind = $;
+      psPetName = $;
+      piPetColour = colour;
+      if kind <> $
+      {
+         psPetKind = SetString($,kind);
+      }
+
+      if name <> $
+      {
+         psPetName = SetString($,name);
+      }
 
       return;
    }
@@ -8201,9 +8377,16 @@ messages:
    NewOwner(what = $)
    "A user has a new owner when they enter a new room."
    {
-      local i, oOldRoom;
+      local i, oOldRoom, lCameFrom;
 
       Send(self,@CancelIfOffer);
+
+      // Ours: where we leave from, for followers (util/shardssocial.kod RoomChanged)
+      lCameFrom = $;
+      if poOwner <> $ AND poOwner <> what AND IsClass(poOwner,&Room)
+      {
+         lCameFrom = [Send(poOwner,@GetRoomResource),Send(self,@GetRow),Send(self,@GetCol)];
+      }
 
       // Count right now as the last time we moved.
       piLastMoveUpdateTime = GetTickCount();
@@ -8285,6 +8468,10 @@ messages:
          {
             Send(self,@ToCliPlayer);
             Send(self,@ToCliRoomContents);
+
+            // Ours: friends hear where we are, followers which way we went, and pets are
+            // told about, now our client has the room (util/shardssocial.kod)
+            Send(Send(SYS,@GetShardsSocial),@RoomChanged,#who=self,#came_from=lCameFrom);
          }
       }
 

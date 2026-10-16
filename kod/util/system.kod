@@ -392,6 +392,8 @@ properties:
    poGameQuestMaintenance = $
    // Ours: fast travel (util/travelnet.kod), made on demand
    poTravelNetwork = $
+   // Ours: friends, pets and the shared crowd (util/shardssocial.kod), made on demand
+   poShardsSocial = $
    poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
@@ -5160,6 +5162,17 @@ messages:
       }
 
       return poTravelNetwork;
+   }
+
+   GetShardsSocial()
+   "Ours: friends, pets and the shared crowd (util/shardssocial.kod), made on demand."
+   {
+      if poShardsSocial = $
+      {
+         poShardsSocial = Create(&ShardsSocial);
+      }
+
+      return poShardsSocial;
    }
 
    GetGameQuestMaintenance()

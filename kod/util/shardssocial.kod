@@ -1,0 +1,960 @@
+// Ours (Meridian Shards, docs/adr/0015-social-on-our-server.md): friends, pets and the shared
+// crowd, kept with the game instead of on the friends relay our client used before. One object,
+// SYS@GetShardsSocial, made on demand. It holds no state of its own: each player's friends,
+// requests, options, follows and pet are on the player (User), and each room's crowd on the room
+// (Room.GetAmbientCrowd), so rebuilding this object loses nothing.
+//
+// Our client asks over UC_SHARDS (User.ShardsCommand). A name always ends a command, so it may
+// hold spaces:
+//   friend list | request <name> | accept <name> | decline <name> | cancel <name> | remove <name>
+//   friend options <flags> | search <text> | follow <name> | unfollow | stopfollower <name> | hp
+//   pet list | pet set <kind> <colour> [<name>] | pet clear
+//   ambient
+// It hears UC_FRIENDS (the list, a friend's location or health, the exit a leader took, search
+// results), UC_PETS (the pets of players in its room, by object) and UC_AMBIENT (its room's crowd).
+
+////////////////////////////////////////////////////////////////////////////////
+ShardsSocial is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   // UC_FRIENDS' kinds
+   FR_LIST = 1
+   FR_LOC = 2
+   FR_HP = 3
+   FR_EXIT = 4
+   FR_SEARCH = 5
+
+   // A player's options (User.GetSocialFlags): all off by default
+   SF_HIDE_LOCATION = 1
+   SF_HIDE_SEARCH = 2
+   SF_REFUSE_FOLLOW = 4
+   SF_ALL = 7
+
+   MAX_FRIENDS = 100
+   MAX_REQUESTS = 50
+   SEARCH_MIN = 2
+   SEARCH_MAX = 20
+   PET_KIND_MAX = 24
+   PET_NAME_MAX = 16
+   PET_COLOUR_MAX = 15
+
+resources:
+
+   social_no_such = "No one called %s plays here."
+   social_self = "That's you."
+   social_already = "%s is already your friend."
+   social_asked_already = "You've already asked %s."
+   social_too_many = "You have as many friends as you can keep."
+   social_asked = "You ask %s to be your friend."
+   social_asked_you = "%s wants to be your friend (the Friends tab)."
+   social_now_friends = "You and %s are friends now."
+   social_declined = "%s declined your friend request."
+   social_removed = "%s is no longer your friend."
+   social_you_removed = "You and %s are no longer friends."
+   social_not_friend = "%s isn't your friend."
+   social_not_online = "%s isn't in the game."
+   social_not_here = "%s isn't here: you can only start following someone in your room."
+   social_chain = "%s is following you: you can't follow them back."
+   social_refuses = "%s doesn't take followers."
+   social_follow = "You follow %s."
+   social_following_you = "%s is following you."
+   social_unfollowed = "%s stopped following you."
+   social_stopped_you = "%s stopped you following."
+   social_logon = "Your friend %s is in the game."
+   social_logoff = "Your friend %s has left the game."
+   social_empty = ""
+
+classvars:
+
+properties:
+
+messages:
+
+   // ---- the commands ----
+
+   FriendCommand(who = $,words = $)
+   "friend ...: the second word says what."
+   {
+      local sWhat, oOther, iFlags;
+
+      if who = $ OR Length(words) < 2
+      {
+         return;
+      }
+
+      sWhat = Nth(words,2);
+      if StringEqual(sWhat,"list")
+      {
+         Send(self,@SendFriendList,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sWhat,"hp")
+      {
+         Send(self,@SendHealth,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sWhat,"unfollow")
+      {
+         Send(self,@Unfollow,#who=who);
+
+         return;
+      }
+
+      if Length(words) < 3
+      {
+         return;
+      }
+
+      if StringEqual(sWhat,"options")
+      {
+         iFlags = StringToNumber(Nth(words,3));
+         if iFlags = $ OR iFlags < 0
+         {
+            return;
+         }
+
+         Send(self,@SetOptions,#who=who,#flags=iFlags & SF_ALL);
+
+         return;
+      }
+
+      if StringEqual(sWhat,"search")
+      {
+         Send(self,@SendSearch,#who=who,#text=Send(self,@JoinWords,#words=words,#from=3));
+
+         return;
+      }
+
+      oOther = Send(SYS,@FindUserByString,#string=Send(self,@JoinWords,#words=words,#from=3));
+      if oOther = $ OR NOT IsClass(oOther,&User)
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_no_such,
+              #parm1=Send(self,@JoinWords,#words=words,#from=3));
+
+         return;
+      }
+
+      if StringEqual(sWhat,"request")
+      {
+         Send(self,@Request,#who=who,#other=oOther);
+      }
+      else if StringEqual(sWhat,"accept")
+      {
+         Send(self,@Accept,#who=who,#other=oOther);
+      }
+      else if StringEqual(sWhat,"decline")
+      {
+         Send(self,@Decline,#who=who,#other=oOther);
+      }
+      else if StringEqual(sWhat,"cancel")
+      {
+         Send(self,@Cancel,#who=who,#other=oOther);
+      }
+      else if StringEqual(sWhat,"remove")
+      {
+         Send(self,@Remove,#who=who,#other=oOther);
+      }
+      else if StringEqual(sWhat,"follow")
+      {
+         Send(self,@Follow,#who=who,#leader=oOther);
+      }
+      else if StringEqual(sWhat,"stopfollower")
+      {
+         Send(self,@StopFollower,#who=who,#follower=oOther);
+      }
+
+      return;
+   }
+
+   PetCommand(who = $,words = $)
+   "pet list, pet set <kind> <colour> [<name>], pet clear."
+   {
+      local sWhat, sKind, iColour, sName;
+
+      if who = $ OR Length(words) < 2
+      {
+         return;
+      }
+
+      sWhat = Nth(words,2);
+      if StringEqual(sWhat,"list")
+      {
+         Send(self,@SendRoomPets,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sWhat,"clear")
+      {
+         Send(who,@SetPet,#kind=$,#colour=0,#name=$);
+         Send(self,@PetChanged,#who=who);
+
+         return;
+      }
+
+      if NOT StringEqual(sWhat,"set") OR Length(words) < 4
+      {
+         return;
+      }
+
+      // The kinds are our client's (packages/world pets.ts); only their shape is checked here
+      sKind = Nth(words,3);
+      iColour = StringToNumber(Nth(words,4));
+      if StringLength(sKind) > PET_KIND_MAX OR iColour = $ OR iColour < 0
+         OR iColour > PET_COLOUR_MAX
+      {
+         return;
+      }
+
+      sName = $;
+      if Length(words) >= 5
+      {
+         sName = Send(self,@JoinWords,#words=words,#from=5);
+         if StringLength(sName) > PET_NAME_MAX
+         {
+            return;
+         }
+      }
+
+      Send(who,@SetPet,#kind=sKind,#colour=iColour,#name=sName);
+      Send(self,@PetChanged,#who=who);
+
+      return;
+   }
+
+   AmbientCommand(who = $)
+   "UC_AMBIENT: the crowd our client should show in the player's room."
+   {
+      local oRoom, lCrowd, oSession;
+
+      oSession = Send(who,@GetShardsSession);
+      oRoom = Send(who,@GetOwner);
+      if oSession = $ OR oRoom = $ OR NOT IsClass(oRoom,&Room)
+      {
+         return;
+      }
+
+      lCrowd = Send(oRoom,@GetAmbientCrowd,#who=who);
+      AddPacket(1,BP_USERCOMMAND,1,UC_AMBIENT,4,Nth(lCrowd,1),4,Nth(lCrowd,2),1,Nth(lCrowd,3));
+      SendPacket(oSession);
+
+      return;
+   }
+
+   JoinWords(words = $,from = 1)
+   "The words from the from'th on, one space between, as a new string; $ when there are none."
+   {
+      local i, n;
+
+      if Length(words) < from
+      {
+         return $;
+      }
+
+      n = 0;
+      ClearTempString();
+      foreach i in words
+      {
+         n = n + 1;
+         if n > from
+         {
+            AppendTempString(" ");
+         }
+
+         if n >= from
+         {
+            AppendTempString(i);
+         }
+      }
+
+      return SetString($,GetTempString());
+   }
+
+   // ---- friends and requests ----
+
+   AreFriends(user1 = $,user2 = $)
+   {
+      return FindListElem(Send(user1,@GetFriends),user2) > 0;
+   }
+
+   Request(who = $,other = $)
+   {
+      if other = who
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_self);
+
+         return;
+      }
+
+      if Send(self,@AreFriends,#user1=who,#user2=other)
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_already,#parm1=Send(other,@GetTrueName));
+
+         return;
+      }
+
+      // Both asked: that's a yes
+      if FindListElem(Send(who,@GetFriendsIn),other) > 0
+      {
+         Send(self,@Accept,#who=who,#other=other);
+
+         return;
+      }
+
+      if FindListElem(Send(who,@GetFriendsOut),other) > 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_asked_already,#parm1=Send(other,@GetTrueName));
+
+         return;
+      }
+
+      if Length(Send(who,@GetFriends)) >= MAX_FRIENDS
+         OR Length(Send(who,@GetFriendsOut)) >= MAX_REQUESTS
+         OR Length(Send(other,@GetFriendsIn)) >= MAX_REQUESTS
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_too_many);
+
+         return;
+      }
+
+      Send(who,@SetFriendsOut,#members=Cons(other,Send(who,@GetFriendsOut)));
+      Send(other,@SetFriendsIn,#members=Cons(who,Send(other,@GetFriendsIn)));
+      Send(who,@MsgSendUser,#message_rsc=social_asked,#parm1=Send(other,@GetTrueName));
+      if Send(other,@IsLoggedOn)
+      {
+         Send(other,@MsgSendUser,#message_rsc=social_asked_you,#parm1=Send(who,@GetTrueName));
+      }
+
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=other);
+
+      return;
+   }
+
+   Accept(who = $,other = $)
+   {
+      if FindListElem(Send(who,@GetFriendsIn),other) = 0
+      {
+         return;
+      }
+
+      Send(self,@DropRequests,#user1=who,#user2=other);
+      if Length(Send(who,@GetFriends)) >= MAX_FRIENDS
+         OR Length(Send(other,@GetFriends)) >= MAX_FRIENDS
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_too_many);
+         Send(self,@SendFriendList,#who=who);
+
+         return;
+      }
+
+      if NOT Send(self,@AreFriends,#user1=who,#user2=other)
+      {
+         Send(who,@SetFriends,#members=Cons(other,Send(who,@GetFriends)));
+      }
+
+      if NOT Send(self,@AreFriends,#user1=other,#user2=who)
+      {
+         Send(other,@SetFriends,#members=Cons(who,Send(other,@GetFriends)));
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=social_now_friends,#parm1=Send(other,@GetTrueName));
+      if Send(other,@IsLoggedOn)
+      {
+         Send(other,@MsgSendUser,#message_rsc=social_now_friends,#parm1=Send(who,@GetTrueName));
+      }
+
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=other);
+
+      return;
+   }
+
+   Decline(who = $,other = $)
+   {
+      if FindListElem(Send(who,@GetFriendsIn),other) = 0
+      {
+         return;
+      }
+
+      Send(self,@DropRequests,#user1=who,#user2=other);
+      if Send(other,@IsLoggedOn)
+      {
+         Send(other,@MsgSendUser,#message_rsc=social_declined,#parm1=Send(who,@GetTrueName));
+      }
+
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=other);
+
+      return;
+   }
+
+   Cancel(who = $,other = $)
+   {
+      if FindListElem(Send(who,@GetFriendsOut),other) = 0
+      {
+         return;
+      }
+
+      Send(self,@DropRequests,#user1=who,#user2=other);
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=other);
+
+      return;
+   }
+
+   DropRequests(user1 = $,user2 = $)
+   "Any request either way between user1 and user2."
+   {
+      Send(user1,@SetFriendsIn,#members=DelListElem(Send(user1,@GetFriendsIn),user2));
+      Send(user1,@SetFriendsOut,#members=DelListElem(Send(user1,@GetFriendsOut),user2));
+      Send(user2,@SetFriendsIn,#members=DelListElem(Send(user2,@GetFriendsIn),user1));
+      Send(user2,@SetFriendsOut,#members=DelListElem(Send(user2,@GetFriendsOut),user1));
+
+      return;
+   }
+
+   Remove(who = $,other = $)
+   "Friends no more, both ways, and neither follows the other."
+   {
+      if NOT Send(self,@AreFriends,#user1=who,#user2=other)
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_not_friend,#parm1=Send(other,@GetTrueName));
+
+         return;
+      }
+
+      if Send(who,@GetFollowing) = other
+      {
+         Send(self,@Unfollow,#who=who);
+      }
+
+      if Send(other,@GetFollowing) = who
+      {
+         Send(self,@Unfollow,#who=other);
+      }
+
+      Send(who,@SetFriends,#members=DelListElem(Send(who,@GetFriends),other));
+      Send(other,@SetFriends,#members=DelListElem(Send(other,@GetFriends),who));
+      Send(who,@MsgSendUser,#message_rsc=social_you_removed,#parm1=Send(other,@GetTrueName));
+      if Send(other,@IsLoggedOn)
+      {
+         Send(other,@MsgSendUser,#message_rsc=social_removed,#parm1=Send(who,@GetTrueName));
+      }
+
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=other);
+
+      return;
+   }
+
+   SetOptions(who = $,flags = 0)
+   {
+      local iBefore, i;
+
+      iBefore = Send(who,@GetSocialFlags);
+      Send(who,@SetSocialFlags,#flags=flags);
+
+      // Turned away followers now refused
+      if (flags & SF_REFUSE_FOLLOW) AND NOT (iBefore & SF_REFUSE_FOLLOW)
+      {
+         foreach i in Send(who,@GetFollowers)
+         {
+            Send(self,@StopFollower,#who=who,#follower=i);
+         }
+      }
+
+      Send(self,@SendFriendList,#who=who);
+
+      // Sharing turned on or off: friends hear at once
+      if (flags & SF_HIDE_LOCATION) <> (iBefore & SF_HIDE_LOCATION)
+      {
+         Send(self,@TellWhere,#who=who);
+      }
+
+      return;
+   }
+
+   // ---- what our client hears ----
+
+   SendFriendList(who = $)
+   "UC_FRIENDS FR_LIST: the options; each friend's name, whether they're in the game and when "
+   "they were last (Kod time); the requests to us and ours; whom we follow and who follows us. "
+   "Then where each friend in the game is."
+   {
+      local oSession, i, lFriends, oFollowing;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lFriends = Send(who,@GetFriends);
+      AddPacket(1,BP_USERCOMMAND,1,UC_FRIENDS,1,FR_LIST,1,Send(who,@GetSocialFlags),
+                2,Length(lFriends));
+      foreach i in lFriends
+      {
+         AddPacket(STRING_RESOURCE,Send(i,@GetTrueName),1,Send(i,@IsLoggedOn),
+                   4,Send(i,@GetLastSeen));
+      }
+
+      AddPacket(2,Length(Send(who,@GetFriendsIn)));
+      foreach i in Send(who,@GetFriendsIn)
+      {
+         AddPacket(STRING_RESOURCE,Send(i,@GetTrueName));
+      }
+
+      AddPacket(2,Length(Send(who,@GetFriendsOut)));
+      foreach i in Send(who,@GetFriendsOut)
+      {
+         AddPacket(STRING_RESOURCE,Send(i,@GetTrueName));
+      }
+
+      oFollowing = Send(who,@GetFollowing);
+      if oFollowing = $
+      {
+         AddPacket(1,0);
+      }
+      else
+      {
+         AddPacket(1,1,STRING_RESOURCE,Send(oFollowing,@GetTrueName));
+      }
+
+      AddPacket(2,Length(Send(who,@GetFollowers)));
+      foreach i in Send(who,@GetFollowers)
+      {
+         AddPacket(STRING_RESOURCE,Send(i,@GetTrueName));
+      }
+
+      SendPacket(oSession);
+
+      foreach i in lFriends
+      {
+         if Send(i,@IsLoggedOn)
+         {
+            Send(self,@SendLocation,#to=who,#about=i);
+         }
+      }
+
+      return;
+   }
+
+   SendLocation(to = $,about = $)
+   "UC_FRIENDS FR_LOC: where about is (its room's number and file, and its square), or that "
+   "about doesn't say (shown 0)."
+   {
+      local oSession, oRoom;
+
+      oSession = Send(to,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      // Not in a room yet (still logging on): their room change will say
+      oRoom = Send(about,@GetOwner);
+      if oRoom = $ OR NOT IsClass(oRoom,&Room)
+      {
+         return;
+      }
+
+      if Send(about,@GetSocialFlags) & SF_HIDE_LOCATION
+      {
+         AddPacket(1,BP_USERCOMMAND,1,UC_FRIENDS,1,FR_LOC,STRING_RESOURCE,Send(about,@GetTrueName),
+                   1,0,4,0,4,0,2,0,2,0);
+      }
+      else
+      {
+         AddPacket(1,BP_USERCOMMAND,1,UC_FRIENDS,1,FR_LOC,STRING_RESOURCE,Send(about,@GetTrueName),
+                   1,1,4,Send(oRoom,@GetRoomNum),4,Send(oRoom,@GetRoomResource),
+                   2,Send(about,@GetRow),2,Send(about,@GetCol));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   TellWhere(who = $)
+   "Where who is, to their friends in the game."
+   {
+      local i;
+
+      foreach i in Send(who,@GetFriends)
+      {
+         if Send(i,@IsLoggedOn)
+         {
+            Send(self,@SendLocation,#to=i,#about=who);
+         }
+      }
+
+      return;
+   }
+
+   SendHealth(who = $)
+   "UC_FRIENDS FR_HP: who's health (a whole percentage) to their friends in the same room. Our "
+   "client asks when its health changes, a few times a second at most."
+   {
+      local i, oObj, oRoom, iPct, iMax, oSession;
+
+      oRoom = Send(who,@GetOwner);
+      iMax = Send(who,@GetMaxHealth);
+      if oRoom = $ OR NOT IsClass(oRoom,&Room) OR iMax = $ OR iMax <= 0
+      {
+         return;
+      }
+
+      iPct = Bound(Send(who,@GetHealth) * 100 / iMax,0,100);
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         oObj = First(i);
+         if oObj <> who AND IsClass(oObj,&User) AND Send(self,@AreFriends,#user1=oObj,#user2=who)
+         {
+            oSession = Send(oObj,@GetShardsSession);
+            if oSession <> $
+            {
+               AddPacket(1,BP_USERCOMMAND,1,UC_FRIENDS,1,FR_HP,
+                         STRING_RESOURCE,Send(who,@GetTrueName),1,iPct);
+               SendPacket(oSession);
+            }
+         }
+      }
+
+      return;
+   }
+
+   SendSearch(who = $,text = $)
+   "UC_FRIENDS FR_SEARCH: players in the game whose names hold text, but those who hide."
+   {
+      local oSession, i, lFound, n;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lFound = $;
+      n = 0;
+      if text <> $ AND StringLength(text) >= SEARCH_MIN
+      {
+         foreach i in Send(SYS,@GetUsersLoggedOn)
+         {
+            if n < SEARCH_MAX AND i <> who
+               AND NOT (Send(i,@GetSocialFlags) & SF_HIDE_SEARCH)
+               AND NOT (IsClass(i,&DM) AND Send(i,@IsHidden))
+               AND StringContain(Send(i,@GetTrueName),text)
+            {
+               lFound = Cons(i,lFound);
+               n = n + 1;
+            }
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_FRIENDS,1,FR_SEARCH,2,n);
+      foreach i in lFound
+      {
+         AddPacket(STRING_RESOURCE,Send(i,@GetTrueName));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   // ---- in the game and out (User.UserLogon, UserLogoff, SomeoneLogon, SomeoneLogoff) ----
+
+   UserEntered(who = $)
+   "who came into the game: nobody follows anybody across a logon."
+   {
+      Send(who,@SetFollowing,#what=$);
+      Send(who,@SetFollowers,#members=$);
+
+      return;
+   }
+
+   UserLeaving(who = $)
+   "who is leaving the game: their follows end, both ways."
+   {
+      local i;
+
+      if Send(who,@GetFollowing) <> $
+      {
+         Send(self,@Unfollow,#who=who);
+      }
+
+      foreach i in Send(who,@GetFollowers)
+      {
+         Send(self,@StopFollower,#who=who,#follower=i,#quiet=TRUE);
+      }
+
+      return;
+   }
+
+   FriendCameOrWent(who = $,other = $,came = TRUE)
+   "other came into the game or left it; who is told, if they're friends."
+   {
+      if who = other OR NOT Send(self,@AreFriends,#user1=who,#user2=other)
+      {
+         return;
+      }
+
+      if came
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_logon,#parm1=Send(other,@GetTrueName));
+      }
+      else
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_logoff,#parm1=Send(other,@GetTrueName));
+      }
+
+      Send(self,@SendFriendList,#who=who);
+
+      return;
+   }
+
+   // ---- following (docs/adr/0005-friends.md 4) ----
+
+   Follow(who = $,leader = $)
+   {
+      if leader = who OR NOT Send(self,@AreFriends,#user1=who,#user2=leader)
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_not_friend,#parm1=Send(leader,@GetTrueName));
+
+         return;
+      }
+
+      if NOT Send(leader,@IsLoggedOn)
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_not_online,#parm1=Send(leader,@GetTrueName));
+
+         return;
+      }
+
+      if Send(leader,@GetOwner) <> Send(who,@GetOwner)
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_not_here,#parm1=Send(leader,@GetTrueName));
+
+         return;
+      }
+
+      if Send(leader,@GetFollowing) = who
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_chain,#parm1=Send(leader,@GetTrueName));
+
+         return;
+      }
+
+      if Send(leader,@GetSocialFlags) & SF_REFUSE_FOLLOW
+      {
+         Send(who,@MsgSendUser,#message_rsc=social_refuses,#parm1=Send(leader,@GetTrueName));
+
+         return;
+      }
+
+      if Send(who,@GetFollowing) <> $
+      {
+         Send(self,@Unfollow,#who=who);
+      }
+
+      Send(who,@SetFollowing,#what=leader);
+      if FindListElem(Send(leader,@GetFollowers),who) = 0
+      {
+         Send(leader,@SetFollowers,#members=Cons(who,Send(leader,@GetFollowers)));
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=social_follow,#parm1=Send(leader,@GetTrueName));
+      Send(leader,@MsgSendUser,#message_rsc=social_following_you,#parm1=Send(who,@GetTrueName));
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=leader);
+
+      return;
+   }
+
+   Unfollow(who = $)
+   "who stops following (they asked, or their client gave up); the leader hears."
+   {
+      local oLeader;
+
+      oLeader = Send(who,@GetFollowing);
+      if oLeader = $
+      {
+         return;
+      }
+
+      Send(who,@SetFollowing,#what=$);
+      Send(oLeader,@SetFollowers,#members=DelListElem(Send(oLeader,@GetFollowers),who));
+      if Send(oLeader,@IsLoggedOn)
+      {
+         Send(oLeader,@MsgSendUser,#message_rsc=social_unfollowed,#parm1=Send(who,@GetTrueName));
+      }
+
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=oLeader);
+
+      return;
+   }
+
+   StopFollower(who = $,follower = $,quiet = FALSE)
+   "who turns follower away; the follower's client stops walking when its list says so."
+   {
+      if FindListElem(Send(who,@GetFollowers),follower) = 0
+      {
+         return;
+      }
+
+      Send(who,@SetFollowers,#members=DelListElem(Send(who,@GetFollowers),follower));
+      if Send(follower,@GetFollowing) = who
+      {
+         Send(follower,@SetFollowing,#what=$);
+         if NOT quiet AND Send(follower,@IsLoggedOn)
+         {
+            Send(follower,@MsgSendUser,#message_rsc=social_stopped_you,#parm1=Send(who,@GetTrueName));
+         }
+      }
+
+      Send(self,@SendFriendList,#who=who);
+      Send(self,@SendFriendList,#who=follower);
+
+      return;
+   }
+
+   // ---- changing rooms (User.NewOwner) ----
+
+   RoomChanged(who = $,came_from = $)
+   "who came into another room. came_from is where they left: [room file resource, row, col], "
+   "or $. "
+   "Friends hear where they are now, followers which way they went (FR_EXIT: they work out the "
+   "door or edge from the square, docs/adr/0005-friends.md 4.3), and pets are told about."
+   {
+      local i, oRoom, oSession;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $ OR NOT IsClass(oRoom,&Room)
+      {
+         return;
+      }
+
+      Send(self,@TellWhere,#who=who);
+
+      if came_from <> $
+      {
+         foreach i in Send(who,@GetFollowers)
+         {
+            oSession = Send(i,@GetShardsSession);
+            if oSession <> $
+            {
+               AddPacket(1,BP_USERCOMMAND,1,UC_FRIENDS,1,FR_EXIT,STRING_RESOURCE,Send(who,@GetTrueName),
+                         4,Nth(came_from,1),4,Send(oRoom,@GetRoomResource),
+                         2,Nth(came_from,2),2,Nth(came_from,3));
+               SendPacket(oSession);
+            }
+         }
+      }
+
+      Send(self,@SendRoomPets,#who=who);
+      Send(self,@PetChanged,#who=who,#others_only=TRUE);
+
+      return;
+   }
+
+   // ---- pets (docs/adr/0006-pets.md) ----
+
+   AddPetEntry(who = $)
+   "One UC_PETS entry: the player's object, whether they have a pet, and its kind, colour, name."
+   {
+      local sKind, sName;
+
+      sKind = Send(who,@GetPetKind);
+      if sKind = $
+      {
+         AddPacket(4,who,1,0);
+
+         return;
+      }
+
+      sName = Send(who,@GetPetName);
+      if sName = $
+      {
+         sName = social_empty;
+      }
+
+      AddPacket(4,who,1,1,STRING_RESOURCE,sKind,1,Send(who,@GetPetColour),STRING_RESOURCE,sName);
+
+      return;
+   }
+
+   SendRoomPets(who = $)
+   "UC_PETS: the pets of every player in who's room, to who; who always, pet or none, so our "
+   "client learns its own."
+   {
+      local i, oObj, oRoom, oSession, lUsers;
+
+      oSession = Send(who,@GetShardsSession);
+      oRoom = Send(who,@GetOwner);
+      if oSession = $ OR oRoom = $ OR NOT IsClass(oRoom,&Room)
+      {
+         return;
+      }
+
+      lUsers = $;
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         oObj = First(i);
+         if IsClass(oObj,&User) AND (oObj = who OR Send(oObj,@GetPetKind) <> $)
+         {
+            lUsers = Cons(oObj,lUsers);
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_PETS,2,Length(lUsers));
+      foreach i in lUsers
+      {
+         Send(self,@AddPetEntry,#who=i);
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   PetChanged(who = $,others_only = FALSE)
+   "who's pet (or none), to the players in their room (themselves too, but for a room entry)."
+   {
+      local i, oObj, oRoom, oSession;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $ OR NOT IsClass(oRoom,&Room)
+      {
+         return;
+      }
+
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         oObj = First(i);
+         if IsClass(oObj,&User) AND NOT (others_only AND oObj = who)
+         {
+            oSession = Send(oObj,@GetShardsSession);
+            if oSession <> $
+            {
+               AddPacket(1,BP_USERCOMMAND,1,UC_PETS,2,1);
+               Send(self,@AddPetEntry,#who=who);
+               SendPacket(oSession);
+            }
+         }
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

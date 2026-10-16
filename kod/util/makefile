@@ -9,6 +9,6 @@ BOFS = system.bof library.bof parlia.bof assgame.bof questengine.bof lore.bof \
        aarchive.bof necbal.bof nodeattk.bof rntmaint.bof factgame.bof eventtxt.bof \
        warevent.bof statistics.bof settings.bof survivalmaint.bof \
        gameevent.bof gameeventengine.bof realtime.bof playermarket.bof dmfeed.bof \
-       gamequestmaint.bof travelnet.bof
+       gamequestmaint.bof travelnet.bof shardssocial.bof
 
 !include $(KODDIR)\kod.mak

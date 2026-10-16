@@ -204,6 +204,12 @@ properties:
    // DMs can say "turn off pk" in a room to prevent PK for 60 minutes
    ptNoPKTimer = $
 
+   // Ours: the crowd our client shows here (GetAmbientCrowd): its seed (0 for none yet), the
+   // GetTickCount it began at, and the game hour then
+   piAmbientSeed = 0
+   piAmbientSince = 0
+   piAmbientHour = 0
+
    prRoom                       // the room resource id
    prmRoom                      // the room data id
    piRoom_num
@@ -1172,6 +1178,38 @@ messages:
    GetRoomResource()
    {
       return prRoom;
+   }
+
+   GetAmbientCrowd(who = $)
+   "Ours (docs/adr/0015-social-on-our-server.md): the crowd our client shows here, the same for "
+   "everyone in the room: [seed, ms since it began, the game hour it began in]. Someone already "
+   "here keeps it going for half an hour; an empty room's lasts ten minutes, then a new one "
+   "begins (a late arrival runs the ticks it missed, packages/world ambientStepper.ts)."
+   {
+      local i, oObj, iNow, iElapsed, bOthers;
+
+      iNow = GetTickCount();
+      iElapsed = iNow - piAmbientSince;
+      bOthers = FALSE;
+      foreach i in plActive
+      {
+         oObj = First(i);
+         if oObj <> who AND IsClass(oObj,&User)
+         {
+            bOthers = TRUE;
+         }
+      }
+
+      if piAmbientSeed = 0 OR iElapsed < 0 OR iElapsed > 1800000
+         OR (NOT bOthers AND iElapsed > 600000)
+      {
+         piAmbientSeed = Random(1,100000000);
+         piAmbientSince = iNow;
+         piAmbientHour = Send(SYS,@GetHour);
+         iElapsed = 0;
+      }
+
+      return [piAmbientSeed,iElapsed,piAmbientHour];
    }
 
    GetRoomRows()

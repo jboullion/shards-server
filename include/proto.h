@@ -288,6 +288,9 @@ enum {
    UC_SHARDS = 100,
    UC_TRAVEL_LIST = 101,
    UC_PVP_UNTIL = 102,
+   UC_FRIENDS = 103,
+   UC_PETS = 104,
+   UC_AMBIENT = 105,
 };
 
 // Login error action constants
