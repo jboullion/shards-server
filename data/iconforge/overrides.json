@@ -129,5 +129,9 @@
  },
  "bunnygreyx.bgf": {
   "describe": "a dead wild grey rabbit lying on its side, with soft silver-grey fur, a pale belly and long ears (keep its pose, colours and proportions)"
+ },
+ "ratx.bgf": {
+  "output": "duskratx.bgf",
+  "describe": "a dead dusk rat lying on its side: a sleek, sinister giant rat with dark slate-purple fur, a sickly pale belly and its fangs bared, with the same pose and proportions"
  }
 }

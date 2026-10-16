@@ -1,5 +1,5 @@
 {
- "next_batch": 26,
+ "next_batch": 27,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2836,7 +2836,7 @@
    }
   },
   "bunny2.bgf": {
-   "status": "review",
+   "status": "installed",
    "attempts": 1,
    "notes": [],
    "history": [
@@ -2844,12 +2844,20 @@
      "batch": "025",
      "providers": [
       "openai"
-     ]
+     ],
+     "decision": "keep"
     }
-   ]
+   ],
+   "output": "bunny2.bgf",
+   "chosen": {
+    "batch": "025",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\025\\bunny2\\v0.bgf"
+   }
   },
   "bunny2x.bgf": {
-   "status": "review",
+   "status": "installed",
    "attempts": 1,
    "notes": [],
    "history": [
@@ -2857,12 +2865,20 @@
      "batch": "025",
      "providers": [
       "openai"
-     ]
+     ],
+     "decision": "keep"
     }
-   ]
+   ],
+   "output": "bunny2x.bgf",
+   "chosen": {
+    "batch": "025",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\025\\bunny2x\\v0.bgf"
+   }
   },
   "bunnygrey.bgf": {
-   "status": "review",
+   "status": "installed",
    "attempts": 1,
    "notes": [],
    "history": [
@@ -2870,12 +2886,20 @@
      "batch": "025",
      "providers": [
       "openai"
-     ]
+     ],
+     "decision": "keep"
     }
-   ]
+   ],
+   "output": "bunnygrey.bgf",
+   "chosen": {
+    "batch": "025",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\025\\bunnygrey\\v0.bgf"
+   }
   },
   "bunnygreyx.bgf": {
-   "status": "review",
+   "status": "installed",
    "attempts": 1,
    "notes": [],
    "history": [
@@ -2883,9 +2907,38 @@
      "batch": "025",
      "providers": [
       "openai"
-     ]
+     ],
+     "decision": "keep"
     }
-   ]
+   ],
+   "output": "bunnygreyx.bgf",
+   "chosen": {
+    "batch": "025",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\025\\bunnygreyx\\v0.bgf"
+   }
+  },
+  "ratx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "026",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "duskratx.bgf",
+   "chosen": {
+    "batch": "026",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\026\\duskratx\\v0.bgf"
+   }
   }
  }
 }

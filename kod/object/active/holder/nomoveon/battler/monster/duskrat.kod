@@ -39,7 +39,7 @@ resources:
    duskrat_illusion_poisoned = \
       "%s%s reels as poison from your attack courses through %s veins."
 
-   duskrat_dead_icon_rsc = ratX.bgf
+   duskrat_dead_icon_rsc = duskratx.bgf
    duskrat_dead_name_rsc = "dead dusk rat"
 
    duskrat_sound_hit = rat_atkh.ogg
