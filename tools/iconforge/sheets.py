@@ -115,12 +115,17 @@ def slice_many(gen: Image.Image, items: list) -> list:
 
 def rebuild(b: BGF, sheets: list, results: list, pal) -> BGF:
     """A new BGF: each frame pixelized from its cell into its original box (same size, offsets, hotspots)."""
-    new = {}
+    new, missing = {}, []
     for frames, gen in zip(sheets, results):
         for i, cell in zip(frames, slice_back(gen, b, frames)):
-            new[i] = pixelize(cell, b.bitmaps[i], b.shrink, b.shrink, pal)
+            try:
+                new[i] = pixelize(cell, b.bitmaps[i], b.shrink, b.shrink, pal)
+            except ValueError:  # the model left this cell empty (or merged it into a neighbour)
+                missing.append(i)
     bitmaps = [new.get(i) or b.bitmaps[i] for i in range(len(b.bitmaps))]
-    return BGF(name=b.name, shrink=b.shrink, groups=[list(g) for g in b.groups], bitmaps=bitmaps)
+    out = BGF(name=b.name, shrink=b.shrink, groups=[list(g) for g in b.groups], bitmaps=bitmaps)
+    out.missing = missing  # frames kept from the original art; the review should know
+    return out
 
 
 def animation_gif(b: BGF, pal, path: Path, slot: int = 0, ms: int = 140, scale: int = 2):

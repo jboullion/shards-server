@@ -1,5 +1,5 @@
 {
- "next_batch": 21,
+ "next_batch": 22,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2365,6 +2365,216 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\020\\ratsoldx\\v0.bgf"
+   }
+  },
+  "wolf.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "wolf.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\wolf\\v0.bgf"
+   }
+  },
+  "wolfx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "wolfx.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\wolfx\\v0.bgf"
+   }
+  },
+  "ogre.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ogre.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\ogre\\v0.bgf"
+   }
+  },
+  "ogrex.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ogrex.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\ogrex\\v0.bgf"
+   }
+  },
+  "knight.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "knight.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\knight\\v0.bgf"
+   }
+  },
+  "knightx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "knightx.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\knightx\\v0.bgf"
+   }
+  },
+  "cknight.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "cknight.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\cknight\\v0.bgf"
+   }
+  },
+  "cknightx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "cknightx.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\cknightx\\v0.bgf"
+   }
+  },
+  "hknight.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "hknight.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\hknight\\v0.bgf"
+   }
+  },
+  "hknightx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "hknightx.bgf",
+   "chosen": {
+    "batch": "021",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\021\\hknightx\\v0.bgf"
    }
   }
  }

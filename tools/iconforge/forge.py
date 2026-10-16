@@ -579,6 +579,9 @@ def cmd_batch(a):
                         print("!! %s %s v%d: %d of %d sheets missing" % (n, s, v, sum(g is None for g in got), len(plan)))
                         continue
                     cand = sheets.rebuild(b, plan, got, pal)
+                    if cand.missing:
+                        print("!! %s %s v%d: %d of %d frames came back empty and keep the original art: %s"
+                              % (n, s, v, len(cand.missing), len(b.bitmaps), cand.missing))
                     path = out / output.removesuffix(".bgf") / ("v%d.bgf" % len(item["variants"]))
                     cand.write(path)
                     got[0].convert("RGB").resize((512, 512)).save(path.with_suffix(".raw.png"))

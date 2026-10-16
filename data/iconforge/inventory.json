@@ -5,7 +5,7 @@
   "fanart": 184,
   "missing": 1
  },
- "selected": 116,
+ "selected": 126,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -10556,7 +10556,7 @@
     650,
     650
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "cknightx.bgf",
@@ -10575,7 +10575,7 @@
     1080,
     1041
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "cngrocer.bgf",
@@ -12004,7 +12004,7 @@
     648,
     624
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "hknightx.bgf",
@@ -12023,7 +12023,7 @@
     648,
     624
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "hydrab.bgf",
@@ -12823,7 +12823,7 @@
     631,
     620
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "knightx.bgf",
@@ -12842,7 +12842,7 @@
     546,
     240
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "kranprst.bgf",
@@ -13380,7 +13380,7 @@
     452,
     648
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "ogrex.bgf",
@@ -13399,7 +13399,7 @@
     1152,
     648
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "onecon.bgf",
@@ -15399,7 +15399,7 @@
     704,
     446
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "wolfx.bgf",
@@ -15418,7 +15418,7 @@
     487,
     153
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "worml.bgf",

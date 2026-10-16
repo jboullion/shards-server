@@ -118,10 +118,19 @@ def to_palette(rgba: np.ndarray, pal: np.ndarray, allowed=None) -> np.ndarray:
     """(h, w, 4) uint8 -> (h, w) palette indices; transparent pixels -> 254."""
     idx_pool = np.array([i for i in range(256) if i != TRANSPARENT and (allowed is None or i in allowed)])
     lab_pal = _palette_lab(pal)[idx_pool]
-    lab = _rgb_to_lab(rgba[..., :3].astype(np.float32) / 255.0)
-    d = ((lab[..., None, :] - lab_pal[None, None, :, :]) ** 2).sum(-1)
-    out = idx_pool[d.argmin(-1)].astype(np.uint8)
-    out[rgba[..., 3] < ALPHA_CUT] = TRANSPARENT
+    h, w = rgba.shape[:2]
+    solid = rgba[..., 3] >= ALPHA_CUT
+    out = np.full((h, w), TRANSPARENT, np.uint8)
+    if not solid.any():
+        return out
+    # match each distinct colour once (a big creature frame has far fewer colours than pixels)
+    colours, inverse = np.unique(rgba[..., :3][solid].reshape(-1, 3), axis=0, return_inverse=True)
+    lab = _rgb_to_lab(colours.astype(np.float32) / 255.0)
+    best = np.empty(len(colours), np.int64)
+    for k in range(0, len(colours), 4096):  # bounded memory for frames with many colours
+        d = ((lab[k:k + 4096, None, :] - lab_pal[None, :, :]) ** 2).sum(-1)
+        best[k:k + 4096] = d.argmin(-1)
+    out[solid] = idx_pool[best[inverse.reshape(-1)]].astype(np.uint8)
     return out
 
 
