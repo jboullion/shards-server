@@ -55,7 +55,8 @@ classvars:
    vrDesc = duskrat_desc_rsc
    vrDead_icon = duskrat_dead_icon_rsc
    vrDead_name = duskrat_dead_name_rsc
-   viDead_drawfx = DRAWFX_BLACK
+   // Shards: drawn as its art, not black (the common rat's corpse: the dusk rat has none of its own)
+   viDead_drawfx = DRAWFX_NONE
 
    viTreasure_type = TID_RAT
 
@@ -82,7 +83,9 @@ classvars:
 properties:
 
    piAnimation = ANIM_NONE
-   piDrawfx = DRAWFX_BLACK
+   // Shards: drawn as its art, not as a black silhouette: its restyled art (dark slate fur,
+   // violet eyes) has its own look
+   piDrawfx = DRAWFX_NONE
 
 messages:
 
