@@ -1,5 +1,5 @@
 {
- "next_batch": 22,
+ "next_batch": 23,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2575,6 +2575,216 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\021\\hknightx\\v0.bgf"
+   }
+  },
+  "gbeetle.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "gbeetle.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\gbeetle\\v0.bgf"
+   }
+  },
+  "chupa.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "chupa.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\chupa\\v0.bgf"
+   }
+  },
+  "chupax.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "chupax.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\chupax\\v0.bgf"
+   }
+  },
+  "spinebeast.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "spinebeast.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\spinebeast\\v0.bgf"
+   }
+  },
+  "spinebeastsmall.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "spinebeastsmall.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\spinebeastsmall\\v0.bgf"
+   }
+  },
+  "spinebeastbehemoth.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "spinebeastbehemoth.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\spinebeastbehemoth\\v0.bgf"
+   }
+  },
+  "gbeetlex.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "gbeetlex.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\gbeetlex\\v0.bgf"
+   }
+  },
+  "spinebeastx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "spinebeastx.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\spinebeastx\\v0.bgf"
+   }
+  },
+  "spinebeastsmallx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "spinebeastsmallx.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\spinebeastsmallx\\v0.bgf"
+   }
+  },
+  "spinebeastbehemothx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "022",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "spinebeastbehemothx.bgf",
+   "chosen": {
+    "batch": "022",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\022\\spinebeastbehemothx\\v0.bgf"
    }
   }
  }
