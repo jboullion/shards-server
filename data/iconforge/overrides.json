@@ -117,5 +117,17 @@
  },
  "cowx.bgf": {
   "describe": "a dead pygmy cow lying flat on its side, a small black-and-white spotted dairy cow with its legs stretched out sideways and one comic crossed-out X eye (keep its pose, colours and proportions)"
+ },
+ "bunny2.bgf": {
+  "describe": "a wild brown rabbit: a small, lean bunny with soft tawny-brown fur, a cream belly, long upright ears, dark eyes and a white cotton tail, in natural rabbit colours (not purple or blue), with the same proportions"
+ },
+ "bunny2x.bgf": {
+  "describe": "a dead wild brown rabbit lying on its side, with soft tawny-brown fur, a cream belly and long ears, in natural rabbit colours (not purple or blue), with the same pose and proportions"
+ },
+ "bunnygrey.bgf": {
+  "describe": "a wild grey rabbit: a small, lean bunny with soft silver-grey fur, a pale belly, long upright ears, dark eyes and a white cotton tail (keep its colours and proportions)"
+ },
+ "bunnygreyx.bgf": {
+  "describe": "a dead wild grey rabbit lying on its side, with soft silver-grey fur, a pale belly and long ears (keep its pose, colours and proportions)"
  }
 }

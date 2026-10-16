@@ -1,5 +1,5 @@
 {
- "next_batch": 25,
+ "next_batch": 26,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2834,6 +2834,58 @@
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\024\\cowx\\v0.bgf"
    }
+  },
+  "bunny2.bgf": {
+   "status": "review",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "025",
+     "providers": [
+      "openai"
+     ]
+    }
+   ]
+  },
+  "bunny2x.bgf": {
+   "status": "review",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "025",
+     "providers": [
+      "openai"
+     ]
+    }
+   ]
+  },
+  "bunnygrey.bgf": {
+   "status": "review",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "025",
+     "providers": [
+      "openai"
+     ]
+    }
+   ]
+  },
+  "bunnygreyx.bgf": {
+   "status": "review",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "025",
+     "providers": [
+      "openai"
+     ]
+    }
+   ]
   }
  }
 }

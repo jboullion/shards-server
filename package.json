@@ -1,0 +1,13 @@
+{
+  "name": "shards-server",
+  "private": true,
+  "description": "Running the local Meridian Shards server (no dependencies: no npm install needed)",
+  "scripts": {
+    "start": "node tools/server.mjs start",
+    "stop": "node tools/server.mjs stop",
+    "restart": "node tools/server.mjs restart",
+    "status": "node tools/server.mjs status",
+    "logs": "node tools/server.mjs logs",
+    "maint": "node tools/server.mjs maint"
+  }
+}

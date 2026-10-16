@@ -43,6 +43,15 @@ SHARDS_DIR = REPO / "resource" / "graphics" / "shards"
 SERVED = [Path.home() / "AppData" / "Local" / "Meridian-104" / "resource", REPO / "resource"]
 CLASSIC = Path(r"H:\Steam\steamapps\common\Meridian 59\resource")
 
+# Sprites the client draws with no Kod behind them: meridian-browser's ambient critters
+# (packages/world/src/ambient/critters.ts). The bunnies left the server but still hop about there.
+CLIENT_ONLY = {
+    "bunny2.bgf": ("monster", ["ambient bunny"]),
+    "bunny2x.bgf": ("monster", ["ambient bunny"]),
+    "bunnygrey.bgf": ("monster", ["ambient grey bunny"]),
+    "bunnygreyx.bgf": ("monster", ["ambient grey bunny"]),
+}
+
 HIGHRES_SHRINK = 15
 HIGHRES_SIDE = 300
 
@@ -92,6 +101,11 @@ def run() -> dict:
             kinds.setdefault(name, [])
             if kind not in kinds[name]:
                 kinds[name].append(kind)
+    for name, (kind, labels) in CLIENT_ONLY.items():
+        icons.setdefault(name, []).extend(labels)
+        kinds.setdefault(name, [])
+        if kind not in kinds[name]:
+            kinds[name].append(kind)
     shards = _index(SHARDS_DIR, False)
     served_idx = {}
     for root in reversed(SERVED):  # earlier roots win
