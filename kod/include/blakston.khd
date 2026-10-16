@@ -809,7 +809,6 @@
    RID_GODROOM = 901
    RID_UNIVERSITY = 902
    RID_GALLERY = 903
-   RID_NEWROOM = 904
 
    // Duke castle
    RID_BLACKSTONE = 950
@@ -1955,8 +1954,7 @@
    TID_ICE_ELE       = 61
    TID_NERU_ELE      = 62
 
-   TID_EASTER_BUNNY  = 63
-   TID_KILLER_BUNNY  = 64
+   // 63-64 were the easter and killer bunnies.
 
    TID_XEO_AIR       = 65
    TID_XEO_EARTH     = 66
@@ -1978,20 +1976,7 @@
    TID_KNIGHT = 80
    TID_OGRE = 81
 
-   //Ore
-   TID_QORCITE = 82
-   TID_RUBY = 83
-   TID_SAPPHIRE = 84
-   TID_DIAMOND = 85
-   TID_UNCUT = 86
-   TID_EMERALD = 87
-   TID_ORE = 88
-   TID_NERUORE = 89
-
-   //Resources
-   TID_RESTREE = 90
-   TID_DENSETREE = 91
-   TID_RESPLANT = 92
+   // 82-92 were the crafting resource nodes (ore veins, trees, plants).
 
    TID_TROLL = 93
 
@@ -2027,8 +2012,7 @@
    TID_FRENZY_SPROUT = 121
    TID_HELL_WASP = 122
 
-   TID_TROLL_CORPSE = 124
-   TID_KRIIPA_CORPSE = 125
+   // 124-125 were the troll and kriipa skinning corpses.
 
    TID_BLACK_DRAGON = 126
    TID_COW  = 127
@@ -2108,7 +2092,6 @@
    IA_MADE_TRANSCENDANT    = 20
    IA_DM_CREATED           = 21
    IA_XP_KILL_BONUS        = 22
-   IA_CRAFTED              = 23
    IA_INDESTRUCTIBLE       = 24
    IA_NOTDROPPABLE         = 25
    IA_APPRAISE             = 26
@@ -2259,12 +2242,6 @@
    SKID_BLOCK = 404
    SKID_SECOND_WIND = 405
    SKID_DISARM = 406
-
-   //Crafting Skills
-   SKID_MINING = 407
-   SKID_LOGGING = 408
-   SKID_GATHERING = 409
-   SKID_SKINNING = 410
 
    // Melee weapon strokes start here.
    SKID_DEFAULT = 420
@@ -2492,53 +2469,6 @@
    SID_ADDPETOITEM         = 254
    SID_APPRAISE            = 255
    SID_MONSTER_MORPH       = 300
-   
-   //Crafting
-   SID_CRAFTMACE           = 210
-   SID_CRAFTAXE            = 211
-   SID_CRAFTHAMMER         = 212
-   SID_CRAFTCHAINARMOR     = 213
-   SID_CRAFTIVYCIRCLET     = 214
-   SID_CRAFTLEATHERARMOR   = 215
-   SID_CRAFTNERUDITESWORD  = 216
-   SID_CRAFTSHORTSWORD     = 217
-   SID_CRAFTSMALLSHIELD    = 218
-   SID_CRAFTBATTLEBOW      = 219
-   SID_CRAFTNERUDITESHIELD = 220
-   SID_CRAFTGOLDSHIELD     = 221
-   SID_CRAFTGAUNTLETS      = 222
-   SID_CRAFTHELMET         = 223
-   SID_CRAFTCIRCLET        = 224
-   SID_CRAFTSCALEARMOR     = 225
-   SID_CRAFTLONGBOW        = 226
-   SID_CRAFTNERUDITEARMOR  = 227
-   SID_CRAFTKNIGHTSHIELD   = 228
-   SID_CRAFTMYSTICSWORD    = 229
-   SID_CRAFTPLATEARMOR     = 230
-   SID_CRAFTDAEMONHELM     = 231
-   SID_CRAFTGUILDSHIELD    = 232
-   SID_CRAFTSCIMITAR       = 233
-   SID_CRAFTLONGSWORD      = 234
-   SID_CRAFTAPPAREL        = 235
-   SID_CRAFTMAGICROBES     = 236
-   SID_SMELTING            = 237
-   SID_HEWING              = 238
-   SID_TANNING             = 239
-   SID_SPINNING            = 240
-   SID_CRAFTPICKAXE        = 243
-   SID_CRAFTWOODAXE        = 244
-   SID_CRAFTSICKLE         = 245
-   SID_CRAFTSKINKNIFE      = 246
-   SID_CRAFTMSH            = 247
-   SID_CRAFTNERUBOW        = 248
-   SID_CRAFTBRAWL          = 249
-   SID_CRAFTKNIGHTSHELMET  = 250
-   SID_CRAFTWIZARDHAT      = 251
-   SID_CRAFTLIGHTMAGICROBES = 252
-   SID_CRAFTTHORNCIRCLET   = 256
-
-
-   
 
    // Depreciated spell IDs
    SID_LIGHTNING = 1                   // use SID_LIGHTNING_BOLT
@@ -2604,7 +2534,7 @@
    SS_FAREN       = 4
    SS_RIIJA       = 5
    SS_JALA        = 6
-   SS_CRAFTING    = 7
+   SS_CRAFTING    = 7   // Reserved: crafting was removed. Kept so school numbers and client packets don't shift.
    SS_DM_COMMAND  = 8
 
    // We may use skill an spell schools in the same routines, thus no overlap.

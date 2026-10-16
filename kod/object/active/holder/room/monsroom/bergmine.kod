@@ -71,7 +71,7 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [&Nyrphling, 70], [&Bandit, 24], [&BanditSniper, 5],
+      plMonsters = [ [&Scorpion, 70], [&Bandit, 24], [&BanditSniper, 5],
                      [&BanditCaptain, 1] ];
 
       // Use Random Spawn

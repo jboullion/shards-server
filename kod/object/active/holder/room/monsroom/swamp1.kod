@@ -112,7 +112,7 @@ messages:
       else if (iHour = 5)
       {
          // during the day weaker monsters spawn
-         plMonsters = [ [&BigSlime, 40], [&Frogman, 60] ];
+         plMonsters = [ [&Slime, 40], [&Frogman, 60] ];
       }
 
       propagate;

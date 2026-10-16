@@ -163,7 +163,6 @@ spell_school_qor = pt "Qor"
 spell_school_faren = pt "Faren"
 spell_school_kraanan = pt "Kraanan"
 spell_school_jala = pt "Jala"
-spell_school_crafting = pt "Crafting"
 spell_intro_rsc = pt "Um dos muitos feitiços místicos."
 spell_gesture_third = pt \
    "%s%s murmura algo debaixo de %s respiração e faz um gesto místico."

@@ -137,9 +137,7 @@ messages:
             Create(&Herbs,#number=5),
             Create(&Flask)
          ],
-         [
-            SKID_GATHERING
-         ],
+         $,
          [ 
             SID_HEAT,
             SID_FADE

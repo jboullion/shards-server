@@ -1,0 +1,92 @@
+# Iconforge style
+
+The look we want: Meridian 59's original 1996 item sprites. They are small (about 60–120 px),
+painted rather than rendered, with a limited, slightly muddy palette, strong dark outlines in
+places, hard edges against the background and simple top-left light. Photographic textures,
+smooth 3D shading and glossy highlights are what make the fan art stand out, so they go.
+
+The block between the markers is appended to every prompt. Edit it and the next batch uses it
+(cached results are keyed on the prompt, so a change re-runs those icons).
+
+<!-- style-block -->
+Style: a classic 1990s fantasy RPG inventory item sprite, like the reference images (the original
+Meridian 59 item art). Hand-painted low-resolution pixel art: chunky readable shapes, a limited
+earthy palette with few shades per colour, flat cel-like shading lit from the top left, crisp hard
+edges and a thin dark outline where the object meets the background. No photographic texture, no
+smooth 3D render shading, no glossy specular highlights, no gradients, no drop shadow, no text.
+Show the whole object, centred, filling most of the frame, at the same angle as the first image.
+Background: a single flat solid magenta (#FF00FF) everywhere around the object, with no shadow or
+floor.
+<!-- /style-block -->
+
+## Local model prompt (comfy)
+
+SDXL img2img sees only the icon, not the references, and reads short tag-style prompts. Pixel Art
+XL (the LoRA) is triggered by "pixel". `{item}` becomes the item's name.
+
+<!-- comfy-block -->
+pixel, {item}, a single fantasy rpg inventory item icon, 1990s game sprite, simple, flat colors,
+limited palette, dark outline, centered, plain flat magenta background
+<!-- /comfy-block -->
+
+## Spell icons
+
+Spell icons are a different look from items: small bold symbols, 16×16 and 64×64, at shrink 1.
+
+<!-- spell-block -->
+Style: a classic 1990s fantasy RPG spell icon like the reference images (the original Meridian 59
+spell icons): one bold, simple symbol that reads instantly even at 16 pixels, chunky low-resolution
+pixel art with saturated colours, a few shades per colour and hard edges. No text, no frame or
+border, no photographic or 3D-rendered look, no gradients in the background. The symbol fills most
+of the square. Background: a single flat solid magenta (#FF00FF) everywhere around the symbol.
+<!-- /spell-block -->
+
+Classic spell icons sent as references (their 64×64 frame):
+
+<!-- spell-refs -->
+ifirebal.bgf
+iblink.bgf
+imirth.bgf
+idarknes.bgf
+ihaste.bgf
+ilitning.bgf
+<!-- /spell-refs -->
+
+## Creatures (monsters, NPCs)
+
+Animated sprites go to the model one angle at a time: a sheet with every pose of that angle (see
+tools/iconforge/sheets.py). The original creatures are pre-rendered, clay-model-like figures.
+
+<!-- monster-block -->
+Style: an original 1996 Meridian 59 creature sprite like the reference images: a pre-rendered,
+hand-sculpted clay-model look with saturated colours, simple strong lighting from the top left, clear
+readable shapes and crisp edges against the background. No photographic texture, no glossy modern 3D
+render, no motion blur, no text. Background: a single flat solid magenta (#FF00FF) everywhere around
+the creature, with no grid lines, cell borders, shadows or floor.
+<!-- /monster-block -->
+
+Classic creature sprites sent as references (their first frame):
+
+<!-- monster-refs -->
+orc.bgf
+troll.bgf
+kriipa.bgf
+lupogg.bgf
+avchief.bgf
+spdrqu.bgf
+<!-- /monster-refs -->
+
+## Style references
+
+Classic client icons sent as style references with each request (providers that accept several
+images: openai, fal). Names are .bgf files in the classic client's resource folder; their
+inventory frame is used. Pick ones that span materials (metal, food, cloth, glass, wood).
+
+<!-- refs -->
+hammer.bgf
+meatpie.bgf
+potion01.bgf
+drumstik.bgf
+helm.bgf
+mug.bgf
+<!-- /refs -->

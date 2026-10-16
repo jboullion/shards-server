@@ -86,13 +86,14 @@ what stands between this and interesting generated rooms.
 
 ## Trying a generated room in the game
 
-`roogen1.roo` is installed as a worked example:
+No generated room is installed. To try one, add:
 
-* `kod/object/active/holder/room/roogen1.kod` — the room class
-* `RID_ROOGEN1 = 10100` in `blakston.khd`
-* registered in the room makefile and in `CreateAllRoomsIfNew` (system.kod)
-* the `.roo` copied to `resource/rooms`, `run/server/rooms`, and
-  `run/localclient/resource`
+* a room class under `kod/object/active/holder/room/` that loads the `.roo`
+* a `RID_` number in `blakston.khd`
+* the class's `.bof` in the room makefile, and a `CreateOneRoomIfNew` call in
+  `CreateAllRoomsIfNew` (system.kod)
+* the `.roo` itself in `resource/rooms`, which the makefile copies to
+  `run/server/rooms` and `run/localclient/resource`
 
 The client reads rooms from `run/localclient/resource`, so a generated room has
 to be copied there too or it will not render for the player.

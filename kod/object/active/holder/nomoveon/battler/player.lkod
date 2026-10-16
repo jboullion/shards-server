@@ -1070,7 +1070,3 @@ phased_player_description = pt \
    "outro plano de existência."
 bad_line_of_sight = pt \
    "Sua linha de visão prejudicada torna um acerto bem-sucedido mais difícil."
-cant_fight_tool = pt "Você não pode lutar com uma ferramenta de colheita!"
-cant_Harvest = pt "Você não pode colher com esta arma!"
-killed_resource = pt "Você esgotou este recurso."
-cant_cast_resources = pt "Você não pode lançar magia em recursos!"

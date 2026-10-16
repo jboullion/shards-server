@@ -2163,11 +2163,6 @@ messages:
          return FALSE;
       }
 
-      if IsClass(self,&Resource)
-      {
-         return FALSE;
-      }
-      
       // Make sure room allows the attack.
       if NOT Send(oRoom,@ReqSomethingAttack,#what=self,#victim=victim,
                   #stroke_obj=stroke_obj)

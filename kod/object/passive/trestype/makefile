@@ -14,17 +14,16 @@ BOFS = wimptres.bof notres.bof spquent.bof med-tght.bof wmp-medt.bof \
    dethspdt.bof skel2t.bof skel3t.bof skel4t.bof narthylt.bof \
    wrmlarvt.bof wrmquent.bof dangelt.bof newbietrs.bof thrasht.bof \
    statuet.bof kriipat.bof molluskt.bof shadowbeastt.bof ratktres.bof \
-   earthelet.bof fireelet.bof iceelet.bof neruelet.bof easterbunnyt.bof \
-   killerbunnyt.bof xeoairt.bof xeoeartht.bof xeofiret.bof xeowatert.bof \
+   earthelet.bof fireelet.bof iceelet.bof neruelet.bof \
+   xeoairt.bof xeoeartht.bof xeofiret.bof xeowatert.bof \
    xeoacidt.bof xeounholyt.bof xeoholyt.bof xeonerut.bof xeoillt.bof lupoggt.bof necrot.bof \
    earthdragt.bof mimict.bof minotaurt.bof knightt.bof ogret.bof \
-   diamondt.bof emeraldt.bof oret.bof qorcitet.bof resplantt.bof restreet.bof \
-   rubyt.bof sapphiret.bof trollt.bof densetreet.bof uncutt.bof neruoret.bof \
+   trollt.bof \
    dricereavert.bof drobsidianreavert.bof drstonereavert.bof drtyrantt.bof drvajrat.bof \
    drvozunt.bof drredhydrat.bof drgreenhydrat.bof drgoldhydrat.bof drminotaurberserkert.bof \
    drgrandpatrentt.bof drgreenseekert.bof drgreyseekert.bof drblackhydrat.bof \
    drbrownseekert.bof drchimerat.bof drcrocot.bof drcrushersproutt.bof drcyclopst.bof drdeathmitemaget.bof \
    drdeathmitescoutt.bof drdeathmitesoldiert.bof drdeathmitetankt.bof drdulahant.bof drfallenmonkt.bof \
    drfollowerofqort.bof drfrenzysproutt.bof drhellwaspt.bof drrevenantbt.bof drspittersproutt.bof \
-   kriipacorpset.bof trollcorpset.bof blackdragt.bof cowt.bof
+   blackdragt.bof cowt.bof
 !include $(KODDIR)\kod.mak

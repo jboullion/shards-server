@@ -209,7 +209,7 @@ messages:
 
    NewHold(what = $)
    {
-      if IsClass(what,&Monster) AND NOT IsClass(what,&Resource)
+      if IsClass(what,&Monster)
       {
          piMonster_count = piMonster_count + 1;
       }
@@ -219,7 +219,7 @@ messages:
 
    LeaveHold(what = $)
    {
-      if IsClass(what,&Monster) AND NOT IsClass(what,&Resource)
+      if IsClass(what,&Monster)
       {
          piMonster_count = piMonster_count - 1;
       }

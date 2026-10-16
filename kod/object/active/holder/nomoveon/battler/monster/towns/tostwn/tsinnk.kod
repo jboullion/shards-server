@@ -40,7 +40,6 @@ resources:
 
    TsIK_watch_head = "Hey, %s%s!  Watch your head!"
 
-   Crafting_forget_potion_sale = "Want to forget crafting? I got somthing for that. "
 
 classvars:
 
@@ -124,7 +123,7 @@ messages:
 
    InitCondSale()
    {
-      local oObj, oObj2, oObj3;
+      local oObj, oObj2;
 
       oObj=Create(&PurpleMushroom,#number=4);
       Send(Send(SYS,@GetLibrary),@AddToMobLib,#mob=self,
@@ -135,11 +134,6 @@ messages:
       Send(Send(SYS,@GetLibrary),@AddToMobLib,#mob=self,
             #triggers=[Send(oObj2,@GetName)],
             #action=[LIBACT_CONDITIONAL,oObj2,650,TsIK_orcteeth_sale]);
-
-      oObj3=Create(&ForgetPotionCrafting);
-      Send(Send(SYS,@GetLibrary),@AddToMobLib,#mob=self,
-            #triggers=[Send(oObj3,@GetName)],
-            #action=[LIBACT_CONDITIONAL,oObj3,2500,Crafting_forget_potion_sale]);
 
       return;
    }

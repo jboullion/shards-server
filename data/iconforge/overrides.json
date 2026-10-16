@@ -1,0 +1,85 @@
+{
+ "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it).",
+ "icebolt.bgf": {
+  "mode": "generate",
+  "output": "iiceshrd.bgf",
+  "describe": "a single jagged shard of pale blue ice flying diagonally upward, with a short frosty trail"
+ },
+ "iicenova.bgf": {
+  "mode": "generate",
+  "describe": "a burst of sharp ice crystals exploding outward from a bright blue-white centre, a frost nova"
+ },
+ "iholybl.bgf": {
+  "mode": "generate",
+  "describe": "an open hand raised in blessing, engulfed in a blaze of golden-white holy fire"
+ },
+ "irift.bgf": {
+  "mode": "generate",
+  "describe": "a dark swirling purple-black rift torn open in the air like a doorway, with a faint glow at its edges"
+ },
+ "ispectate.bgf": {
+  "mode": "generate",
+  "describe": "a pale translucent ghostly figure of a person fading out of the world"
+ },
+ "ispirsword.bgf": {
+  "mode": "generate",
+  "describe": "a glowing spectral sword made of white-gold light, pointing upward, with a soft halo"
+ },
+ "iunholyt.bgf": {
+  "mode": "generate",
+  "describe": "a dark clawed hand wreathed in sickly green and black unholy energy"
+ },
+ "iwallice.bgf": {
+  "mode": "generate",
+  "describe": "a row of tall jagged ice spikes rising from the ground, forming a wall of ice"
+ },
+ "iappraise.bgf": {
+  "mode": "generate",
+  "describe": "a pair of golden merchant's balance scales, gleaming gold with two hanging pans"
+ },
+ "duskrat.bgf": {
+  "describe": "a dusk rat: a sleek, sinister giant rat with dark slate-purple fur, a sickly pale belly, a few glowing violet eyes and wisps of dark poisonous vapour around its fangs"
+ },
+ "ratking.bgf": {
+  "describe": "the rat king: a huge, bloated giant rat with mangy grey-brown fur, a battered golden crown on its head and a ragged royal red cape over its back"
+ },
+ "ratkingx.bgf": {
+  "describe": "the dead rat king: a huge, bloated giant rat lying dead on its side, with mangy grey-brown fur, its battered golden crown fallen beside it and a ragged red cape"
+ },
+ "ratsold.bgf": {
+  "describe": "a rat soldier: a giant rat wearing a dented iron helmet and a battered leather jerkin with rusty iron plates strapped to its shoulders"
+ },
+ "ratsoldx.bgf": {
+  "describe": "a dead rat soldier: a giant rat lying dead on its side, still wearing its dented iron helmet and battered leather jerkin with rusty iron plates"
+ },
+ "wolf.bgf": {
+  "describe": "a lean grey timber wolf with a thick brown-grey coat and a pale belly (keep its colours, gear and proportions)"
+ },
+ "wolfx.bgf": {
+  "describe": "a dead grey timber wolf lying on its side, with a thick brown-grey coat and a pale belly"
+ },
+ "ogre.bgf": {
+  "describe": "a huge, hulking, brutish ogre (keep its colours, gear and proportions)"
+ },
+ "ogrex.bgf": {
+  "describe": "a dead huge, hulking ogre sprawled on the ground (keep its colours, gear and proportions)"
+ },
+ "knight.bgf": {
+  "describe": "an undead knight of a long-forgotten legion in battered plate armour (keep its colours, gear and proportions)"
+ },
+ "knightx.bgf": {
+  "describe": "a fallen undead knight in battered plate armour lying dead on the ground (keep its colours, gear and proportions)"
+ },
+ "cknight.bgf": {
+  "describe": "an undead captain: a commanding knight in ornate, battered plate armour (keep its colours, gear and proportions)"
+ },
+ "cknightx.bgf": {
+  "describe": "a fallen undead captain in ornate, battered plate armour lying dead on the ground (keep its colours, gear and proportions)"
+ },
+ "hknight.bgf": {
+  "describe": "an undead half knight: a gruesome knight who met a terrible death, in broken plate armour (keep its colours, gear and proportions)"
+ },
+ "hknightx.bgf": {
+  "describe": "a fallen undead half knight in broken plate armour lying dead on the ground (keep its colours, gear and proportions)"
+ }
+}

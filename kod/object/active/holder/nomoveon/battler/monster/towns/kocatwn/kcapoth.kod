@@ -124,9 +124,7 @@ messages:
             Create(&Solagh,#number=4)
          ],         
          $,
-         [
-            SID_CRAFTIVYCIRCLET
-         ],
+         $,
          $];
 
       return;

@@ -76,7 +76,6 @@ resources:
    item_stats_shal_sp = "%i Shal'ille spellpower\n"
    item_stats_qor_sp = "%i Qor spellpower\n"
    item_stats_jala_instrument_sp = "%i Jala instrument power\n"
-   item_stats_craft_sp = "%i Crafting spellpower\n"
    item_stats_resistance = "%i%% %s\n"
    item_stats_dmg_type = "Deals %s damage\n"
 
@@ -87,10 +86,6 @@ resources:
    item_weight    = "%i weight and %i bulk\n"
    item_bulk      = "%i bulk\n"
 
-   mining_bonus      = "%i bonus Mining Yield\n"
-   logging_bonus     = "%i bonus Logging Yield\n"
-   gathering_bonus   = "%i bonus Gathering Yield\n"
-   skinning_bonus    = "%i bonus Skinning Yield\n"
 
    item_cast_spell = "\n\nEmblazoned with mystic symbols, this %s grants its wielder the unyielding force of %s on its user."
    spell_too_soon_since_attacking_2 = "~r~BYou have taken part in battle to recently to activate your item enchantments! "
@@ -145,9 +140,6 @@ classvars:
 
    viDefense_base = 0 
    viAttack_base  = 0
-   viRefined      = $
-   viRefinedAt    = $
-   viRefineSpell  = $
    
 properties:
 
@@ -172,16 +164,11 @@ properties:
    piIndestructible = FALSE
    pbIs_Droppable = TRUE
 
-   viMiningBonus     = 0
-   viGatheringBonus  = 0
-   viLoggingBonus    = 0
-   viSkinningBonus   = 0
 
    viHalf   = FALSE
    viAlmost = FALSE
    viVery   = FALSE
 
-   poCrafter         = $
    poSpell           = $
    piAppraisal_Price = 0
    poAppraiser       = $
@@ -244,7 +231,7 @@ messages:
       local i, bFoundProperties, iHigh_level, n, iFarenPower, iRiijaPower,
             iKraananPower, iJalaPower, iShalPower, iQorPower, iInstrumentPower,
             iNum, iMinDamage, iMinDamageOwner, iAttackType, oItemAtt,
-            lResists, iLen, iCraftingPower;
+            lResists, iLen;
 
       // This message 'telescopes' resources into the 5th %r of
       // item_desc_template. There are 16 different stats we can add;
@@ -475,8 +462,6 @@ messages:
                         #oSpell=Send(SYS,@FindSpellByNum,#num=SID_SEANCE));
       iQorPower = Send(self,@GetSpellModifier,
                         #oSpell=Send(SYS,@FindSpellByNum,#num=SID_DARKNESS));
-      iCraftingPower = Send(self,@GetSpellModifier,
-                        #oSpell=Send(SYS,@FindSpellByNum,#num=SID_CRAFTAPPAREL));
 
       iInstrumentPower = 0;
       if IsClass(self,&Instrument)
@@ -491,14 +476,12 @@ messages:
          OR iShalPower <> 0
          OR iQorPower <> 0
          OR iInstrumentPower <> 0
-         OR iCraftingPower <> 0
       {
          if iFarenPower = iRiijaPower
             AND iRiijaPower = iKraananPower
             AND iKraananPower = iJalaPower
             AND iJalaPower = iShalPower
             AND iShalPower = iQorPower
-            AND iQorPower = iCraftingPower
             AND iFarenPower <> 0
          {
             if NOT bFoundProperties
@@ -566,14 +549,8 @@ messages:
             {
                AddPacket(4,system_blank_resource);
             }
-            if iCraftingPower <> 0
-            {
-               AddPacket(4,item_stats_craft_sp, 4,iCraftingPower);
-            }
-            else
-            {
-               AddPacket(4,system_blank_resource);
-            }
+            // This slot of system_rsc_template_8 was crafting spellpower.
+            AddPacket(4,system_blank_resource);
             if iInstrumentPower <> 0
             {
                AddPacket(4,item_stats_jala_instrument_sp, 4,iInstrumentPower);
@@ -711,76 +688,12 @@ messages:
          AddPacket(4,system_blank_resource);
       }
 
-      if viMiningBonus <> 0
+      // Four slots here were the harvesting yield bonuses (crafting was
+      // removed). They stay blank so the template counts above still add up.
+      if bFoundProperties
       {
-         if bFoundProperties = FALSE
-         {
-            AddPacket(4,system_rsc_template_6, 4,special_properties_header);
-            AddPacket(4,mining_bonus,4,viMiningBonus);
-            bFoundProperties = TRUE;
-         }
-         else
-         {
-            AddPacket(4,mining_bonus,4,viMiningBonus);
-         }
-      }
-      else if bFoundProperties
-      {
-         AddPacket(4,system_blank_resource);
-      }
-
-      if viLoggingBonus <> 0
-      {
-         if bFoundProperties = FALSE
-         {
-            AddPacket(4,system_rsc_template_5, 4,special_properties_header);
-            AddPacket(4,logging_bonus,4,viLoggingBonus);
-            bFoundProperties = TRUE;
-         }
-         else
-         {
-            AddPacket(4,logging_bonus,4,viLoggingBonus);
-         }
-      }
-      else if bFoundProperties
-      {
-         AddPacket(4,system_blank_resource);
-      }
-
-      if viGatheringBonus <> 0
-      {
-         if bFoundProperties = FALSE
-         {
-            AddPacket(4,system_rsc_template_4, 4,special_properties_header);
-            AddPacket(4,gathering_bonus,4,viGatheringBonus);
-            bFoundProperties = TRUE;
-         }
-         else
-         {
-            AddPacket(4,gathering_bonus,4,viGatheringBonus);
-         }
-      }
-      else if bFoundProperties
-      {
-         AddPacket(4,system_blank_resource);
-      }
-      
-      if viSkinningBonus <> 0
-      {
-         if bFoundProperties = FALSE
-         {
-            AddPacket(4,system_rsc_template_3, 4,special_properties_header);
-            AddPacket(4,skinning_bonus,4,viSkinningBonus);
-            bFoundProperties = TRUE;
-         }
-         else
-         {
-            AddPacket(4,skinning_bonus,4,viSkinningBonus);
-         }
-      }
-      else if bFoundProperties
-      {
-         AddPacket(4,system_blank_resource);
+         AddPacket(4,system_blank_resource, 4,system_blank_resource,
+                   4,system_blank_resource, 4,system_blank_resource);
       }
 
       if viWeight <> $
@@ -2894,26 +2807,6 @@ messages:
 	   return pbColored;
    }
 
-   GetMiningBonus()
-   {
-      return viMiningBonus;
-   }
-
-   GetLoggingBonus()
-   {
-      return viLoggingBonus;
-   }
-
-   GetGatheringBonus()
-   {
-      return viGatheringBonus;
-   }
-
-   GetSkinningBonus()
-   {
-      return viSkinningBonus;
-   }
-   
    SetDefense(number = $)
    {
       if number = $
@@ -2936,21 +2829,6 @@ messages:
       return piHitBonus;
    }
 
-   GetRefinedVersion()
-   {
-      return viRefined;
-   }
-   
-   GetRefinedAt()
-   {
-      return viRefinedAt;
-   }
-
-   GetRefineSpell()
-   {
-      return viRefineSpell;
-   }
-   
    SetIndestructible()
    {
       piIndestructible = TRUE;
@@ -2974,18 +2852,6 @@ messages:
    {
       return pbIs_Droppable;
    }	
-
-   SetCrafter(Crafter=$)
-   {
-      poCrafter = Crafter;
-
-      return;
-   }
-
-   GetCrafter()
-   {
-      return poCrafter;
-   }
 
    SetItemEnchantment(ItemSpell=$)
    {

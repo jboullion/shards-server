@@ -92,15 +92,6 @@ messages:
       Send(self,@NewHold,#what=Create(&DynamicLight,
             #iColor=LIGHT_ORANGE,#iIntensity=50),
             #new_row=6,#new_col=6,#fine_row=0,#fine_col=0);
-      Send(self,@NewHold,#what=Create(&KocatanForge),
-            #new_row=6,#new_col=7,#fine_row=0,#fine_col=51,
-            #new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&Forge),
-            #new_row=9,#new_col=9,#fine_row=48,#fine_col=32,
-            #new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&KocatanAnvil),
-            #new_row=6,#new_col=3,#fine_row=56,#fine_col=32,
-            #new_angle=ANGLE_EAST);
       propagate;
    }
 

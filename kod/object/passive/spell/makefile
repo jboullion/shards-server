@@ -56,8 +56,6 @@ BOFS = animate.bof \
        teleportspell.bof \
        utility.bof \
        walspell.bof \
-       crafting.bof \
-       refine.bof \
        creaspsw.bof \
        transmon.bof
 

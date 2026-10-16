@@ -27,9 +27,8 @@ messages:
 
    Constructed()
    {
-      plTreasure = [ [ &OrcTooth, 35 ],
+      plTreasure = [ [ &OrcTooth, 40 ],
                      [ &Scimitar, 12 ],
-                     [ &CraftGloves, 5 ],
                      [ &IceArrow, 18 ],
                      [ &NeruditeArmor, 10],
                      [ &UncutSeraphym, 10],
