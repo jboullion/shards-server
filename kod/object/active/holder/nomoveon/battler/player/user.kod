@@ -535,6 +535,11 @@ properties:
    plCompletedPassiveQuestChains = $
    plOngoingPassiveQuestChains = $
 
+   // Ours: the fast travel points this player has attuned to, by id (util/travelnet.kod)
+   plAttunedPortals = $
+   // Ours: the words of the UC_SHARDS command being read (ShardsCommand); $ between commands
+   plShardsWords = $
+
    piLogoffPenaltyCount = 0
 
    piTimeNewsPosted = 0
@@ -2591,6 +2596,10 @@ messages:
          case UC_MINIGAME_RESET_PLAYERS:
             Send(Nth(client_msg,2),@ResetPlayers,#who=self);
             return;
+         case UC_SHARDS:
+            // Ours: a command from Meridian Shards' client (docs/adr/0015)
+            Send(self,@ShardsCommand,#string=Nth(client_msg,2));
+            return;
          case UC_REQ_TIME:
                ClearTempString();
                Send(SYS,@AppendOrdinalToTempString,#number=Send(SYS,@GetDay));
@@ -3241,6 +3250,18 @@ messages:
          }
 
          return MM_NONE;
+      }
+
+      // Ours: travel portals, marked until this player attunes (util/travelnet.kod)
+      if IsClass(what,&TravelPortal)
+      {
+         if Send(Send(SYS,@GetTravelNetwork),@IsAttuned,#who=self,
+                 #id=Send(what,@GetTravelPoint))
+         {
+            return MM_TRAVEL;
+         }
+
+         return MM_TRAVEL | MM_TRAVEL_UNATTUNED;
       }
 
       if IsClass(what,&Reflection)
@@ -4371,6 +4392,124 @@ messages:
       {
          Send(self,@NotifyMonstersOfPresence);
       }
+
+      return;
+   }
+
+   // Ours (Meridian Shards, docs/adr/0015-social-on-our-server.md 1): commands from our
+   // client, as UC_SHARDS lines: a verb and its arguments, separated by spaces. Each verb
+   // goes to its feature. Nothing is spoken, so there's nothing for the client to hide.
+   //   travel <id>   fast travel from the portal we stand by (util/travelnet.kod)
+
+   ShardsCommand(string = $)
+   {
+      local lWords, sVerb;
+
+      if string = $
+      {
+         return;
+      }
+
+      // ParseString needs the temp string the command arrived in: read it first
+      plShardsWords = $;
+      ParseString(string," ",@ShardsCommandWord);
+      lWords = plShardsWords;
+      plShardsWords = $;
+      if lWords = $
+      {
+         return;
+      }
+
+      sVerb = First(lWords);
+      if StringEqual(sVerb,"travel")
+      {
+         Send(Send(SYS,@GetTravelNetwork),@TravelCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
+      Debug("Unknown UC_SHARDS command from",self);
+
+      return;
+   }
+
+   ShardsCommandWord(string = $)
+   "Called by ParseString from ShardsCommand, once a word (copied: the temp string is reused)."
+   {
+      local sWord;
+
+      sWord = CreateString();
+      SetString(sWord,string);
+      plShardsWords = AppendListElem(sWord,plShardsWords);
+
+      return;
+   }
+
+   GetAttunedPortals()
+   {
+      return plAttunedPortals;
+   }
+
+   AttunePortal(id = $)
+   "Ours: this player can travel to point id now (util/travelnet.kod). Clients redraw its marker."
+   {
+      local i, oObj;
+
+      if id = $ OR FindListElem(plAttunedPortals,id) > 0
+      {
+         return;
+      }
+
+      plAttunedPortals = Cons(id,plAttunedPortals);
+
+      // Its portal's marker changes for this player (BuildMinimapDotFlag)
+      if poOwner <> $
+      {
+         foreach i in Send(poOwner,@GetHolderActive)
+         {
+            oObj = First(i);
+            if IsClass(oObj,&TravelPortal) AND Send(oObj,@GetTravelPoint) = id
+            {
+               Send(self,@SomethingChanged,#what=oObj);
+            }
+         }
+      }
+
+      return;
+   }
+
+   SendTravelList(here = $,places = $)
+   "Ours: UC_TRAVEL_LIST, the places our client may offer from point here: this point, the "
+   "seconds the PvP lockout has left, then each place's id and name."
+   {
+      local i;
+
+      if poSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_TRAVEL_LIST,4,here,4,Send(self,@PvPSecondsLeft),
+                1,Length(places));
+      foreach i in places
+      {
+         AddPacket(4,First(i),4,Nth(i,2));
+      }
+      SendPacket(poSession);
+
+      return;
+   }
+
+   SendPvPUntil()
+   "Ours: UC_PVP_UNTIL, the seconds the PvP lockout has left (Player.PvPSecondsLeft)."
+   {
+      if poSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_PVP_UNTIL,4,Send(self,@PvPSecondsLeft));
+      SendPacket(poSession);
 
       return;
    }

@@ -14,10 +14,10 @@ constants:
 
    include blakston.khd
 
-   COLOR_BLUE = 1
-   COLOR_GREEN = 2
-   COLOR_YELLOW = 3
-   COLOR_PURPLE = 4
+   HUE_BLUE = 1
+   HUE_GREEN = 2
+   HUE_YELLOW = 3
+   HUE_PURPLE = 4
 
 resources:
 

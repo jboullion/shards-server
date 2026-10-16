@@ -224,6 +224,12 @@
 
    UC_REQ_TIME  = 60
 
+   // Ours (Meridian Shards): a command line from our client (docs/adr/0015), and what our
+   // features send back to it
+   UC_SHARDS = 100
+   UC_TRAVEL_LIST = 101
+   UC_PVP_UNTIL = 102
+
    // enchantment byte
    ENCHANTMENT_PLAYER = 1
    ENCHANTMENT_ROOM = 2

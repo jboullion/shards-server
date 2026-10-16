@@ -179,6 +179,12 @@ messages:
                         #damage=iDamage,#aspell=viAttack_spell,
                         #atype=viAttack_type);
 
+      // Ours: the damage came from the enchantment, but its caster is who fought (PvP lockout)
+      if IsClass(oTarget,&Player)
+      {
+         Send(oTarget,@NotePvPHarm,#attacker=oCaster);
+      }
+
       if (IsClass(oCaster,&Battler))
       {
          Send(oCaster,@AssessHit,#what=oTarget,#damage=iDamage,

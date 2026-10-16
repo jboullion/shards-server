@@ -4861,6 +4861,7 @@ messages:
          if actual = TRUE
          {
             piTimeAttackedPlayer = GetTime();
+            Send(self,@SendPvPUntil);
          }
 
          return TRUE;
@@ -4957,6 +4958,7 @@ messages:
       if actual = TRUE
       {
          piTimeAttackedPlayer = GetTime();
+         Send(self,@SendPvPUntil);
       }
 
       return TRUE;
@@ -5725,6 +5727,17 @@ messages:
 
       origdamage = damage/100;
       color_rsc = player_hit_color_none;
+
+      // Ours: harm from another player, or from their minion, counts towards the PvP lockout
+      // (NotePvPHarm), whatever path it came by (melee, bolts, walls, clouds)
+      if what <> $ AND IsClass(what,&Monster)
+      {
+         Send(self,@NotePvPHarm,#attacker=Send(what,@GetMaster));
+      }
+      else if what <> $
+      {
+         Send(self,@NotePvPHarm,#attacker=what);
+      }
 
       // Attacks against a minion master will cause minions to defend the master.
       if what <> $
@@ -15526,7 +15539,63 @@ messages:
 
       // Set our attacked-by time here.
       piTimeAttackedByPlayer = iTime;
+      Send(self,@SendPvPUntil);
 
+      return;
+   }
+
+   // Ours (Meridian Shards, docs/adr/0011-fast-travel.md 4): fighting another player, either
+   // way, locks out fast travel, Elusion and Rescue for TeleportAttackDelaySec after the last
+   // blow. The two times are the state.
+
+   PvPSecondsLeft()
+   "Seconds until this player may travel again; 0 when not in PvP."
+   {
+      local iLast;
+
+      iLast = Bound(piTimeAttackedPlayer,piTimeAttackedByPlayer,$);
+      if iLast = 0
+      {
+         return 0;
+      }
+
+      return Bound(iLast + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec) - GetTime(),0,$);
+   }
+
+   IsInPvP()
+   {
+      return Send(self,@PvPSecondsLeft) > 0;
+   }
+
+   NotePvPHarm(attacker = $)
+   "Another player (or their minion) harmed us, any way at all: both players' times "
+   "are set, so being attacked always counts. Not in the arenas, which are by consent."
+   {
+      if attacker = $ OR attacker = self OR NOT IsClass(attacker,&Player)
+         OR poOwner = $ OR Send(poOwner,@IsArena)
+      {
+         return;
+      }
+
+      piTimeAttackedByPlayer = GetTime();
+      Send(self,@SendPvPUntil);
+      Send(attacker,@NotePvPAttacked);
+
+      return;
+   }
+
+   NotePvPAttacked()
+   "We harmed another player (NotePvPHarm)."
+   {
+      piTimeAttackedPlayer = GetTime();
+      Send(self,@SendPvPUntil);
+
+      return;
+   }
+
+   SendPvPUntil()
+   "Users tell their client how long the lockout lasts (UC_PVP_UNTIL)."
+   {
       return;
    }
 

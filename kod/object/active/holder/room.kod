@@ -356,6 +356,8 @@ messages:
       local iTerrain;
 
       Send(self,@CreateStandardObjects);
+      // Ours: the room's fast travel portals, if it has any (util/travelnet.kod)
+      Send(Send(SYS,@GetTravelNetwork),@PlacePortals,#where=self);
       Send(self,@CreateStandardExits);
       Send(self,@CreateYellZoneList);
       Send(self,@ComputeFarenBonus);

@@ -390,6 +390,8 @@ properties:
    poQuestEngine = $
    poDMFeed = $
    poGameQuestMaintenance = $
+   // Ours: fast travel (util/travelnet.kod), made on demand
+   poTravelNetwork = $
    poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
@@ -5147,6 +5149,17 @@ messages:
       }
 
       return TRUE;
+   }
+
+   GetTravelNetwork()
+   "Ours: the fast travel network (util/travelnet.kod), made on demand like GetDMFeed."
+   {
+      if poTravelNetwork = $
+      {
+         poTravelNetwork = Create(&TravelNetwork);
+      }
+
+      return poTravelNetwork;
    }
 
    GetGameQuestMaintenance()

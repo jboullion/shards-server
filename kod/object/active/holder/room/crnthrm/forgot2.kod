@@ -13,8 +13,8 @@ ForgottenToo is CorNothRoom
 constants:
 
    include blakston.khd
-   COLOR_BLUE = 1
-   COLOR_GREEN = 2
+   HUE_BLUE = 1
+   HUE_GREEN = 2
    
 resources:
 
@@ -264,47 +264,47 @@ messages:
          {  send(first(i),@delete);  }
       }
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_psycho,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_psycho,
 	                    #specialgender=GENDER_MALE,#desc=desc_psycho);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH,
            #new_row=5,#new_col=13,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_aythya,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_aythya,
 	                    #specialgender=GENDER_MALE,#desc=desc_aythya);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH,
            #new_row=5,#new_col=10,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_jinx,
+      oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_jinx,
 	                    #specialgender=GENDER_FEMALE,#desc=desc_jinx);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH,
            #new_row=12,#new_col=11,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_skahn,
+      oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_skahn,
 	                    #specialgender=GENDER_MALE,#desc=desc_skahn);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH_EAST,
            #new_row=14,#new_col=9,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_sif,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_sif,
 	                    #specialgender=GENDER_FEMALE,#desc=desc_sif);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH_WEST,
            #new_row=14,#new_col=13,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_gkimo,
+      oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_gkimo,
 	                    #specialgender=GENDER_MALE,#desc=desc_gkimo);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_EAST,
            #new_row=17,#new_col=8,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_bael,
+      oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_bael,
 	                    #specialgender=GENDER_FEMALE,#desc=desc_bael);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_WEST,
            #new_row=17,#new_col=14,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_gsol,
+      oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_gsol,
 	                    #specialgender=GENDER_MALE,#desc=desc_gsol);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_NORTH_EAST,
            #new_row=19,#new_col=10,#fine_row=32,#fine_col=32);
 
-      oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_gcorliss,
+      oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_gcorliss,
 	                    #specialgender=GENDER_MALE,#desc=desc_gcorliss);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_NORTH_WEST,
            #new_row=19,#new_col=13,#fine_row=32,#fine_col=32);

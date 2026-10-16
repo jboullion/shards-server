@@ -111,5 +111,11 @@
  },
  "spinebeastbehemothx.bgf": {
   "describe": "the dead spinebeast behemoth lying on the ground: a colossal beast with a scarred obsidian-black hide, its ember-orange cracks gone dull and grey, and a crown of huge jagged soot-dark bone spikes"
+ },
+ "cow.bgf": {
+  "describe": "a pygmy cow: a small, stocky black-and-white spotted dairy cow with short little horns, a pink nose and a pink udder (keep its colours and proportions)"
+ },
+ "cowx.bgf": {
+  "describe": "a dead pygmy cow lying on its back, a small black-and-white spotted dairy cow with its legs in the air and comic crossed-out X eyes (keep its colours and proportions)"
  }
 }
