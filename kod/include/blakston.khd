@@ -807,6 +807,8 @@
    RID_RATCAVE3   = 860
 
    RID_GODROOM = 901
+   // Meridian Shards' admin test room (room/provgrnd.kod)
+   RID_PROVING_GROUNDS = 4300
    RID_UNIVERSITY = 902
    RID_GALLERY = 903
 

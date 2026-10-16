@@ -1,0 +1,103 @@
+// A training dummy for the Proving Grounds (Meridian Shards' admin test room):
+// it never moves, never fights back and never dies, and tells whoever hits it
+// how much damage that did. After the orc pit boss's body (bossbody.kod).
+
+////////////////////////////////////////////////////////////////////////////////
+TrainingDummy is Monster
+
+constants:
+
+   include blakston.khd
+
+   // Hit points: refilled before every hit, so no blow or spell can finish it
+   DUMMY_HIT_POINTS = 1000
+
+resources:
+
+   TrainingDummy_name_rsc = "training dummy"
+   TrainingDummy_icon_rsc = totem.bgf
+   TrainingDummy_desc_rsc = \
+      "A post wrapped in straw and old leather, scarred by a thousand blows.  "
+      "It tells you how hard you hit it."
+
+   TrainingDummy_dead_icon_rsc = totem.bgf
+   TrainingDummy_dead_name_rsc = "broken training dummy"
+
+   TrainingDummy_sound_hit = tr_atkh.ogg
+   TrainingDummy_sound_miss = tr_atkm.ogg
+   TrainingDummy_sound_death = tr_dth.ogg
+   TrainingDummy_sound_aware = tr_awr.ogg
+
+   TrainingDummy_damage_rsc = "The training dummy takes %i damage."
+
+classvars:
+
+   vrName = TrainingDummy_name_rsc
+   vrIcon = TrainingDummy_icon_rsc
+   vrDesc = TrainingDummy_desc_rsc
+   vrDead_icon = TrainingDummy_dead_icon_rsc
+   vrDead_name = TrainingDummy_dead_name_rsc
+
+   viTreasure_type = TID_NONE
+   viAttack_type = ATCK_WEAP_WHIP
+   viSpeed = SPEED_NONE
+   viAttributes = MOB_NOMOVE
+   viDefault_behavior = AI_NOMOVE | AI_NOFIGHT
+   viLevel = 1
+   viDifficulty = 1
+   viVisionDistance = 1
+   viKarma = 0
+   viCashmin = 0
+   viCashmax = 0
+   vrSound_hit = TrainingDummy_sound_hit
+   vrSound_miss = TrainingDummy_sound_miss
+   vrSound_aware = TrainingDummy_sound_aware
+   vrSound_death = TrainingDummy_sound_death
+
+properties:
+
+messages:
+
+   GetMaxHitPoints()
+   {
+      return DUMMY_HIT_POINTS;
+   }
+
+   AssessDamage(what=$)
+   {
+      // Full before every hit, so it can't die; ReportDamage reads what this one took
+      piHit_points = piMax_hit_points*100;
+      if what <> $ AND IsClass(what,&Player)
+      {
+         Post(self,@ReportDamage,#who=what);
+      }
+
+      propagate;
+   }
+
+   ReportDamage(who = $)
+   {
+      local iTaken;
+
+      iTaken = (piMax_hit_points*100 - piHit_points + 50) / 100;
+      piHit_points = piMax_hit_points*100;
+      if who <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=TrainingDummy_damage_rsc,#parm1=iTaken);
+      }
+
+      return;
+   }
+
+   CreateTreasure(who=$,corpse=$)
+   {
+      return;
+   }
+
+   CanMorphTo()
+   {
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////
