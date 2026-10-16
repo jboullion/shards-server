@@ -81,5 +81,35 @@
  },
  "hknightx.bgf": {
   "describe": "a fallen undead half knight in broken plate armour lying dead on the ground (keep its colours, gear and proportions)"
+ },
+ "gbeetle.bgf": {
+  "describe": "a giant beetle: a huge armoured beetle with a glossy slate-grey shell striped in darker grey, glowing blue eyes and dripping mandibles (keep its colours and proportions)"
+ },
+ "gbeetlex.bgf": {
+  "describe": "a dead giant beetle lying on its back, its empty glossy slate-grey striped shell upturned (keep its colours and proportions)"
+ },
+ "chupa.bgf": {
+  "describe": "a chupacabra: a gaunt, hairless, dog-like predator with sandy-tan leathery skin, visible ribs, long fangs and a row of small spines down its back (keep its colours and proportions)"
+ },
+ "chupax.bgf": {
+  "describe": "a dead chupacabra lying on its side: a gaunt, hairless, dog-like predator with sandy-tan leathery skin and visible ribs (keep its colours and proportions)"
+ },
+ "spinebeast.bgf": {
+  "describe": "a spinebeast: a squat, heavily armoured four-legged beast with a dark charcoal hide and a frill of bone-white horns and spikes stained rusty red (keep its colours and proportions)"
+ },
+ "spinebeastx.bgf": {
+  "describe": "a dead spinebeast lying on the ground: a squat, heavily armoured beast with a dark charcoal hide and a frill of bone-white horns and spikes stained rusty red (keep its colours and proportions)"
+ },
+ "spinebeastsmall.bgf": {
+  "describe": "a young spinebeast calf: a chubby, adorable little four-legged beast with a soft sandy-tan hide, a pale cream belly, big bright eyes and short, rounded cream-coloured nubs instead of sharp spikes; clean, no blood"
+ },
+ "spinebeastsmallx.bgf": {
+  "describe": "a dead young spinebeast calf lying on the ground: a chubby little beast with a soft sandy-tan hide, a pale cream belly and short, rounded cream-coloured nubs instead of spikes; no blood"
+ },
+ "spinebeastbehemoth.bgf": {
+  "describe": "the spinebeast behemoth: an ancient, colossal spinebeast with a scarred obsidian-black hide split by glowing ember-orange cracks, and a crown of huge, jagged, soot-dark bone spikes and horns tipped with glowing orange"
+ },
+ "spinebeastbehemothx.bgf": {
+  "describe": "the dead spinebeast behemoth lying on the ground: a colossal beast with a scarred obsidian-black hide, its ember-orange cracks gone dull and grey, and a crown of huge jagged soot-dark bone spikes"
  }
 }

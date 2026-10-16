@@ -1,0 +1,24 @@
+{
+  "format": "meridian-room",
+  "formatVersion": 1,
+  "roomId": 0,
+  "vertices": [
+    [-512,448],
+    [-896,448],
+    [-512,832],
+    [-896,832]
+  ],
+  "linedefs": [
+    {"start":0,"end":1,"front":{"sector":0,"normal":3204,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":2,"end":0,"front":{"sector":0,"normal":3204,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":3,"end":2,"front":{"sector":0,"normal":3204,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":1,"end":3,"front":{"sector":0,"normal":3204,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null}
+  ],
+  "sectors": [
+    {"serverId":0,"floorTexture":3204,"ceilingTexture":0,"floorHeight":0,"ceilingHeight":450,"xOffset":0,"yOffset":0,"light":50,"flags":0,"animateSpeed":0,"floorSlope":null,"ceilingSlope":null}
+  ],
+  "things": [
+    {"x":-960,"y":896},
+    {"x":-448,"y":384}
+  ]
+}
