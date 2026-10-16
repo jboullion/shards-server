@@ -1,5 +1,5 @@
 {
- "next_batch": 23,
+ "next_batch": 25,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2785,6 +2785,54 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\022\\spinebeastbehemothx\\v0.bgf"
+   }
+  },
+  "cow.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "023",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "cow.bgf",
+   "chosen": {
+    "batch": "023",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\023\\cow\\v0.bgf"
+   }
+  },
+  "cowx.bgf": {
+   "status": "installed",
+   "attempts": 2,
+   "notes": [],
+   "history": [
+    {
+     "batch": "023",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "024",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "cowx.bgf",
+   "chosen": {
+    "batch": "024",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\024\\cowx\\v0.bgf"
    }
   }
  }
