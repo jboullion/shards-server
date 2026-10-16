@@ -1,0 +1,28 @@
+{
+  "format": "meridian-room",
+  "formatVersion": 1,
+  "roomId": 0,
+  "vertices": [
+    [-904,-72],
+    [-1264,288],
+    [-768,64],
+    [-720,104],
+    [-584,240],
+    [-992,560]
+  ],
+  "linedefs": [
+    {"start":0,"end":1,"front":{"sector":0,"normal":2001,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":2,"end":0,"front":{"sector":0,"normal":2001,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":3,"end":2,"front":{"sector":0,"normal":2004,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":4,"end":3,"front":{"sector":0,"normal":2001,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":5,"end":4,"front":{"sector":0,"normal":2001,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":1,"end":5,"front":{"sector":0,"normal":2001,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null}
+  ],
+  "sectors": [
+    {"serverId":0,"floorTexture":4608,"ceilingTexture":1603,"floorHeight":0,"ceilingHeight":96,"xOffset":0,"yOffset":0,"light":192,"flags":0,"animateSpeed":0,"floorSlope":null,"ceilingSlope":null}
+  ],
+  "things": [
+    {"x":-1344,"y":576},
+    {"x":-512,"y":-128}
+  ]
+}

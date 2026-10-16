@@ -1,0 +1,96 @@
+// Ours (Meridian Shards, docs/adr/0011-fast-travel.md 1.2): a fast travel portal, one per
+// travel point (util/travelnet.kod), placed by TravelNetwork.PlacePortals. It's clicked, not
+// walked onto: touching it attunes, or lists where it can take you. A historic one (the museum's
+// and the historic towns') takes you straight to its other end.
+
+////////////////////////////////////////////////////////////////////////////////
+TravelPortal is Portal
+
+constants:
+
+   include blakston.khd
+
+   TRAVELPORTAL_RANGE = 3
+
+resources:
+
+   travelportal_name_rsc = "travel portal"
+   travelportal_desc_rsc = \
+      "The portal hums with a steady light.  Touch it to attune to it, and "
+      "once attuned, to travel to any other portal you know."
+   travelportal_too_far = "You must stand closer to the portal to touch it."
+
+classvars:
+
+   vrName = travelportal_name_rsc
+   viObject_flags = OF_ACTIVATABLE
+   viMoveOn_type = MOVEON_NO
+
+properties:
+
+   vrDesc = travelportal_desc_rsc
+
+   // Its travel point's id (TravelNetwork.GetPoints)
+   piPoint = 0
+
+messages:
+
+   Constructor(point = 0)
+   {
+      piPoint = point;
+
+      propagate;
+   }
+
+   GetTravelPoint()
+   {
+      return piPoint;
+   }
+
+   ShowDesc()
+   "The historic network's portals say where they lead (TravelNetwork.GetPortalDesc)."
+   {
+      local rDesc;
+
+      rDesc = Send(Send(SYS,@GetTravelNetwork),@GetPortalDesc,#id=piPoint);
+      if rDesc = $
+      {
+         propagate;
+      }
+
+      AddPacket(4,rDesc);
+
+      return;
+   }
+
+   CalculatePortalArea()
+   {
+      // Walking onto it does nothing: it's touched (TryActivate)
+      plTeleportArea = $;
+
+      return;
+   }
+
+   TryActivate(who = $)
+   "Return FALSE only if you want user.kod to send its own error message to user."
+   {
+      if poOwner = $ OR NOT IsClass(who,&User) OR poOwner <> Send(who,@GetOwner)
+      {
+         return TRUE;
+      }
+
+      if Abs(Send(who,@GetRow) - Send(self,@GetRow)) > TRAVELPORTAL_RANGE
+         OR Abs(Send(who,@GetCol) - Send(self,@GetCol)) > TRAVELPORTAL_RANGE
+      {
+         Send(who,@MsgSendUser,#message_rsc=travelportal_too_far);
+
+         return TRUE;
+      }
+
+      Send(Send(SYS,@GetTravelNetwork),@PortalTouched,#who=who,#id=piPoint);
+
+      return TRUE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

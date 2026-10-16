@@ -21,9 +21,9 @@ constants:
    POSE_WEAPON_ATTACK = 4
    POSE_BOW_ATTACK = 5
 
-   COLOR_BLUE = 1
-   COLOR_GREEN = 2
-   COLOR_YELLOW = 3
+   HUE_BLUE = 1
+   HUE_GREEN = 2
+   HUE_YELLOW = 3
 
 resources:
 
@@ -625,17 +625,17 @@ messages:
 
       iFlags = viObject_flags | piDrawEffectFlag;
 
-      if piColor = COLOR_GREEN
+      if piColor = HUE_GREEN
       {
          iFlags = iFlags | OF_DISPLAY_NAME;
       }
 
-      if piColor = COLOR_BLUE
+      if piColor = HUE_BLUE
       {
          iFlags = iFlags | OF_DISPLAY_NAME;
       }
 
-      if piColor = COLOR_YELLOW
+      if piColor = HUE_YELLOW
       {
          iFlags = iFlags | OF_DISPLAY_NAME;
       }
@@ -649,17 +649,17 @@ messages:
 
       iFlags = 0;
 
-      if piColor = COLOR_GREEN
+      if piColor = HUE_GREEN
       {
          iFlags = iFlags | NC_SUPER;
       }
 
-      if piColor = COLOR_BLUE
+      if piColor = HUE_BLUE
       {
          iFlags = iFlags | NC_DM;
       }
 
-      if piColor = COLOR_YELLOW
+      if piColor = HUE_YELLOW
       {
          iFlags = iFlags | NC_CREATOR;
       }
@@ -673,17 +673,17 @@ messages:
 
       iFlags = 0;
 
-      if piColor = COLOR_GREEN
+      if piColor = HUE_GREEN
       {
          iFlags = iFlags | OT_SUPER;
       }
 
-      if piColor = COLOR_BLUE
+      if piColor = HUE_BLUE
       {
          iFlags = iFlags | OT_DM;
       }
 
-      if piColor = COLOR_YELLOW
+      if piColor = HUE_YELLOW
       {
          iFlags = iFlags | OT_CREATOR;
       }

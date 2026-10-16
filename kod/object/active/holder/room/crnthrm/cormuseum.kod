@@ -111,6 +111,9 @@ resources:
    museumportal_sign_name= "Visit the historical Cities!"
    museumportal_sign_desc = \
       "How to Visit the historical Cities:\n"
+      "Each portal along the west wall shows one of the cities as it once was: Jasper, "
+      "Marion, the north and south of Barloque, and Cor Noth.  Touch one to step through.  "
+      "They are sanctuaries now, and a portal in each of them brings you back here."
 
 classvars:
 
@@ -287,17 +290,8 @@ messages:
       Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_MUSEUM_CHALICE),
             #new_row=22,#new_col=13,#fine_row=46,#fine_col=25,#new_angle=ANGLE_EAST);
 
-      // Portals from left to right
-      //Send(self,@NewHold,#what=Create(&Portal,#dest_row=21,#dest_col=11),
-      //      #new_row=20,#new_col=1,#fine_row=0,#fine_col=48,#new_angle=ANGLE_EAST);
-      //Send(self,@NewHold,#what=Create(&Portal,#dest_row=21,#dest_col=11),
-      //      #new_row=18,#new_col=1,#fine_row=40,#fine_col=48,#new_angle=ANGLE_EAST);
-      //Send(self,@NewHold,#what=Create(&Portal,#dest_row=21,#dest_col=11),
-      //      #new_row=17,#new_col=1,#fine_row=16,#fine_col=48,#new_angle=ANGLE_EAST);
-      //Send(self,@NewHold,#what=Create(&Portal,#dest_row=21,#dest_col=11),
-      //      #new_row=16,#new_col=1,#fine_row=0,#fine_col=48,#new_angle=ANGLE_EAST);
-      //Send(self,@NewHold,#what=Create(&Portal,#dest_row=21,#dest_col=11),
-      //      #new_row=14,#new_col=1,#fine_row=32,#fine_col=48,#new_angle=ANGLE_EAST);
+      // Ours: the five travel portals to the historic towns stand by the west wall, where these
+      // were meant to (util/travelnet.kod, docs/adr/0011-fast-travel.md 5.1)
 
       //some more deco
       Send(self,@NewHold,#what=Create(&Candelabra),

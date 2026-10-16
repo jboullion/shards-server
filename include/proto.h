@@ -282,6 +282,12 @@ enum {
    UC_MINIGAME_RESET_PLAYERS= 49,
 
    UC_REQ_TIME = 60,
+
+   // Ours (Meridian Shards): a command line from our client (docs/adr/0015 in
+   // meridian-browser), handled by user.kod ShardsCommand; and what our features send back
+   UC_SHARDS = 100,
+   UC_TRAVEL_LIST = 101,
+   UC_PVP_UNTIL = 102,
 };
 
 // Login error action constants

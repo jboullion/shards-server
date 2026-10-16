@@ -13,9 +13,9 @@ TosForgotten is TosRoom
 constants:
 
    include blakston.khd
-   COLOR_BLUE = 1
-   COLOR_GREEN = 2
-   COLOR_YELLOW = 3
+   HUE_BLUE = 1
+   HUE_GREEN = 2
+   HUE_YELLOW = 3
    
 resources:
 
@@ -316,18 +316,18 @@ messages:
       iRandom = Random(1,5);      
       if iRandom = 1 or iRandom = 2
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_th,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_th,
                           #specialgender=GENDER_MALE,#desc=desc_th);
       }
 
       if iRandom = 3 or iRandom = 4
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_pg,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_pg,
                           #specialgender=GENDER_MALE,#desc=desc_pg);
       }
       if iRandom = 5
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_dm,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_dm,
                           #specialgender=GENDER_MALE,#desc=desc_dm);
       }
 
@@ -343,27 +343,27 @@ messages:
       iRandom = Random(1, 6);
       if iRandom = 1 or iRandom = 2
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_ax,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_ax,
                           #specialgender=GENDER_FEMALE,#desc=desc_ax);
       }
       if iRandom = 3
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_kr,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_kr,
                           #specialgender=GENDER_MALE,#desc=desc_kr);
       }
       if iRandom = 4
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_lj,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_lj,
                           #specialgender=GENDER_FEMALE,#desc=desc_lj);
       }
       if iRandom = 5
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_hn,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_hn,
                           #specialgender=GENDER_MALE,#desc=desc_hn);
       }
       if iRandom = 6
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_iz,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_iz,
                           #specialgender=GENDER_MALE,#desc=desc_iz);
       }
 
@@ -379,37 +379,37 @@ messages:
 
       if iRandom < 5
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_zw,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_zw,
                           #specialgender=GENDER_MALE,#desc=desc_zw);
       }
 
       if iRandom = 5 or iRandom = 6
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_gs,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_gs,
                           #specialgender=GENDER_MALE,#desc=desc_gs);
       }
 
       if iRandom = 7
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_za,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_za,
                           #specialgender=GENDER_FEMALE,#desc=desc_za);
       }
 
       if iRandom = 8
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_zs,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_zs,
                           #specialgender=GENDER_MALE,#desc=desc_zs);
       }
 
       if iRandom = 9
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_rq,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_rq,
                           #specialgender=GENDER_MALE,#desc=desc_rq);
       }
 
       if iRandom = 10
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_gn,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_gn,
                           #specialgender=GENDER_MALE,#desc=desc_gn);
       }
 
@@ -424,43 +424,43 @@ messages:
 
       if iRandom < 4
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_ms,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_ms,
                           #specialgender=GENDER_MALE,#desc=desc_ms);
       }
 
       if iRandom = 4 OR iRandom = 5
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_al,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_al,
                           #specialgender=GENDER_MALE,#desc=desc_al);
       }
 
       if iRandom = 6 OR iRandom = 7
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_ky,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_ky,
                           #specialgender=GENDER_FEMALE,#desc=desc_ky);
       }
 
       if iRandom = 8
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_dt,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_dt,
                           #specialgender=GENDER_MALE,#desc=desc_dt);
       }
 
       if iRandom = 9
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_kn,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_kn,
                           #specialgender=GENDER_MALE,#desc=desc_kn);
       }
 
       if iRandom = 10
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_ze,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_ze,
                           #specialgender=GENDER_MALE,#desc=desc_ze);
       }      
 
       if iRandom = 11
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_gm,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_gm,
                           #specialgender=GENDER_MALE,#desc=desc_gm);
       }      
       
@@ -475,19 +475,19 @@ messages:
 
       if iRandom = 1 OR iRandom = 2
       {
-         oStatue = Create(&Statue,#special=COLOR_BLUE,#specialname=name_mr,
+         oStatue = Create(&Statue,#special=HUE_BLUE,#specialname=name_mr,
                           #specialgender=GENDER_MALE,#desc=desc_mr);
       }
 
       if iRandom = 3
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_vt,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_vt,
                           #specialgender=GENDER_MALE,#desc=desc_vt);
       }
 
       if iRandom = 4
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_td,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_td,
                           #specialgender=GENDER_MALE,#desc=desc_td);
       }
 
@@ -502,37 +502,37 @@ messages:
 
       if iRandom < 4
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_to,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_to,
                           #specialgender=GENDER_MALE,#desc=desc_to);
       }
 
       if iRandom = 4 OR iRandom = 5
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_rh,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_rh,
                           #specialgender=GENDER_MALE,#desc=desc_rh);
       }
 
       if iRandom = 6
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_zr,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_zr,
                           #specialgender=GENDER_MALE,#desc=desc_zr);
       }
 
       if iRandom = 7 OR iRandom = 8
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_br,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_br,
                           #specialgender=GENDER_MALE,#desc=desc_br);
       }
 
       if iRandom = 9
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_ct,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_ct,
                           #specialgender=GENDER_FEMALE,#desc=desc_ct);
       }
 
       if iRandom = 10
       {
-         oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_om,
+         oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_om,
                           #specialgender=GENDER_MALE,#desc=desc_om);
       }
 
@@ -542,62 +542,62 @@ messages:
 
       /// the ones below are permanent.
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_rg,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_rg,
                        #specialgender=GENDER_MALE,#desc=desc_rg);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_NORTH_WEST,
            #new_row=13,#new_col=13,#fine_row=32,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_zd,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_zd,
                        #specialgender=GENDER_MALE,#desc=desc_zd);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_NORTH_EAST,
            #new_row=13,#new_col=2,#fine_row=32,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_ap,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_ap,
                        #specialgender=GENDER_FEMALE,#desc=desc_ap);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_EAST,
            #new_row=9,#new_col=4,#fine_row=40,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_gt,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_gt,
                        #specialgender=GENDER_MALE,#desc=desc_gt);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_WEST,
            #new_row=9,#new_col=11,#fine_row=40,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_gw,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_gw,
                        #specialgender=GENDER_MALE,#desc=desc_gw);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_WEST,
            #new_row=7,#new_col=11,#fine_row=24,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_xn,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_xn,
                        #specialgender=GENDER_MALE,#desc=desc_xn);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_EAST,
            #new_row=7,#new_col=4,#fine_row=24,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_mc,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_mc,
                        #specialgender=GENDER_MALE,#desc=desc_mc);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_WEST,
            #new_row=5,#new_col=11,#fine_row=8,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_st,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_st,
                        #specialgender=GENDER_FEMALE,#desc=desc_st);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_EAST,
            #new_row=5,#new_col=4,#fine_row=8,#fine_col=0);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_q,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_q,
                        #specialgender=GENDER_MALE,#desc=desc_q);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH_EAST,
            #new_row=2,#new_col=4,#fine_row=24,#fine_col=56);
 
-      oStatue = Create(&Statue,#special=COLOR_GREEN,#specialname=name_zj,
+      oStatue = Create(&Statue,#special=HUE_GREEN,#specialname=name_zj,
                        #specialgender=GENDER_FEMALE,#desc=desc_zj);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH_WEST,
            #new_row=2,#new_col=10,#fine_row=24,#fine_col=8);
       
-      oStatue = Create(&Statue,#special=COLOR_YELLOW,#specialname=name_zn,
+      oStatue = Create(&Statue,#special=HUE_YELLOW,#specialname=name_zn,
                        #specialgender=GENDER_MALE,#desc=desc_zn);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH,
            #new_row=1,#new_col=7,#fine_row=32,#fine_col=16);
 
-      oStatue = Create(&Statue,#special=COLOR_YELLOW,#specialname=name_zp,
+      oStatue = Create(&Statue,#special=HUE_YELLOW,#specialname=name_zp,
                        #specialgender=GENDER_MALE,#desc=desc_zp);
       Send(self,@NewHold,#what=oStatue,#new_angle=ANGLE_SOUTH,
            #new_row=1,#new_col=7,#fine_row=32,#fine_col=48);

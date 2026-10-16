@@ -1,0 +1,218 @@
+// The Proving Grounds: Meridian Shards' admin test room (RID 4300, provgrnd.roo).
+// Only admins and DMs come in (as the God room). Built to try things in one place:
+//
+//   the pen          rows 2-10, cols 2-14: five spawn pads, for monsters to fight
+//   the spell range  rows 2-10, cols 18-31: training dummies 2, 5 and 10 squares east
+//                    of the casting mark (row 6, col 19)
+//   the terrain      rows 14-17: grass, earth, rocky ground, cobbles, shallow and deep
+//                    water, painted water (a water texture on a dry floor) and grass
+//   the hall         rows 19-23: under a roof, for indoor light and bats
+//
+// Exits on the west side: row 12 to Tos, row 13 to the God room. The room's source is
+// resource/rooms/src/provgrnd.room.json (meridian-editor); the helpers below are for
+// the maintenance port, as the admin dashboard uses them:
+//
+//   send object <room> SpawnMonster what class Orc pad int 1 count int 3
+//   send object <room> ClearMonsters
+//   send object <room> ClearItems
+//   send object <room> ResetDummies
+
+////////////////////////////////////////////////////////////////////////////////
+ProvingGrounds is Room
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   room_name_ProvingGrounds = "The Proving Grounds"
+   room_ProvingGrounds = provgrnd.roo
+
+classvars:
+
+   vrName = room_name_ProvingGrounds
+
+   viTeleport_row = 12
+   viTeleport_col = 16
+
+   viTerrain_type = TERRAIN_FIELDS
+   viPermanent_flags = ROOM_SAFELOGOFF
+
+properties:
+
+   prRoom = room_ProvingGrounds
+   piRoom_num = RID_PROVING_GROUNDS
+
+   piBaseLight = LIGHT_NICE
+   piOutside_factor = 8
+
+   // The spawn pads, [row, col], numbered from 1
+   plPads = $
+
+messages:
+
+   Constructed()
+   {
+      plPads = [ [4,4], [4,12], [8,4], [8,12], [6,8] ];
+
+      propagate;
+   }
+
+   CreateStandardExits()
+   {
+      plExits = $;
+
+      plExits = Cons([ 12, 2, RID_TOS, 45, 31, ROTATE_NONE ],plExits);
+      plExits = Cons([ 13, 2, RID_GODROOM, 21, 10, ROTATE_NONE ],plExits);
+
+      propagate;
+   }
+
+   CreateStandardObjects()
+   {
+      Send(self,@ResetDummies);
+
+      propagate;
+   }
+
+   ReqNewHold(what = $,new_row = $,new_col = $)
+   {
+      // Admins and DMs only, as the God room
+      if IsClass(what,&User) AND NOT IsClass(what,&DM)
+      {
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   Teleport(what=$)
+   {
+      if IsClass(what,&User) AND NOT IsClass(what,&DM)
+      {
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   SeanceCheck()
+   {
+      return FALSE;
+   }
+
+   SpawnMonster(what = $, pad = 1, count = 1)
+   "Creates count monsters of class what on spawn pad pad (1-5), kept from "
+   "the disposal sweep. Returns how many were made."
+   {
+      local i, lPad, oMonster, iMade;
+
+      if what = $ OR pad < 1 OR pad > Length(plPads)
+      {
+         return 0;
+      }
+
+      lPad = Nth(plPads,pad);
+      iMade = 0;
+      for (i = 1; i <= Bound(count,1,10); ++i)
+      {
+         oMonster = Create(what);
+         if oMonster = $
+         {
+            return iMade;
+         }
+
+         if IsClass(oMonster,&Monster)
+         {
+            Send(oMonster,@SetDontDispose);
+         }
+
+         // Spread a group about the pad's square
+         Send(self,@NewHold,#what=oMonster,#new_row=First(lPad),#new_col=Nth(lPad,2),
+              #fine_row=Random(8,56),#fine_col=Random(8,56));
+         iMade = iMade + 1;
+      }
+
+      return iMade;
+   }
+
+   ClearMonsters()
+   "Deletes every monster here but the training dummies. Returns how many."
+   {
+      local i, oObj, lGone;
+
+      lGone = $;
+      foreach i in plActive
+      {
+         oObj = First(i);
+         if IsClass(oObj,&Monster) AND NOT IsClass(oObj,&TrainingDummy)
+         {
+            lGone = Cons(oObj,lGone);
+         }
+      }
+
+      foreach oObj in lGone
+      {
+         Send(oObj,@Delete);
+      }
+
+      return Length(lGone);
+   }
+
+   ClearItems()
+   "Deletes every item lying here (dropped, or left by the dead). Returns how many."
+   {
+      local i, oObj, lGone;
+
+      lGone = $;
+      foreach i in plPassive
+      {
+         oObj = First(i);
+         if IsClass(oObj,&Item)
+         {
+            lGone = Cons(oObj,lGone);
+         }
+      }
+
+      foreach oObj in lGone
+      {
+         Send(oObj,@Delete);
+      }
+
+      return Length(lGone);
+   }
+
+   ResetDummies()
+   "Puts fresh training dummies 2, 5 and 10 squares east of the casting mark."
+   {
+      local i, oObj, lGone, iCol;
+
+      lGone = $;
+      foreach i in plActive
+      {
+         oObj = First(i);
+         if IsClass(oObj,&TrainingDummy)
+         {
+            lGone = Cons(oObj,lGone);
+         }
+      }
+
+      foreach oObj in lGone
+      {
+         Send(oObj,@Delete);
+      }
+
+      foreach iCol in [ 21, 24, 29 ]
+      {
+         oObj = Create(&TrainingDummy);
+         Send(oObj,@SetDontDispose);
+         Send(self,@NewHold,#what=oObj,#new_row=6,#new_col=iCol,
+              #fine_row=32,#fine_col=32,#new_angle=ANGLE_WEST);
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

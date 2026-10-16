@@ -1,0 +1,48 @@
+{
+  "format": "meridian-room",
+  "formatVersion": 1,
+  "roomId": 0,
+  "vertices": [
+    [-2560,896],
+    [-2176,1280],
+    [-2112,576],
+    [-1664,1088],
+    [-1664,1792],
+    [-1664,1472],
+    [-2176,1792],
+    [-2176,1408],
+    [-2176,1536],
+    [-2176,1600],
+    [-2176,1472],
+    [-1920,1408],
+    [-1920,1472],
+    [-1856,1472],
+    [-1856,1408],
+    [-1664,1408]
+  ],
+  "linedefs": [
+    {"start":0,"end":1,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":2,"end":0,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":24},"back":null},
+    {"start":3,"end":2,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":4,"end":5,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":24},"back":null},
+    {"start":6,"end":4,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":24},"back":null},
+    {"start":1,"end":7,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":8,"end":9,"front":{"sector":0,"normal":2403,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":9,"end":6,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":24},"back":null},
+    {"start":10,"end":8,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":11,"end":12,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":12,"end":10,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":5,"end":13,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":13,"end":14,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":14,"end":15,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null},
+    {"start":7,"end":11,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":24},"back":null},
+    {"start":15,"end":3,"front":{"sector":0,"normal":4713,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":null}
+  ],
+  "sectors": [
+    {"serverId":0,"floorTexture":2011,"ceilingTexture":1601,"floorHeight":0,"ceilingHeight":84,"xOffset":0,"yOffset":0,"light":192,"flags":0,"animateSpeed":0,"floorSlope":null,"ceilingSlope":null}
+  ],
+  "things": [
+    {"x":-2624,"y":1856},
+    {"x":-1600,"y":512}
+  ]
+}

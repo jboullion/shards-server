@@ -118,6 +118,10 @@
    MM_BOSS                 = 0x00000800
    MM_RARE_ITEM            = 0x00001000
    MM_NO_PVP               = 0x00002000
+   // Ours (Meridian Shards, docs/adr/0011-fast-travel.md 3): a fast travel portal, and one
+   // this player hasn't attuned to yet (the client draws a gold "!" over it)
+   MM_TRAVEL               = 0x00040000
+   MM_TRAVEL_UNATTUNED     = 0x00080000
 
    // Player name color sent as hex RGB value. Define constants
    // for ease of use as needed. Requires OF_PLAYER boolean flag
@@ -807,6 +811,8 @@
    RID_RATCAVE3   = 860
 
    RID_GODROOM = 901
+   // Meridian Shards' admin test room (room/provgrnd.kod)
+   RID_PROVING_GROUNDS = 4300
    RID_UNIVERSITY = 902
    RID_GALLERY = 903
 

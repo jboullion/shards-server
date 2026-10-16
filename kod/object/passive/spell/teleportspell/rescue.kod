@@ -68,10 +68,9 @@ messages:
 
    CanPayCosts(who = $,lTargets = $)
    {
-      // Can't cast just after attacking someone
-      if Send(who,@GetLastPlayerAttackTime)
-         + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec)
-         > GetTime()
+      // Can't cast just after fighting another player, attacking or attacked (ours:
+      // Player.IsInPvP, docs/adr/0011-fast-travel.md 4.3)
+      if Send(who,@IsInPvP)
       {
          Send(who,@MsgSendUser,#message_rsc=spell_too_soon_since_attacking);
 

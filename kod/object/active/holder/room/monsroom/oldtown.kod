@@ -10,6 +10,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 OldTown is MonsterRoom
 
+// Ours (Meridian Shards, docs/adr/0011-fast-travel.md 5): the historic towns are museum tours,
+// reached by travel portal from the Cor Noth museum: sanctuaries, with no monsters (Constructed)
+// and no combat, where logging off is safe. CanHavePlayerPortal stays FALSE, so Death Rift and
+// the like still can't open into them; only the travel portals lead in.
+
 constants:
 
    include blakston.khd
@@ -17,6 +22,8 @@ constants:
 resources:
 
 classvars:
+
+   viPermanent_flags = ROOM_NO_COMBAT | ROOM_SAFELOGOFF
 
 properties:
 

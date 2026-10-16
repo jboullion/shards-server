@@ -1,0 +1,511 @@
+// Ours (Meridian Shards, docs/adr/0011-fast-travel.md): the fast travel network. One object,
+// SYS@GetTravelNetwork, made on demand. It holds no state of its own: the travel points are
+// GetPoints' table, and what each player has attuned to is on the player
+// (User.plAttunedPortals, point ids), so rebuilding rooms or this object loses nothing.
+//
+// Each point is [id, name, network, room, portal row, portal col, arrival row, arrival col,
+// arrival angle], and optionally the portal's fine row and column (else the square's middle).
+// An id on the main network never changes once players have attuned to it. Rooms get their
+// portals from PlacePortals (room.kod Constructed), so a point needs no change to its room's class.
+//
+// Using a portal (TravelPortal.TryActivate) on the main network: not attuned yet, the player
+// attunes; attuned, they get the list of places (User.SendTravelList, UC_TRAVEL_LIST). Their
+// client answers with the command "travel <id>" (UC_SHARDS, User.ShardsCommand), checked again
+// here before the journey.
+//
+// The historic network has no list: the museum's five portals each lead to one historic town,
+// and each town's portal back to its own (GetHistoricLinks).
+
+////////////////////////////////////////////////////////////////////////////////
+TravelNetwork is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+
+   NET_MAIN = 1
+   NET_HISTORIC = 2
+
+   // A point's fields
+   TP_ID = 1
+   TP_NAME = 2
+   TP_NET = 3
+   TP_RID = 4
+   TP_ROW = 5
+   TP_COL = 6
+   TP_AROW = 7
+   TP_ACOL = 8
+   TP_ANGLE = 9
+   TP_FROW = 10
+   TP_FCOL = 11
+
+   // A historic link's fields: the museum's point, the town's, and the museum portal's look
+   HL_MUSEUM = 1
+   HL_TOWN = 2
+   HL_DESC = 3
+
+   // A player must stand this near a portal (squares), as CorpseNode's range
+   PORTAL_RANGE = 3
+
+resources:
+
+   travel_name_tos = "Tos"
+   travel_name_marion = "Marion"
+   travel_name_raza = "Raza"
+   travel_name_jasper = "Jasper"
+   travel_name_barloque = "Barloque"
+   travel_name_cornoth = "Cor Noth"
+   travel_name_kocatan = "Ko'catan"
+   travel_name_bergen = "Bergen"
+   travel_name_brax = "Brax"
+   travel_name_castle = "Castle Victoria"
+   travel_name_proving = "the Proving Grounds"
+
+   travel_name_museum = "the Meridian 59 Museum"
+   travel_name_old_jasper = "Historic Jasper"
+   travel_name_old_marion = "Historic Marion"
+   travel_name_old_bar_north = "Historic North Barloque"
+   travel_name_old_bar_south = "Historic South Barloque"
+   travel_name_old_cornoth = "Historic Cor Noth"
+   travel_name_old_cor_univ = "The Historic Hall of Genealogy"
+
+   travel_desc_old_jasper = \
+      "Through the portal's light you see Jasper as it stood long ago.  Touch it to step through."
+   travel_desc_old_marion = \
+      "Through the portal's light you see Marion as it stood long ago.  Touch it to step through."
+   travel_desc_old_bar_north = \
+      "Through the portal's light you see the north of Barloque as it stood long ago.  "
+      "Touch it to step through."
+   travel_desc_old_bar_south = \
+      "Through the portal's light you see the south of Barloque as it stood long ago.  "
+      "Touch it to step through."
+   travel_desc_old_cornoth = \
+      "Through the portal's light you see Cor Noth as it stood long ago, and beside it the Hall "
+      "of Genealogy.  Touch it to step through."
+   travel_desc_back = \
+      "The portal hums with a steady light.  Touch it to return to the Meridian 59 Museum."
+
+   travel_attuned = "You attune to the portal of %s.  You can travel here now from any portal you know."
+   travel_pvp = "You fought another player too recently: %i seconds left."
+   travel_token = "The portal won't carry a faction token."
+   travel_not_attuned = "You aren't attuned to that portal."
+   travel_no_portal = "You must stand by a portal to travel."
+   travel_cannot = "The portal won't take you now."
+   travel_unknown = "The portal knows no such place."
+   travel_already_here = "You're already there."
+   travel_blocked = "Something stops you arriving there.  Try again in a moment."
+
+   travel_sound = portal.ogg
+   travel_attune_sound = nodeup.ogg
+
+classvars:
+
+properties:
+
+messages:
+
+   GetPoints()
+   "Every travel point. The squares were picked on flat, dry, open floor near each town's "
+   "arrival square, clear of doors and placed objects (the city pass, "
+   "docs/adr/0011-fast-travel.md 8.5): UtilGoNearSquare doesn't check a player can stand "
+   "there. The two-room towns' portals are on their main streets. Arrivals face away from "
+   "the portal. Ids never change: players keep them (User.plAttunedPortals)."
+   {
+      return [
+         [ 1, travel_name_tos, NET_MAIN, RID_TOS, 29, 5, 29, 6, ANGLE_EAST ],
+         [ 2, travel_name_marion, NET_MAIN, RID_MARION, 5, 4, 6, 5, ANGLE_SOUTH_EAST ],
+         [ 3, travel_name_raza, NET_MAIN, RID_RAZA, 21, 6, 21, 7, ANGLE_EAST ],
+         [ 4, travel_name_jasper, NET_MAIN, RID_JASPER, 60, 42, 60, 41, ANGLE_NORTH_WEST ],
+         [ 5, travel_name_barloque, NET_MAIN, RID_BAR_NORTH, 4, 13, 4, 14, ANGLE_EAST ],
+         [ 6, travel_name_cornoth, NET_MAIN, RID_CORNOTH, 41, 59, 41, 60, ANGLE_NORTH ],
+         [ 7, travel_name_kocatan, NET_MAIN, RID_KOCATAN, 48, 9, 48, 11, ANGLE_NORTH_EAST ],
+         [ 8, travel_name_bergen, NET_MAIN, RID_BERG_CITY, 52, 73, 52, 75, ANGLE_NORTH_WEST ],
+         [ 9, travel_name_brax, NET_MAIN, RID_G8, 46, 48, 46, 47, ANGLE_NORTH ],
+         [ 10, travel_name_castle, NET_MAIN, RID_CASTLE1, 7, 6, 7, 4, ANGLE_SOUTH ],
+         [ 90, travel_name_proving, NET_MAIN, RID_PROVING_GROUNDS, 11, 20, 12, 20, ANGLE_SOUTH ],
+         // The museum's five, on the west wall from south to north, where its original portals
+         // were meant to stand (cormuseum.kod); each leads to one town (GetHistoricLinks)
+         [ 111, travel_name_museum, NET_HISTORIC, RID_COR_MUSEUM, 20, 1, 20, 3, ANGLE_EAST, 0, 48 ],
+         [ 112, travel_name_museum, NET_HISTORIC, RID_COR_MUSEUM, 18, 1, 18, 3, ANGLE_EAST, 40, 48 ],
+         [ 113, travel_name_museum, NET_HISTORIC, RID_COR_MUSEUM, 17, 1, 17, 3, ANGLE_EAST, 16, 48 ],
+         [ 114, travel_name_museum, NET_HISTORIC, RID_COR_MUSEUM, 16, 1, 16, 3, ANGLE_EAST, 0, 48 ],
+         [ 115, travel_name_museum, NET_HISTORIC, RID_COR_MUSEUM, 14, 1, 14, 3, ANGLE_EAST, 32, 48 ],
+         [ 101, travel_name_old_jasper, NET_HISTORIC, RID_OLD_JASPER, 48, 63, 38, 25, ANGLE_SOUTH ],
+         [ 102, travel_name_old_marion, NET_HISTORIC, RID_OLD_MARION, 54, 40, 56, 38, ANGLE_SOUTH_WEST ],
+         [ 103, travel_name_old_bar_north, NET_HISTORIC, RID_OLD_BAR_NORTH, 28, 43, 28, 41, ANGLE_WEST ],
+         [ 104, travel_name_old_bar_south, NET_HISTORIC, RID_OLD_BAR_SOUTH, 32, 43, 34, 43, ANGLE_SOUTH ],
+         [ 105, travel_name_old_cornoth, NET_HISTORIC, RID_OLD_CORNOTH, 21, 35, 12, 27, ANGLE_WEST ],
+         [ 106, travel_name_old_cor_univ, NET_HISTORIC, RID_OLD_COR_UNIV, 7, 28, 5, 28, ANGLE_NORTH ]
+      ];
+   }
+
+   GetPoint(id = $)
+   {
+      local i;
+
+      foreach i in Send(self,@GetPoints)
+      {
+         if First(i) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   GetPointName(id = $)
+   {
+      local lPoint;
+
+      lPoint = Send(self,@GetPoint,#id=id);
+      if lPoint = $
+      {
+         return $;
+      }
+
+      return Nth(lPoint,TP_NAME);
+   }
+
+   GetHistoricLinks()
+   "The historic network: each museum portal, the town it leads to, and how it looks. Each "
+   "town's portal leads back to its museum portal. The Hall of Genealogy is reached on foot "
+   "from Cor Noth; its own portal goes back to Cor Noth's."
+   {
+      return [
+         [ 111, 101, travel_desc_old_jasper ],
+         [ 112, 102, travel_desc_old_marion ],
+         [ 113, 103, travel_desc_old_bar_north ],
+         [ 114, 104, travel_desc_old_bar_south ],
+         [ 115, 105, travel_desc_old_cornoth ],
+         [ 115, 106, travel_desc_old_cornoth ]
+      ];
+   }
+
+   HistoricLinkOf(id = $)
+   "The historic link a point is in: a museum portal's own, or a town's."
+   {
+      local i;
+
+      foreach i in Send(self,@GetHistoricLinks)
+      {
+         if Nth(i,HL_MUSEUM) = id OR Nth(i,HL_TOWN) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   GetPortalDesc(id = $)
+   "What a portal looks like (TravelPortal.ShowDesc): historic ones say where they lead; $ for "
+   "the portal's own description."
+   {
+      local lLink;
+
+      lLink = Send(self,@HistoricLinkOf,#id=id);
+      if lLink = $
+      {
+         return $;
+      }
+
+      if Nth(lLink,HL_MUSEUM) = id
+      {
+         return Nth(lLink,HL_DESC);
+      }
+
+      return travel_desc_back;
+   }
+
+   PlacePortals(where = $)
+   "Gives a room its travel portals, from the table (room.kod Constructed)."
+   {
+      local i, iRid, oPortal, iFineRow, iFineCol;
+
+      if where = $
+      {
+         return;
+      }
+
+      iRid = Send(where,@GetRoomNum);
+      foreach i in Send(self,@GetPoints)
+      {
+         if Nth(i,TP_RID) = iRid
+         {
+            iFineRow = FINENESS/2;
+            iFineCol = FINENESS/2;
+            if Length(i) >= TP_FCOL
+            {
+               iFineRow = Nth(i,TP_FROW);
+               iFineCol = Nth(i,TP_FCOL);
+            }
+
+            oPortal = Create(&TravelPortal,#point=First(i));
+            Send(where,@NewHold,#what=oPortal,#new_row=Nth(i,TP_ROW),
+                 #new_col=Nth(i,TP_COL),#fine_row=iFineRow,#fine_col=iFineCol);
+         }
+      }
+
+      return;
+   }
+
+   IsAttuned(who = $,id = $)
+   {
+      local lPoint;
+
+      lPoint = Send(self,@GetPoint,#id=id);
+      if lPoint = $
+      {
+         return FALSE;
+      }
+
+      // The historic towns need no attuning (5.1)
+      if Nth(lPoint,TP_NET) <> NET_MAIN
+      {
+         return TRUE;
+      }
+
+      return FindListElem(Send(who,@GetAttunedPortals),id) > 0;
+   }
+
+   PortalHere(who = $)
+   "The travel point of the nearest portal the player stands by, or $ (the museum has five)."
+   {
+      local i, oRoom, oObj, iDist, iBest, iPoint;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+      {
+         return $;
+      }
+
+      iPoint = $;
+      iBest = PORTAL_RANGE + 1;
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         oObj = First(i);
+         if IsClass(oObj,&TravelPortal)
+         {
+            iDist = Bound(Abs(Send(who,@GetRow) - Send(oObj,@GetRow)),
+                          Abs(Send(who,@GetCol) - Send(oObj,@GetCol)),$);
+            if iDist < iBest
+            {
+               iBest = iDist;
+               iPoint = Send(oObj,@GetTravelPoint);
+            }
+         }
+      }
+
+      return iPoint;
+   }
+
+   PortalTouched(who = $,id = $)
+   "A player touched the portal of point id: they attune, or get the list of places."
+   {
+      local lPoint;
+
+      lPoint = Send(self,@GetPoint,#id=id);
+      if lPoint = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      // The historic network goes straight to the portal's other end
+      if Nth(lPoint,TP_NET) = NET_HISTORIC
+      {
+         Send(self,@Journey,#who=who,
+              #to=Send(self,@GetPoint,#id=Send(self,@HistoricOtherEnd,#id=id)));
+
+         return;
+      }
+
+      if NOT Send(self,@IsAttuned,#who=who,#id=id)
+      {
+         Send(who,@AttunePortal,#id=id);
+         Send(who,@MsgSendUser,#message_rsc=travel_attuned,#parm1=Nth(lPoint,TP_NAME));
+         Send(who,@WaveSendUser,#wave_rsc=travel_attune_sound);
+
+         return;
+      }
+
+      Send(self,@SendTravelPlaces,#who=who,#here=id);
+
+      return;
+   }
+
+   HistoricOtherEnd(id = $)
+   "Where a historic portal leads: a museum portal to its town, a town's back to its museum "
+   "portal."
+   {
+      local lLink;
+
+      lLink = Send(self,@HistoricLinkOf,#id=id);
+      if lLink = $
+      {
+         return $;
+      }
+
+      if Nth(lLink,HL_MUSEUM) = id
+      {
+         return Nth(lLink,HL_TOWN);
+      }
+
+      return Nth(lLink,HL_MUSEUM);
+   }
+
+   SendTravelPlaces(who = $,here = $)
+   "The places a player can go from point here (UC_TRAVEL_LIST, User.SendTravelList)."
+   {
+      local i, lHere, lOut;
+
+      lHere = Send(self,@GetPoint,#id=here);
+      if lHere = $
+      {
+         return;
+      }
+
+      lOut = $;
+      foreach i in Send(self,@GetPoints)
+      {
+         if Send(self,@CanGo,#who=who,#from=lHere,#to=i)
+         {
+            lOut = Cons([First(i),Nth(i,TP_NAME)],lOut);
+         }
+      }
+
+      Send(who,@SendTravelList,#here=here,#places=lOut);
+
+      return;
+   }
+
+   CanGo(who = $,from = $,to = $)
+   "Whether point to is on the list from point from: both on the main network, and attuned. "
+   "The historic network has no list (PortalTouched)."
+   {
+      if Nth(from,TP_NET) <> NET_MAIN OR Nth(to,TP_NET) <> NET_MAIN
+      {
+         return FALSE;
+      }
+
+      if First(to) = First(from)
+      {
+         return TRUE;
+      }
+
+      return Send(self,@IsAttuned,#who=who,#id=First(to));
+   }
+
+   TravelCommand(who = $,words = $)
+   "The client's travel <id> command (UC_SHARDS): checked again, then the journey."
+   {
+      local iHere, lHere, lTo, iTo;
+
+      if who = $ OR Length(words) < 2
+      {
+         return;
+      }
+
+      iHere = Send(self,@PortalHere,#who=who);
+      if iHere = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_no_portal);
+
+         return;
+      }
+
+      iTo = StringToNumber(Nth(words,2));
+      lHere = Send(self,@GetPoint,#id=iHere);
+      lTo = Send(self,@GetPoint,#id=iTo);
+      // Only the main network has a list to choose from
+      if lTo = $ OR Nth(lHere,TP_NET) <> NET_MAIN OR Nth(lTo,TP_NET) <> NET_MAIN
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_unknown);
+
+         return;
+      }
+
+      if iTo = iHere
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_already_here);
+
+         return;
+      }
+
+      if NOT Send(self,@IsAttuned,#who=who,#id=iTo)
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_not_attuned);
+
+         return;
+      }
+
+      Send(self,@Journey,#who=who,#to=lTo);
+
+      return;
+   }
+
+   Journey(who = $,to = $)
+   "Takes a player to point to's arrival square, if nothing stops them: the PvP lockout, a "
+   "faction token, a state they can't act in, or no room to arrive in."
+   {
+      local oRoom;
+
+      if who = $ OR to = $
+      {
+         return;
+      }
+
+      if Send(who,@IsInPvP)
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_pvp,#parm1=Send(who,@PvPSecondsLeft));
+         Send(who,@SendPvPUntil);
+
+         return;
+      }
+
+      if Send(who,@FindHolding,#class=&Token) <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_token);
+
+         return;
+      }
+
+      if Send(who,@IsInCannotInteractMode)
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_cannot);
+
+         return;
+      }
+
+      oRoom = Send(SYS,@FindRoomByNum,#num=Nth(to,TP_RID));
+      if oRoom = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_cannot);
+
+         return;
+      }
+
+      // A dry run first, as Portal.TeleportSomething does
+      if NOT Send(self,@UtilGoNearSquare,#what=who,#where=oRoom,
+                  #new_row=Nth(to,TP_AROW),#new_col=Nth(to,TP_ACOL),
+                  #fine_row=FINENESS/2,#fine_col=FINENESS/2,
+                  #new_angle=Nth(to,TP_ANGLE),#max_distance=PORTAL_RANGE,
+                  #do_move=FALSE)
+      {
+         Send(who,@MsgSendUser,#message_rsc=travel_blocked);
+
+         return;
+      }
+
+      Send(who,@WaveSendUser,#wave_rsc=travel_sound);
+      Send(self,@UtilGoNearSquare,#what=who,#where=oRoom,
+           #new_row=Nth(to,TP_AROW),#new_col=Nth(to,TP_ACOL),
+           #fine_row=FINENESS/2,#fine_col=FINENESS/2,
+           #new_angle=Nth(to,TP_ANGLE),#max_distance=PORTAL_RANGE);
+      Send(who,@WaveSendUser,#wave_rsc=travel_sound);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////
