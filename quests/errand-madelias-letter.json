@@ -1,0 +1,64 @@
+{
+  "id": 108,
+  "key": "errand-madelias-letter",
+  "name": "Madelia's Letter",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_LOVE_LETTER_2"
+  ],
+  "giver": {
+    "class": "BarloqueTailor"
+  },
+  "band": {
+    "min": 0,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 3
+  },
+  "text": {
+    "offer": "Yes, actually, I have a missive in need of delivery. If thou wouldst give this letter to the innkeeper of Barloque I would be most grateful.",
+    "complete": "Ah, a letter from my fair Madelia! It warms my heart to know that she is thinking of me. Please take this as a token of my thanks."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a love letter",
+      "turnin": {
+        "class": "BarloqueInnkeeper"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 500
+      },
+      {
+        "class": "Shillings",
+        "count": 600
+      },
+      {
+        "class": "Shillings",
+        "count": 400
+      },
+      {
+        "class": "Shillings",
+        "count": 700
+      },
+      {
+        "class": "Shillings",
+        "count": 550
+      },
+      {
+        "class": "Shillings",
+        "count": 650
+      },
+      {
+        "class": "Shillings",
+        "count": 450
+      }
+    ]
+  }
+}

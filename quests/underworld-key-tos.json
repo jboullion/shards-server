@@ -1,0 +1,50 @@
+{
+  "id": 33,
+  "key": "underworld-key-tos",
+  "name": "A Key to Tos",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_TOS_KEY"
+  ],
+  "giver": {
+    "class": "Beelzebub"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Help?... yes... snakes... go... key... Tos... (Beelzebub wants five giant snakes slain, you think.)",
+    "progress": "Return to Beelzebub once it's done.",
+    "complete": "...gooood... (Beelzebub gives you an old key to Tos.)"
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Snake",
+      "count": 5
+    },
+    {
+      "kind": "kill",
+      "target": "GoldHydra",
+      "count": 5,
+      "brief": "...good... yes... gold... hydras... go... (Five golden hydras, it seems.)"
+    },
+    {
+      "kind": "kill",
+      "target": "Tyrant",
+      "count": 5,
+      "brief": "...good... yesss... tyrants... go... (Five tyrants.)"
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "TosKey"
+      }
+    ]
+  }
+}

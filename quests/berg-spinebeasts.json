@@ -1,0 +1,35 @@
+{
+  "tier": "main",
+  "id": 202,
+  "key": "berg-spinebeasts",
+  "name": "Spinebeasts of the Jagged Hills",
+  "giver": {
+    "class": "BergBlacksmith"
+  },
+  "band": {
+    "min": 100,
+    "max": 120
+  },
+  "text": {
+    "offer": "The hides of the great spinebeasts make the best leather I've ever worked, but the beasts in the Jagged Hills have grown too many and too bold. Kill twelve of the big ones and the miners can get to the hills again.",
+    "progress": "The spinebeasts roam the Jagged Hills and the outskirts of Berg.",
+    "complete": "Twelve! That'll keep my forge in work for a season."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Spinebeast",
+      "exact": true,
+      "count": 12,
+      "rooms": [
+        2811,
+        2813
+      ],
+      "objective": "Spinebeasts slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3000
+  }
+}

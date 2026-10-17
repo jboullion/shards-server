@@ -1,0 +1,43 @@
+{
+  "id": 71,
+  "key": "faction-join-princess",
+  "name": "A Letter for the Crown",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_PRINCESS_JOIN"
+  ],
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "neutral",
+    "intriguing": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "So, you wish to prove yourself worthy of my trust? Wouldst thou be so kind as to deliver an official letter to Priestess Xiana? I would be most grateful.",
+    "complete": "A letter from her highness?! Excellent. Thank you. You have proven your loyalty to the crown, and are now a trusted servant of Princess Kateriina."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "an official letter",
+      "turnin": {
+        "class": "ShalillePriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "joinFaction": "princess"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": 63,
+  "key": "story-necromancer-warning-good",
+  "name": "Parrin's Warning",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_NECRO_WARNING_2"
+  ],
+  "giver": {
+    "class": "Minstrel"
+  },
+  "band": {
+    "min": 40,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "I have news of great urgency. My travels have taken me to many places and I have seen many strange things, but none so dangerous as these vile necromancers. Please take this letter to Priestess Qerti'nya of Kraanan, and quickly. It is my belief that these creatures threaten all of Meridian. They come from a power older than our gods, though these forces may be linked on some level.",
+    "complete": "She listens not, but no matter. She has been warned. Thank you, brave soul. Take this as your material reward for your service to the people of Meridian."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "Parrin's letter",
+      "turnin": {
+        "class": "KraananPriestess"
+      }
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "Minstrel"
+      },
+      "objective": "Return to Parrin",
+      "brief": "You bring me the rantings of a poor soul with a pitifully addled brain? I have more important concerns at this moment. Leave my presence, as I have nothing to say to you."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 1000
+      },
+      {
+        "class": "Shillings",
+        "count": 1000
+      },
+      {
+        "class": "Shillings",
+        "count": 1200
+      },
+      {
+        "class": "Shillings",
+        "count": 1400
+      },
+      {
+        "class": "Shillings",
+        "count": 1600
+      },
+      {
+        "class": "Prism"
+      }
+    ]
+  }
+}

@@ -96,6 +96,9 @@ classvars:
 
 properties:
 
+   // Ours: ported to the new quests (shards-server quests/, docs/adr/0009-quests.md 7.1)
+   pbDisabled = TRUE
+
    piNumPlayers = 1
    piPlayerRestrict = \
       Q_PLAYER_NOTTRIED_RECENTLY | Q_PLAYER_NOTNEWBIE | Q_PLAYER_LAWFUL

@@ -1569,6 +1569,12 @@ messages:
       if NOT bItemCast
       {
          Send(self,@ImproveAbility,#who=who,#target=oTarget);
+
+         // Ours: cast steps (util/questbook.kod)
+         if IsClass(who,&User)
+         {
+            Send(Send(SYS,@GetQuestBook),@SpellCast,#who=who,#cast=self);
+         }
       }
 
       if NOT IsClass(who,&ItemAttribute)

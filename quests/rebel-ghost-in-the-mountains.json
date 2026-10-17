@@ -1,0 +1,37 @@
+{
+  "tier": "main",
+  "id": 162,
+  "key": "rebel-ghost-in-the-mountains",
+  "name": "The Ghost in the Mountains",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 130
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "The Duke and the Princess squabble while the dead walk out of Brax. Somebody has to deal with it, and it might as well be us - the people will remember who stood up. There's a ghost in the Cragged Mountains, Tendrath, who knows the way into that buried city. Go and talk to him.",
+    "progress": "Tendrath haunts the Cragged Mountains, outside the ancient place where Brax lies buried.",
+    "complete": "Jonas D'Accor's people, fighting the dead? Perhaps there is hope for the living after all."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "HunterGhost"
+      },
+      "objective": "Find Tendrath in the Cragged Mountains"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 2000
+  }
+}

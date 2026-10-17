@@ -1,0 +1,50 @@
+{
+  "id": 32,
+  "key": "underworld-key-barloque",
+  "name": "A Key to Barloque",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_BARLOQUE_KEY"
+  ],
+  "giver": {
+    "class": "Joline"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Help? HELP! You are the one who has been killing my family! Why did they even go near Marion? It must have been Beelzebub! His colony must have scared my babies. Go and kill five death mite scouts for me, and I'll give you a key to Barloque.",
+    "progress": "Return to Joline once it's done.",
+    "complete": "Finally. Good job getting rid of those insects! Here is the key to Barloque."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DeathMiteScout",
+      "count": 5
+    },
+    {
+      "kind": "kill",
+      "target": "DeathMiteSoldier",
+      "count": 5,
+      "brief": "Got some of the scouts? Good. Now go and take out the soldiers: kill five death mite soldiers for me."
+    },
+    {
+      "kind": "kill",
+      "target": "DeathMiteMage",
+      "count": 5,
+      "brief": "Good. There are some magic ones out there, a little harder to deal with, but I am sure you can handle them. Go and kill five death mite mages for me."
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "BarloqueKey"
+      }
+    ]
+  }
+}

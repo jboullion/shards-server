@@ -1,0 +1,103 @@
+// Ours (Meridian Shards, docs/adr/0009-quests.md): a quest giver placed by data, not by its
+// room's Kod. Each is a row of QuestDefs.GetGivers (shards-server quests/givers.json), placed by
+// QuestBook.PlaceGivers when its room is built, with its own name, description and borrowed
+// picture. The admin dashboard places them where you stand.
+
+////////////////////////////////////////////////////////////////////////////////
+QuestGiver is Towns
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   questgiver_name_rsc = "quest giver"
+   questgiver_icon_rsc = tsinnk.bgf
+   questgiver_desc_rsc = "A traveller with work for those willing to do it."
+
+classvars:
+
+   vrName = questgiver_name_rsc
+   vrIcon = questgiver_icon_rsc
+   vrDesc = questgiver_desc_rsc
+   viAttributes = MOB_NOFIGHT | MOB_NOMOVE | MOB_LAWFUL
+
+properties:
+
+   // Its row of QuestDefs.GetGivers
+   piGiver = 0
+   prGiverName = $
+   prGiverIcon = $
+   prGiverDesc = $
+
+messages:
+
+   Constructor(giver = 0)
+   {
+      local lGiver;
+
+      piGiver = giver;
+      lGiver = Send(Send(SYS,@GetQuestBook),@GetGiver,#id=giver);
+      if lGiver <> $
+      {
+         prGiverName = Nth(lGiver,2);
+         prGiverIcon = Nth(lGiver,3);
+         prGiverDesc = Nth(lGiver,4);
+      }
+
+      propagate;
+   }
+
+   GetGiverId()
+   {
+      return piGiver;
+   }
+
+   GetName()
+   {
+      if prGiverName <> $
+      {
+         return prGiverName;
+      }
+
+      return vrName;
+   }
+
+   GetTrueName()
+   {
+      return Send(self,@GetName);
+   }
+
+   GetApparentName()
+   {
+      return Send(self,@GetName);
+   }
+
+   GetIcon()
+   {
+      if prGiverIcon <> $
+      {
+         return prGiverIcon;
+      }
+
+      return vrIcon;
+   }
+
+   ShowDesc(iHitPoint_Percent = $)
+   {
+      local rDesc;
+
+      rDesc = prGiverDesc;
+      if rDesc = $
+      {
+         rDesc = vrDesc;
+      }
+
+      AddPacket(4,vrCondition_healthy, 4,rDesc, 4,monster_nothing);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

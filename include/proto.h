@@ -291,6 +291,9 @@ enum {
    UC_FRIENDS = 103,
    UC_PETS = 104,
    UC_AMBIENT = 105,
+   UC_QUEST_OFFERS = 106,
+   UC_QUEST_LOG = 107,
+   UC_QUEST_PROGRESS = 108,
 };
 
 // Login error action constants

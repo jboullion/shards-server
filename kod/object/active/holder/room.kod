@@ -364,6 +364,8 @@ messages:
       Send(self,@CreateStandardObjects);
       // Ours: the room's fast travel portals, if it has any (util/travelnet.kod)
       Send(Send(SYS,@GetTravelNetwork),@PlacePortals,#where=self);
+      // Ours: its placed quest givers, if it has any (util/questbook.kod)
+      Send(Send(SYS,@GetQuestBook),@PlaceGivers,#where=self);
       Send(self,@CreateStandardExits);
       Send(self,@CreateYellZoneList);
       Send(self,@ComputeFarenBonus);
@@ -452,23 +454,73 @@ messages:
 
    Recreate()
    {
-      local cClass, lUsers, oNewRoom, i;
+      local cClass, lUsers, lWanderers, oNewRoom, oGodRoom, oWanderer, i;
 
       cClass = GetClass(self);
+      oGodRoom = Send(SYS,@FindRoomByNum,#num=RID_GODROOM);
       foreach i in plActive
       {
          if IsClass(First(i),&User)
          {
             lUsers = Cons(First(i),lUsers);
          }
+
+         // Wanderers are made once by the god room, so deleting one here
+         // loses it for good. Note where it stood to put it back afterwards.
+         if IsClass(First(i),&Wanderer)
+            AND oGodRoom <> $
+            AND oGodRoom <> self
+         {
+            oWanderer = First(i);
+            lWanderers = Cons([oWanderer,Send(oWanderer,@GetRow),
+                               Send(oWanderer,@GetCol),
+                               Send(oWanderer,@GetFineRow),
+                               Send(oWanderer,@GetFineCol),
+                               Send(oWanderer,@GetAngle)],lWanderers);
+         }
+      }
+
+      // Park the wanderers in the god room while this room is deleted.
+      foreach i in lWanderers
+      {
+         Send(oGodRoom,@NewHold,#what=First(i),#new_row=15,#new_col=9);
       }
 
       Send(self,@Delete);
       Send(SYS,@CreateOneRoomIfNew,#num=piRoom_num,#class=cClass);
+      oNewRoom = Send(SYS,@FindRoomByNum,#num=piRoom_num);
       foreach i in lUsers
       {
-         oNewRoom = Send(SYS,@FindRoomByNum,#num=piRoom_num);
          Send(oNewRoom,@Teleport,#what=i);
+      }
+
+      foreach i in lWanderers
+      {
+         oWanderer = First(i);
+         if oNewRoom = $
+         {
+            Send(oWanderer,@NextDest);
+
+            continue;
+         }
+
+         // The new room may make its own copy (g8 makes Tendrath).
+         if Send(oNewRoom,@FindHoldingActive,#class=GetClass(oWanderer)) <> $
+         {
+            Send(oWanderer,@Delete);
+
+            continue;
+         }
+
+         Send(oNewRoom,@NewHold,#what=oWanderer,#new_row=Nth(i,2),
+              #new_col=Nth(i,3),#fine_row=Nth(i,4),#fine_col=Nth(i,5),
+              #new_angle=Nth(i,6));
+
+         // NewHold refuses bad coords; send it on its way instead.
+         if Send(oWanderer,@GetOwner) <> oNewRoom
+         {
+            Send(oWanderer,@NextDest);
+         }
       }
 
       return;

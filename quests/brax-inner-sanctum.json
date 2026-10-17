@@ -1,0 +1,38 @@
+{
+  "tier": "main",
+  "id": 168,
+  "key": "brax-inner-sanctum",
+  "name": "The Inner Sanctum",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 125,
+    "max": 145
+  },
+  "requires": {
+    "quests": [
+      167
+    ]
+  },
+  "text": {
+    "offer": "At the heart of Brax is the Queen's inner sanctum, where Venya'cyr's remains lie, guarded by dark angels. Kill three, and you will have struck at the heart of the evil that raises the dead of Meridian. Take friends. Many friends.",
+    "progress": "The dark angels guard Queen Venya'cyr's Inner Sanctum, beyond the dungeon of Castle Brax.",
+    "complete": "You have stood in the Queen's own sanctum and walked out again. I have watched this city for an age, and I have never seen it done. Rest, hunter. You have earned it."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DarkAngel",
+      "count": 3,
+      "rooms": [
+        749
+      ],
+      "objective": "Dark angels slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 5000
+  }
+}

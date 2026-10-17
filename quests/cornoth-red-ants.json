@@ -1,0 +1,39 @@
+{
+  "id": 132,
+  "key": "cornoth-red-ants",
+  "name": "Red Ants in the Hills",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 46,
+    "max": 56
+  },
+  "requires": {
+    "quests": [
+      130
+    ]
+  },
+  "text": {
+    "offer": "Shepherds from the hills above Marion come here to sell their wool, and they tell me red ants the size of dogs have taken their pastures. Ten of them dead should let the flocks back up there.",
+    "progress": "Red ants live in the hills and on Seafarer's Peak, above Marion.",
+    "complete": "The shepherds will drink to you tonight. So will I."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "RedAnt",
+      "count": 10,
+      "rooms": [
+        515,
+        516
+      ],
+      "objective": "Red ants slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 150
+  }
+}

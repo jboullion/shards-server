@@ -1,0 +1,57 @@
+{
+  "id": 14,
+  "key": "guide-factions",
+  "name": "The Powers of Meridian",
+  "tier": "main",
+  "replaces": [
+    "HP50_JOIN_FACTION_CHAIN"
+  ],
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 80
+  },
+  "requires": {
+    "faction": "neutral"
+  },
+  "text": {
+    "offer": "Princess Kateriina says, \"There has been talk of thee as of late. It is good to see that the gossip is not idle. Thou art indeed showing promise. Under my tutelage, the schools of Shal'ille, Jala, and Faren shall be easier to learn and more powerful to employ. I shall also teach you how to regenerate mana faster and defend yourself from attack.\" She bids you hear the other powers of the land before you choose, if you choose at all.",
+    "complete": "Jonas says, \"I have no pretty talk for you. My rebels and I fight to free this land from tyranny of royalty and money. The fighting will be hand-to-hand, and vicious. I will train you to hit harder and more precisely with the arms of Weaponcraft. I will also teach you field dressings for faster healing. Side with us. Join the fighting elite!\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      },
+      "objective": "Entreat Duke Akardius",
+      "brief": "Princess Kateriina has given you allowance to join her faction of holy mage practitioners, but she is not the only leader vying for power in the land. Perhaps Duke Akardius of Tos, who operates a merchant empire out of Blackstone Keep at the north end of Tos, may make you a better offer? When you find him, talk to him (double-click).",
+      "rewards": {
+        "trainingPoints": 500
+      }
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RebelLiege",
+        "rooms": [
+          371
+        ]
+      },
+      "objective": "Meet with the Rebel",
+      "brief": "Duke Akardius says, \"Fie on that naive Princess. My faction is about power at any cost. Under me, you shall learn faster and cast stronger in the schools of Qor, Riija, and Kraanan. Join my unholy tricksters and battle-mages and let us take this land for our own. Furthermore, if you are ever blacklisted as a murderer, you will still be able to do business as long as you work for me.\" The two official powers struggling for control of Meridian also face a third opponent, the exiled former general Jonas. Meet with him in the town of Jasper and talk to him (double-click)."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "trainingPoints": 1000
+  }
+}

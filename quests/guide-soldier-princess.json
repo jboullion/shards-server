@@ -1,0 +1,39 @@
+{
+  "id": 17,
+  "key": "guide-soldier-princess",
+  "name": "Rise in the Ranks",
+  "tier": "main",
+  "replaces": [
+    "HP80_SOLDIER_SHIELD_CHAIN"
+  ],
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 100
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "You are becoming more than just a common grunt in my service, and I have seen your promise. Ask me about becoming a soldier, and wear the shield of my soldiers when you have it.",
+    "complete": "Be sure to mind your new responsibilities - and your new enemies."
+  },
+  "steps": [
+    {
+      "kind": "equip",
+      "items": [
+        "SoldierShield"
+      ],
+      "objective": "Wear a soldier's shield"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "trainingPoints": 500
+  }
+}

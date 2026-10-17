@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 166,
+  "key": "brax-daemon-skeletons",
+  "name": "Daemon Bones",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 110,
+    "max": 135
+  },
+  "requires": {
+    "quests": [
+      164
+    ]
+  },
+  "text": {
+    "offer": "The tusked dead were her soldiers. The daemon skeletons are her guard - bones bound to something far worse than a soul. They hold the graveyard and the castle walls. Destroy ten.",
+    "progress": "The daemon skeletons guard the Ancient Graveyard and the walls of Castle Brax.",
+    "complete": "Ten daemons sent back to whatever pit they came from. You are stronger than I thought."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DaemonSkeleton",
+      "count": 10,
+      "rooms": [
+        827,
+        829
+      ],
+      "objective": "Daemon skeletons destroyed"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3000
+  }
+}

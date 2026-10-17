@@ -417,6 +417,8 @@ properties:
    poTravelNetwork = $
    // Ours: friends, pets and the shared crowd (util/shardssocial.kod), made on demand
    poShardsSocial = $
+   // Ours: quests you can find (util/questbook.kod), made on demand
+   poQuestBook = $
    poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
@@ -5230,6 +5232,17 @@ messages:
       }
 
       return poShardsSocial;
+   }
+
+   GetQuestBook()
+   "Ours: quests you can find (util/questbook.kod), made on demand."
+   {
+      if poQuestBook = $
+      {
+         poQuestBook = Create(&QuestBook);
+      }
+
+      return poQuestBook;
    }
 
    GetGameQuestMaintenance()

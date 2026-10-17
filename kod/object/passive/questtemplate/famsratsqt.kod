@@ -91,6 +91,9 @@ classvars:
 
 properties:
 
+   // Ours: ported to the new quests as quests/cellar-rats.json (docs/adr/0009-quests.md 7.1)
+   pbDisabled = TRUE
+
    piNumPlayers = 1
    piPlayerRestrict = Q_PLAYER_NOTTRIED_RECENTLY
    plSpecialRestrict = $

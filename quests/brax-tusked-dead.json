@@ -1,0 +1,38 @@
+{
+  "tier": "main",
+  "id": 164,
+  "key": "brax-tusked-dead",
+  "name": "The Tusked Dead",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 95,
+    "max": 120
+  },
+  "requires": {
+    "quests": [
+      163
+    ]
+  },
+  "text": {
+    "offer": "The decaying city is full of the Queen's tusked dead, the soldiers she raised when Brax sank. Break fifteen of them and the city's streets will be yours to walk.",
+    "progress": "The tusked skeletons fill the Decaying City of Brax.",
+    "complete": "Fifteen fewer. The city remembers what it was to be quiet."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "TuskedSkeleton",
+      "count": 15,
+      "rooms": [
+        828
+      ],
+      "objective": "Tusked skeletons destroyed"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 2500
+  }
+}

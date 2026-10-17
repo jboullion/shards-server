@@ -1811,6 +1811,20 @@ messages:
       return;
    }
 
+   TryActivate(who = $)
+   "Ours: activating an NPC is talking to it about quests (util/questbook.kod). Return FALSE "
+   "only if you want user.kod to send its own error message to user."
+   {
+      if NOT (piBehavior & AI_NPC)
+      {
+         return FALSE;
+      }
+
+      Send(Send(SYS,@GetQuestBook),@NpcActivated,#who=who,#npcobj=self);
+
+      return TRUE;
+   }
+
    GetBehavior()
    {
       return piBehavior;
@@ -3887,6 +3901,9 @@ messages:
             Send(EVENTENGINE_OBJECT,@MonsterKilled,#dead_monster=self,
                   #killing_player=what,#corpse=oBody);
 
+            // Ours: kill steps, shared with the killer's builder group (util/questbook.kod)
+            Send(Send(SYS,@GetQuestBook),@MonsterKilled,#dead=self,#killer=what);
+
             if (piReputationGroup <> REP_NEUTRAL
                AND Send(SETTINGS_OBJECT,@GetMonsterFactionEnabled))
             {
@@ -5862,6 +5879,12 @@ messages:
       }
 
       if viQuestID = 0
+      {
+         return TRUE;
+      }
+
+      // The quest that replaced it in the QuestBook (ADR 0009), or the old one done before
+      if Send(Send(SYS,@GetQuestBook),@HasDoneReplacing,#who=who,#old=viQuestID)
       {
          return TRUE;
       }

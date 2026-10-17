@@ -1,0 +1,51 @@
+{
+  "id": 20,
+  "key": "guide-brax",
+  "name": "The Ancient City of Brax",
+  "tier": "main",
+  "replaces": [
+    "HP100_INVESTIGATE_BRAX_CHAIN"
+  ],
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 100,
+    "max": 130
+  },
+  "requires": {
+    "quests": [
+      13
+    ]
+  },
+  "text": {
+    "offer": "You've been to Castle Victoria and back, and still the dead walk. I've heard tell of something deeper in the mountains. Deep in the mountains lies an ancient city that was buried under the earth due to some sort of catastrophe. At an ancient place, its origin forgotten, find entrance to the underground city. Within lurks something timeless and evil that must be stopped if the undead threat in Meridian is to be curtailed.",
+    "complete": "You have made your choice in the eternal struggle."
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_NECROAREA1"
+      ],
+      "auto": true,
+      "objective": "Find the Ancient City of Brax",
+      "brief": "Deep in the mountains lies an ancient city that was buried under the earth due to some sort of catastrophe. At an ancient place, its origin forgotten, find entrance to the underground city. Within lurks something timeless and evil that must be stopped if the undead threat in Meridian is to be curtailed.",
+      "rewards": {
+        "xp": 500
+      }
+    },
+    {
+      "kind": "equip",
+      "items": [
+        "HunterSword",
+        "NecromancerAmulet"
+      ],
+      "objective": "Investigate the City of Brax",
+      "brief": "This is it. This place holds the source of the undead threat plaguing the land. Waves of evil radiate through the very air. Remain wary as you proceed further. The undead horrors of Brax hold secrets of an evil beyond time. It may be a never-ending quest to understand and resist the threat, but learn everything you can about Brax and how its Queen doomed it to sink under the earth. In the end, you may be forced to make a choice: fight, or serve."
+    }
+  ],
+  "rewards": {
+    "trainingPoints": 2000
+  }
+}

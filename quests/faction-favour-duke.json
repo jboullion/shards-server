@@ -1,0 +1,68 @@
+{
+  "id": 73,
+  "key": "faction-favour-duke",
+  "name": "The Duke's Taxes",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_DUKE_SERVICE"
+  ],
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Ah, my loyal servant. I require you to collect all taxes due from Frisconar, the apothecary of Tos. Return within the hour.",
+    "progress": "Duke Akardius has commanded you to collect taxes from Frisconar. Return quickly with the full amount.",
+    "complete": "You have done well. You have carried out my task, and remain in my favor."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "TosApothecary"
+      },
+      "objective": "Collect the taxes from Frisconar"
+    },
+    {
+      "kind": "deliver",
+      "parcel": "the Duke's taxes",
+      "brief": "Oh, yes, my tax money for the Duke... Here it is.",
+      "objective": "Bring the taxes to Duke Akardius",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "trainingPoints": 100,
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 200
+      },
+      {
+        "class": "Shillings",
+        "count": 300
+      },
+      {
+        "class": "Shillings",
+        "count": 400
+      }
+    ]
+  }
+}

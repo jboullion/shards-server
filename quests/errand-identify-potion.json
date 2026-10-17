@@ -1,0 +1,66 @@
+{
+  "id": 44,
+  "key": "errand-identify-potion",
+  "name": "A Strange Potion",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_POTION_ID"
+  ],
+  "giver": {
+    "class": "MarionInnkeeper"
+  },
+  "band": {
+    "min": 0,
+    "max": 40
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "As a matter of fact, yes! I recently received this potion. I tried to identify it magically, but it seems to repel my efforts. Could you take it to Joguer, the apothecary in Barloque, and ask him if it can be identified? Come back with the knowledge of what it is and I'll reward you.",
+    "complete": "Excellent, I'm sure I'll be able to find a good use for it. Here, please take this in payment."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a strange potion",
+      "turnin": {
+        "class": "BarloqueApothecary"
+      }
+    },
+    {
+      "kind": "deliver",
+      "parcel": "a labelled potion",
+      "turnin": {
+        "class": "MarionInnkeeper"
+      },
+      "brief": "Hmmm, a most interesting specimen. Let me just take a few drops for analysis... Ah yes. Let me put a label on it so that Morrigan will know what it is."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 1000
+      },
+      {
+        "class": "Shillings",
+        "count": 1500
+      },
+      {
+        "class": "MeatPie",
+        "count": 4
+      },
+      {
+        "class": "Cheese",
+        "count": 3
+      },
+      {
+        "class": "ShortSword"
+      },
+      {
+        "class": "Hammer"
+      }
+    ]
+  }
+}

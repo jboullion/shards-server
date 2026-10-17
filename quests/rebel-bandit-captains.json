@@ -1,0 +1,44 @@
+{
+  "tier": "main",
+  "id": 191,
+  "key": "rebel-bandit-captains",
+  "name": "The Bandit Captains",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 115,
+    "max": 135
+  },
+  "requires": {
+    "faction": "rebel",
+    "quests": [
+      190
+    ]
+  },
+  "text": {
+    "offer": "The bandits answer to their captains, hard men who know the hills better than any soldier. Kill five of them and the bands will scatter.",
+    "progress": "The bandit captains lead from the camps, the hideout of the eastern bandits and the mines of Berg.",
+    "complete": "Five captains. The bandits will be a long time finding new ones."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "BanditCaptain",
+      "count": 5,
+      "rooms": [
+        2961,
+        2962,
+        2960
+      ],
+      "objective": "Bandit captains slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 4000
+  }
+}

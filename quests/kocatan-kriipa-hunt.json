@@ -1,0 +1,44 @@
+{
+  "tier": "errand",
+  "id": 174,
+  "key": "kocatan-kriipa-hunt",
+  "name": "The Kriipa Hunt",
+  "giver": {
+    "class": "KocatanWeaponsMaster"
+  },
+  "band": {
+    "min": 135,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      155
+    ]
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "The kriipa breed as fast as we can kill them. A true warrior hunts them every day. Ten kriipa - and come back tomorrow for more.",
+    "progress": "The kriipa roam the path to the ruins and the warrior avars' camps.",
+    "complete": "Ten more. The hunt goes on tomorrow."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Kriipa",
+      "count": 10,
+      "rooms": [
+        2124,
+        2122,
+        2123,
+        2132
+      ],
+      "objective": "Kriipa slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 5000
+  }
+}

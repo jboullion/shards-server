@@ -1,0 +1,72 @@
+{
+  "id": 104,
+  "key": "errand-late-tax",
+  "name": "A Late Tax",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_LATE_TAX"
+  ],
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "A matter of urgency has been brought to my attention. Certain property and business owners in the community have been remiss in their financial obligations to me. Will you please take this letter to the merchant of Barloque immediately. Here is something for your troubles. Now make haste.",
+    "complete": "What's this? You know, it is strange how strict the Duke has become about collecting taxes. I suspect there is more to this than meets the eye. I have my suspicions but they are of no concern to you."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a tax letter",
+      "turnin": {
+        "class": "BarloqueMerchant"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 800
+      },
+      {
+        "class": "Shillings",
+        "count": 1000
+      },
+      {
+        "class": "Shillings",
+        "count": 1200
+      },
+      {
+        "class": "Shillings",
+        "count": 1400
+      },
+      {
+        "class": "Shillings",
+        "count": 1600
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 20
+      },
+      {
+        "class": "DetectGoodPotion"
+      },
+      {
+        "class": "DetectEvilPotion"
+      },
+      {
+        "class": "DetectInvisibilityPotion"
+      }
+    ]
+  }
+}

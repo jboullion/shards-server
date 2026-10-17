@@ -1,0 +1,58 @@
+{
+  "id": 74,
+  "key": "faction-favour-princess",
+  "name": "The Princess's Letters",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_PRINCESS_SERVICE"
+  ],
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Ah, my loyal servant. Wouldst thou be so kind as to deliver an official letter to Councillor Esseldi? I would be most grateful.",
+    "complete": "A letter from her highness?! Excellent. Thank you. You have proven your loyalty to the crown, and remain a trusted servant of Princess Kateriina."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "an official letter",
+      "turnin": {
+        "class": "FiveCouncilor",
+        "rooms": [
+          526
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "trainingPoints": 100,
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 200
+      },
+      {
+        "class": "Shillings",
+        "count": 300
+      },
+      {
+        "class": "Shillings",
+        "count": 400
+      }
+    ]
+  }
+}

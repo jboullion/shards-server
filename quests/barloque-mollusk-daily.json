@@ -1,0 +1,38 @@
+{
+  "id": 230,
+  "key": "barloque-mollusk-daily",
+  "name": "Mollusk Shell",
+  "tier": "errand",
+  "giver": {
+    "class": "BarloqueBlacksmith"
+  },
+  "band": {
+    "min": 130,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Ya know what makes the finest armour? Mollusk shell. Hard as nerudite and half the weight. There's great mollusks deep in the Forest o' Farol, an' under the lake down there. Kill six of 'em for me - an' come back tomorrow, I'll always want more.",
+    "progress": "The mollusks live deep in the Forest of Farol and in the underground lake beneath it.",
+    "complete": "Ha! Good shell, this. Come back tomorrow, I'll be wantin' more."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "MolluskMonster",
+      "count": 6,
+      "rooms": [
+        546,
+        550,
+        551
+      ],
+      "objective": "Mollusks slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 5000
+  }
+}

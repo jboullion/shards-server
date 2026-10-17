@@ -1,0 +1,38 @@
+{
+  "tier": "main",
+  "id": 201,
+  "key": "berg-the-desolate-mire",
+  "name": "The Desolate Mire",
+  "giver": {
+    "class": "BergInnkeeper"
+  },
+  "band": {
+    "min": 110,
+    "max": 130
+  },
+  "requires": {
+    "quests": [
+      200
+    ]
+  },
+  "text": {
+    "offer": "Past the marsh is the Desolate Mire, and in it, eyes. Great floating eyes that watch the road and bring death with a look. Ten of them, and the mire might be crossed in safety.",
+    "progress": "The giant eyes float above the Desolate Mire.",
+    "complete": "The mire's quiet. I don't know how you stood their gaze."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GiantEye",
+      "count": 10,
+      "rooms": [
+        2954
+      ],
+      "objective": "Giant eyes slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3500
+  }
+}

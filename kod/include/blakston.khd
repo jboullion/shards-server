@@ -122,6 +122,17 @@
    // this player hasn't attuned to yet (the client draws a gold "!" over it)
    MM_TRAVEL               = 0x00040000
    MM_TRAVEL_UNATTUNED     = 0x00080000
+   // Ours (docs/adr/0009-quests.md 2): quest markers, worked out per viewer by QuestBook.MarkerFor:
+   // "!" an offer, "?" a step to hand in, grey "!" an offer we nearly qualify for, a ring round a
+   // monster that counts for one of our steps, grey "?" a step not done yet
+   MM_QUEST_OFFER          = 0x00004000
+   MM_QUEST_TURNIN         = 0x00008000
+   MM_QUEST_SOON           = 0x00010000
+   MM_QUEST_TARGET         = 0x00020000
+   MM_QUEST_PENDING        = 0x00100000
+   // ... and the quest's tier, for the mark's colour: neither is gold (main and levelling chains)
+   MM_QUEST_SILVER         = 0x00200000
+   MM_QUEST_BRONZE         = 0x00400000
 
    // Player name color sent as hex RGB value. Define constants
    // for ease of use as needed. Requires OF_PLAYER boolean flag

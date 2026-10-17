@@ -1,0 +1,44 @@
+{
+  "tier": "main",
+  "id": 154,
+  "key": "kocatan-avar-chieftains",
+  "name": "The Chieftains",
+  "giver": {
+    "class": "KocatanCaptainGood"
+  },
+  "band": {
+    "min": 115,
+    "max": 135
+  },
+  "requires": {
+    "quests": [
+      151
+    ]
+  },
+  "text": {
+    "offer": "The avar warriors answer to their chieftains, and the chieftains answer to no one. Strike at them and the war turns. Five chieftains - it will not be easy, and you may want friends at your back.",
+    "progress": "The avar chieftains lead the camps of the warrior and noble avars, deep in the jungle.",
+    "complete": "Five chieftains. In all my years of this war I have not seen the like. Ko'catan is in your debt."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "AvarChieftain",
+      "count": 5,
+      "rooms": [
+        2122,
+        2123,
+        2133,
+        2142,
+        2143,
+        2152,
+        2154
+      ],
+      "objective": "Avar chieftains slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "shillings": 2000
+  }
+}

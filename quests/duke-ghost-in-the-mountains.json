@@ -1,0 +1,37 @@
+{
+  "tier": "main",
+  "id": 160,
+  "key": "duke-ghost-in-the-mountains",
+  "name": "The Ghost in the Mountains",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 130
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "text": {
+    "offer": "The dead that trouble my lands come from Brax, the old city buried under the Cragged Mountains. I want it cleansed - and anything of value in it brought to Tos. A ghost walks the mountains outside it, a druid called Tendrath, who knows the way in. Find him.",
+    "progress": "Tendrath haunts the Cragged Mountains, outside the ancient place where Brax lies buried.",
+    "complete": "The Duke sent you? Akardius wants Brax for his treasury, no doubt. Still - the dead must be fought, whoever pays for it."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "HunterGhost"
+      },
+      "objective": "Find Tendrath in the Cragged Mountains"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 2000
+  }
+}

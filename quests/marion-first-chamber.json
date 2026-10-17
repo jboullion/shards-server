@@ -1,0 +1,33 @@
+{
+  "id": 124,
+  "key": "marion-first-chamber",
+  "name": "The Crypt's First Chamber",
+  "tier": "main",
+  "giver": {
+    "class": "MarionElder"
+  },
+  "band": {
+    "min": 30,
+    "max": 40
+  },
+  "text": {
+    "offer": "The crypt behind my hut was a quiet place, once. Now spectral mummies drift through its first chamber and the villagers won't go near. Clear a dozen of them out of there, so we can see what lies deeper.",
+    "progress": "The crypt's entrance is behind Ran er'Hoth's hut in Marion.",
+    "complete": "Good. The way into the deeper crypt is open now - and I've a mind to send you down it."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "SpectralMummy",
+      "count": 12,
+      "rooms": [
+        2600
+      ],
+      "objective": "Spectral mummies destroyed"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 100
+  }
+}

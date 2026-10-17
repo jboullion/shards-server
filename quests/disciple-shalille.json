@@ -1,0 +1,46 @@
+{
+  "id": 79,
+  "key": "disciple-shalille",
+  "name": "Disciple of Shal'ille",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_SHALILLE_DISCIPLE"
+  ],
+  "giver": {
+    "class": "ShalillePriestess"
+  },
+  "band": {
+    "min": 20,
+    "max": 150
+  },
+  "text": {
+    "offer": "You wish to learn more of the gentle, healing ways of our good Lady. You must brave the temple of Priestess Zuxana, and proclaim your willingness to forgive their violence and brutality. Say, \"The ways of violence and destruction have hardened our people. It is time to move towards gentleness and peace. I will begin this process by granting forgiveness for your deeds. Please accept my blessing.\" Then, return and tell me that you have done as I asked.",
+    "complete": "Blessed be this day. Today there is the birth of another soul filling with the light of Shal'ille. Seek me when you are ready to learn more of the Blessed Mother's knowledge and spells. You are worthy."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "QorPriestess"
+      },
+      "objective": "Bring Shal'ille's forgiveness to Priestess Zuxana"
+    },
+    {
+      "kind": "talk",
+      "brief": "Yes, I suppose it is time for Qor to seek redemption. You may return to Xiana now.",
+      "objective": "Return to Priestess Xiana",
+      "turnin": {
+        "class": "ShalillePriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "items": [
+      {
+        "class": "DiscipleRobe",
+        "school": "shalille"
+      }
+    ]
+  }
+}

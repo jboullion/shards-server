@@ -1,0 +1,68 @@
+{
+  "id": 47,
+  "key": "errand-kocatan-arrows",
+  "name": "Arrows for the Duke",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_KOC_WEAPON_TRADE"
+  ],
+  "giver": {
+    "class": "KocatanBowMaker"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Duke Akardius has requested my services to supply his troops, but unfortunately I have no one to take the supplies to him. Here are the arrows to be delivered; I am sure the Duke will pay you for your troubles. Remember that you are bound to deliver the supplies. For some reason I trust you, though.",
+    "complete": "Thank you. This is but the first delivery of many. May it foster good trade relations for years to come. Here, please take this."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a bundle of arrows",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "InkyCap",
+        "count": 10
+      },
+      {
+        "class": "Emerald",
+        "count": 6
+      },
+      {
+        "class": "IdentifyWand"
+      },
+      {
+        "class": "PurifyWand"
+      },
+      {
+        "class": "ResistColdPotion"
+      },
+      {
+        "class": "ResistFirePotion"
+      },
+      {
+        "class": "ResistMagicPotion"
+      },
+      {
+        "class": "ResistPoisonPotion"
+      },
+      {
+        "class": "ResistShockPotion"
+      }
+    ]
+  }
+}

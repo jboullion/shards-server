@@ -1,0 +1,60 @@
+{
+  "tier": "main",
+  "id": 184,
+  "key": "duke-bandits",
+  "name": "Bandits on the Roads",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 120
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "text": {
+    "offer": "These bandits rob the Duke's taxes on the roads west of Berg, and they laugh at my soldiers. Their camps lie in the hills toward Berg. Cut down fifteen of their thugs and ten of the snipers who cover them.",
+    "progress": "The bandits camp in the hills and mines near Berg, and on Kardde's path and pass.",
+    "complete": "The roads will be safer for it. But their captains still lead them."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Bandit",
+      "exact": true,
+      "count": 15,
+      "rooms": [
+        2961,
+        2962,
+        2960,
+        2815,
+        2818,
+        2820
+      ],
+      "objective": "Bandits slain"
+    },
+    {
+      "kind": "kill",
+      "target": "BanditSniper",
+      "count": 10,
+      "rooms": [
+        2961,
+        2962,
+        2960,
+        2815,
+        2818,
+        2820
+      ],
+      "objective": "Bandit snipers slain",
+      "brief": "Now the snipers - ten of them."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3000
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": 58,
+  "key": "story-war-letter",
+  "name": "A Dangerous Letter",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_WARLETTER"
+  ],
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Ah, yes! I have just written this letter to Skivlat, the banker in Tos. Please deliver it to him. I suggest you hire a guard, because it may be dangerous. I'm sure the reward will be enough for you and a guard.",
+    "complete": "Why, thank you! I wasn't expecting a letter from Jonas, but it is welcome. Please take this as a token of my appreciation."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a sealed war letter",
+      "turnin": {
+        "class": "TosBanker"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 1000
+      },
+      {
+        "class": "Shillings",
+        "count": 1000
+      },
+      {
+        "class": "Shillings",
+        "count": 1500
+      },
+      {
+        "class": "Shillings",
+        "count": 2000
+      },
+      {
+        "class": "LongSword"
+      },
+      {
+        "class": "Gauntlet"
+      },
+      {
+        "class": "InkyCap",
+        "count": 5
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": 72,
+  "key": "faction-join-rebel",
+  "name": "Arms for the Rebellion",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_REBEL_JOIN"
+  ],
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "neutral",
+    "intriguing": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "You wish to join our fight for freedom? I cannot trust you, for you may be a spy for my enemies. Prove your value by bringing me a scimitar.",
+    "progress": "Before Jonas D'Accor will let you join his ranks, he must be convinced you are not a spy. Bring him a scimitar, and you will gain his trust.",
+    "complete": "Excellent work! This will equip the troops I field in battle. Consider yourself one of the freedom fighters for the land."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "Scimitar",
+      "count": 1,
+      "objective": "A scimitar for Jonas"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "joinFaction": "rebel"
+  }
+}

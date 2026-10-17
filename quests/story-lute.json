@@ -1,0 +1,55 @@
+{
+  "id": 60,
+  "key": "story-lute",
+  "name": "An Instrument for Parrin's Pupil",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_LUTE"
+  ],
+  "giver": {
+    "class": "Minstrel"
+  },
+  "band": {
+    "min": 25,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Of course you'll need an instrument to play. I'll even help you get one. Here's what you do: Lady Aftyn, the healer in Marion, can set you up with one. Go to her and tell her Parrin sent you.",
+    "complete": "Thank you, here is the lute. Please learn to play it well."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "objective": "Tell Lady Aftyn that Parrin sent you"
+    },
+    {
+      "kind": "deliver",
+      "parcel": "a vial of Sacchaqua",
+      "turnin": {
+        "class": "JasperElder"
+      },
+      "brief": "You are going to learn to play from Parrin?! Good luck! By the way, Parrin owes me a favor. If you do something for me, I'll give you the lute: I need this rushed to Afiera D'xor in Jasper. When you've done that, come back."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "objective": "Collect the lute from Lady Aftyn",
+      "brief": "Ah, I've been anxiously awaiting this! Thank you for your swift delivery. Go back to Lady Aftyn for your lute."
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "Lute"
+      }
+    ]
+  }
+}

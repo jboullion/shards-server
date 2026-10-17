@@ -58,7 +58,7 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [&DeathSpider, 40], [&Troll, 60] ];
+      plMonsters = [ [&DeathSpider, 35], [&Troll, 45], [&RedAnt, 20] ];
 
       plGenerators = [ [4, 14], [16, 13], [18, 8], [27, 14], [34, 6],
 		      [26, 23], [37, 17], [22, 38], [14, 31], [11, 46], 
@@ -67,7 +67,15 @@ messages:
       propagate;
    }
 
-   
+   CreateStandardObjects()
+   {
+      // Tendrath, the hunter ghost: the guide's Brax quests start with him (ADR 0009 8).
+      // The god room used to make him and he walked here, so rebuilding this room lost him.
+      Send(self,@NewHold,#what=Create(&HunterGhost),#new_row=38,#new_col=38);
+
+      propagate;
+   }
+
    CreateStandardExits()
    {
       plExits = $;

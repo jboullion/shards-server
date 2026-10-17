@@ -51,6 +51,11 @@ messages:
    {
       local i, iPlayerHP, oRoom, lPassiveQuests;
 
+      // Ours: the guide chains are quests now (shards-server quests/guide-*.json,
+      // docs/adr/0009-quests.md 7.2), so nothing is handed out here any more; QuestBook.MigrateOld
+      // counts the chains a player finished and clears the old guide quests at logon
+      return $;
+
       // if vbTriggered is TRUE, we're evaluating a player
       //    because something wanted to add a new quest chain
 

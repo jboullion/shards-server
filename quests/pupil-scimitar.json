@@ -1,0 +1,36 @@
+{
+  "id": 102,
+  "key": "pupil-scimitar",
+  "name": "Quintor's Pupil",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_SCIMITAR_PROF"
+  ],
+  "giver": {
+    "class": "JasperBlacksmith"
+  },
+  "band": {
+    "min": 40,
+    "max": 150
+  },
+  "text": {
+    "offer": "So you are a warrior? Ha! Don't look like much of a warrior to me. Before I will spend my time teaching you the valuable ways of the scimitar, you must prove yourself by slaying a cave orc. Do this and return to me.",
+    "complete": "Finally. The first thing I must teach you is to snap to it. Come to me and we shall begin to learn how to effectively use the greatest weapon in the land: the scimitar."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "CaveOrc",
+      "count": 1
+    },
+    {
+      "kind": "kill",
+      "target": "Yeti",
+      "count": 2,
+      "brief": "That took long enough. I do not like to be kept waiting so long. With this extra time I have decided that you must slay yetis now: two of them. This time do not waste so many strokes with that...weapon. Go now."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1
+  }
+}

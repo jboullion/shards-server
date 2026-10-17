@@ -1,0 +1,38 @@
+{
+  "id": 122,
+  "key": "raza-farol-road",
+  "name": "The Farol Road",
+  "tier": "main",
+  "giver": {
+    "class": "RazaInnKeeper"
+  },
+  "band": {
+    "min": 22,
+    "max": 32
+  },
+  "requires": {
+    "quests": [
+      120
+    ]
+  },
+  "text": {
+    "offer": "The carters who bring my ale come in along the edge of the Forest of Farol, and they've stopped coming. Centipedes, they say, as long as a man. Clear the road for them: ten should do it.",
+    "progress": "The road runs along the western edge of the Forest of Farol, past the outskirts of Raza.",
+    "complete": "The carters will be glad to hear it, and so am I. Drink's on the house next time."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Centipede",
+      "count": 10,
+      "rooms": [
+        331
+      ],
+      "objective": "Centipedes slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 50
+  }
+}

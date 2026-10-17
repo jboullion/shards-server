@@ -1,0 +1,42 @@
+{
+  "tier": "main",
+  "id": 143,
+  "key": "princess-orc-pit",
+  "name": "The Brute of the Pit",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 95
+  },
+  "requires": {
+    "faction": "princess",
+    "quests": [
+      142
+    ]
+  },
+  "text": {
+    "offer": "The wizards were not the root of it. They serve a great brute in a pit at the heart of the caves, and while it lives the orcs will gather again. Slay it.",
+    "progress": "The pit lies past Grog's and Brog's antechambers, deep in the orc caves.",
+    "complete": "It is done, then. And thou hast seen more of those caves than any of my knights. There is something more I would ask of thee."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "OrcPitBoss",
+      "count": 1,
+      "rooms": [
+        "RID_ORC_PIT"
+      ],
+      "objective": "Slay the orc pit boss"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 1000
+  }
+}

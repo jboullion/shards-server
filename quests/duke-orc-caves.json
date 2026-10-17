@@ -1,0 +1,61 @@
+{
+  "tier": "main",
+  "id": 140,
+  "key": "duke-orc-caves",
+  "name": "The Orcs West of Tos",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 70,
+    "max": 90
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "text": {
+    "offer": "My patrols in the Twisted Woods keep vanishing, and the trail always ends at the old cave in the west. There is an illusion sealing the orc caves beyond it - break it, go in, and remind the orcs whose land this is. Fifteen of their warriors, to start.",
+    "progress": "The orc caves lie behind an illusionary wall in a cave west of Tos, in the Twisted Woods. You'll need to dispel the illusion to pass.",
+    "complete": "Good. The patrols will sleep easier. But the orcs answer to something deeper in those caves, and I mean to find out what."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "CaveOrc",
+      "count": 15,
+      "rooms": [
+        2500,
+        2501,
+        2502,
+        2504,
+        2505,
+        2507,
+        2508
+      ],
+      "objective": "Cave orcs slain"
+    },
+    {
+      "kind": "kill",
+      "target": "OrcWizard",
+      "count": 10,
+      "rooms": [
+        2500,
+        2501,
+        2502,
+        2504,
+        2505,
+        2507,
+        2508
+      ],
+      "objective": "Orc wizards slain",
+      "brief": "The orc wizards are the ones casting the glamours that hide their raiders. Kill ten of them."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 500
+  }
+}

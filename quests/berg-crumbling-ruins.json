@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 205,
+  "key": "berg-crumbling-ruins",
+  "name": "The Crumbling Ruins",
+  "giver": {
+    "class": "BergLeaderM"
+  },
+  "band": {
+    "min": 145,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      204
+    ]
+  },
+  "text": {
+    "offer": "At the end of the valley are the crumbling ruins of a city older than Berg, and the greatest of the minotaurs keep their lairs there. Clear six of them out of the ruins, and the valley will be ours again.",
+    "progress": "The ruins lie at the far end of the Valley of Death.",
+    "complete": "The ruins are clear. You have done what no one in Berg believed could be done."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Minotaur",
+      "count": 6,
+      "rooms": [
+        2854
+      ],
+      "inRooms": true,
+      "objective": "Minotaurs slain in the Crumbling Ruins"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 10000
+  }
+}

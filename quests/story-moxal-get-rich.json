@@ -1,0 +1,93 @@
+{
+  "id": 55,
+  "key": "story-moxal-get-rich",
+  "name": "Moxal's Golden Opportunity",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_MOXAL_SCAM_1"
+  ],
+  "giver": {
+    "class": "KocatanInnkeeper"
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Ah, friend and fellow dreamer! I think I have found the perfect opportunity for us! It can't fail! Simple: just take this letter to Pacal ix'Anoak. Before you know it, the cash will start rolling in!",
+    "complete": "Hmmm... Apparently, this person thinks I'm a complete idiot. I'm somewhat surprised that YOU fell for it. Ah well, since you went to all this trouble, let me give you a little something. Here."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "Moxal's letter",
+      "turnin": {
+        "class": "KocatanShopkeeper"
+      }
+    },
+    {
+      "kind": "deliver",
+      "parcel": "Moxal's letter",
+      "turnin": {
+        "class": "KocatanBowMaker"
+      },
+      "brief": "Hmmm... According to this, we're supposed to pass the letter on to someone else, then we both get rich. Ok, why don't you take it to Hanla zax'Ta."
+    }
+  ],
+  "rewards": {
+    "trainingPoints": 100,
+    "oneOf": [
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "Mace"
+      },
+      {
+        "class": "BlindWand"
+      },
+      {
+        "class": "ShortSword"
+      },
+      {
+        "class": "ShortSword"
+      },
+      {
+        "class": "ShortSword"
+      },
+      {
+        "class": "MysticSword"
+      },
+      {
+        "class": "PlateArmor"
+      }
+    ]
+  }
+}

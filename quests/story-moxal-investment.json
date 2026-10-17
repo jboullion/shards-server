@@ -1,0 +1,59 @@
+{
+  "id": 56,
+  "key": "story-moxal-investment",
+  "name": "Moxal's Investment",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_MOXAL_SCAM_2"
+  ],
+  "giver": {
+    "class": "KocatanInnkeeper"
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Early last week I had a great idea, and I've been trying to convince Oxal ix'Tokak to help me finance it. Look, if you convince him, I'll split the returns with both of you 50/50/50.",
+    "complete": "*sigh* Ah, well, Oxal was not of strong enough stomach, I guess. I don't suppose YOU have 100,000 shillings to invest in a moderately risky venture?"
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanBartender"
+      },
+      "objective": "Talk Oxal into it"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanInnkeeper"
+      },
+      "objective": "Tell Moxal",
+      "brief": "Oh, Riija, let me guess. Moxal sent you. Well, tell him, AGAIN, that I'm not interested."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanBartender"
+      },
+      "objective": "Try Oxal again",
+      "brief": "Now, now, now. Maybe you didn't try hard enough. Try again, and be sure to remind him about the tenfold, no, HUNDREDFOLD return."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanInnkeeper"
+      },
+      "objective": "Tell Moxal, again",
+      "brief": "SHEESH, WHAT IS IT WITH YOU PEOPLE? Look, Moxal is either a pie-eyed fool or a total thief, I haven't figured out which, but only a total idiot would give him money. Tell him I'm NOT INTERESTED."
+    }
+  ],
+  "rewards": {
+    "xp": 400
+  }
+}

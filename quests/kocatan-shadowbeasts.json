@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 173,
+  "key": "kocatan-shadowbeasts",
+  "name": "Shadows in the Hollows",
+  "giver": {
+    "class": "KocatanWeaponsMaster"
+  },
+  "band": {
+    "min": 140,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      155
+    ]
+  },
+  "text": {
+    "offer": "There is something worse than kriipa under this island: the shadowbeasts, kin of the kriipa, that haunt the archaic hollows and the aqueducts in the orc caves. I have never fought one and lived to say I won. Kill six, and you are the greatest warrior Ko'catan has known.",
+    "progress": "The shadowbeasts haunt the Archaic Hollows and the Aqueducts of Merb, in the orc caves below the island.",
+    "complete": "Six shadowbeasts. I bow to you - and I do not bow."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Shadowbeast",
+      "count": 6,
+      "rooms": [
+        2502,
+        2503
+      ],
+      "objective": "Shadowbeasts slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 10000
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": 35,
+  "key": "underworld-key-castle-victoria",
+  "name": "A Key to Castle Victoria",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_CASTLEVICTORIA_KEY"
+  ],
+  "giver": {
+    "class": "CeresofQor"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Help?... Some souls have gone free... spirits... put them back in their place... five of them...",
+    "progress": "Return to Ceres of Qor once it's done.",
+    "complete": "Good harvest... the spirits are damned once more... (Ceres of Qor gives you an old key to Castle Victoria.)"
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Spirit",
+      "count": 5
+    },
+    {
+      "kind": "kill",
+      "target": "Spirit",
+      "count": 10,
+      "brief": "MORE!... MORE!... (Ten more lost spirits.)"
+    },
+    {
+      "kind": "kill",
+      "target": "Spirit",
+      "count": 15,
+      "brief": "MORE!... MORE!... MORE!... MORE!... (Fifteen more.)"
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "CastleKey"
+      }
+    ]
+  }
+}

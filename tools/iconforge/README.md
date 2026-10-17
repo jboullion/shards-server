@@ -87,6 +87,12 @@ python tools/iconforge/hair.py beard pbdc --describe "a pointed goatee with a th
 - Outputs go to `build/iconforge/hair/<name>/` (`raw.png` is cached, `preview.png` shows the part on both heads in four hair colours). Install by copying the BGF to `resource/graphics/shards/` and listing it in `kod/util/system.kod` (`GetAllowedHairIcons`, `GetAllowedBeardIcons`).
 - `data/iconforge/hair.json` lists every style made so far, with its reference and description.
 
+## Fixing sprites by hand
+
+meridian-browser's admin dashboard (`npm run dev`, then `localhost:5173/admin.html`) has a **Sprites** tab: a pixel editor for any `.bgf`, with hair and facial hair previewed on both heads in every hair colour. It saves to `resource/graphics/shards/`, keeping the copy it replaces in `build/spriteforge/backups/`. It can also import a PNG and list a new style in `system.kod`.
+
+Hand fixes live in the same folder iconforge installs to. Re-running `forge.py install` or `hair.py` for the same name overwrites them, so redo the fix (or skip that name) afterwards.
+
 ## Files
 
 - `forge.py`: the CLI.

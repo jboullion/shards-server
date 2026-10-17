@@ -1,0 +1,41 @@
+{
+  "id": 103,
+  "key": "pupil-truth",
+  "name": "Parrin's Pupil",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_TRUTH_SPELL",
+    "QST_ID_TRUTH_SPELL_ENDBRANCH"
+  ],
+  "giver": {
+    "class": "Minstrel"
+  },
+  "band": {
+    "min": 20,
+    "max": 150
+  },
+  "text": {
+    "offer": "Are you truly ready to learn the magic of songs of Jala? If so you must prove your devotion to the arts. I would like you to try out your voice. Go to the merchant of Barloque and sing a song. Any song you wish. Then come back to me and let me know how it went.",
+    "complete": "Oh well, we shall work on that. Now open your mind to the ways of Jala; I shall train your voice, if you are willing."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "BarloqueMerchant"
+      },
+      "objective": "Sing a song for the merchant of Barloque"
+    },
+    {
+      "kind": "talk",
+      "brief": "By my troth, that is awful. Did Parrin send thee? Tell him to train thy voice.",
+      "objective": "Tell Parrin, honestly, how it went",
+      "turnin": {
+        "class": "Minstrel"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1
+  }
+}

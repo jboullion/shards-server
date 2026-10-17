@@ -1,0 +1,81 @@
+{
+  "id": 59,
+  "key": "story-jala-necklace",
+  "name": "The Necklace of Jala",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_JALA_NECKLACE"
+  ],
+  "giver": {
+    "class": "Minstrel"
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "A necklace of Jala? I have heard about such lovely things, although I do not have one myself. Rumor is that Moxal ix'Hanak, the innkeeper of Ko'catan, has been bragging about one lately. Perhaps you should go ask him about the necklace?",
+    "complete": "Finally done? The payment was smaller than I expected, so I will have to keep it all to cover my expenses. But here is the necklace I promised you. Come back soon!"
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanInnkeeper"
+      },
+      "objective": "Ask Moxal about the necklace"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanBartender"
+      },
+      "objective": "Offer Oxal some entertainment",
+      "brief": "Why, YES! I am glad to see you, friend. I had the best idea in the world! You sing, right? Why don't you go ask Oxal ix'Tokak if some entertainment would please him? I'll act as your agent and we can split the profits fairly. Oh, and I'll give you that necklace you want, too."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanBowMaker"
+      },
+      "objective": "Ask Hanla about Moxal's proposal",
+      "brief": "You sing here? HA! There is NO way I am trusting that idiot Moxal. Go talk to Hanla zax'Ta and ask her about this proposal of Moxal's."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanBartender"
+      },
+      "objective": "Tell Oxal to let you sing",
+      "brief": "Why did Oxal send you here? Tell him to quit being so silly and to let you sing."
+    },
+    {
+      "kind": "collect",
+      "item": "Lute",
+      "count": 1,
+      "turnin": {
+        "class": "KocatanBartender"
+      },
+      "objective": "Bring your lute to Oxal",
+      "brief": "Fine. Go fetch your lute and play a song, then give the lute to me."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanInnkeeper"
+      },
+      "objective": "Tell Moxal you did well",
+      "brief": "Excellent! After that performance, people will pay me good money for the lute of such a famous bard. Go tell Moxal that you have done well."
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "JalaNecklace"
+      }
+    ]
+  }
+}

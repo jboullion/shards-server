@@ -1,0 +1,41 @@
+{
+  "tier": "main",
+  "id": 155,
+  "key": "kocatan-origin-of-the-kriipa",
+  "name": "Origin of the Kriipa",
+  "giver": {
+    "class": "KocatanWeaponsMaster"
+  },
+  "band": {
+    "min": 125,
+    "max": 145
+  },
+  "requires": {
+    "quests": [
+      154
+    ]
+  },
+  "text": {
+    "offer": "You've beaten avars and their chieftains; now face what even the avars fear. The kriipa come up from the old places by the ruins - swift, armoured, deadly. Kill eight, and you'll have nothing left to learn from me.",
+    "progress": "The kriipa roam the path to the ruins and the warrior avars' camps.",
+    "complete": "Eight kriipa. You are as fine a warrior as this island has seen. Konima himself would have bowed to you."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Kriipa",
+      "count": 8,
+      "rooms": [
+        2124,
+        2122,
+        2123,
+        2132
+      ],
+      "objective": "Kriipa slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "shillings": 2500
+  }
+}

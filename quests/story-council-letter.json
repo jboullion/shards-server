@@ -1,0 +1,55 @@
+{
+  "id": 57,
+  "key": "story-council-letter",
+  "name": "A Letter for the Council",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_COUNCIL_LETTER"
+  ],
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 0,
+    "max": 40
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Why yes, I do have work. Take this letter to Councillor Bei Naq as fast as possible. He will pay for the service.",
+    "complete": "I've been expecting this letter. Thank you. Here is your fee."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "an official letter",
+      "turnin": {
+        "class": "TwoCouncilor",
+        "rooms": [
+          576
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 500
+      },
+      {
+        "class": "Shillings",
+        "count": 750
+      },
+      {
+        "class": "Shillings",
+        "count": 750
+      },
+      {
+        "class": "Shillings",
+        "count": 1000
+      }
+    ]
+  }
+}

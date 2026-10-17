@@ -1,0 +1,33 @@
+{
+  "id": 125,
+  "key": "marion-slime-on-the-shore",
+  "name": "Slime on the Shore",
+  "tier": "main",
+  "giver": {
+    "class": "MarionInnkeeper"
+  },
+  "band": {
+    "min": 30,
+    "max": 40
+  },
+  "text": {
+    "offer": "My fish come up from the shore of the Great Ocean, and lately the fishermen come back with nothing but slime on their boots - and worse. Slimes, crawling up out of the water. Kill a dozen of them and the fishermen might go back out.",
+    "progress": "The shore of the Great Ocean lies past the Valley of Ileria.",
+    "complete": "Fish on the table again, thanks to you. Take this."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Slime",
+      "count": 12,
+      "rooms": [
+        552
+      ],
+      "objective": "Slimes slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 100
+  }
+}

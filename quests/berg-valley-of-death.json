@@ -1,0 +1,35 @@
+{
+  "tier": "main",
+  "id": 203,
+  "key": "berg-valley-of-death",
+  "name": "The Valley of Death",
+  "giver": {
+    "class": "BergLeaderM"
+  },
+  "band": {
+    "min": 125,
+    "max": 145
+  },
+  "text": {
+    "offer": "South of Berg the land dies: the Valley of Death, where daemon-bound skeletons walk the slopes and the barren stretches. They creep closer to my city every year. Destroy ten of them there.",
+    "progress": "The daemon skeletons walk the hopeless slopes and the barren stretches of the Valley of Death.",
+    "complete": "Ten fewer horrors at my borders. Berg thanks you."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DaemonSkeleton",
+      "count": 10,
+      "rooms": [
+        2852,
+        2853
+      ],
+      "inRooms": true,
+      "objective": "Daemon skeletons destroyed in the Valley of Death"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 5000
+  }
+}

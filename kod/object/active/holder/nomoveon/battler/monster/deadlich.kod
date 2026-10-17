@@ -225,20 +225,9 @@ messages:
 
    Delete(lichswapout=FALSE)
    {
-      local iQNTindex, oQE, oQ;
-
-      if lichswapout
-      {
-         oQE = Send(SYS,@GetQuestEngine);
-
-         // Swap the quest NPC to the new Lich, so that this dead Lich gets
-         // cleaned up by garbage collection. If the new Lich dies, the quest
-         // NPC is set back to the new dead Lich.
-         iQNTindex = First(Nth(Send(oQE,@GetQuestTemplate,
-                           #index=QST_ID_ESTABLISH_NECROGUILD),QT_QUEST_NODES));
-         Send(oQE,@SetQuestNodeNPCList,#index=iQNTindex,#new_NPC_list=[poLich]);
-      }
-      else
+      // The necromancer guild quest is the QuestBook's now (ADR 0009), given by whichever dead
+      // Lich lies in the Inner Sanctum: no old quest node to swap over to the raised Lich.
+      if NOT lichswapout
       {
          if poLich <> $
          {

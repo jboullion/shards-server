@@ -1,0 +1,42 @@
+{
+  "tier": "main",
+  "id": 141,
+  "key": "duke-orc-pit",
+  "name": "The Pit Boss",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 95
+  },
+  "requires": {
+    "faction": "duke",
+    "quests": [
+      140
+    ]
+  },
+  "text": {
+    "offer": "My scouts report the orcs gather around a pit deep in the caves, where some brute rules them. Kill it, and their raids on Tos end with it.",
+    "progress": "The pit lies past Grog's and Brog's antechambers, deep in the orc caves.",
+    "complete": "Then the orcs are broken, for now. And now that you know those caves - I have a far more delicate errand in mind. Come and see me when you are ready."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "OrcPitBoss",
+      "count": 1,
+      "rooms": [
+        "RID_ORC_PIT"
+      ],
+      "objective": "Slay the orc pit boss"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 1000
+  }
+}

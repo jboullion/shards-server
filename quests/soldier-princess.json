@@ -1,0 +1,48 @@
+{
+  "id": 76,
+  "key": "soldier-princess",
+  "name": "A Soldier of the Crown",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_PRINCESS_SOLDIER"
+  ],
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "I am in need of allies. Please, prove your loyalty by fighting one of the Duke's soldiers. You should find one guarding a flagpole nearby. Come back and let me know you are done.",
+    "progress": "Princess Kateriina will allow you to join the Royal army, but first you must prove your loyalty by slaying her enemies at the flagpoles.",
+    "complete": "It is good that we can count you as an ally. Take this as a symbol of your commitment to the battle."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DukeTroop",
+      "count": 1
+    },
+    {
+      "kind": "kill",
+      "target": "RebelTroop",
+      "count": 1,
+      "brief": "I am glad to see you have returned. Please fight one of the rebels. Tell me when you are done and you will be made a soldier."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "items": [
+      {
+        "class": "PrincessShield"
+      }
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+// Ours (Meridian Shards, docs/adr/0009-quests.md): what a deliver step gives you to carry, named
+// by the quest (QuestBook.BeginStep), and taken back when you hand it in.
+
+////////////////////////////////////////////////////////////////////////////////
+QuestParcel is QuestItem
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   questparcel_name_rsc = "parcel"
+   questparcel_icon_rsc = scr04.bgf
+   questparcel_desc_rsc = "Something you've agreed to deliver.  It isn't yours to open."
+
+classvars:
+
+   vrName = questparcel_name_rsc
+   vrIcon = questparcel_icon_rsc
+   vrDesc = questparcel_desc_rsc
+
+   viDefinite = ARTICLE_NONE
+   viIndefinite = ARTICLE_NONE
+
+   viValue_average = 0
+   viWeight = 1
+   viBulk = 1
+
+properties:
+
+   // The quest it's for, and what it's called
+   piQuest = 0
+   prParcelName = $
+
+messages:
+
+   Constructor(quest = 0, parcel_name = $)
+   {
+      piQuest = quest;
+      prParcelName = parcel_name;
+
+      propagate;
+   }
+
+   GetQuestId()
+   {
+      return piQuest;
+   }
+
+   GetName()
+   {
+      if prParcelName <> $
+      {
+         return prParcelName;
+      }
+
+      return vrName;
+   }
+
+   GetTrueName()
+   {
+      return Send(self,@GetName);
+   }
+
+   GetApparentName()
+   {
+      return Send(self,@GetName);
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,37 @@
+{
+  "id": 10,
+  "key": "guide-raza",
+  "name": "The Shadow Mummy of Raza",
+  "tier": "main",
+  "replaces": [
+    "HP20_RAZA_CHAIN"
+  ],
+  "giver": {
+    "class": "RazaElder"
+  },
+  "band": {
+    "min": 0,
+    "max": 30
+  },
+  "text": {
+    "offer": "Rodric d'Stane says, \"Ah, so you are the new soul to these lands. Perhaps you can help us. We are gravely in need of adventurers who can clear out the mausoleum on the north side of town. Please assist us by slaying the evil shadow mummy that has corrupted our dead!\"",
+    "progress": "The elder of Raza has requested you enter the Mausoleum on the north end of town and slay the shadow mummy that has brought a curse to the honored dead resting within. To that end, you can find weapons and armor at the blacksmith, and you can purchase spell reagents at the apothecary, both located on the west side of Raza. When you find them, type 'buy' to see what they have for sale. You can also sell items they're interested in by typing 'offer' while facing them.",
+    "complete": "Rodric d'Stane says, \"Thank you for your assistance. You have truly helped us in our time of need. I shall share with you some of the wisdom of my years. Perhaps my meager experience will help you face the dangers of Meridian proper. Go now, and find the city of Marion. Once you are there, I recommend you seek out Priestess Xiana at the Temple of Shal'ille. She can guide you further.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "BlackMummy",
+      "count": 1,
+      "objective": "Slay the Shadow Mummy"
+    }
+  ],
+  "rewards": {
+    "xp": 1000
+  },
+  "requires": {
+    "quests": [
+      121
+    ]
+  }
+}

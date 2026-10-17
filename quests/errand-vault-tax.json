@@ -1,0 +1,74 @@
+{
+  "id": 106,
+  "key": "errand-vault-tax",
+  "name": "A Tithe of Profits",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_VAULT_TAX"
+  ],
+  "giver": {
+    "class": "TosBanker"
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Yes, I have need of a courier. Duke Akardius is due a certain percentage of profits from my business. Please take this tithe of shillings to him quickly. I am too busy to do it myself. Be warned that any thievery will be reported. I have arranged for the Duke to pay you for your troubles.",
+    "complete": "Ah, I see the banker of Tos is on time this week. Thank you for your swiftness and honor. They could use you around more often."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a tithe of shillings",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "InkyCap",
+        "count": 7
+      },
+      {
+        "class": "EntrootBerry",
+        "count": 20
+      },
+      {
+        "class": "OrcTooth",
+        "count": 20
+      },
+      {
+        "class": "DetectInvisibilityPotion"
+      },
+      {
+        "class": "DetectGoodPotion"
+      },
+      {
+        "class": "DetectEvilPotion"
+      },
+      {
+        "class": "IllusionaryFormPotion"
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 30
+      },
+      {
+        "class": "SilverArrow",
+        "count": 30
+      },
+      {
+        "class": "NodeBurstPotion"
+      }
+    ]
+  }
+}

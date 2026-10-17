@@ -1,0 +1,82 @@
+{
+  "id": 46,
+  "key": "errand-kocatan-ale",
+  "name": "Ale for the Island",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_KOC_ALE_TRADE"
+  ],
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Oxal ix'Tokak, in Ko'catan, has asked for supplies of our brew for his customers on the other side. Please take this ale to him; I have arranged for Oxal to pay you for the journey. Do not steal my goods. But let us not dwell on the seedier side of life: this could be the beginning of something very profitable for all involved, my friend!",
+    "complete": "I see D'Franco has kept his word. This is very good. I am sure that this is the beginning of a mutually beneficial relationship. Here is a token of my gratitude."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a shipment of ale",
+      "turnin": {
+        "class": "KocatanBartender"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "InkyCap",
+        "count": 10
+      },
+      {
+        "class": "Arrow",
+        "count": 60
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 30
+      },
+      {
+        "class": "SilverArrow",
+        "count": 30
+      },
+      {
+        "class": "LongBow"
+      },
+      {
+        "class": "KaraholsCursePotion"
+      },
+      {
+        "class": "HoldWand"
+      },
+      {
+        "class": "FireRing"
+      },
+      {
+        "class": "ColdRing"
+      },
+      {
+        "class": "ShockRing"
+      },
+      {
+        "class": "AcidRing"
+      },
+      {
+        "class": "ResistMagicPotion"
+      },
+      {
+        "class": "ResistPoisonPotion"
+      },
+      {
+        "class": "ResistShockPotion"
+      }
+    ]
+  }
+}

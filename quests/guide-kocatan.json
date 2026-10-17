@@ -1,0 +1,72 @@
+{
+  "id": 19,
+  "key": "guide-kocatan",
+  "name": "The Descendants of Konima",
+  "tier": "main",
+  "replaces": [
+    "HP90_INVESTIGATE_ISLAND_CHAIN"
+  ],
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 90,
+    "max": 120
+  },
+  "text": {
+    "offer": "Duke Akardius tells you, \"Ah yes. I have been watching you rise to prominence in this land, and I believe, as somewhat of a newcomer, you may be ideal for a delicate mission I have in mind. It has recently come to my attention that one of our hallowed myths may be incorrect. The great warrior, Konima, led an expedition into the caves near here to end the Orc Wars once and for all. His entire company vanished. He was believed dead, but now I am hearing rumors that his people live on somehow. I bid you enter the Orc Caves in the Twisted Woods and find the descendants of our great hero. If possible, set up a trade alliance, such that I may increase my power and influence here in Meridian. To get you started, you'll have money to fund your expedition as soon as you set out.\"",
+    "complete": "Wulfgang zax'Ak says, \"Believe it or not, I'm actually aware the mainland exists. I am of the opinion that a trading alliance would be of net benefit to both our peoples. I'll work out the details with the Duke, but here is your commission.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_ORC_CAVE1"
+      ],
+      "auto": true,
+      "objective": "Find a way into the Orc Caves",
+      "brief": "To the west of Tos, in the Twisted Woods, there is a cave. In that cave, ancient mages sealed off the Orc Caves with an illusionary wall. To proceed, you must find a way to dispel illusions. Other adventurers may help, or you might purchase a scroll of dispel illusion. It is also possible for you to learn the spell yourself if you study the ways of Kraanan.",
+      "rewards": {
+        "xp": 500,
+        "shillings": 50000
+      }
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_KOCATAN"
+      ],
+      "auto": true,
+      "objective": "Find Konima's descendants",
+      "brief": "The darkness is cloying, and the smell of orcs is pungent in the air. You have indeed entered the den of the orcs, and no man knows how deep these warrens go. How could Konima's legion possibly have survived down here? Somewhere in the limitless Orc Caves, the descendants of the famed hero Konima live on. Find them, but be wary, for none know what evils may lurk in the depths.",
+      "rewards": {
+        "xp": 5000
+      }
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanTown",
+        "rooms": [
+          "RID_KOCATAN"
+        ]
+      },
+      "objective": "Ask about a trade treaty",
+      "brief": "You emerge into the light to find a beautiful city towering all around you. The trek through the orc caves was a vicious and deadly affair, but it seems you've found the descendants of Konima - and they are prospering. Talk to any of the citizens of this astounding city (double-click) about a trade treaty."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "kocatanTradeMaster"
+      },
+      "objective": "Find Wulfgang's Trading Post",
+      "brief": "In reply, you are told, \"You'll have to find Wulfgang zax'Ak. He's the one most equipped to trade. Unfortunately, his Trading Post lies deep in the jungle. I don't know specific directions.\" Somewhere in the Ko'catani jungle lies the Trading Post of Wulfgang zax'Ak. Find him and talk to him (double-click), on behalf of Duke Akardius, about a trade treaty."
+    }
+  ],
+  "rewards": {
+    "shillings": 100000
+  }
+}

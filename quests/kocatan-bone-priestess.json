@@ -1,0 +1,38 @@
+{
+  "id": 36,
+  "key": "kocatan-bone-priestess",
+  "name": "The Bone Priestess's Prize",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_BONE_PRIESTESS"
+  ],
+  "giver": {
+    "class": "KocatanBonePriestess"
+  },
+  "band": {
+    "min": 90,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 3
+  },
+  "text": {
+    "offer": "Wak-wak! Hedd of Pit Boss! Wak wak wa-ak! (You're a little rusty in the language of the avars, but you think the bone priestess would like an orc pit boss head.)",
+    "complete": "Chp chp chp chp chp chp chp! (She gives you a shard of a sword of Riija in return.)"
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "OrcPitBossHead",
+      "count": 1,
+      "objective": "An orc pit boss head"
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "SwordShardA"
+      }
+    ]
+  }
+}

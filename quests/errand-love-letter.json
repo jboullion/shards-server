@@ -1,0 +1,67 @@
+{
+  "id": 107,
+  "key": "errand-love-letter",
+  "name": "A Love Letter",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_LOVE_LETTER_1"
+  ],
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 0,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 3
+  },
+  "text": {
+    "offer": "Yes, actually, I have a love letter for my darling, the tailor of Barloque. Please take it to her, and send her my love. Tell her that I miss her, won't you? And that I long for the moment when next we meet. Go now, quickly, lest she think that my love for her is fleeting and fickle.",
+    "complete": "Ah, another letter from my love. How wonderful. Please take this for thy trouble."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a love letter",
+      "turnin": {
+        "class": "BarloqueTailor"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 500
+      },
+      {
+        "class": "Shillings",
+        "count": 600
+      },
+      {
+        "class": "Shillings",
+        "count": 400
+      },
+      {
+        "class": "Shillings",
+        "count": 700
+      },
+      {
+        "class": "Shillings",
+        "count": 550
+      },
+      {
+        "class": "Shillings",
+        "count": 650
+      },
+      {
+        "class": "Shillings",
+        "count": 450
+      },
+      {
+        "class": "SeduceWand"
+      }
+    ]
+  }
+}

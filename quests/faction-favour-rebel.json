@@ -1,0 +1,55 @@
+{
+  "id": 75,
+  "key": "faction-favour-rebel",
+  "name": "Equipment for the Troops",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_REBEL_SERVICE"
+  ],
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Ah, my fellow freedom fighter. My troops have need of more equipment. This war costs us much, and I do not have the luxury of a large treasury like the other leaders do. Bring me a long sword and I will not forget your loyalty.",
+    "progress": "Jonas D'Accor's troops need equipment: bring him a long sword.",
+    "complete": "Ah, excellent. I will definitely put this to good use. You have shown your dedication to the cause."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "LongSword",
+      "count": 1,
+      "objective": "A long sword for Jonas"
+    }
+  ],
+  "rewards": {
+    "trainingPoints": 100,
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 200
+      },
+      {
+        "class": "Shillings",
+        "count": 300
+      },
+      {
+        "class": "Shillings",
+        "count": 400
+      }
+    ]
+  }
+}

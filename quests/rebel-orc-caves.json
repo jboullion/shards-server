@@ -1,0 +1,61 @@
+{
+  "tier": "main",
+  "id": 144,
+  "key": "rebel-orc-caves",
+  "name": "Steel from the Orcs",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 70,
+    "max": 90
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "The orcs under the Twisted Woods are well armed - too well armed. Somebody is trading with them, and I want to know who, and I want their steel for my own people. Get through the illusion that seals their caves and cut down fifteen of their warriors.",
+    "progress": "The orc caves lie behind an illusionary wall in a cave west of Tos. You'll need to dispel the illusion to pass.",
+    "complete": "Good steel, this. Not orc-made. Someone deeper in those caves is supplying them."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "CaveOrc",
+      "count": 15,
+      "rooms": [
+        2500,
+        2501,
+        2502,
+        2504,
+        2505,
+        2507,
+        2508
+      ],
+      "objective": "Cave orcs slain"
+    },
+    {
+      "kind": "kill",
+      "target": "OrcWizard",
+      "count": 10,
+      "rooms": [
+        2500,
+        2501,
+        2502,
+        2504,
+        2505,
+        2507,
+        2508
+      ],
+      "objective": "Orc wizards slain",
+      "brief": "Their wizards guard the trade routes through the caves. Kill ten of them and the way opens."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 500
+  }
+}

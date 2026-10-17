@@ -1,0 +1,37 @@
+{
+  "id": 82,
+  "key": "disciple-kraanan",
+  "name": "Disciple of Kraanan",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_KRAANAN_DISCIPLE"
+  ],
+  "giver": {
+    "class": "KraananPriestess"
+  },
+  "band": {
+    "min": 20,
+    "max": 150
+  },
+  "text": {
+    "offer": "You have two hours in which to kill a skeleton. Go immediately. Return and tell me when you are done.",
+    "complete": "You have done well. You are a worthy follower. Perhaps it is you who will crack the stone around Kraanan's soul. Seek me when you wish to learn more of his ways and his spells."
+  },
+  "timeLimitMinutes": 120,
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Skeleton",
+      "count": 1
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "items": [
+      {
+        "class": "DiscipleRobe",
+        "school": "kraanan"
+      }
+    ]
+  }
+}

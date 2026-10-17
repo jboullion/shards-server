@@ -1,0 +1,42 @@
+{
+  "tier": "main",
+  "id": 145,
+  "key": "rebel-orc-pit",
+  "name": "Whoever Rules the Pit",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 95
+  },
+  "requires": {
+    "faction": "rebel",
+    "quests": [
+      144
+    ]
+  },
+  "text": {
+    "offer": "The trail of that steel leads to a pit at the bottom of the caves, and to the brute that runs it. Kill it, and the orcs' trade is ours to follow.",
+    "progress": "The pit lies past Grog's and Brog's antechambers, deep in the orc caves.",
+    "complete": "And the steel? It came up through the caves from somewhere else entirely. People, living past the orcs. I want to meet them."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "OrcPitBoss",
+      "count": 1,
+      "rooms": [
+        "RID_ORC_PIT"
+      ],
+      "objective": "Slay the orc pit boss"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 1000
+  }
+}

@@ -1,0 +1,2190 @@
+// Ours (Meridian Shards, docs/adr/0009-quests.md): quests you can find. One object,
+// SYS@GetQuestBook, made on demand. Every quest is a standing offer, at its giver, to every player
+// it suits: there's no pool and no schedule.
+//
+// The quests are data (shards-server quests/*.json), generated into QuestDefs
+// (util/questdefs.kod), which this class inherits its tables from. They're cached here
+// (plQuests) and read again whenever the generated table's hash changes.
+//
+// Each player keeps their own state on User, as integers only:
+//   plQuestLog   each active quest: [ id, step, count, deadline (GetTime, or 0 for none) ]
+//   plQuestDone  each quest done:   [ id, times done, when last done (GetTime) ]
+//
+// Talking to an NPC is activating it (Monster.TryActivate -> NpcActivated): the player gets
+// what it has for them (UC_QUEST_OFFERS), and it's remembered as the NPC they're talking to
+// (User.poQuestNpc; our client's commands can't name objects). Then our client sends "quest ..."
+// commands (UC_SHARDS, User.ShardsCommand -> QuestCommand):
+//   quest accept <id>     take on a quest that NPC offers
+//   quest turnin <id>     hand in the current step there
+//   quest offers          what that NPC has for us again
+//   quest abandon <id>
+//   quest log             -> UC_QUEST_LOG
+// and is told of progress with UC_QUEST_PROGRESS. Everything is checked again here.
+//
+// Markers (User.BuildMinimapDotFlag -> MarkerFor): an NPC with a step ready to hand in shows
+// MM_QUEST_TURNIN ("?"), one with an offer MM_QUEST_OFFER ("!"), one waiting on a step not
+// done yet MM_QUEST_PENDING (grey "?"), one whose quest we nearly qualify for MM_QUEST_SOON
+// (grey "!"). A monster that counts for one of our kill steps gets MM_QUEST_TARGET.
+//
+// The admin dashboard drives it over the maintenance port (Admin* messages, at the end).
+
+////////////////////////////////////////////////////////////////////////////////
+QuestBook is QuestDefs
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   // A quest's fields (QuestDefs.GetQuests)
+   QB_ID = 1
+   QB_NAME = 2
+   QB_GIVER_CLASS = 3
+   QB_GIVER_PLACED = 4
+   QB_BAND_MIN = 5
+   QB_BAND_MAX = 6
+   QB_PREREQS = 7
+   QB_KARMA_MIN = 8
+   QB_KARMA_MAX = 9
+   QB_COOLDOWN = 10
+   QB_TIME_LIMIT = 11
+   QB_STEPS = 12
+   QB_XP = 13
+   QB_SHILLINGS = 14
+   QB_ITEMS = 15
+   QB_TP = 16
+   QB_TIER = 17
+   QB_FACTION = 18
+   QB_ONE_OF = 19
+   QB_NEEDS = 20
+   QB_SPECIAL = 21
+   QB_EXCLUDES = 22
+
+   // What a quest needs of a player besides (QB_NEEDS bits)
+   QBQ_INTRIGUING = 1
+   QBQ_GUILD_MASTER = 2
+   QBQ_GUILD_SHIELD = 4
+   QBQ_NO_GUILD = 8
+
+   // A step's fields
+   QBS_KIND = 1
+   QBS_CLASS = 2
+   QBS_COUNT = 3
+   // Bits: 1 the class itself only, 2 only kills in QBS_ROOMS count
+   QBS_EXACT = 4
+   QBS_TURNIN_CLASS = 5
+   QBS_TURNIN_PLACED = 6
+   QBS_OBJECTIVE = 7
+   QBS_ROOMS = 8
+   QBS_PARCEL = 9
+   QBS_TURNIN_NAME = 10
+   QBS_AUTO = 11
+   QBS_REWARD = 12
+   QBS_WITH = 13
+   QBS_CLASSES = 14
+   QBS_AMOUNT = 15
+
+   // A step's rewards, and a quest's: [ xp, shillings, training points, items, one of, special ].
+   // An item is [ class, count ] or [ class, count, SS_* ] (made for a school: a disciple robe).
+   QBR_XP = 1
+   QBR_SHILLINGS = 2
+   QBR_TP = 3
+   QBR_ITEMS = 4
+   QBR_ONE_OF = 5
+   QBR_SPECIAL = 6
+
+   // Special rewards: [ kind, its number ] (tools/quests/validate.ts SPECIAL)
+   QRW_JOIN = 1
+   QRW_INSIGNIA = 2
+   QRW_NECRO_GUILD = 3
+
+   // Step kinds (tools/quests/validate.ts KIND_NUM)
+   QK_KILL = 1
+   QK_COLLECT = 2
+   QK_TALK = 3
+   QK_DELIVER = 4
+   QK_VISIT = 5
+   // The guide chains' kinds: done once, by doing something
+   QK_CAST = 6
+   QK_DEPOSIT = 7
+   QK_STASH = 8
+   QK_BUY = 9
+   QK_EQUIP = 10
+   QK_HEALTH = 11
+   QK_HOMETOWN = 12
+   QK_NODES = 13
+
+   // Tiers: the markers' colour (gold, silver, bronze)
+   QT_MAIN = 1
+   QT_STORY = 2
+   QT_ERRAND = 3
+
+   // Old history's kinds (QuestDefs.GetReplaced)
+   QR_TEMPLATE = 1
+   QR_CHAIN = 2
+
+   // A placed giver's fields (QuestDefs.GetGivers)
+   QBG_ID = 1
+   QBG_NAME = 2
+   QBG_ICON = 3
+   QBG_DESC = 4
+   QBG_RID = 5
+   QBG_ROW = 6
+   QBG_COL = 7
+   QBG_FROW = 8
+   QBG_FCOL = 9
+   QBG_ANGLE = 10
+
+   // A player's log entry, and done entry
+   QBL_ID = 1
+   QBL_STEP = 2
+   QBL_COUNT = 3
+   QBL_DEADLINE = 4
+   QBD_ID = 1
+   QBD_TIMES = 2
+   QBD_LAST = 3
+
+   // What an NPC has for a player (UC_QUEST_OFFERS)
+   QO_NONE = 0
+   QO_OFFER = 1
+   QO_READY = 2
+   QO_PENDING = 3
+   QO_SOON = 4
+
+   // A player must stand this near an NPC (squares)
+   QUEST_REACH = 4
+   // Quests a player can have going at once
+   QUEST_MAX_ACTIVE = 10
+   // A quest shows a grey "!" this much health below its band
+   QUEST_SOON_HEALTH = 10
+
+resources:
+
+   quest_accepted = "You take on the quest ~B%s~n."
+   quest_progress = "%s: %i/%i"
+   quest_step_done = "%s: done.  Return to %s."
+   quest_next = "~B%s~n: %s."
+   quest_complete = "You complete the quest ~B%s~n."
+   quest_abandoned = "You abandon the quest ~B%s~n."
+   quest_expired = "You ran out of time for the quest ~B%s~n."
+   quest_full = "You have too many quests already.  Finish or abandon one first."
+   quest_too_far = "You must stand closer to speak with them."
+   quest_nothing = "They have no work for you right now."
+   quest_not_ready = "You haven't finished that yet."
+   quest_cant = "You can't take on that quest."
+   quest_parcel_given = "You are given %s to deliver."
+   quest_parcel_missing = \
+      "You no longer have what you were to deliver.  Abandon the quest and take it on again."
+   quest_reward_money = "You receive %i shillings."
+   quest_reward_item = "You receive %s."
+   quest_reward_floor = "You can't carry %s; it's on the ground at your feet."
+   quest_reward_insignia = "Your guild shield now bears a new sign."
+   quest_no_shield = "You have no guild shield to bear the sign."
+
+   quest_sound_accept = nodeup.ogg
+
+classvars:
+
+properties:
+
+   // The generated tables, as last read, and their hash (EnsureLoaded)
+   piHash = 0
+   plQuests = $
+   plGivers = $
+   // Every NPC class that gives or takes in a step, for a quick no (MarkerFor)
+   plNpcClasses = $
+   // [ [ QR_*, old number, quest id ], ... ] (QuestDefs.GetReplaced), for HasDoneReplacing
+   plReplaced = $
+
+messages:
+
+   ////////////////////////////////////////////////////////////////// the tables
+
+   EnsureLoaded()
+   "Reads the generated tables again after a rebuild (their hash changed)."
+   {
+      local i, j, iHash, cClass;
+
+      iHash = Send(self,@GetCatalogHash);
+      if iHash = piHash
+      {
+         return;
+      }
+
+      // The generated tables come in groups (a Kod list literal holds at most 40 elements)
+      plQuests = Send(self,@Flatten,#groups=Send(self,@GetQuests));
+      plGivers = Send(self,@Flatten,#groups=Send(self,@GetGivers));
+      plNpcClasses = $;
+      foreach i in plQuests
+      {
+         cClass = Nth(i,QB_GIVER_CLASS);
+         if cClass <> $ AND FindListElem(plNpcClasses,cClass) = 0
+         {
+            plNpcClasses = Cons(cClass,plNpcClasses);
+         }
+
+         foreach j in Nth(i,QB_STEPS)
+         {
+            cClass = Nth(j,QBS_TURNIN_CLASS);
+            if cClass <> $ AND FindListElem(plNpcClasses,cClass) = 0
+            {
+               plNpcClasses = Cons(cClass,plNpcClasses);
+            }
+         }
+      }
+      plReplaced = Send(self,@Flatten,#groups=Send(self,@GetReplaced));
+      piHash = iHash;
+
+      return;
+   }
+
+   HasDoneReplacing(who = $,old = $)
+   "Whether who has done the quest that replaced the old QuestEngine quest QST_ID old (teachers "
+   "ask it of the quest they used to teach for: Monster.HasDoneLearnQuest)."
+   {
+      local i;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      Send(self,@EnsureLoaded);
+      foreach i in plReplaced
+      {
+         if First(i) = QR_TEMPLATE AND Nth(i,2) = old
+            AND Send(self,@DoneEntry,#who=who,#id=Nth(i,3)) <> $
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   Flatten(groups = $)
+   "A generated table's groups of rows as one list of rows, in order."
+   {
+      local i, j, lOut;
+
+      lOut = $;
+      foreach i in groups
+      {
+         foreach j in i
+         {
+            lOut = AppendListElem(j,lOut);
+         }
+      }
+
+      return lOut;
+   }
+
+   GetQuest(id = $)
+   {
+      local i;
+
+      Send(self,@EnsureLoaded);
+      foreach i in plQuests
+      {
+         if First(i) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   GetStep(qrow = $,num = 1)
+   {
+      local lSteps;
+
+      lSteps = Nth(qrow,QB_STEPS);
+      if num < 1 OR num > Length(lSteps)
+      {
+         return $;
+      }
+
+      return Nth(lSteps,num);
+   }
+
+   GetGiver(id = $)
+   {
+      local i;
+
+      Send(self,@EnsureLoaded);
+      foreach i in plGivers
+      {
+         if First(i) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   PlaceGivers(where = $)
+   "Gives a room its placed quest givers, from the table (room.kod Constructed)."
+   {
+      local i, iRid, oGiver;
+
+      if where = $
+      {
+         return;
+      }
+
+      Send(self,@EnsureLoaded);
+      iRid = Send(where,@GetRoomNum);
+      foreach i in plGivers
+      {
+         if Nth(i,QBG_RID) = iRid
+         {
+            oGiver = Create(&QuestGiver,#giver=First(i));
+            Send(where,@NewHold,#what=oGiver,#new_row=Nth(i,QBG_ROW),
+                 #new_col=Nth(i,QBG_COL),#fine_row=Nth(i,QBG_FROW),
+                 #fine_col=Nth(i,QBG_FCOL),#new_angle=Nth(i,QBG_ANGLE));
+         }
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////////// a player's state
+
+   LogEntry(who = $,id = $)
+   {
+      local i;
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         if First(i) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   DoneEntry(who = $,id = $)
+   {
+      local i;
+
+      foreach i in Send(who,@GetQuestDone)
+      {
+         if First(i) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   NpcMatches(obj = $,cls = $,placed = 0)
+   "Whether obj is the NPC a quest names: a placed giver by id, or any NPC of a class."
+   {
+      if obj = $
+      {
+         return FALSE;
+      }
+
+      if placed > 0
+      {
+         return IsClass(obj,&QuestGiver) AND Send(obj,@GetGiverId) = placed;
+      }
+
+      return cls <> $ AND IsClass(obj,cls);
+   }
+
+   IsQuestNpc(obj = $)
+   "Whether obj may give or take in a step (a quick no for the markers)."
+   {
+      local i;
+
+      if IsClass(obj,&QuestGiver)
+      {
+         return TRUE;
+      }
+
+      foreach i in plNpcClasses
+      {
+         if IsClass(obj,i)
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   CanOffer(who = $,qrow = $)
+   "QO_OFFER if this quest is offered to who now, QO_SOON if only their health keeps them from "
+   "it (and not by much), else QO_NONE."
+   {
+      local i, lDone, iHealth, iKarma, iMin, iFaction;
+
+      if Send(self,@LogEntry,#who=who,#id=First(qrow)) <> $
+      {
+         return QO_NONE;
+      }
+
+      lDone = Send(self,@DoneEntry,#who=who,#id=First(qrow));
+      if lDone <> $
+      {
+         if Nth(qrow,QB_COOLDOWN) = $
+            OR GetTime() - Nth(lDone,QBD_LAST) < Nth(qrow,QB_COOLDOWN)
+         {
+            return QO_NONE;
+         }
+      }
+
+      foreach i in Nth(qrow,QB_PREREQS)
+      {
+         if Send(self,@DoneEntry,#who=who,#id=i) = $
+         {
+            return QO_NONE;
+         }
+      }
+
+      // The same errand from another giver, done or going
+      foreach i in Nth(qrow,QB_EXCLUDES)
+      {
+         if Send(self,@DoneEntry,#who=who,#id=i) <> $
+            OR Send(self,@LogEntry,#who=who,#id=i) <> $
+         {
+            return QO_NONE;
+         }
+      }
+
+      iKarma = Send(who,@GetKarma);
+      if (Nth(qrow,QB_KARMA_MIN) <> $ AND iKarma < Nth(qrow,QB_KARMA_MIN))
+         OR (Nth(qrow,QB_KARMA_MAX) <> $ AND iKarma > Nth(qrow,QB_KARMA_MAX))
+      {
+         return QO_NONE;
+      }
+
+      iFaction = Nth(qrow,QB_FACTION);
+      if iFaction <> $
+      {
+         if (iFaction = -1 AND Send(who,@GetFaction) = FACTION_NEUTRAL)
+            OR (iFaction >= 0 AND Send(who,@GetFaction) <> iFaction)
+         {
+            return QO_NONE;
+         }
+      }
+
+      if NOT Send(self,@MeetsNeeds,#who=who,#needs=Nth(qrow,QB_NEEDS))
+      {
+         return QO_NONE;
+      }
+
+      iHealth = Send(who,@GetBaseMaxHealth);
+      iMin = Nth(qrow,QB_BAND_MIN);
+      if iHealth < iMin
+      {
+         if iHealth + QUEST_SOON_HEALTH >= iMin
+         {
+            return QO_SOON;
+         }
+
+         return QO_NONE;
+      }
+
+      return QO_OFFER;
+   }
+
+   MeetsNeeds(who = $,needs = 0)
+   "Whether who has what QB_NEEDS asks: of interest to the court, a guild master, a guild shield, "
+   "no guild."
+   {
+      local oGuild;
+
+      if needs = $ OR needs = 0
+      {
+         return TRUE;
+      }
+
+      if (needs & QBQ_INTRIGUING) AND NOT Send(who,@PlayerIsIntriguing)
+      {
+         return FALSE;
+      }
+
+      if needs & QBQ_GUILD_MASTER
+      {
+         oGuild = Send(who,@GetGuild);
+         if oGuild = $
+         {
+            return FALSE;
+         }
+
+         if Send(oGuild,@GetGuildMaster) <> who OR NOT Send(oGuild,@HasGuildColors)
+         {
+            return FALSE;
+         }
+      }
+
+      if (needs & QBQ_GUILD_SHIELD) AND NOT Send(who,@PossessesA,#class=&GuildShield)
+      {
+         return FALSE;
+      }
+
+      if (needs & QBQ_NO_GUILD) AND Send(who,@GetGuild) <> $
+      {
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
+   StepReady(who = $,entry = $,qrow = $)
+   "Whether the player's current step of this quest can be handed in."
+   {
+      local lStep, iKind;
+
+      lStep = Send(self,@GetStep,#qrow=qrow,#num=Nth(entry,QBL_STEP));
+      if lStep = $
+      {
+         return FALSE;
+      }
+
+      iKind = Nth(lStep,QBS_KIND);
+      if iKind = QK_TALK
+      {
+         return TRUE;
+      }
+
+      if iKind = QK_DELIVER
+      {
+         return Send(self,@FindParcel,#who=who,#id=First(qrow)) <> $;
+      }
+
+      if iKind = QK_COLLECT
+      {
+         return Send(self,@CountHolding,#who=who,#cls=Nth(lStep,QBS_CLASS))
+                >= Nth(lStep,QBS_COUNT);
+      }
+
+      return Nth(entry,QBL_COUNT) >= Nth(lStep,QBS_COUNT);
+   }
+
+   ActiveCount(who = $)
+   {
+      return Length(Send(who,@GetQuestLog));
+   }
+
+   ////////////////////////////////////////////////////////////////// markers
+
+   MarkerFor(viewer = $,obj = $)
+   "The quest minimap bits an object has for this viewer (User.BuildMinimapDotFlag)."
+   {
+      local i, lQuest, lStep, iOffer, iReady, iPending, iOffered, iSoon;
+
+      if NOT IsClass(viewer,&User)
+      {
+         return 0;
+      }
+
+      Send(self,@EnsureLoaded);
+
+      // A monster: does it count for one of our kill steps?
+      if NOT (Send(obj,@GetBehavior) & AI_NPC)
+      {
+         foreach i in Send(viewer,@GetQuestLog)
+         {
+            lQuest = Send(self,@GetQuest,#id=First(i));
+            if lQuest <> $
+            {
+               lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+               if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_KILL
+                  AND Nth(i,QBL_COUNT) < Nth(lStep,QBS_COUNT)
+                  AND Send(self,@KillMatches,#dead=obj,#step=lStep,
+                           #rid=Send(Send(obj,@GetOwner),@GetRoomNum))
+               {
+                  return MM_QUEST_TARGET;
+               }
+            }
+         }
+
+         return 0;
+      }
+
+      if NOT Send(self,@IsQuestNpc,#obj=obj)
+      {
+         return 0;
+      }
+
+      // "?" before anything else: a step we can hand in here. Each kind of mark takes the best
+      // tier among its quests (gold, then silver, then bronze); auto steps are never handed in
+      iReady = 0;
+      iPending = 0;
+      foreach i in Send(viewer,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_AUTO) = 0
+               AND Send(self,@NpcMatches,#obj=obj,#cls=Nth(lStep,QBS_TURNIN_CLASS),
+                        #placed=Nth(lStep,QBS_TURNIN_PLACED))
+            {
+               if Send(self,@StepReady,#who=viewer,#entry=i,#qrow=lQuest)
+               {
+                  iReady = Send(self,@BetterTier,#tier=iReady,#other=Nth(lQuest,QB_TIER));
+               }
+               else
+               {
+                  iPending = Send(self,@BetterTier,#tier=iPending,#other=Nth(lQuest,QB_TIER));
+               }
+            }
+         }
+      }
+
+      if iReady > 0
+      {
+         return MM_QUEST_TURNIN | Send(self,@TierBits,#tier=iReady);
+      }
+
+      iOffered = 0;
+      iSoon = 0;
+      foreach i in plQuests
+      {
+         if Send(self,@NpcMatches,#obj=obj,#cls=Nth(i,QB_GIVER_CLASS),
+                 #placed=Nth(i,QB_GIVER_PLACED))
+         {
+            iOffer = Send(self,@CanOffer,#who=viewer,#qrow=i);
+            if iOffer = QO_OFFER
+            {
+               iOffered = Send(self,@BetterTier,#tier=iOffered,#other=Nth(i,QB_TIER));
+            }
+
+            if iOffer = QO_SOON
+            {
+               iSoon = Send(self,@BetterTier,#tier=iSoon,#other=Nth(i,QB_TIER));
+            }
+         }
+      }
+
+      if iOffered > 0
+      {
+         return MM_QUEST_OFFER | Send(self,@TierBits,#tier=iOffered);
+      }
+
+      if iPending > 0
+      {
+         return MM_QUEST_PENDING | Send(self,@TierBits,#tier=iPending);
+      }
+
+      if iSoon > 0
+      {
+         return MM_QUEST_SOON | Send(self,@TierBits,#tier=iSoon);
+      }
+
+      return 0;
+   }
+
+   BetterTier(tier = 0,other = QT_STORY)
+   "The better of two tiers (main before story before errand); 0 is none yet."
+   {
+      if tier = 0 OR other < tier
+      {
+         return other;
+      }
+
+      return tier;
+   }
+
+   TierBits(tier = QT_STORY)
+   "A tier as minimap bits: gold has none of its own."
+   {
+      if tier = QT_STORY
+      {
+         return MM_QUEST_SILVER;
+      }
+
+      if tier = QT_ERRAND
+      {
+         return MM_QUEST_BRONZE;
+      }
+
+      return 0;
+   }
+
+   RefreshMarkers(who = $)
+   "Re-sends the NPCs and monsters in who's room whose markers may have changed, to who only."
+   {
+      local i, oRoom, oObj;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+      {
+         return;
+      }
+
+      Send(self,@EnsureLoaded);
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         oObj = First(i);
+         if IsClass(oObj,&Monster)
+         {
+            if NOT (Send(oObj,@GetBehavior) & AI_NPC)
+               OR Send(self,@IsQuestNpc,#obj=oObj)
+            {
+               Send(who,@SomethingChanged,#what=oObj);
+            }
+         }
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////////// the client's commands
+
+   NpcActivated(who = $,npcobj = $)
+   "Monster.TryActivate, for an NPC: what it has for who, and it's who's NPC to talk to now."
+   {
+      if NOT IsClass(who,&User) OR npcobj = $
+      {
+         return;
+      }
+
+      if NOT Send(self,@InReach,#who=who,#obj=npcobj)
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_too_far);
+
+         return;
+      }
+
+      Send(who,@SetQuestNpc,#what=npcobj);
+      Send(self,@CheckDeadlines,#who=who);
+      Send(self,@SendOffers,#who=who,#npcobj=npcobj);
+
+      return;
+   }
+
+   InReach(who = $,obj = $)
+   {
+      return Send(obj,@GetOwner) = Send(who,@GetOwner)
+         AND Abs(Send(who,@GetRow) - Send(obj,@GetRow)) <= QUEST_REACH
+         AND Abs(Send(who,@GetCol) - Send(obj,@GetCol)) <= QUEST_REACH;
+   }
+
+   QuestCommand(who = $,words = $)
+   "The client's quest commands (UC_SHARDS): accept, turnin, offers, abandon, log."
+   {
+      local sVerb, iId, oNpc;
+
+      if who = $ OR NOT IsClass(who,&User) OR Length(words) < 2
+      {
+         return;
+      }
+
+      Send(self,@CheckDeadlines,#who=who);
+      sVerb = Nth(words,2);
+      if StringEqual(sVerb,"log")
+      {
+         Send(self,@SendLog,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"offers")
+      {
+         oNpc = Send(self,@NpcNear,#who=who);
+         if oNpc <> $
+         {
+            Send(self,@SendOffers,#who=who,#npcobj=oNpc);
+         }
+
+         return;
+      }
+
+      if Length(words) < 3
+      {
+         return;
+      }
+
+      iId = StringToNumber(Nth(words,3));
+      if StringEqual(sVerb,"abandon")
+      {
+         Send(self,@Abandon,#who=who,#id=iId);
+
+         return;
+      }
+
+      oNpc = Send(self,@NpcNear,#who=who);
+      if oNpc = $
+      {
+         return;
+      }
+
+      if StringEqual(sVerb,"accept")
+      {
+         Send(self,@Accept,#who=who,#id=iId,#npcobj=oNpc);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"turnin")
+      {
+         Send(self,@TurnIn,#who=who,#id=iId,#npcobj=oNpc);
+
+         return;
+      }
+
+      return;
+   }
+
+   NpcNear(who = $)
+   "The NPC who last talked to, if it's still in their room and near enough; else $, and "
+   "who is told why if it's too far. Found among the room's objects, so an NPC deleted since "
+   "is never sent to."
+   {
+      local i, oRoom, oNpc;
+
+      oNpc = Send(who,@GetQuestNpc);
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $ OR oNpc = $
+      {
+         return $;
+      }
+
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         if First(i) = oNpc
+         {
+            if NOT Send(self,@InReach,#who=who,#obj=oNpc)
+            {
+               Send(who,@MsgSendUser,#message_rsc=quest_too_far);
+
+               return $;
+            }
+
+            return oNpc;
+         }
+      }
+
+      return $;
+   }
+
+   OffersFrom(who = $,npcobj = $)
+   "What an NPC has for who: [ id, QO_*, step ] each, steps to hand in first."
+   {
+      local i, lQuest, lStep, lOut, iOffer;
+
+      lOut = $;
+      if npcobj = $
+      {
+         return lOut;
+      }
+
+      Send(self,@EnsureLoaded);
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $
+               AND Send(self,@NpcMatches,#obj=npcobj,#cls=Nth(lStep,QBS_TURNIN_CLASS),
+                        #placed=Nth(lStep,QBS_TURNIN_PLACED))
+            {
+               if Send(self,@StepReady,#who=who,#entry=i,#qrow=lQuest)
+               {
+                  lOut = Cons([First(i),QO_READY,Nth(i,QBL_STEP)],lOut);
+               }
+               else
+               {
+                  lOut = Cons([First(i),QO_PENDING,Nth(i,QBL_STEP)],lOut);
+               }
+            }
+         }
+      }
+
+      foreach i in plQuests
+      {
+         if Send(self,@NpcMatches,#obj=npcobj,#cls=Nth(i,QB_GIVER_CLASS),
+                 #placed=Nth(i,QB_GIVER_PLACED))
+         {
+            iOffer = Send(self,@CanOffer,#who=who,#qrow=i);
+            if iOffer <> QO_NONE
+            {
+               lOut = AppendListElem([First(i),iOffer,1],lOut);
+            }
+         }
+      }
+
+      return lOut;
+   }
+
+   SendOffers(who = $,npcobj = $)
+   "UC_QUEST_OFFERS: the NPC, then each of its quests for us as id, QO_* and step."
+   {
+      local i, lOffers, oSession;
+
+      if npcobj = $
+      {
+         return;
+      }
+
+      lOffers = Send(self,@OffersFrom,#who=who,#npcobj=npcobj);
+      if lOffers = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_nothing);
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_QUEST_OFFERS,4,npcobj,1,Length(lOffers));
+      foreach i in lOffers
+      {
+         AddPacket(4,First(i),1,Nth(i,2),1,Nth(i,3));
+      }
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendLog(who = $)
+   "UC_QUEST_LOG: the catalogue's hash; each active quest as id, step, count and seconds left "
+   "(-1 for no limit); then each quest done as id and times."
+   {
+      local i, lQuest, lStep, iCount, iLeft, lDone, oSession;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      Send(self,@EnsureLoaded);
+      AddPacket(1,BP_USERCOMMAND,1,UC_QUEST_LOG,4,piHash,1,Length(Send(who,@GetQuestLog)));
+      foreach i in Send(who,@GetQuestLog)
+      {
+         iCount = Nth(i,QBL_COUNT);
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_COLLECT
+            {
+               iCount = Bound(Send(self,@CountHolding,#who=who,#cls=Nth(lStep,QBS_CLASS)),
+                              0,Nth(lStep,QBS_COUNT));
+            }
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_DELIVER
+            {
+               iCount = 0;
+               if Send(self,@FindParcel,#who=who,#id=First(i)) <> $
+               {
+                  iCount = 1;
+               }
+            }
+         }
+
+         iLeft = -1;
+         if Nth(i,QBL_DEADLINE) > 0
+         {
+            iLeft = Bound(Nth(i,QBL_DEADLINE) - GetTime(),0,$);
+         }
+
+         AddPacket(4,First(i),1,Nth(i,QBL_STEP),2,iCount,4,iLeft);
+      }
+
+      lDone = Send(who,@GetQuestDone);
+      AddPacket(2,Length(lDone));
+      foreach i in lDone
+      {
+         AddPacket(4,First(i),2,Nth(i,QBD_TIMES));
+      }
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendProgress(who = $,entry = $,num = $)
+   "UC_QUEST_PROGRESS: a quest's id, step and count, as it changes."
+   {
+      local oSession;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      if num = $
+      {
+         num = Nth(entry,QBL_COUNT);
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_QUEST_PROGRESS,4,First(entry),1,Nth(entry,QBL_STEP),
+                2,num);
+      SendPacket(oSession);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////////// taking on and handing in
+
+   Accept(who = $,id = $,npcobj = $)
+   {
+      local lQuest;
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest = $
+         OR NOT Send(self,@NpcMatches,#obj=npcobj,#cls=Nth(lQuest,QB_GIVER_CLASS),
+                     #placed=Nth(lQuest,QB_GIVER_PLACED))
+         OR Send(self,@CanOffer,#who=who,#qrow=lQuest) <> QO_OFFER
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_cant);
+
+         return;
+      }
+
+      if Send(self,@ActiveCount,#who=who) >= QUEST_MAX_ACTIVE
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_full);
+
+         return;
+      }
+
+      Send(self,@StartQuest,#who=who,#qrow=lQuest);
+
+      return;
+   }
+
+   StartQuest(who = $,qrow = $)
+   "Puts a quest in who's log at its first step, with no checks (Accept, AdminGrant)."
+   {
+      local iDeadline, lEntry;
+
+      iDeadline = 0;
+      if Nth(qrow,QB_TIME_LIMIT) <> $
+      {
+         iDeadline = GetTime() + Nth(qrow,QB_TIME_LIMIT);
+      }
+
+      lEntry = [ First(qrow), 1, 0, iDeadline ];
+      Send(who,@SetQuestLog,#log=AppendListElem(lEntry,Send(who,@GetQuestLog)));
+      Send(who,@MsgSendUser,#message_rsc=quest_accepted,#parm1=Nth(qrow,QB_NAME));
+      Send(who,@WaveSendUser,#wave_rsc=quest_sound_accept);
+      Send(self,@BeginStep,#who=who,#entry=lEntry,#qrow=qrow);
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return;
+   }
+
+   BeginStep(who = $,entry = $,qrow = $)
+   "A step starts: a parcel to carry, or a count of what's already held."
+   {
+      local lStep, oParcel;
+
+      lStep = Send(self,@GetStep,#qrow=qrow,#num=Nth(entry,QBL_STEP));
+      if lStep = $
+      {
+         return;
+      }
+
+      if Nth(lStep,QBS_KIND) = QK_DELIVER
+         AND Send(self,@FindParcel,#who=who,#id=First(qrow)) = $
+      {
+         oParcel = Create(&QuestParcel,#quest=First(qrow),#parcel_name=Nth(lStep,QBS_PARCEL));
+         Send(self,@GiveOrDrop,#who=who,#what=oParcel);
+         Send(who,@MsgSendUser,#message_rsc=quest_parcel_given,#parm1=Nth(lStep,QBS_PARCEL));
+      }
+
+      // Reaching a health, a hometown, the mana nodes: maybe already done
+      Post(self,@CheckStateSteps,#who=who);
+
+      return;
+   }
+
+   TurnIn(who = $,id = $,npcobj = $)
+   {
+      local lEntry, lQuest, lStep, iStep;
+
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lEntry = $ OR lQuest = $
+      {
+         return;
+      }
+
+      iStep = Nth(lEntry,QBL_STEP);
+      lStep = Send(self,@GetStep,#qrow=lQuest,#num=iStep);
+      if lStep = $
+         OR NOT Send(self,@NpcMatches,#obj=npcobj,#cls=Nth(lStep,QBS_TURNIN_CLASS),
+                     #placed=Nth(lStep,QBS_TURNIN_PLACED))
+      {
+         return;
+      }
+
+      if NOT Send(self,@StepReady,#who=who,#entry=lEntry,#qrow=lQuest)
+      {
+         if Nth(lStep,QBS_KIND) = QK_DELIVER
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_parcel_missing);
+         }
+         else
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_not_ready);
+         }
+
+         return;
+      }
+
+      // What the step took
+      if Nth(lStep,QBS_KIND) = QK_COLLECT
+      {
+         Send(self,@TakeItems,#who=who,#cls=Nth(lStep,QBS_CLASS),#num=Nth(lStep,QBS_COUNT));
+      }
+      if Nth(lStep,QBS_KIND) = QK_DELIVER
+      {
+         Send(self,@DeleteParcels,#who=who,#id=id);
+      }
+
+      Send(self,@AdvanceStep,#who=who,#entry=lEntry,#qrow=lQuest);
+
+      return;
+   }
+
+   AdvanceStep(who = $,entry = $,qrow = $)
+   "The current step is done: the next one, or the quest is complete."
+   {
+      local iStep, lStep;
+
+      // The step just done gives what it gives
+      lStep = Send(self,@GetStep,#qrow=qrow,#num=Nth(entry,QBL_STEP));
+      if lStep <> $
+      {
+         Send(self,@AwardList,#who=who,#rewards=Nth(lStep,QBS_REWARD));
+      }
+
+      iStep = Nth(entry,QBL_STEP) + 1;
+      if iStep > Length(Nth(qrow,QB_STEPS))
+      {
+         Send(self,@Complete,#who=who,#entry=entry,#qrow=qrow);
+
+         return;
+      }
+
+      SetNth(entry,QBL_STEP,iStep);
+      SetNth(entry,QBL_COUNT,0);
+      lStep = Send(self,@GetStep,#qrow=qrow,#num=iStep);
+      Send(who,@MsgSendUser,#message_rsc=quest_next,#parm1=Nth(qrow,QB_NAME),
+           #parm2=Nth(lStep,QBS_OBJECTIVE));
+      Send(self,@BeginStep,#who=who,#entry=entry,#qrow=qrow);
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return;
+   }
+
+   Complete(who = $,entry = $,qrow = $)
+   {
+      local lDone;
+
+      Send(who,@SetQuestLog,#log=DelListElem(Send(who,@GetQuestLog),entry));
+      lDone = Send(self,@DoneEntry,#who=who,#id=First(qrow));
+      if lDone = $
+      {
+         Send(who,@SetQuestDone,
+              #done=Cons([ First(qrow), 1, GetTime() ],Send(who,@GetQuestDone)));
+      }
+      else
+      {
+         SetNth(lDone,QBD_TIMES,Nth(lDone,QBD_TIMES) + 1);
+         SetNth(lDone,QBD_LAST,GetTime());
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=quest_complete,#parm1=Nth(qrow,QB_NAME));
+      Send(self,@Award,#who=who,#qrow=qrow);
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return;
+   }
+
+   Award(who = $,qrow = $)
+   "A quest's rewards, at its end."
+   {
+      Send(self,@AwardList,#who=who,
+           #rewards=[ Nth(qrow,QB_XP), Nth(qrow,QB_SHILLINGS), Nth(qrow,QB_TP), Nth(qrow,QB_ITEMS),
+                      Nth(qrow,QB_ONE_OF), Nth(qrow,QB_SPECIAL) ]);
+
+      return;
+   }
+
+   AwardList(who = $,rewards = $)
+   "[ xp, shillings, training points, items, one of these items, special ]: a step's rewards, or "
+   "a quest's."
+   {
+      local i, j, oItem, lItems;
+
+      if rewards = $
+      {
+         return;
+      }
+
+      if Nth(rewards,QBR_XP) > 0
+      {
+         Send(who,@AddXP,#iAmount=Nth(rewards,QBR_XP));
+      }
+
+      if Nth(rewards,QBR_TP) > 0
+      {
+         Send(who,@AddTrainingPoints,#points=Nth(rewards,QBR_TP));
+      }
+
+      if Nth(rewards,QBR_SHILLINGS) > 0
+      {
+         Send(self,@GiveOrDrop,#who=who,#what=Create(&Shillings,#number=Nth(rewards,QBR_SHILLINGS)));
+         Send(who,@MsgSendUser,#message_rsc=quest_reward_money,#parm1=Nth(rewards,QBR_SHILLINGS));
+      }
+
+      // The items, and one more drawn from the list of choices
+      lItems = Nth(rewards,QBR_ITEMS);
+      if Nth(rewards,QBR_ONE_OF) <> $
+      {
+         lItems = Cons(Nth(Nth(rewards,QBR_ONE_OF),Random(1,Length(Nth(rewards,QBR_ONE_OF)))),lItems);
+      }
+
+      // IsClass needs an object, not a class: the first is made, and says whether it stacks
+      foreach i in lItems
+      {
+         oItem = Send(self,@MakeItem,#entry=i);
+         Send(who,@MsgSendUser,#message_rsc=quest_reward_item,#parm1=Send(oItem,@GetName));
+         Send(self,@GiveOrDrop,#who=who,#what=oItem);
+         if NOT IsClass(oItem,&NumberItem)
+         {
+            j = 1;
+            while j < Nth(i,2)
+            {
+               oItem = Send(self,@MakeItem,#entry=i);
+               Send(who,@MsgSendUser,#message_rsc=quest_reward_item,
+                    #parm1=Send(oItem,@GetName));
+               Send(self,@GiveOrDrop,#who=who,#what=oItem);
+               ++j;
+            }
+         }
+      }
+
+      if Length(rewards) >= QBR_SPECIAL
+      {
+         foreach i in Nth(rewards,QBR_SPECIAL)
+         {
+            Send(self,@AwardSpecial,#who=who,#kind=First(i),#num=Nth(i,2));
+         }
+      }
+
+      return;
+   }
+
+   MakeItem(entry = $)
+   "A reward item: [ class, count ], or [ class, count, SS_* ] for one made for a school."
+   {
+      if Length(entry) >= 3
+      {
+         return Create(First(entry),#number=Nth(entry,2),#school=Nth(entry,3));
+      }
+
+      return Create(First(entry),#number=Nth(entry,2));
+   }
+
+   AwardSpecial(who = $,kind = $,num = 0)
+   "The rewards that aren't things: joining a faction, a sign on a guild shield, the necromancer guild."
+   {
+      local oShield, oLich;
+
+      if kind = QRW_JOIN
+      {
+         // As the old faction quests: leave any faction first (posted, as they were)
+         Post(who,@ResignFaction);
+         Post(who,@JoinFaction,#new_faction=num);
+
+         return;
+      }
+
+      if kind = QRW_INSIGNIA
+      {
+         oShield = Send(self,@FindGuildShield,#who=who);
+         if oShield = $
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_no_shield);
+
+            return;
+         }
+
+         Send(oShield,@ChangeGuildInsignia,#Insignia=num);
+         Send(who,@MsgSendUser,#message_rsc=quest_reward_insignia);
+
+         return;
+      }
+
+      if kind = QRW_NECRO_GUILD
+      {
+         // The dead Lich raises the Lich and deletes itself: posted, after the hand-in's done
+         oLich = Send(Send(SYS,@FindRoomByNum,#num=RID_INNERSAN),@FindHoldingActive,
+                      #class=&DeadLich);
+         if oLich <> $
+         {
+            Post(oLich,@EstablishNecromancerGuild,#master=who);
+         }
+         else
+         {
+            Debug("QuestBook: no dead Lich to raise the necromancer guild for",who);
+         }
+
+         return;
+      }
+
+      return;
+   }
+
+   FindGuildShield(who = $)
+   "The guild shield to emboss: the one in use, else one in the pack without a sign, else any."
+   {
+      local i, oShield;
+
+      foreach i in Send(who,@GetPlayerUsing)
+      {
+         if IsClass(i,&GuildShield)
+         {
+            return i;
+         }
+      }
+
+      oShield = $;
+      foreach i in Send(who,@GetHolderPassive)
+      {
+         if IsClass(i,&GuildShield)
+         {
+            if NOT Send(i,@HasInsignia)
+            {
+               return i;
+            }
+
+            oShield = i;
+         }
+      }
+
+      return oShield;
+   }
+
+   GiveOrDrop(who = $,what = $)
+   "Into who's pack, or at their feet if they can't carry it."
+   {
+      local oRoom;
+
+      if what = $
+      {
+         return;
+      }
+
+      if Send(who,@ReqNewHold,#what=what)
+      {
+         Send(who,@NewHold,#what=what);
+
+         return;
+      }
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+      {
+         Send(what,@Delete);
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=quest_reward_floor,#parm1=Send(what,@GetName));
+      Send(oRoom,@NewHold,#what=what,#new_row=Send(who,@GetRow),#new_col=Send(who,@GetCol),
+           #fine_row=Send(who,@GetFineRow),#fine_col=Send(who,@GetFineCol));
+
+      return;
+   }
+
+   Abandon(who = $,id = $)
+   {
+      local lEntry, lQuest;
+
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      if lEntry = $
+      {
+         return;
+      }
+
+      Send(self,@DropEntry,#who=who,#entry=lEntry);
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_abandoned,#parm1=Nth(lQuest,QB_NAME));
+      }
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return;
+   }
+
+   DropEntry(who = $,entry = $)
+   "Takes a quest out of who's log, and any parcel it gave them."
+   {
+      Send(who,@SetQuestLog,#log=DelListElem(Send(who,@GetQuestLog),entry));
+      Send(self,@DeleteParcels,#who=who,#id=First(entry));
+
+      return;
+   }
+
+   CheckDeadlines(who = $)
+   "Drops the quests whose time ran out."
+   {
+      local i, lQuest, lExpired;
+
+      lExpired = $;
+      foreach i in Send(who,@GetQuestLog)
+      {
+         if Nth(i,QBL_DEADLINE) > 0 AND GetTime() > Nth(i,QBL_DEADLINE)
+         {
+            lExpired = Cons(i,lExpired);
+         }
+      }
+
+      if lExpired = $
+      {
+         return FALSE;
+      }
+
+      foreach i in lExpired
+      {
+         Send(self,@DropEntry,#who=who,#entry=i);
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_expired,#parm1=Nth(lQuest,QB_NAME));
+         }
+      }
+
+      return TRUE;
+   }
+
+   PlayerLoggedOn(who = $)
+   "User.UserLogon: quests the player knows nothing of any more go (a retired id), and so do "
+   "those whose time ran out; then our client gets the log."
+   {
+      local i, lGone;
+
+      Send(self,@MigrateOld,#who=who);
+      lGone = $;
+      foreach i in Send(who,@GetQuestLog)
+      {
+         if Send(self,@GetQuest,#id=First(i)) = $
+         {
+            lGone = Cons(i,lGone);
+         }
+      }
+      foreach i in lGone
+      {
+         Send(self,@DropEntry,#who=who,#entry=i);
+      }
+
+      Send(self,@CheckDeadlines,#who=who);
+      Send(self,@CheckStateSteps,#who=who);
+      Send(self,@SendLog,#who=who);
+
+      return;
+   }
+
+   MigrateOld(who = $)
+   "The old guide chains (GameQuestMaintenance) and QuestEngine quests a player finished count "
+   "as the quests that replace them (GetReplaced) done; the old guide quests themselves go "
+   "(docs/adr/0009-quests.md 7.3)."
+   {
+      local i, j, lChains, iOld;
+
+      lChains = Send(who,@TakeOldGuideChains);
+      foreach i in Send(self,@Flatten,#groups=Send(self,@GetReplaced))
+      {
+         if First(i) = QR_CHAIN AND FindListElem(lChains,Nth(i,2)) > 0
+         {
+            Send(self,@MarkDone,#who=who,#id=Nth(i,3));
+         }
+
+         if First(i) = QR_TEMPLATE
+         {
+            foreach j in Send(who,@GetOldQuestHistory)
+            {
+               iOld = First(j) & QUEST_HISTORY_MASK;
+               if iOld = Nth(i,2) AND (First(j) & QUEST_HISTORY_SUCCESS)
+               {
+                  Send(self,@MarkDone,#who=who,#id=Nth(i,3));
+               }
+            }
+         }
+      }
+
+      return;
+   }
+
+   MarkDone(who = $,id = $)
+   "Counts quest id done once for who, if it isn't already, with no rewards."
+   {
+      if Send(self,@DoneEntry,#who=who,#id=id) <> $ OR Send(self,@LogEntry,#who=who,#id=id) <> $
+      {
+         return;
+      }
+
+      Send(who,@SetQuestDone,#done=Cons([ id, 1, GetTime() ],Send(who,@GetQuestDone)));
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////////// what happens in the world
+
+   AutoAdvance(who = $,id = $,step = 0)
+   "An auto step was counted (TellProgress): on to the next, if it's still that step."
+   {
+      local lEntry, lQuest;
+
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lEntry = $ OR lQuest = $ OR Nth(lEntry,QBL_STEP) <> step
+      {
+         return;
+      }
+
+      Send(self,@AdvanceStep,#who=who,#entry=lEntry,#qrow=lQuest);
+
+      return;
+   }
+
+   ActionDone(who = $,kind = 0,what = $,with = $,num = 0)
+   "Something was done that an action step may want (cast, deposit, stash, buy, equip): each "
+   "current step of that kind it matches is counted."
+   {
+      local i, lQuest, lStep;
+
+      if NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
+      {
+         return;
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = kind AND Nth(i,QBL_COUNT) = 0
+               AND Send(self,@ActionMatches,#step=lStep,#what=what,#with=with,#num=num)
+            {
+               SetNth(i,QBL_COUNT,1);
+               Send(self,@TellProgress,#who=who,#entry=i,#qrow=lQuest,#step=lStep,#num=1);
+            }
+         }
+      }
+
+      return;
+   }
+
+   ActionMatches(step = $,what = $,with = $,num = 0)
+   {
+      local i;
+
+      if Nth(step,QBS_WITH) <> $ AND (with = $ OR NOT IsClass(with,Nth(step,QBS_WITH)))
+      {
+         return FALSE;
+      }
+
+      if Nth(step,QBS_KIND) = QK_DEPOSIT
+      {
+         return num >= Nth(step,QBS_AMOUNT);
+      }
+
+      if Nth(step,QBS_KIND) = QK_STASH
+      {
+         // what is the list of items left; any one of the class will do
+         if Nth(step,QBS_CLASS) = $
+         {
+            return TRUE;
+         }
+
+         foreach i in what
+         {
+            if IsClass(i,Nth(step,QBS_CLASS))
+            {
+               return TRUE;
+            }
+         }
+
+         return FALSE;
+      }
+
+      if Nth(step,QBS_KIND) = QK_EQUIP
+      {
+         foreach i in Nth(step,QBS_CLASSES)
+         {
+            if IsClass(what,i)
+            {
+               return TRUE;
+            }
+         }
+
+         return FALSE;
+      }
+
+      // cast, buy: the spell or the item, when the step names one
+      return Nth(step,QBS_CLASS) = $ OR IsClass(what,Nth(step,QBS_CLASS));
+   }
+
+   SpellCast(who = $,cast = $)
+   "Spell.CastSpell, by a player."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_CAST,#what=cast);
+
+      return;
+   }
+
+   MoneyDeposited(who = $,with = $,amount = 0)
+   "User.MadeMoneyDeposit, with a banker."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_DEPOSIT,#with=with,#num=amount);
+
+      return;
+   }
+
+   ItemsStashed(who = $,with = $,items = $)
+   "User.MadeItemDeposit, with a vault keeper."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_STASH,#what=items,#with=with);
+
+      return;
+   }
+
+   ItemBought(who = $,with = $,what = $)
+   "User.BoughtAnItem."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_BUY,#what=what,#with=with);
+
+      return;
+   }
+
+   ItemEquipped(who = $,what = $)
+   "User.NewUsing: worn or wielded."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_EQUIP,#what=what);
+
+      return;
+   }
+
+   CheckStateSteps(who = $)
+   "Steps that are a state, not a deed: a base health reached, a hometown chosen, every mana "
+   "node bonded. Checked at logon, when a step starts, on a health gain, a hometown, a node."
+   {
+      local i, lQuest, lStep, iKind, bDone;
+
+      if NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
+      {
+         return;
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(i,QBL_COUNT) = 0
+            {
+               iKind = Nth(lStep,QBS_KIND);
+               bDone = FALSE;
+               if iKind = QK_HEALTH
+               {
+                  bDone = Send(who,@GetBaseMaxHealth) >= Nth(lStep,QBS_AMOUNT);
+               }
+               if iKind = QK_HOMETOWN
+               {
+                  bDone = NOT Send(who,@CanChangeHomeroom);
+               }
+               if iKind = QK_NODES
+               {
+                  bDone = Send(who,@NumManaNodes) >= Nth(lStep,QBS_AMOUNT);
+               }
+
+               if bDone
+               {
+                  SetNth(i,QBL_COUNT,1);
+                  Send(self,@TellProgress,#who=who,#entry=i,#qrow=lQuest,#step=lStep,#num=1);
+               }
+            }
+         }
+      }
+
+      return;
+   }
+
+   KillMatches(dead = $,step = $,rid = 0)
+   "Whether a kill of dead in room rid counts for this kill step."
+   {
+      if (Nth(step,QBS_EXACT) & 2) AND FindListElem(Nth(step,QBS_ROOMS),rid) = 0
+      {
+         return FALSE;
+      }
+
+      if Nth(step,QBS_EXACT) & 1
+      {
+         return GetClass(dead) = Nth(step,QBS_CLASS);
+      }
+
+      return IsClass(dead,Nth(step,QBS_CLASS));
+   }
+
+   MonsterKilled(dead = $,killer = $)
+   "Monster.Killed, outside arenas: the killer and everyone in the room's builder group with "
+   "them get the kill."
+   {
+      local i, oRoom;
+
+      if killer = $ OR NOT IsClass(killer,&User)
+      {
+         return;
+      }
+
+      Send(self,@CountKill,#who=killer,#dead=dead);
+      oRoom = Send(killer,@GetOwner);
+      if oRoom = $
+      {
+         return;
+      }
+
+      foreach i in Send(oRoom,@GetBuilderGroup)
+      {
+         if i <> killer AND Send(oRoom,@AreGroupedHere,#who=killer,#what=i)
+         {
+            Send(self,@CountKill,#who=i,#dead=dead);
+         }
+      }
+
+      return;
+   }
+
+   CountKill(who = $,dead = $)
+   {
+      local i, lQuest, lStep, iCount, iRid;
+
+      if Send(who,@GetQuestLog) = $
+      {
+         return;
+      }
+
+      // Where it happened, for the steps that count only in their rooms (who stands with dead)
+      iRid = 0;
+      if Send(who,@GetOwner) <> $
+      {
+         iRid = Send(Send(who,@GetOwner),@GetRoomNum);
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_KILL
+               AND Nth(i,QBL_COUNT) < Nth(lStep,QBS_COUNT)
+               AND Send(self,@KillMatches,#dead=dead,#step=lStep,#rid=iRid)
+            {
+               iCount = Nth(i,QBL_COUNT) + 1;
+               SetNth(i,QBL_COUNT,iCount);
+               Send(self,@TellProgress,#who=who,#entry=i,#qrow=lQuest,#step=lStep,#num=iCount);
+            }
+         }
+      }
+
+      return;
+   }
+
+   TellProgress(who = $,entry = $,qrow = $,step = $,num = 0)
+   "A count went up: a line, UC_QUEST_PROGRESS, and once done, where to hand it in."
+   {
+      Send(self,@SendProgress,#who=who,#entry=entry,#num=num);
+      if num >= Nth(step,QBS_COUNT)
+      {
+         // Posted: the caller may be going through the log, which advancing changes
+         if Nth(step,QBS_AUTO) = 1
+         {
+            Post(self,@AutoAdvance,#who=who,#id=First(entry),#step=Nth(entry,QBL_STEP));
+
+            return;
+         }
+
+         Send(who,@MsgSendUser,#message_rsc=quest_step_done,#parm1=Nth(step,QBS_OBJECTIVE),
+              #parm2=Nth(step,QBS_TURNIN_NAME));
+         Send(self,@RefreshMarkers,#who=who);
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=quest_progress,#parm1=Nth(step,QBS_OBJECTIVE),
+           #parm2=num,#parm3=Nth(step,QBS_COUNT));
+
+      return;
+   }
+
+   EnteredRoom(who = $,where = $)
+   "Player.NewOwner: visit steps."
+   {
+      local i, lQuest, lStep, iRid;
+
+      if where = $ OR NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
+      {
+         return;
+      }
+
+      iRid = Send(where,@GetRoomNum);
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_VISIT AND Nth(i,QBL_COUNT) = 0
+               AND FindListElem(Nth(lStep,QBS_ROOMS),iRid) > 0
+            {
+               SetNth(i,QBL_COUNT,1);
+               Send(self,@TellProgress,#who=who,#entry=i,#qrow=lQuest,#step=lStep,#num=1);
+            }
+         }
+      }
+
+      return;
+   }
+
+   ItemGained(who = $,what = $)
+   "User.NewHold, before the item is held: collect steps count it."
+   {
+      local i, lQuest, lStep, iCount, iAdd;
+
+      if what = $ OR NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
+      {
+         return;
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_COLLECT
+               AND IsClass(what,Nth(lStep,QBS_CLASS))
+            {
+               iAdd = 1;
+               if IsClass(what,&NumberItem)
+               {
+                  iAdd = Send(what,@GetNumber);
+               }
+
+               iCount = Send(self,@CountHolding,#who=who,#cls=Nth(lStep,QBS_CLASS)) + iAdd;
+               if iCount - iAdd < Nth(lStep,QBS_COUNT)
+               {
+                  iCount = Bound(iCount,0,Nth(lStep,QBS_COUNT));
+                  Send(self,@TellProgress,#who=who,#entry=i,#qrow=lQuest,#step=lStep,
+                       #num=iCount);
+               }
+            }
+         }
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////////// items
+
+   HeldItems(who = $)
+   "Everything in who's pack, and in their bags."
+   {
+      local i, oObj, lOut, j;
+
+      lOut = $;
+      foreach i in Send(who,@GetHolderPassive)
+      {
+         oObj = Send(who,@HolderExtractObject,#data=i);
+         lOut = Cons(oObj,lOut);
+         if IsClass(oObj,&Bag)
+         {
+            foreach j in Send(oObj,@GetBagContents)
+            {
+               lOut = Cons(Send(oObj,@HolderExtractObject,#data=j),lOut);
+            }
+         }
+      }
+
+      return lOut;
+   }
+
+   CountHolding(who = $,cls = $)
+   {
+      local i, iCount;
+
+      iCount = 0;
+      foreach i in Send(self,@HeldItems,#who=who)
+      {
+         if IsClass(i,cls)
+         {
+            if IsClass(i,&NumberItem)
+            {
+               iCount = iCount + Send(i,@GetNumber);
+            }
+            else
+            {
+               iCount = iCount + 1;
+            }
+         }
+      }
+
+      return iCount;
+   }
+
+   TakeItems(who = $,cls = $,num = 0)
+   {
+      local i, iLeft, iHave;
+
+      iLeft = num;
+      foreach i in Send(self,@HeldItems,#who=who)
+      {
+         if iLeft > 0 AND IsClass(i,cls)
+         {
+            if IsClass(i,&NumberItem)
+            {
+               iHave = Send(i,@GetNumber);
+               if iHave > iLeft
+               {
+                  Send(i,@SubtractNumber,#number=iLeft);
+                  iLeft = 0;
+               }
+               else
+               {
+                  iLeft = iLeft - iHave;
+                  Send(i,@Delete);
+               }
+            }
+            else
+            {
+               --iLeft;
+               Send(i,@Delete);
+            }
+         }
+      }
+
+      return;
+   }
+
+   FindParcel(who = $,id = $)
+   {
+      local i;
+
+      foreach i in Send(self,@HeldItems,#who=who)
+      {
+         if IsClass(i,&QuestParcel) AND Send(i,@GetQuestId) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   DeleteParcels(who = $,id = $)
+   {
+      local oParcel;
+
+      oParcel = Send(self,@FindParcel,#who=who,#id=id);
+      while oParcel <> $
+      {
+         Send(oParcel,@Delete);
+         oParcel = Send(self,@FindParcel,#who=who,#id=id);
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////////// the admin dashboard
+   // Over the maintenance port (meridian-browser tools/dev/questApi.ts), for trying quests out:
+   //   send object <questbook> AdminGrant who object <player> id int <quest>
+
+   AdminGrant(who = $,id = $)
+   "Admin supported\n"
+   "Gives who quest id at its first step, whatever they've done before."
+   {
+      local lQuest, lEntry;
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      if lEntry <> $
+      {
+         Send(self,@DropEntry,#who=who,#entry=lEntry);
+      }
+
+      Send(self,@StartQuest,#who=who,#qrow=lQuest);
+
+      return TRUE;
+   }
+
+   AdminSetStep(who = $,id = $,step = 1)
+   "Admin supported\n"
+   "Puts who's quest id at a step, its count at 0 (given first if they haven't it)."
+   {
+      local lQuest, lEntry;
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest = $ OR NOT IsClass(who,&User) OR step < 1 OR step > Length(Nth(lQuest,QB_STEPS))
+      {
+         return FALSE;
+      }
+
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      if lEntry = $
+      {
+         Send(self,@StartQuest,#who=who,#qrow=lQuest);
+         lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      }
+
+      Send(self,@DeleteParcels,#who=who,#id=id);
+      SetNth(lEntry,QBL_STEP,step);
+      SetNth(lEntry,QBL_COUNT,0);
+      Send(self,@BeginStep,#who=who,#entry=lEntry,#qrow=lQuest);
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return TRUE;
+   }
+
+   AdminFinishStep(who = $,id = $)
+   "Admin supported\n"
+   "Counts who's current step of quest id as done, ready to hand in (an auto step goes on)."
+   {
+      local lQuest, lEntry, lStep;
+
+      if NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      if lQuest = $ OR lEntry = $
+      {
+         return FALSE;
+      }
+
+      lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(lEntry,QBL_STEP));
+      SetNth(lEntry,QBL_COUNT,Nth(lStep,QBS_COUNT));
+      Send(self,@SendProgress,#who=who,#entry=lEntry);
+      // An auto step goes on by itself, as when it's counted in play
+      if Nth(lStep,QBS_AUTO) = 1
+      {
+         Post(self,@AutoAdvance,#who=who,#id=id,#step=Nth(lEntry,QBL_STEP));
+
+         return TRUE;
+      }
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return TRUE;
+   }
+
+   AdminComplete(who = $,id = $)
+   "Admin supported\n"
+   "Completes quest id for who, with its rewards (given first if they haven't it)."
+   {
+      local lQuest, lEntry;
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      if lEntry = $
+      {
+         Send(self,@StartQuest,#who=who,#qrow=lQuest);
+         lEntry = Send(self,@LogEntry,#who=who,#id=id);
+      }
+
+      Send(self,@DeleteParcels,#who=who,#id=id);
+      Send(self,@Complete,#who=who,#entry=lEntry,#qrow=lQuest);
+
+      return TRUE;
+   }
+
+   AdminReset(who = $,id = 0)
+   "Admin supported\n"
+   "Forgets quest id for who, active or done; id 0 forgets every quest."
+   {
+      local i, lEntry, lDone;
+
+      if NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      if id = 0
+      {
+         foreach i in Send(who,@GetQuestLog)
+         {
+            Send(self,@DeleteParcels,#who=who,#id=First(i));
+         }
+         Send(who,@SetQuestLog,#log=$);
+         Send(who,@SetQuestDone,#done=$);
+      }
+      else
+      {
+         lEntry = Send(self,@LogEntry,#who=who,#id=id);
+         if lEntry <> $
+         {
+            Send(self,@DropEntry,#who=who,#entry=lEntry);
+         }
+
+         lDone = Send(self,@DoneEntry,#who=who,#id=id);
+         if lDone <> $
+         {
+            Send(who,@SetQuestDone,#done=DelListElem(Send(who,@GetQuestDone),lDone));
+         }
+      }
+
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return TRUE;
+   }
+
+   AdminState(who = $)
+   "Admin supported\n"
+   "Who's quests: [ log, done ] (show list <n> to read it)."
+   {
+      if NOT IsClass(who,&User)
+      {
+         return $;
+      }
+
+      return [ Send(who,@GetQuestLog), Send(who,@GetQuestDone) ];
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

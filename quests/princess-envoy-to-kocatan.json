@@ -1,0 +1,40 @@
+{
+  "tier": "main",
+  "id": 146,
+  "key": "princess-envoy-to-kocatan",
+  "name": "An Envoy of the Crown",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 85,
+    "max": 100
+  },
+  "requires": {
+    "faction": "princess",
+    "quests": [
+      143
+    ]
+  },
+  "text": {
+    "offer": "Beyond the orc caves, they say, the descendants of Konima's lost legion still live, in a city by the sea called Ko'catan. If they are real, the crown should be the first to greet them. Carry this letter through the caves to their captain, Cital ko'Manca, and bring them our friendship.",
+    "progress": "Ko'catan lies past the orc caves, on an island. Find Cital ko'Manca there.",
+    "complete": "A letter from a princess of Meridian? Then the stories of the mainland are true. Welcome to Ko'catan, envoy. We have need of friends - and of fighters."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a letter from Princess Kateriina",
+      "turnin": {
+        "class": "KocatanCaptainGood"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 1500
+  }
+}

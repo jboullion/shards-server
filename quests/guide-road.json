@@ -1,0 +1,175 @@
+{
+  "id": 11,
+  "key": "guide-road",
+  "name": "The Road Through Meridian",
+  "tier": "main",
+  "replaces": [
+    "HP30_NEWBIE_CHAIN"
+  ],
+  "giver": {
+    "class": "ShalillePriestess"
+  },
+  "band": {
+    "min": 15,
+    "max": 50
+  },
+  "text": {
+    "offer": "Priestess Xiana says, \"It is wise that you have sought me out. Many new adventurers fall prey to the dangers of this land, but Shal'ille is always watching out for you. If you die, return here as quickly as possible and say 'summon'. I will then retrieve your corpse for you, so that you may safely retrieve your items. If you do not have me summon your corpse, it will remain where you died, and perhaps become looted by scavengers and thieves. To retrieve your items from your corpse, get close to it and right click on it or look at it to open it like a container or chest.I suggest you seek out the town of Jasper, where you can safeguard your money in the Royal Bank. If you encounter trouble along the way, use the 'phase' spell to temporarily protect yourself and ask for help from others.\"",
+    "complete": "Congratulations. You have traveled far and wide across these lands and can now call yourself a true citizen of Meridian."
+  },
+  "steps": [
+    {
+      "kind": "cast",
+      "spell": "Phase",
+      "objective": "Practice Phasing",
+      "rewards": {
+        "xp": 300
+      }
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_JASWEST"
+      ],
+      "auto": true,
+      "objective": "Find the town of Jasper",
+      "brief": "Now that you have mastered phasing, it would be wise to assign it to a hotkey. Monsters and players may not give you much time to react. Use phase to protect yourself on your way to Jasper. As a final note, as long as you are under 50 health, you cannot be attacked by other players and phase will not assess you any penalties for staying phased out too long. Priestess Xiana has suggested you find the town of Jasper, where adventurers may use the Royal Bank to safeguard their hard-earned shillings. Jasper lies far south of Marion, through forests filled with threats appropriate for fledgling explorers. To reach it, leave Marion heading south, and do not deviate to areas east or west, for powerful monsters such as trolls and mollusk creatures lie off the beaten path and will easily slay you. If you get lost, your 'recall' spell will return you to Marion. You may also battle monsters along the way to get stronger. Creatures such as giant rats, centipedes, and living trees are good targets.",
+      "rewards": {
+        "xp": 1000
+      }
+    },
+    {
+      "kind": "deposit",
+      "with": "JasperBanker",
+      "amount": 1,
+      "objective": "Find the Royal Bank",
+      "brief": "The journey was long and fraught with peril, but you've finally found the town of Jasper! Now where in this maze-like place is that Royal Bank? Somewhere within the run-down town of Jasper lies the Royal Bank, run by Yevitan, a mysterious man of few words. Find the Royal Bank among the abandoned buildings and deposit some shillings.",
+      "rewards": {
+        "shillings": 10000
+      }
+    },
+    {
+      "kind": "stash",
+      "with": "JasperVaultman",
+      "objective": "Find the Jasper Vaults",
+      "brief": "Yevitan says, \"Not bad for a fledgling adventurer. I do hope you plan to deposit more than this sum as you grow in strength. Fortunately for you, we're running a new-account special. For doing business with us, here's a ten thousand shilling bonus. Be sure to visit our sister branch in the city of Tos if you find yourself in that area. As for your gear, you'll have to find the vaults across the street to deposit items.\" Yevitan has told you about a Vault business where you can store your gear. He said it is across the street from his Royal Bank. Find Rolan De'nair and make a deposit of gear.",
+      "rewards": {
+        "xp": 250
+      }
+    },
+    {
+      "kind": "cast",
+      "spell": "Conveyance",
+      "objective": "Use your Conveyance spell",
+      "brief": "Rolan De'nair says, \"Always nice to see a new face. Say, have you used the spell Conveyance yet? For a small monetary fee, we run magical portals here that will take stackable items from almost anywhere. Try it now. Watch the magic at work!\" Rolan De'nair has asked you to use your Conveyance spell to practice depositing stackable items at a distance. Make sure you have a few shillings on you, then cast conveyance and target a stackable item in your inventory. Stackable items have numbers on their icons. They are often reagents, such as mushrooms or herbs, but they can also be treasure like emeralds or sapphires.",
+      "rewards": {
+        "xp": 350
+      }
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_CORNOTH"
+      ],
+      "auto": true,
+      "objective": "Find Cor Noth",
+      "brief": "Rolan De'nair tells you, \"We received your item deposit, and you can withdraw it in person at any time. If you're looking for knowledge of the land, you can't beat the university city, Cor Noth. You look like you could use some fight training. Follow the road east out of Jasper and then north as it curves through the woods. I heard there's been some bad weather, so you might have to trek off the beaten path, but when you hit King's Way, you're almost there. Head straight north along King's Way and you'll find Cor Noth! Once you're there, look for Rook, the swordsman.\" Cor Noth is a university town that offers great knowledge to all those willing to learn. To find it, head east out of Jasper and follow the road past the Lake of Jala's Song. Curve north, and venture off the beaten path until you find King's Way. The monsters in the woods are weak and easily fought, but beware the frogmen closer to Cor Noth. Once you see the famous Clock Tower and the ivory walls of academia, you will know you are close.",
+      "rewards": {
+        "xp": 1500
+      }
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "CorNothSergeant"
+      },
+      "objective": "Find Rook in Cor Noth",
+      "brief": "The university city of Cor Noth sprawls open before you. The famed Clock Tower dominates the view. But where does one actually go to learn and study? Cor Noth includes a variety of residents, including a renowned swordsman, a skilled seamstress, a veteran innkeeper, and a merchant from a distant land. Find Rook, the master of weapons who lives in this city. He will instruct you further. When you find him, talk to him (double-click).",
+      "rewards": {
+        "trainingPoints": 600
+      }
+    },
+    {
+      "kind": "cast",
+      "spell": "Meditate",
+      "objective": "Cast your Meditate spell",
+      "brief": "Rook says, \"Hut! Hop to, adventurer. I'll make a soldier out of you yet. Let's spar!\" You've learned much from your training session under the famed swordsman Rook. To use that knowledge, cast the spell Meditate and say the name of a spell or skill you would like to improve. You may purchase skills from trainers like Rook and practice them immediately.",
+      "rewards": {
+        "xp": 400
+      }
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_BAR_SOUTH"
+      ],
+      "auto": true,
+      "objective": "Find Barloque",
+      "brief": "Rook tells you, \"That is how it is done, adventurer. Fight and toughen yourself. Train every day. Become strong, and one day you may even qualify for service under the Princess herself. To that end, I suggest you buy the finest weapons and armor from her Royal City of Barloque. The best blacksmith in the land, Fehr'loi Qan, lives there, and his equipment is always superb.\" Rook has directed you to purchase weapons and armor from the finest blacksmith in the land, Fehr'loi Qan, but first you must find the Royal City of Barloque. From Cor Noth, leave out the north gate, then head east, following the river. Ants and slimes are good enemies along the way, but be wary of spiders.",
+      "rewards": {
+        "xp": 2000
+      }
+    },
+    {
+      "kind": "buy",
+      "with": "BarloqueBlacksmith",
+      "objective": "Find Fehr'loi Qan",
+      "brief": "The Royal City of Barloque is enormous! How are you ever going to find Fehr'loi Qan here? Barloque is a great and shining jewel featuring many high-class businesses. There is a jeweler, a Vault, a guild registrar, a reagent shop, two major inns, the office of the Justicar, and even a jail. The blacksmith operates somewhere within this enormous city, and it is your quest to find him and buy a piece of equipment from him.",
+      "rewards": {
+        "xp": 400
+      }
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_TOS"
+      ],
+      "auto": true,
+      "objective": "Find Tos",
+      "brief": "Fehr'loi Qan says, \"Nothin' but the best here, mind it. They pay me good money for it. That's why I moved up from Tos. Not the undead. Nope. The graveyard didn't bother me one bit, and I'll fight any man who says otherwise. By the way, if you're ever down in Tos, would you mind killing a zombie or two so I can sleep better at night?\" Tos is the oldest city of Meridian, and overrun with thieves and scoundrels. Good thing you've got Fehr'loi Qan's fine weaponry to protect you. Per his request, you should find Tos and help with its zombie problem. To reach it from Barloque, head out the south gate, find the Flatlands, and travel southeast through the Border of the Badlands. In this barren area you must run quickly, for trolls and groundworms are dangerous indeed. Once you've made it through, you will find the Main Gate to the City of Tos to the east.",
+      "rewards": {
+        "xp": 3000
+      }
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "TosInnKeeper"
+      },
+      "objective": "Enter Familiars",
+      "brief": "Tos is a worn-down and barren place, but good music and cheer seem to be coming from a bar across the square. Enter the greatest bar in the land, Familiars and talk to the bartender (double-click) about the zombie problem."
+    },
+    {
+      "kind": "kill",
+      "target": "Zombie",
+      "count": 1,
+      "rooms": [
+        "RID_TOS_GRAVEYARD"
+      ],
+      "auto": true,
+      "objective": "Cleanse the Graveyard",
+      "brief": "Paddock says, \"Ah, yes, quite the racket at night. Zombies rise in the Tos Graveyard to the west during the dark hours. We could certainly do with some sword-born salvation over there. There might even be a little bit of money in it for you, since the undead won't be scaring away customers anymore.\" During the night, the undead rise up in the Tos Graveyard on the west side of the city. Beware the powerful skeletons. If you can manage to defeat a zombie, Paddock will reward you handsomely.",
+      "rewards": {
+        "shillings": 20000
+      }
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_COR_GEN_HALL"
+      ],
+      "auto": true,
+      "objective": "Find the Hall of Genealogy",
+      "brief": "Paddock tells you, \"Nice work if I do say so myself. Here's a little something for that dirty job. This might be a longshot, but would you travel to Cor Noth and see if there's anything in Tos' history that might be causing our undead to rise?\" Paddock has asked you to visit Cor Noth's Hall of Genealogy and research whether there is something in the history of Tos that is causing its undead to rise. Cor Noth is the central city of the mainland, northwest of Tos, southwest of Barloque, east of Marion, and northeast of Jasper."
+    },
+    {
+      "kind": "hometown",
+      "objective": "Choose a Hometown",
+      "brief": "The number of books in this enormous edifice is overwhelming! How could you possibly find anything useful in these thousands of tomes? The only mention of undead in any of these books is in reference to a place called Castle Victoria. It seems Paddock's request is an impossible one for now, but you may still learn something useful here. Find and read the histories of the cities inside the Hall of Genealogy. Of the five major cities, choose a hometown, and truly become a citizen of this land. The town you choose will reflect itself in you, and it will become the destination of your 'recall' spell.",
+      "rewards": {
+        "xp": 5000
+      }
+    }
+  ],
+  "rewards": {}
+}

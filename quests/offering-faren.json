@@ -1,0 +1,39 @@
+{
+  "id": 85,
+  "key": "offering-faren",
+  "name": "An Offering to Faren",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_FAREN_OFFERING"
+  ],
+  "giver": {
+    "class": "FarenPriestess"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Child of our Mistress of the Wilds, will you give of yourself so that your Mother may be stronger? Worship with me, then. Together, we will draw upon our own life essence to form a symbol of the power of nature. Incant these words with me: By the earth, the winds, the seas, and the fire inside, I summon thee, Faren, Mistress of the Wilds.",
+    "complete": "Behold, the Turbulence of Nature manifest! Go now, carry forth the power of our Mistress into the world! Placed at one of the Shrines around the world, it will dedicate the Shrine to Faren."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "objective": "Chant the words with them",
+      "turnin": {
+        "class": "FarenPriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "OfferingFaren"
+      }
+    ]
+  }
+}

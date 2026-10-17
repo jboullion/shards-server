@@ -1,0 +1,99 @@
+{
+  "id": 43,
+  "key": "errand-catering",
+  "name": "The Councillor's Party",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_PARTY"
+  ],
+  "giver": {
+    "class": "OneCouncilor",
+    "rooms": [
+      36
+    ]
+  },
+  "band": {
+    "min": 0,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Perhaps you can help me. I am having a private party and my errand boy has become ill. Will you help me by delivering the food? Pritchett, at the inn in Barloque, is catering the party and knows where the food needs to go: just ask him about the catering assignment. You will be amply rewarded when you have completed the delivery. Please hurry.",
+    "complete": "Ah, what a mouthwatering spread! Here is your commission. I thank you for your speed."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "BarloqueInnkeeper"
+      },
+      "objective": "Ask Pritchett about the catering"
+    },
+    {
+      "kind": "deliver",
+      "parcel": "the food for the party",
+      "turnin": {
+        "class": "ThreeCouncilor",
+        "rooms": [
+          563
+        ]
+      },
+      "brief": "Yes, the party! I was worried no one would show up! Here is the food. Please take it to Councillor Cylill; setting up the party is up to her. Please don't lose track of the food: this business is very important to me."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 1300
+      },
+      {
+        "class": "Shillings",
+        "count": 1400
+      },
+      {
+        "class": "Shillings",
+        "count": 1500
+      },
+      {
+        "class": "Shillings",
+        "count": 1600
+      },
+      {
+        "class": "Shillings",
+        "count": 1700
+      },
+      {
+        "class": "Shillings",
+        "count": 1800
+      },
+      {
+        "class": "Shillings",
+        "count": 1900
+      },
+      {
+        "class": "Shillings",
+        "count": 2000
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 25
+      },
+      {
+        "class": "SilverArrow",
+        "count": 30
+      },
+      {
+        "class": "BaitPotion"
+      },
+      {
+        "class": "DetectGoodPotion"
+      },
+      {
+        "class": "DetectEvilPotion"
+      }
+    ]
+  }
+}

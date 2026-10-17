@@ -1,0 +1,56 @@
+{
+  "id": 111,
+  "key": "errand-bowmaker-good",
+  "name": "A Feather by Trade",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_BOW_MAKER_GOOD"
+  ],
+  "giver": {
+    "class": "KocatanBowMaker"
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "requires": {
+    "karmaMin": 1
+  },
+  "repeat": {
+    "cooldownHours": 3
+  },
+  "text": {
+    "offer": "I use special materials to make my best arrows. The tailfeathers of an avar magician are reputed to offer magical properties to any arrow they fletch. Go, see if you can find an avar willing to trade a tailfeather for something they find precious. The bone priestess might take a chunk of nerudite ore for one.",
+    "complete": "Thanks. Here, take this scrap of metal as your reward."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "NeruditeOreChunk",
+      "count": 1,
+      "turnin": {
+        "class": "KocatanBonePriestess"
+      },
+      "rewards": {
+        "items": [
+          {
+            "class": "AvarShamanFeather"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "collect",
+      "item": "AvarShamanFeather",
+      "count": 1,
+      "brief": "Nyuk nyuk uk ak a-ak!"
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "SwordShardD"
+      }
+    ]
+  }
+}

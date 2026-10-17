@@ -1,0 +1,46 @@
+{
+  "id": 81,
+  "key": "disciple-faren",
+  "name": "Disciple of Faren",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_FAREN_DISCIPLE"
+  ],
+  "giver": {
+    "class": "FarenPriestess"
+  },
+  "band": {
+    "min": 20,
+    "max": 150
+  },
+  "text": {
+    "offer": "You wish the blessing of the land through our Lord Faren. You must prove that you are worthy of his blessings. Take this message to Tova, the bartender of Marion: \"You have defiled the land with your ways. The land gives life, yet you treat it as the enemy to be conquered. Embrace nature, do not spurn it like a forgotten lover. Repent your ways. Follow the words of Faren.\" Return quick to notify me when you are done and perhaps Faren will favor you with power.",
+    "complete": "The gaze of Faren is upon you. You have done well. Seek me when you would learn more of his ways and his spells."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionBartender"
+      },
+      "objective": "Bring Faren's words to Tova in Marion"
+    },
+    {
+      "kind": "talk",
+      "brief": "Tova sighs, \"Here we go again.\"",
+      "objective": "Return to Priestess Tenuv'vyal",
+      "turnin": {
+        "class": "FarenPriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "items": [
+      {
+        "class": "DiscipleRobe",
+        "school": "faren"
+      }
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": 61,
+  "key": "story-aphrodisiac",
+  "name": "A Delicate Matter",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_APHRODISIAC"
+  ],
+  "giver": {
+    "class": "Barloquetailor"
+  },
+  "band": {
+    "min": 40,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Yes, I desperately need a courier! I will try to put this delicately. I am having... uh... problems with... well, man problems. I am told that Joguer, the apothecary, knows of a powerful aphrodisiac. Please, make haste and ask him of it.",
+    "complete": "You are my savior. Bless you. Here, take this as a token of my thanks."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "BarloqueApothecary"
+      },
+      "objective": "Ask Joguer about the aphrodisiac"
+    },
+    {
+      "kind": "collect",
+      "item": "SpiderEgg",
+      "count": 1,
+      "turnin": {
+        "class": "BarloqueApothecary"
+      },
+      "objective": "The egg of a queen spider",
+      "brief": "Yes, I know of a powerful aphrodisiac: the egg of a queen spider. Fetch me one, and I shall prepare a potion for her."
+    },
+    {
+      "kind": "deliver",
+      "parcel": "an aphrodisiac potion",
+      "turnin": {
+        "class": "Barloquetailor"
+      },
+      "brief": "A fine specimen! Deliver this potion to Madelia. I am sure she will be pleased with the results."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 1400
+      },
+      {
+        "class": "Shillings",
+        "count": 1600
+      },
+      {
+        "class": "Shillings",
+        "count": 1800
+      },
+      {
+        "class": "Shillings",
+        "count": 2000
+      }
+    ]
+  }
+}

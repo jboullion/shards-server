@@ -1,0 +1,50 @@
+{
+  "id": 34,
+  "key": "underworld-key-throne-room",
+  "name": "A Key to the Throne Room",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_THRONEROOM_KEY"
+  ],
+  "giver": {
+    "class": "Kailor"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Help? Yes, I could use some help. A certain someone, or rather something, is running wild around here. Go and kill Vozun for me, and I'll give you the key to Castle Victoria's throne room.",
+    "progress": "Return to Kailor once it's done.",
+    "complete": "Finally. Good job getting rid of them! Here is the key to the throne room."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Vozun",
+      "count": 1
+    },
+    {
+      "kind": "kill",
+      "target": "Croco",
+      "count": 1,
+      "brief": "Got him? Great. He has a brother: find him as well. Go and kill Croco for me."
+    },
+    {
+      "kind": "kill",
+      "target": "Dulahan",
+      "count": 1,
+      "brief": "Good, you're quite the warrior! Find Dulahan and slay him!"
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "Throne2Key"
+      }
+    ]
+  }
+}

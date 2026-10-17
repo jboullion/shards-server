@@ -1,0 +1,97 @@
+{
+  "id": 42,
+  "key": "errand-bar-restock",
+  "name": "Restocking the Bar",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_BAR_RESTOCK"
+  ],
+  "giver": {
+    "class": "JasperBartender"
+  },
+  "band": {
+    "min": 0,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Yes, I'm running very low on supplies. Meidei, at the bar in Barloque, knows what I need and it's already paid for. Just ask her about the shipment, and make haste!",
+    "complete": "Thank you, you have done me a great service this day. Take this small token of my thanks."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "BarloqueBartender"
+      },
+      "objective": "Ask Meidei about the shipment"
+    },
+    {
+      "kind": "deliver",
+      "parcel": "a shipment of goblets",
+      "turnin": {
+        "class": "JasperBartender"
+      },
+      "brief": "Ah yes, the shipment is ready for delivery. Make haste with these goblets back to Pietro, and no dishonesty now."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 1400
+      },
+      {
+        "class": "Shillings",
+        "count": 1500
+      },
+      {
+        "class": "Shillings",
+        "count": 1600
+      },
+      {
+        "class": "Shillings",
+        "count": 1700
+      },
+      {
+        "class": "Shillings",
+        "count": 1800
+      },
+      {
+        "class": "Shillings",
+        "count": 1900
+      },
+      {
+        "class": "Shillings",
+        "count": 2000
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 25
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 35
+      },
+      {
+        "class": "SilverArrow",
+        "count": 25
+      },
+      {
+        "class": "SilverArrow",
+        "count": 35
+      },
+      {
+        "class": "Book"
+      },
+      {
+        "class": "ShadowformPotion"
+      },
+      {
+        "class": "KaraholsCursePotion"
+      }
+    ]
+  }
+}

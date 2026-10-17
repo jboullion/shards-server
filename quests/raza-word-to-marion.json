@@ -1,0 +1,35 @@
+{
+  "id": 123,
+  "key": "raza-word-to-marion",
+  "name": "Word to Marion",
+  "tier": "main",
+  "giver": {
+    "class": "RazaElder"
+  },
+  "band": {
+    "min": 25,
+    "max": 35
+  },
+  "requires": {
+    "quests": [
+      10
+    ]
+  },
+  "text": {
+    "offer": "With the shadow mummy gone, Raza can sleep again. But this was no accident: something is calling the dead up all across Meridian. My cousin Ran er'Hoth, the elder of Marion, has written of the same trouble in the crypt behind his hut. Take him this letter, and help him as you helped us. Marion is across the water, on the mainland.",
+    "complete": "Rodric sends you? Then you are welcome here. His letter says the same as I've feared: it isn't only Marion."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a letter for Ran er'Hoth",
+      "turnin": {
+        "class": "MarionElder"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 75
+  }
+}

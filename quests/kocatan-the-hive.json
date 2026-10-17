@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 153,
+  "key": "kocatan-the-hive",
+  "name": "The Hive",
+  "giver": {
+    "class": "KocatanInnkeeper"
+  },
+  "band": {
+    "min": 110,
+    "max": 130
+  },
+  "requires": {
+    "quests": [
+      150
+    ]
+  },
+  "text": {
+    "offer": "The swarms keep coming back, and now I know why: queens. Great bloated things that breed them up in the cliff hive. Kill three of the queens and the swarms will thin for good.",
+    "progress": "The dragonfly queens nest in the cliff hive, and one has been seen outside the mad scientist's hut.",
+    "complete": "No more queens, no more swarms. You've done Ko'catan a great service - and my business."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DragonFlyQueen",
+      "count": 3,
+      "rooms": [
+        2111,
+        2135
+      ],
+      "objective": "Dragonfly queens slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 1500
+  }
+}

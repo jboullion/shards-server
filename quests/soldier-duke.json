@@ -1,0 +1,48 @@
+{
+  "id": 77,
+  "key": "soldier-duke",
+  "name": "A Soldier of the Duke",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_DUKE_SOLDIER"
+  ],
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "text": {
+    "offer": "Yes, perhaps you'll do. Prove your loyalty by murdering one of the rebels. You can usually find some guarding a flagpole. Come back afterwards to tell of your deeds.",
+    "progress": "Duke Akardius will allow you to join the Ducal army, but first you must prove your loyalty by slaying his enemies at the flagpoles.",
+    "complete": "You have done well, my soldier. Join the ranks of the elite and bring my influence and power to those in this land!"
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "RebelTroop",
+      "count": 1
+    },
+    {
+      "kind": "kill",
+      "target": "PrincessTroop",
+      "count": 1,
+      "brief": "Excellent. Now, show your contempt for my enemies by murdering one of the Princess's soldiers. Return to me when you are done to let me know the deed is done."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "items": [
+      {
+        "class": "DukeShield"
+      }
+    ]
+  }
+}

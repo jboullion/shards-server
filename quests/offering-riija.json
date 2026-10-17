@@ -1,0 +1,39 @@
+{
+  "id": 87,
+  "key": "offering-riija",
+  "name": "An Offering to Riija",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_RIIJA_OFFERING"
+  ],
+  "giver": {
+    "class": "RiijaMonk"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Lord Fool wishes to fortify you. Will you chant with me? Incant these words with me: Your words speak wisdom through me, Lord Riija. Feel your power grow with every word spoken.",
+    "complete": "Behold, the double-edged blessing of Riija. Bear it forth into the world and reap the chaos it sows! Placed at one of the Shrines around the world, it will dedicate the Shrine to Riija."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "objective": "Chant the words with them",
+      "turnin": {
+        "class": "RiijaMonk"
+      }
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "OfferingRiija"
+      }
+    ]
+  }
+}

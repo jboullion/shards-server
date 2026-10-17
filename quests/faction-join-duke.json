@@ -1,0 +1,43 @@
+{
+  "id": 70,
+  "key": "faction-join-duke",
+  "name": "The Duke's Trust",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_DUKE_JOIN"
+  ],
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "neutral",
+    "intriguing": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "So, you wish to prove yourself worthy of my trust? You can begin by bringing me a ruby.",
+    "progress": "Duke Akardius has asked you to bring him a ruby, to prove yourself worthy of his trust.",
+    "complete": "Ah, good work. Your service to our cause will not go unnoticed. You have earnt my trust, and are now a member of my faction."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "Ruby",
+      "count": 1,
+      "objective": "A ruby for the Duke"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "joinFaction": "duke"
+  }
+}

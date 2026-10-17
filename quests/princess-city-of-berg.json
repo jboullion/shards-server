@@ -1,0 +1,37 @@
+{
+  "tier": "main",
+  "id": 189,
+  "key": "princess-city-of-berg",
+  "name": "The City of Berg",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 130
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "Past the bandit country lies Berg, a city of its own with its own king, Aaron Leone. Meridian should have friends there. Find the city and take this to the king.",
+    "progress": "Berg lies past the hills and the trader's route, beyond the bandit country.",
+    "complete": "Princess Kateriina sends greetings? Then welcome to Berg. We have troubles enough in the lands around us; perhaps you can help with them."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a letter from Princess Kateriina",
+      "turnin": {
+        "class": "BergLeaderM"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 2000
+  }
+}

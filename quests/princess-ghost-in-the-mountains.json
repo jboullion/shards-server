@@ -1,0 +1,37 @@
+{
+  "tier": "main",
+  "id": 161,
+  "key": "princess-ghost-in-the-mountains",
+  "name": "The Ghost in the Mountains",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 130
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "Queen Venya'cyr's city of Brax lies buried under the Cragged Mountains, and from it the dead rise to trouble my people. My mages tell of a ghost in those mountains, the druid Tendrath, who has watched over Brax for an age. Seek him out; he will know how to enter.",
+    "progress": "Tendrath haunts the Cragged Mountains, outside the ancient place where Brax lies buried.",
+    "complete": "The Princess has sent you? Then the crown remembers Brax. Good. I have waited long for help."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "HunterGhost"
+      },
+      "objective": "Find Tendrath in the Cragged Mountains"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 2000
+  }
+}

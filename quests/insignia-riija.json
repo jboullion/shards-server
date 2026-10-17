@@ -1,0 +1,36 @@
+{
+  "id": 93,
+  "key": "insignia-riija",
+  "name": "The Sign of Riija",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_MONK_INSIGNIA"
+  ],
+  "giver": {
+    "class": "RiijaMonk"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "guildShield": true
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "I see you have an unmarked shield. I am more than willing to offer my insignia, provided you offer me a tithe. I have heard about a passage to another world opening up. I am interested in the magical reagents from that land - perhaps their emergence will result in the strengthening of magic for faithmages like you and I. Go and find me 20 of them. Wear the shield you would like the insignia on, if you carry more than one.",
+    "complete": "Excellent. The Trickster thanks you for your benevolence."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "BlueDragonScale",
+      "count": 20
+    }
+  ],
+  "rewards": {
+    "insignia": "riija"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": 1,
+  "key": "cellar-rats",
+  "name": "Rats in the Cellar",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_FAMS_RATS"
+  ],
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 0,
+    "max": 40
+  },
+  "repeat": null,
+  "timeLimitMinutes": null,
+  "text": {
+    "offer": "Problems? Yes, I've got a few right now. A bunch of rodents have been running around the cellar lately. I'd be in your debt if you dealt with them for me. Start with the small rats: twenty of them should do.",
+    "progress": "Those rats won't clear themselves out of my cellar.",
+    "complete": "Finally! Good job getting rid of those rodents. Have a drink on the house, and take this for your trouble."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "SmallRat",
+      "count": 20,
+      "objective": "Small rats slain"
+    },
+    {
+      "kind": "kill",
+      "target": "GiantRatSoldier",
+      "count": 15,
+      "objective": "Rat soldiers slain",
+      "brief": "Got the little ones? Good, but I've seen bigger ones down there as well. Go and kill fifteen of the rat soldiers for me."
+    },
+    {
+      "kind": "kill",
+      "target": "GiantRatKing",
+      "count": 1,
+      "objective": "The rat king slain",
+      "brief": "Still alive, eh? Those rats have to be coming from somewhere. Find their leader and take him out: that'll put a stop to them."
+    }
+  ],
+  "rewards": {
+    "xp": 300,
+    "shillings": 50,
+    "items": [
+      {
+        "class": "InkyCap",
+        "count": 2
+      }
+    ]
+  }
+}

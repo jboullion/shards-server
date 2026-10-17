@@ -1,0 +1,81 @@
+{
+  "id": 41,
+  "key": "errand-apothecary",
+  "name": "Reagents for Joguer",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_APOTHECARY"
+  ],
+  "giver": {
+    "class": "TosApothecary"
+  },
+  "band": {
+    "min": 25,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Joguer, the apothecary of Barloque, has run out of stock and has need of these reagents. Please take them to him. I have made arrangements for Joguer to pay you for your time.",
+    "complete": "Thank you for your prompt delivery. Business has been booming lately! I wonder why? Oh well, here is your pay. Perhaps stop back later if you are interested in performing this service again."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a bundle of reagents",
+      "turnin": {
+        "class": "BarloqueApothecary"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 600
+      },
+      {
+        "class": "Shillings",
+        "count": 650
+      },
+      {
+        "class": "Shillings",
+        "count": 600
+      },
+      {
+        "class": "Shillings",
+        "count": 650
+      },
+      {
+        "class": "Shillings",
+        "count": 600
+      },
+      {
+        "class": "Shillings",
+        "count": 750
+      },
+      {
+        "class": "Shillings",
+        "count": 700
+      },
+      {
+        "class": "Shillings",
+        "count": 750
+      },
+      {
+        "class": "Shillings",
+        "count": 800
+      },
+      {
+        "class": "Book"
+      },
+      {
+        "class": "DetectInvisibilityPotion"
+      },
+      {
+        "class": "NightVisionPotion"
+      }
+    ]
+  }
+}

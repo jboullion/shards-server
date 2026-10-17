@@ -1,0 +1,40 @@
+{
+  "tier": "main",
+  "id": 147,
+  "key": "rebel-allies-past-the-caves",
+  "name": "Allies Past the Caves",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 85,
+    "max": 100
+  },
+  "requires": {
+    "faction": "rebel",
+    "quests": [
+      145
+    ]
+  },
+  "text": {
+    "offer": "The people who traded steel to the orcs live on an island past the caves - Ko'catan, they call it. Their captain Xacal ko'Ixca doesn't care who rules the mainland, which makes him exactly the man I want to talk to. Take him this, and tell him the rebels are open for business.",
+    "progress": "Ko'catan lies past the orc caves, on an island. Find Xacal ko'Ixca there.",
+    "complete": "Jonas D'Accor. I've heard the name. A man who fights kings? Then perhaps we understand each other. Stay a while - Ko'catan has work for someone who knows how to use a blade."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a message from Jonas D'Accor",
+      "turnin": {
+        "class": "KocatanCaptainEvil"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 1500
+  }
+}

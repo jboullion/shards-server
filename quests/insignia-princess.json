@@ -1,0 +1,53 @@
+{
+  "id": 95,
+  "key": "insignia-princess",
+  "name": "The Insignia of Princess Kateriina",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_FACTION_INSIGNIA"
+  ],
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "princess",
+    "guildShield": true
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "I see you have a shield with colors, but no insignia. If you would care to earn mine, I have a mission for you. In the midst of this political chaos, subjects openly consort against me. Fortunately, I have spies in place which keep an eye on their connivings. Reportedly, Lady Aftyn has been conferring with Drechx, and I am naturally quite intrigued by whatever they talked about. Mention that person's name to Lady Aftyn, and repeat for me word for word what is told to you.",
+    "complete": "Hmmm, fascinating. I will have my spies scry further, but your information has provided the insight that I required. Here, please accept my insignia as a token of my appreciation."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "objective": "Ask Lady Aftyn about Drechx"
+    },
+    {
+      "kind": "talk",
+      "brief": "Lady Aftyn says, \"Uh... I don't really know what you're talking about.\"",
+      "objective": "Tell Princess Kateriina what was said",
+      "turnin": {
+        "class": "PrincessLiege",
+        "rooms": [
+          852
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "insignia": "princess"
+  }
+}

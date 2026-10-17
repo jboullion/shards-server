@@ -1,0 +1,33 @@
+{
+  "id": 121,
+  "key": "raza-restless-graves",
+  "name": "Restless Graves",
+  "tier": "main",
+  "giver": {
+    "class": "RazaElder"
+  },
+  "band": {
+    "min": 20,
+    "max": 30
+  },
+  "text": {
+    "offer": "You've arrived at a troubled time. The dead in our mausoleum, on the north side of town, no longer rest. Mummies walk its halls, and the townsfolk are afraid to tend the graves. Put eight of them back to rest, and then we'll talk about what's stirring them.",
+    "progress": "The mausoleum is on the north side of Raza.",
+    "complete": "Eight fewer of them. But something is waking them, and I fear I know what. Come, listen."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Mummy",
+      "count": 8,
+      "rooms": [
+        306
+      ],
+      "objective": "Mummies put to rest"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 50
+  }
+}

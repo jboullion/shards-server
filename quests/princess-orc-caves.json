@@ -1,0 +1,61 @@
+{
+  "tier": "main",
+  "id": 142,
+  "key": "princess-orc-caves",
+  "name": "The Orc Wizards' Magic",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 70,
+    "max": 90
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "My court mages feel a dark magic gathering beneath the Twisted Woods. They trace it to the orc caves, and to the wizards who lead the orcs there. I would have thee go down and break their strength: begin with fifteen of their warriors, so that the wizards have no shield.",
+    "progress": "The orc caves lie behind an illusionary wall in a cave west of Tos. Thou must dispel the illusion to pass.",
+    "complete": "My mages say the gathering magic falters. Thou hast done the crown a great service."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "CaveOrc",
+      "count": 15,
+      "rooms": [
+        2500,
+        2501,
+        2502,
+        2504,
+        2505,
+        2507,
+        2508
+      ],
+      "objective": "Cave orcs slain"
+    },
+    {
+      "kind": "kill",
+      "target": "OrcWizard",
+      "count": 10,
+      "rooms": [
+        2500,
+        2501,
+        2502,
+        2504,
+        2505,
+        2507,
+        2508
+      ],
+      "objective": "Orc wizards slain",
+      "brief": "Now the wizards themselves. Ten of them, and their magic will scatter."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 500
+  }
+}

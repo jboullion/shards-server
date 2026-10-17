@@ -1,0 +1,73 @@
+{
+  "id": 51,
+  "key": "story-hypochondriac",
+  "name": "Frisconar's Ailments",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_HYPOCHONDRIAC"
+  ],
+  "giver": {
+    "class": "TosApothecary"
+  },
+  "band": {
+    "min": 0,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Thank the gods you're here! I think I'm dying! I've got pelagalosilis! Go to Lady Aftyn, the healer in Marion, and ask her about a cure for it!",
+    "complete": "Oh, thank the gods! I... I was seeing stars! The light at the end of the tunnel! I'm alive! Here, take this: I owe it to you for saving my life!"
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "objective": "Ask Lady Aftyn about a cure"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "BarloqueApothecary"
+      },
+      "objective": "Ask Joguer for a Sacchaqua potion",
+      "brief": "Ah, he's dying, eh? Well, why don't you go to Joguer in Barloque and say that Frisconar needs another Sacchaqua potion."
+    },
+    {
+      "kind": "deliver",
+      "parcel": "a Sacchaqua potion",
+      "turnin": {
+        "class": "TosApothecary"
+      },
+      "brief": "How very amusing. You would think an accomplished apothecary like Frisconar would know that this is nothing more than sugar water. Well, take this to him."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "ScaleArmor"
+      },
+      {
+        "class": "PlateArmor"
+      },
+      {
+        "class": "FineLute"
+      },
+      {
+        "class": "Rose"
+      },
+      {
+        "class": "BerserkerRing"
+      },
+      {
+        "class": "Gauntlet"
+      },
+      {
+        "class": "EnfeebleWand"
+      }
+    ]
+  }
+}

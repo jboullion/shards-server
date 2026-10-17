@@ -1,0 +1,42 @@
+{
+  "tier": "main",
+  "id": 221,
+  "key": "castle-victoria-knights",
+  "name": "Far'Nohl's Knights",
+  "giver": {
+    "class": "fourCouncilor",
+    "rooms": [
+      2
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 125
+  },
+  "requires": {
+    "quests": [
+      220
+    ]
+  },
+  "text": {
+    "offer": "Far'Nohl's knights swore to serve him beyond death, and they keep that oath still, in his chambers at the top of the castle. Free ten of them from it.",
+    "progress": "The undead knights guard Far'Nohl's Chambers, at the top of Castle Victoria.",
+    "complete": "Ten oaths broken. They'll rest now, I hope."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "KnightA",
+      "count": 10,
+      "rooms": [
+        37
+      ],
+      "inRooms": true,
+      "objective": "Undead knights slain in Far'Nohl's Chambers"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3000
+  }
+}

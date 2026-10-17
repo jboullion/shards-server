@@ -1,0 +1,99 @@
+{
+  "id": 40,
+  "key": "errand-ore",
+  "name": "Ore for Quintor",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_ORE"
+  ],
+  "giver": {
+    "class": "BarloqueBlacksmith"
+  },
+  "band": {
+    "min": 25,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Quintor, down in Jasper, has run out of ore. Take this ore to him, and quickly. It would be unwise to betray me. Quintor will pay you for your troubles.",
+    "complete": "Thank you for the ore. Here is your reward. Perhaps we can do business again."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a chunk of ore",
+      "turnin": {
+        "class": "JasperBlacksmith"
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Shillings",
+        "count": 500
+      },
+      {
+        "class": "Shillings",
+        "count": 300
+      },
+      {
+        "class": "Shillings",
+        "count": 400
+      },
+      {
+        "class": "Shillings",
+        "count": 600
+      },
+      {
+        "class": "Shillings",
+        "count": 450
+      },
+      {
+        "class": "Shillings",
+        "count": 650
+      },
+      {
+        "class": "Shillings",
+        "count": 750
+      },
+      {
+        "class": "Shillings",
+        "count": 550
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 25
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 35
+      },
+      {
+        "class": "SilverArrow",
+        "count": 25
+      },
+      {
+        "class": "SilverArrow",
+        "count": 35
+      },
+      {
+        "class": "Axe"
+      },
+      {
+        "class": "MysticSword"
+      },
+      {
+        "class": "StrengthPotion"
+      },
+      {
+        "class": "HastePotion"
+      },
+      {
+        "class": "MagicShieldPotion"
+      }
+    ]
+  }
+}

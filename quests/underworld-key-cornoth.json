@@ -1,0 +1,50 @@
+{
+  "id": 31,
+  "key": "underworld-key-cornoth",
+  "name": "A Key to Cor Noth",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_CORNOTH_KEY"
+  ],
+  "giver": {
+    "class": "Amerantha"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "Help? Yes, I could use some help. Joline lets her overgrown offspring run around all over the place, and I can't stand seeing them. Cull them and I will give you a key to Cor Noth. Go and kill five red hydras for me.",
+    "progress": "Return to Amerantha once it's done.",
+    "complete": "Finally. Good job getting rid of those reptiles! Here is the key to Cor Noth, as I promised."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "RedHydra",
+      "count": 5
+    },
+    {
+      "kind": "kill",
+      "target": "GreenHydra",
+      "count": 5,
+      "brief": "Got some of the red ones? Good. I've seen green ones around as well. Go and kill five green hydras for me."
+    },
+    {
+      "kind": "kill",
+      "target": "BlackHydra",
+      "count": 5,
+      "brief": "Good. There are some darker ones out there, a little harder to see, but I have caught a few of them in the town before. Go and kill five black hydras for me."
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "CorNothKey"
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": 130,
+  "key": "cornoth-river-source",
+  "name": "The River's Source",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 42,
+    "max": 52
+  },
+  "text": {
+    "offer": "My water comes from the River Ille, and the source is choked with fungus beasts. The water's started to taste of them. Kill a dozen up at the river's source, would you? My customers are complaining.",
+    "progress": "The source of the River Ille is north-east of Cor Noth.",
+    "complete": "Ah, I can taste the difference already. Here you are."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "FungusBeast",
+      "count": 12,
+      "rooms": [
+        563
+      ],
+      "objective": "Fungus beasts slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 150
+  }
+}

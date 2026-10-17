@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 220,
+  "key": "castle-victoria-bones",
+  "name": "Bones of the Castle",
+  "giver": {
+    "class": "fourCouncilor",
+    "rooms": [
+      2
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 75
+  },
+  "text": {
+    "offer": "Castle Victoria was the seat of kings, once. Now its halls are full of the walking bones of Far'Nohl's court. I'd see the place cleansed - start with fifteen of the skeletons in its halls, and we'll talk about what lies deeper.",
+    "progress": "The skeletons walk the halls of Castle Victoria and the rooms upstairs.",
+    "complete": "Fifteen. The castle is a little quieter. But Far'Nohl's guard still holds the upper rooms."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Skeleton",
+      "exact": true,
+      "count": 15,
+      "rooms": [
+        38,
+        39
+      ],
+      "inRooms": true,
+      "objective": "Skeletons destroyed in Castle Victoria"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 1000
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "tier": "main",
+  "id": 222,
+  "key": "castle-victoria-tusked-guard",
+  "name": "The Tusked Guard",
+  "giver": {
+    "class": "fourCouncilor",
+    "rooms": [
+      2
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 125
+  },
+  "requires": {
+    "quests": [
+      220
+    ]
+  },
+  "text": {
+    "offer": "The antechamber before the throne room is held by the tusked dead, Far'Nohl's last guard. Destroy ten of them, and the way to the throne lies open.",
+    "progress": "The tusked skeletons guard the antechamber of Castle Victoria, before the throne room.",
+    "complete": "The antechamber is clear. Beyond it, the throne - and the king who sat on it."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "TuskedSkeleton",
+      "count": 10,
+      "rooms": [
+        40
+      ],
+      "inRooms": true,
+      "objective": "Tusked skeletons destroyed in the antechamber"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3000
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "tier": "main",
+  "id": 212,
+  "key": "rebel-marion-crypts",
+  "name": "The Depths of the Marion Crypts",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 130,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "Beneath Marion's crypt, past the resting place of its ancestors, there are deeper chambers: the Affirmation of the Forsaken, and the laboratory of the mad brothers. Something they made down there still lives - thrashers, horrors of claw and muscle. Kill eight. Take friends: this is no task for one.",
+    "progress": "The thrashers haunt the deepest chambers of the Marion crypts: the Affirmation of the Forsaken and the laboratory of the mad brothers.",
+    "complete": "Eight thrashers. Whatever those brothers made, it will think twice before crawling out."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Thrasher",
+      "count": 8,
+      "rooms": [
+        2602,
+        2603
+      ],
+      "objective": "Thrashers slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 12000
+  }
+}

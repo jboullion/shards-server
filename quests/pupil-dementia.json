@@ -1,0 +1,40 @@
+{
+  "id": 99,
+  "key": "pupil-dementia",
+  "name": "Afiera D'xor's Pupil",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_DEMENTIA_SPELL"
+  ],
+  "giver": {
+    "class": "JasperElder"
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "text": {
+    "offer": "I can teach you the little I know of the mystical arts, but I need a favor. I urgently need to get this vial of sacchaqua to Frisconar, but am reluctant to approach him. You see, Frisconar is of late afflicted by some unwholesome force which seems to feed off human energy. Make your meeting brief and perhaps you can avoid these effects.",
+    "complete": "Ah, you have returned from your errand. You have done well. You have proved yourself worthy of my teachings. Come back when you want to learn the \"dement\" spell."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a vial of sacchaqua",
+      "turnin": {
+        "class": "TosApothecary"
+      }
+    },
+    {
+      "kind": "talk",
+      "brief": "Thank you. I hope that this will help me dispel the force of which you were warned. Go now, unless you wish to be so afflicted as well.",
+      "objective": "Return to Afiera D'xor",
+      "turnin": {
+        "class": "JasperElder"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1
+  }
+}

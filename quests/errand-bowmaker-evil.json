@@ -1,0 +1,40 @@
+{
+  "id": 112,
+  "key": "errand-bowmaker-evil",
+  "name": "A Feather by Force",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_BOW_MAKER_EVIL"
+  ],
+  "giver": {
+    "class": "KocatanBowMaker"
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "requires": {
+    "karmaMax": -1
+  },
+  "repeat": {
+    "cooldownHours": 3
+  },
+  "text": {
+    "offer": "I use special materials to make my best arrows. The tailfeathers of an avar magician are reputed to offer magical properties to any arrow they fletch. Go, kill avar shamans until you find one which offers a suitably undamaged tailfeather.",
+    "complete": "Thanks. Here, take this scrap of metal as your reward."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "AvarShamanFeather",
+      "count": 1
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "SwordShardD"
+      }
+    ]
+  }
+}

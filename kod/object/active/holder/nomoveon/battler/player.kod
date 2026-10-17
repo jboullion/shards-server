@@ -1823,6 +1823,9 @@ messages:
          Send(i,@EnteredRoom,#what=what);
       }
 
+      // Ours: visit steps (util/questbook.kod)
+      Send(Send(SYS,@GetQuestBook),@EnteredRoom,#who=self,#where=what);
+
       // Stop any rescue attempts if the user changes rooms.
       if ptRescue <> $
       {
@@ -7281,6 +7284,9 @@ messages:
 
       // New HP may qualify us for (or complete) a passive quest.
       Post(Send(SYS,@GetGameQuestMaintenance),@EvaluatePlayer,#who=self,#vbTriggered=TRUE);
+      // Ours: and for new quests, whose markers change, and health steps (util/questbook.kod)
+      Post(Send(SYS,@GetQuestBook),@RefreshMarkers,#who=self);
+      Post(Send(SYS,@GetQuestBook),@CheckStateSteps,#who=self);
 
       return;
    }
@@ -7473,6 +7479,8 @@ messages:
       if amount > 0 AND node_num <> -1
       {
          piNodelist = piNodelist | node_num;
+         // Ours: a mana node step may be done now (util/questbook.kod)
+         Post(Send(SYS,@GetQuestBook),@CheckStateSteps,#who=self);
       }
 
       if amount < 0 AND node_num <> -1
@@ -13375,6 +13383,13 @@ messages:
          return;
       }
 
+      // Faction service no longer lapses (ADR 0009): the loyalty quests are favours in the
+      // QuestBook, and no timer runs down a member's service.
+      if TRUE
+      {
+         return;
+      }
+
       Send(Self,@UpdateFactionService,#adjust=FALSE);
       if piFactionServiceUpdate > FACTION_RESIGN_TIME
       {
@@ -13531,7 +13546,7 @@ messages:
    JoinFaction(new_faction=FACTION_NEUTRAL)
    "Returns true if the joining was a success"
    {
-      local factliege, oParliament, oQuestEngine;
+      local factliege, oParliament;
 
       if NOT Send(Self,@PlayerIsIntriguing)
       {
@@ -13550,38 +13565,14 @@ messages:
       }
 
       piFaction = new_faction;
-      // Increase the max number of loyalty quests by one, and schedule one.
-      oQuestEngine = Send(SYS,@GetQuestEngine);
-      
+      // The loyalty quests are QuestBook favours now (ADR 0009): nothing to schedule
       if piFaction = FACTION_PRINCESS
       {
-         Send(oQuestEngine,@SetQuestMaxActive,#index = QST_ID_PRINCESS_SERVICE,
-              #new_max = (1+Nth(Send(oQuestEngine,@GetQuestTemplate,
-                                     #index=QST_ID_PRINCESS_SERVICE),
-                                     QT_MAX_NUM_ACTIVE)));
-         Send(oQuestEngine,@ScheduleQuest,
-               #index=QST_ID_PRINCESS_SERVICE,#override=TRUE);
          Post(self,@DrawDefense);
-      }
-
-      if piFaction = FACTION_DUKE
-      {
-         Send(oQuestEngine,@SetQuestMaxActive,#index = QST_ID_DUKE_SERVICE,
-              #new_max = (1+Nth(Send(oQuestEngine,@GetQuestTemplate,
-                                     #index=QST_ID_DUKE_SERVICE),
-                                     QT_MAX_NUM_ACTIVE)));
-         Send(oQuestEngine,@ScheduleQuest,
-               #index=QST_ID_DUKE_SERVICE,#override=TRUE);
       }
 
       if piFaction = FACTION_REBEL
       {
-         Send(oQuestEngine,@SetQuestMaxActive,#index = QST_ID_REBEL_SERVICE,
-               #new_max = (1+Nth(Send(oQuestEngine,@GetQuestTemplate,
-                                      #index=QST_ID_REBEL_SERVICE),
-                                      QT_MAX_NUM_ACTIVE)));
-         Send(oQuestEngine,@ScheduleQuest,
-               #index=QST_ID_REBEL_SERVICE,#override=TRUE);
          Post(self,@DrawOffense);
       }
 
@@ -13621,7 +13612,7 @@ messages:
 
    ResignFaction(bNoTimer=FALSE)
    {
-      local numMembers, oParliament, oQuestEngine, oQuest, oFlagPole;
+      local oParliament, oFlagPole;
 
       if poOwner <> $
       {
@@ -13635,68 +13626,19 @@ messages:
          }
       }
 
-      oQuestEngine = Send(SYS,@GetQuestEngine);
-      if (oQuestEngine = $)
-      {
-         return;
-      }
-
       if Send(Self,@PlayerIsIntriguing)
          AND piFaction <> FACTION_NEUTRAL
       {
          Send(self,@MsgSendUser,#message_rsc=player_unfactioned);
       }
 
-      // Decrease the max number of loyalty quests by one
       if piFaction = FACTION_PRINCESS
       {
-         oQuest = Send(oQuestEngine,@GetQuestTemplate,
-                       #index=QST_ID_PRINCESS_SERVICE);
-         numMembers = Nth(oQuest,QT_MAX_NUM_ACTIVE);
-         if numMembers > 0
-         {
-            Send(oQuestEngine,@SetQuestMaxActive,
-                 #index=QST_ID_PRINCESS_SERVICE,
-                 #new_max=(numMembers-1));
-         }
-         else
-         {
-            Debug("ResignFaction miscounted number of Princess faction members!");
-         }
          Post(self,@DrawDefense);
-      }
-
-      if piFaction = FACTION_DUKE
-      {
-         oQuest = Send(oQuestEngine,@GetQuestTemplate,
-                       #index=QST_ID_DUKE_SERVICE);
-         numMembers = Nth(oQuest,QT_MAX_NUM_ACTIVE);
-
-         if numMembers > 0
-         {
-            Send(oQuestEngine,@SetQuestMaxActive,#index=QST_ID_DUKE_SERVICE,
-                 #new_max=(numMembers-1));
-         }
-         else
-         {
-            Debug("ResignFaction miscounted number of Duke faction members!");
-         }
       }
 
       if piFaction = FACTION_REBEL
       {
-         oQuest = Send(oQuestEngine,@GetQuestTemplate,
-                       #index=QST_ID_REBEL_SERVICE);
-         numMembers = Nth(oQuest,QT_MAX_NUM_ACTIVE);
-         if numMembers > 0
-         {
-            Send(oQuestEngine,@SetQuestMaxActive,#index=QST_ID_REBEL_SERVICE,
-                 #new_max=(numMembers-1));
-         }
-         else
-         {
-            Debug("ResignFaction miscounted number of Rebel faction members!");
-         }
          Post(self,@DrawOffense);
       }
 

@@ -1,0 +1,40 @@
+{
+  "tier": "main",
+  "id": 163,
+  "key": "brax-the-way-down",
+  "name": "The Way Down",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 95,
+    "max": 130
+  },
+  "requires": {
+    "faction": "any"
+  },
+  "text": {
+    "offer": "Brax lies beneath the ancient place south of here. Its Queen sealed it with a lift that only rises for lightning: raise walls of lightning on the pillars and pull the nine levers until every pillar stands lit, and the platform will lift you to the way down. You'll need the Lightning Wall spell - I can teach it, if you don't know it. Find the Winding Caverns beneath, and come back to me.",
+    "progress": "The ancient place lies just south of the Cragged Mountains. Light every pillar with walls of lightning and the levers, ride the platform, and find the Winding Caverns below.",
+    "complete": "You found the way. Then you are ready for what lies in Brax - and there is a great deal of it."
+  },
+  "steps": [
+    {
+      "kind": "cast",
+      "spell": "LightningWall",
+      "objective": "Cast a wall of lightning",
+      "brief": "Good. Now light the pillars in the ancient place with your walls, and pull the levers until all of them stand lit."
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_NECROAREA1"
+      ],
+      "objective": "Get past the levers into the Winding Caverns"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 2000
+  }
+}

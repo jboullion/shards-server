@@ -1,0 +1,40 @@
+{
+  "tier": "main",
+  "id": 171,
+  "key": "kocatan-the-avar-leader",
+  "name": "The Avar Leader",
+  "giver": {
+    "class": "KocatanCaptainEvil"
+  },
+  "band": {
+    "min": 135,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      154
+    ]
+  },
+  "text": {
+    "offer": "You've killed chieftains. Now kill leaders. The bone faction's avars are led by the fiercest of them all, keeping the old ways in the chasm and around the bone priestess's lair. Kill three of the bone faction's leaders there, and the clans will know fear.",
+    "progress": "The leaders of the bone faction keep to the Chasm and the Lair of the Bone Priestess.",
+    "complete": "Three leaders of the bone faction. Even I didn't think it could be done. Here - you've earned all of it."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "AvarChieftain",
+      "count": 3,
+      "rooms": [
+        2131,
+        2141
+      ],
+      "inRooms": true,
+      "objective": "Leaders of the bone faction slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 8000
+  }
+}

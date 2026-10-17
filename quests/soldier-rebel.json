@@ -1,0 +1,48 @@
+{
+  "id": 78,
+  "key": "soldier-rebel",
+  "name": "A Soldier of the Rebellion",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_REBEL_SOLDIER"
+  ],
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "I have faith in you. Go dispatch one of the Princess's soldiers near a flagpole, return to report on your battle, and then we will talk about your future as a soldier.",
+    "progress": "Jonas D'Accor will allow you to join the Rebel army, but first you must prove your loyalty by slaying his enemies at the flagpoles.",
+    "complete": "I knew you were a fit soldier. Now you properly join us in our fight for freedom against tyranny!"
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "PrincessTroop",
+      "count": 1
+    },
+    {
+      "kind": "kill",
+      "target": "DukeTroop",
+      "count": 1,
+      "brief": "Yes, I have heard stories of your fight. Now go conquer one of the Duke's soldiers and you shall join us as an equal when you are done."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "items": [
+      {
+        "class": "RebelShield"
+      }
+    ]
+  }
+}

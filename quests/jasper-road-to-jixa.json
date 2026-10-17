@@ -1,0 +1,37 @@
+{
+  "tier": "main",
+  "id": 182,
+  "key": "jasper-road-to-jixa",
+  "name": "The Village of Jixa",
+  "giver": {
+    "class": "JasperInnKeeper"
+  },
+  "band": {
+    "min": 70,
+    "max": 90
+  },
+  "requires": {
+    "notQuests": [
+      180,
+      181
+    ]
+  },
+  "text": {
+    "offer": "Travellers talk of a village out past the swamps east of Tos - Jixa, they call it, where the dyes come from that every tailor in Jasper wants. I've a letter for the innkeeper there, Jorgan Yesjor, about setting up a trade. The road's dangerous - chupacabras and worse - but you look like you can handle it.",
+    "progress": "Jixa lies east of Tos, past the Duke's Way, the swamps and the forlorn path.",
+    "complete": "A letter from Jasper? Well, well. Not many make it down that road. Welcome to Jixa, traveller."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a letter for the innkeeper of Jixa",
+      "turnin": {
+        "class": "JixaInnkeeper"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 1000
+  }
+}

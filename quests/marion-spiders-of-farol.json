@@ -1,0 +1,41 @@
+{
+  "id": 127,
+  "key": "marion-spiders-of-farol",
+  "name": "The Spiders of Farol",
+  "tier": "main",
+  "giver": {
+    "class": "MarionElder"
+  },
+  "band": {
+    "min": 36,
+    "max": 46
+  },
+  "requires": {
+    "quests": [
+      12
+    ]
+  },
+  "text": {
+    "offer": "What you found in the crypt troubles me. The treefolk of Faronath say the spiders of the Forest of Farol have grown bold, as if something drives them out of the deep wood. Kill ten of them and see if it calms the forest.",
+    "progress": "The Forest of Farol lies west of Marion; Faronath is in its heart.",
+    "complete": "The forest is quieter. But the dead, the spiders, all of it - it reaches further than Marion. Cor Noth should hear of this."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Spider",
+      "count": 10,
+      "rooms": [
+        536,
+        537,
+        556
+      ],
+      "objective": "Spiders slain",
+      "exact": true
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 100
+  }
+}

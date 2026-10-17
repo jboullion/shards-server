@@ -1,0 +1,41 @@
+{
+  "tier": "main",
+  "id": 223,
+  "key": "castle-victoria-far-nohl",
+  "name": "The Ghost of Far'Nohl",
+  "giver": {
+    "class": "fourCouncilor",
+    "rooms": [
+      2
+    ]
+  },
+  "band": {
+    "min": 130,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      222
+    ]
+  },
+  "text": {
+    "offer": "Far'Nohl himself haunts his throne room, mad and powerful beyond anything else in that castle. He comes back, again and again, to take his revenge on trespassers. Destroy him - and bring friends, as many as you can.",
+    "progress": "The ghost of Far'Nohl haunts the throne room of Castle Victoria, beyond the antechamber.",
+    "complete": "The mad king, destroyed - for a while, at least. Castle Victoria has not been this quiet in an age."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Ghost",
+      "count": 1,
+      "rooms": [
+        41
+      ],
+      "objective": "Destroy the ghost of Far'Nohl"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 12000
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "id": 105,
+  "key": "errand-merchant-tax",
+  "name": "A Merchant's Taxes",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_MERCHANT_TAX"
+  ],
+  "giver": {
+    "class": "JasperMerchant"
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Will you take my taxes to Duke Akardius? I am certain I am late this time and need you to take these shillings to him. Think not about deception. I have arranged for your fee to be paid by him.",
+    "complete": "Ah, I was wondering when the merchant of Jasper was going to pay me a visit. Here is your payment for your... speedy service."
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "a purse of taxes",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "InkyCap",
+        "count": 4
+      },
+      {
+        "class": "EntrootBerry",
+        "count": 20
+      },
+      {
+        "class": "OrcTooth",
+        "count": 20
+      },
+      {
+        "class": "DetectInvisibilityPotion"
+      },
+      {
+        "class": "DetectGoodPotion"
+      },
+      {
+        "class": "DetectEvilPotion"
+      },
+      {
+        "class": "IllusionaryFormPotion"
+      },
+      {
+        "class": "NeruditeArrow",
+        "count": 20
+      },
+      {
+        "class": "NodeBurstPotion"
+      }
+    ]
+  }
+}

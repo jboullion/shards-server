@@ -1,0 +1,71 @@
+{
+  "id": 50,
+  "key": "story-chicken-soup",
+  "name": "Chicken Soup",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_CHICKEN_SOUP"
+  ],
+  "giver": {
+    "class": "CornothGrocer"
+  },
+  "band": {
+    "min": 0,
+    "max": 40
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "I'm feeling a little sick. I don't suppose you could go to the Widow Qesino, at the inn in Jasper, and ask her for a bowl of her special chicken soup, could you? I'd be most grateful.",
+    "complete": "Thanks so much, I feel better already just from smelling this delicious soup! Here, take this as a token of my appreciation."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "JasperInnKeeper"
+      },
+      "objective": "Ask the Widow Qesino for chicken soup"
+    },
+    {
+      "kind": "deliver",
+      "parcel": "a bowl of chicken soup",
+      "turnin": {
+        "class": "CornothGrocer"
+      },
+      "brief": "Oh, of course, dear! Here's a bowl of my special soup for Solomon. Wish him well for me."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Hammer"
+      },
+      {
+        "class": "LongSword"
+      },
+      {
+        "class": "Axe"
+      },
+      {
+        "class": "ScaleArmor"
+      },
+      {
+        "class": "FireRing"
+      },
+      {
+        "class": "ColdRing"
+      },
+      {
+        "class": "ShockRing"
+      },
+      {
+        "class": "AcidRing"
+      },
+      {
+        "class": "RingInvisibility"
+      }
+    ]
+  }
+}

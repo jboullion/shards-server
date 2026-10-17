@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 167,
+  "key": "brax-queens-order",
+  "name": "The Queen's Order",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 120,
+    "max": 140
+  },
+  "requires": {
+    "quests": [
+      166
+    ]
+  },
+  "text": {
+    "offer": "It is not the Queen alone who raises Brax's dead. Her Order of necromancers keeps her rites in the ruins of the castle and the dungeon beneath it. Kill ten of them and her power over the dead weakens.",
+    "progress": "The Queen's necromancers hold the Ruins of Castle Brax and the dungeon beneath it.",
+    "complete": "Her Order bleeds. Now only her own court remains."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "NecromancerTroop",
+      "count": 10,
+      "rooms": [
+        830,
+        825
+      ],
+      "objective": "Necromancers of the Queen's Order slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 4000
+  }
+}

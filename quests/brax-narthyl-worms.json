@@ -1,0 +1,39 @@
+{
+  "tier": "main",
+  "id": 165,
+  "key": "brax-narthyl-worms",
+  "name": "Worms Beneath the Graves",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 100,
+    "max": 125
+  },
+  "requires": {
+    "quests": [
+      163
+    ]
+  },
+  "text": {
+    "offer": "Something feeds on Brax's dead: the narthyl worms, burrowing through the graveyard and the city. They grow fat on corruption and spread it further. Kill twelve.",
+    "progress": "The narthyl worms burrow through the Ancient Graveyard and the Decaying City.",
+    "complete": "The graves lie still again - for now. Thank you."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "NarthylWorm",
+      "count": 12,
+      "rooms": [
+        827,
+        828
+      ],
+      "objective": "Narthyl worms slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 2500
+  }
+}

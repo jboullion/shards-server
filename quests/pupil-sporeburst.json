@@ -1,0 +1,36 @@
+{
+  "id": 101,
+  "key": "pupil-sporeburst",
+  "name": "Maleval's Pupil",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_SPOREBURST_LEARN"
+  ],
+  "giver": {
+    "class": "DarkWizard"
+  },
+  "band": {
+    "min": 70,
+    "max": 150
+  },
+  "text": {
+    "offer": "It is indeed a pleasure to see you. I have watched your progress in the arcane studies with great interest; rarely have I encountered one so worthy of my tutelage. I have at last crafted an entirely new spell, grafted together from the energy fields of what the religious rabble would call Faren and Qor. I will teach you my new incantation, if you but perform one small task for me: bring me an offering to Kraanan, that I may research its mystical properties.",
+    "complete": "It has been many moons since that last touched my lips. Return when you wish to learn the sporeburst spell, and we'll have a little toast - To the foolish masses, who offer up their feeble bodies of blood and bone to be swallowed by silent stones or jigging delusory puppet-gods."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "OfferingKraanan",
+      "count": 1
+    },
+    {
+      "kind": "collect",
+      "item": "OfferingQor",
+      "count": 1,
+      "brief": "Ah yes, the spell, the spell. Sporeburst! Now bring me an offering to Qor, and I shall teach you that, and more - I have recently discovered another intriguing spell as well."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1
+  }
+}

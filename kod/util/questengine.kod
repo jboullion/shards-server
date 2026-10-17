@@ -692,6 +692,28 @@ messages:
          }
       }
 
+      // Switched off (ADR 0009): the QuestBook (util/questbook.kod) has the quests now. The
+      // templates stay, so players' old quest history still reads; nothing is scheduled, and
+      // any quest still running is cancelled.
+      Send(self,@DeleteActiveQuests);
+      Send(self,@Suspend);
+      if ptQuestTimer <> $
+      {
+         DeleteTimer(ptQuestTimer);
+         ptQuestTimer = $;
+      }
+
+      if ptQuestDeadlineTimer <> $
+      {
+         DeleteTimer(ptQuestDeadlineTimer);
+         ptQuestDeadlineTimer = $;
+      }
+
+      if TRUE
+      {
+         return;
+      }
+
       // Resume quest scheduling if suspended.
       Send(self,@Suspend,#resume=1);
 
@@ -2015,6 +2037,12 @@ messages:
 
       //   DeleteTimer( ptQuestTimer);      // try removing this line -- damian
       ptQuestTimer = $;
+      // Switched off (ADR 0009): a timer from before stops here
+      if piActive = 0
+      {
+         return;
+      }
+
       ptQuestTimer = CreateTimer(self,@OnQuestTimer,piQuestTimerDelay);
       if ptQuestDeadlineTimer = $
       {
@@ -2044,6 +2072,12 @@ messages:
    "Also does a QT_SCHEDULE_CHANCE die roll unless override=TRUE."
    {
       local QT, lActiveQuests, QTindex, iActive, iMaxActive;
+
+      // Switched off (ADR 0009): the QuestBook has the quests
+      if piActive = 0
+      {
+         return;
+      }
 
       QT = Send(self,@GetQuestTemplate,#index=index);
       if QT = $
@@ -2081,6 +2115,11 @@ messages:
    OnQuestDeadlineTimer()
    {
       ptQuestDeadlineTimer = $;
+      if piActive = 0
+      {
+         return;
+      }
+
       Send(self,@CheckQuestDeadlines);
       ptQuestDeadlineTimer = CreateTimer(self,@OnQuestDeadlineTimer,
                                  piQuestDeadlineTimerDelay);

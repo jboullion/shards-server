@@ -1,0 +1,53 @@
+{
+  "id": 96,
+  "key": "insignia-rebel",
+  "name": "The Insignia of Jonas D'Accor",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_FACTION_INSIGNIA"
+  ],
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel",
+    "guildShield": true
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "I see you have a shield with colors, but no insignia. If you would care to earn mine, I have a mission for you. In the midst of this political chaos, subjects openly consort against me. Fortunately, I have spies in place which keep an eye on their connivings. Reportedly, the Widow Qesino has been conferring with Bei Naq, and I am naturally quite intrigued by whatever they talked about. Mention that person's name to the Widow Qesino, and repeat for me word for word what is told to you.",
+    "complete": "Hmmm, fascinating. I will have my spies scry further, but your information has provided the insight that I required. Here, please accept my insignia as a token of my appreciation."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "JasperInnKeeper"
+      },
+      "objective": "Ask the Widow Qesino about Bei Naq"
+    },
+    {
+      "kind": "talk",
+      "brief": "the Widow Qesino says, \"Ah, yes! We were just chatting about what a fine job the Duke is doing.\"",
+      "objective": "Tell Jonas D'Accor what was said",
+      "turnin": {
+        "class": "RebelLiege",
+        "rooms": [
+          371
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "insignia": "rebel"
+  }
+}

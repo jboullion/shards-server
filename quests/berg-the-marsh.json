@@ -1,0 +1,34 @@
+{
+  "tier": "main",
+  "id": 200,
+  "key": "berg-the-marsh",
+  "name": "The Marsh",
+  "giver": {
+    "class": "BergInnkeeper"
+  },
+  "band": {
+    "min": 100,
+    "max": 120
+  },
+  "text": {
+    "offer": "The traders who come to Berg by the Duke's Way have to cross the marsh, and the ranuculus there drag them under. Twelve of the beasts dead would make that road passable again.",
+    "progress": "The ranuculus lurk in the Marsh and the Desolate Mire.",
+    "complete": "The traders will be back by the end of the week. That's good for Berg, and for my inn."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Ranuculus",
+      "count": 12,
+      "rooms": [
+        2953,
+        2954
+      ],
+      "objective": "Ranuculus slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 3000
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": 100,
+  "key": "pupil-fade",
+  "name": "Joguer's Pupil",
+  "tier": "main",
+  "replaces": [
+    "QST_ID_FADE_SPELL"
+  ],
+  "giver": {
+    "class": "BarloqueApothecary"
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "text": {
+    "offer": "I am glad thou art here; I am willing to make a trade. I stumbled across a formula for speeding the growing process of certain plants, but it has fallen into the hands of the scoundrel Lady Aftyn. I will teach thee the small magicks I know if thou wilt but retrieve this formula for me. Ask her about the formula.",
+    "complete": "Ah, at last. Thou hast done a great service not only to thyself but also to the entire realm. These plants may change the course of history. Come to me when thou would learn from me, friend."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "objective": "Ask Lady Aftyn about the formula"
+    },
+    {
+      "kind": "kill",
+      "target": "CaveOrc",
+      "count": 1,
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "brief": "I have the formula of which you speak. I am reluctant to give it to you, however, as I believe that Joguer's motives are not as noble as he claims. If you prove to me your strength of purpose by slaying a cave orc, however, I will defer to your judgement."
+    },
+    {
+      "kind": "deliver",
+      "parcel": "a plant growth formula",
+      "brief": "Very well, here is the formula. I am not happy to be giving you this. But that is not your concern really is it. You just want to get your spell and be off.",
+      "turnin": {
+        "class": "BarloqueApothecary"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1
+  }
+}

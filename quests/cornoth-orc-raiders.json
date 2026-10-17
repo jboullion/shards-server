@@ -1,0 +1,36 @@
+{
+  "id": 131,
+  "key": "cornoth-orc-raiders",
+  "name": "Orc Raiders",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothSergeant"
+  },
+  "band": {
+    "min": 44,
+    "max": 54
+  },
+  "requires": {
+    "quests": [
+      129
+    ]
+  },
+  "text": {
+    "offer": "Orcs have been raiding travellers in the Berdonne Canyons and up by the old places in the hills. They're getting organised, and that worries me. Kill twelve of them and let them know the roads aren't theirs.",
+    "progress": "Orcs roam the Berdonne Canyons and the hills near Jasper.",
+    "complete": "Twelve orcs. That'll give them something to think about."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Orc",
+      "count": 12,
+      "exact": true,
+      "objective": "Orcs slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 150
+  }
+}

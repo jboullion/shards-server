@@ -1,0 +1,38 @@
+{
+  "tier": "main",
+  "id": 169,
+  "key": "brax-queen-venyacyr",
+  "name": "Queen Venya'cyr",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 130,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      168
+    ]
+  },
+  "text": {
+    "offer": "Her guards are fallen, her Order broken, but the Queen herself still walks her sanctum, and while she walks, the dead of Meridian will never rest. Kill Venya'cyr. Do not go alone - take every friend you have.",
+    "progress": "Queen Venya'cyr walks the Inner Sanctum, beyond the dungeon of Castle Brax. When she falls, she rises again before long.",
+    "complete": "She has fallen... and for a time, at least, the dead of Meridian will rest. I can rest too, I think. Thank you, hunter."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Lich",
+      "count": 1,
+      "rooms": [
+        749
+      ],
+      "objective": "Slay Queen Venya'cyr"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 15000
+  }
+}

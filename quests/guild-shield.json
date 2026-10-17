@@ -1,0 +1,42 @@
+{
+  "id": 97,
+  "key": "guild-shield",
+  "name": "A Mining Expedition",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_GUILDSHIELD",
+    "QST_ID_GUILDSHIELD_INTRO"
+  ],
+  "giver": {
+    "class": "TosBlacksmith"
+  },
+  "band": {
+    "min": 30,
+    "max": 150
+  },
+  "requires": {
+    "guildMaster": true
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Aye, someone eager to do this favor for me. Undoubtedly you've heard that the orc mines have reopened. Well, them orcs mine a strain of iron ore that's of a much higher grade than what we can get out of the stripped out Jasper mines. Bring me some ore, and I'll use the last of what I have now to make you a coat of arms.",
+    "progress": "Find a chunk of ore in the orc caves and bring it back to the blacksmith of Tos.",
+    "complete": "Ah, this will make for some fine weapons and armor! Thank you greatly. In your absence, I have fashioned a shield which displays your guild's crest and colors. Wear it forth proudly, you have done well for your guild this day."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "OreChunk",
+      "count": 1
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "GuildShield"
+      }
+    ]
+  }
+}

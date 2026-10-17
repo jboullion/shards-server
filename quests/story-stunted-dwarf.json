@@ -1,0 +1,87 @@
+{
+  "id": 53,
+  "key": "story-stunted-dwarf",
+  "name": "The Stunted Dwarf",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_STUNTED_DWARF"
+  ],
+  "giver": {
+    "class": "MarionBartender"
+  },
+  "band": {
+    "min": 40,
+    "max": 150
+  },
+  "text": {
+    "offer": "Hot day, eh? Sure would be a great day for a stunted dwarf. Ah, an ancient drink. Actually, the recipe has been lost in time, although I hear that Colhorr the blacksmith might know of it.",
+    "complete": "How remarkable! You must be a persistent one. I must give you something equally rare in return."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionBlacksmith"
+      },
+      "objective": "Ask Colhorr about the stunted dwarf"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionBartender"
+      },
+      "objective": "Tell Tova it's a myth",
+      "brief": "Stunted dwarf? Ha! That's just a myth, and you tell Tova I said that!"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanTown",
+        "rooms": [
+          "RID_KOCATAN"
+        ]
+      },
+      "objective": "Ask around Ko'catan about the stunted dwarf",
+      "brief": "Ah, well. If you ever hear anyone mention a stunted dwarf, you be sure to find out what you can. They say the islanders of Ko'catan still know their old drinks."
+    },
+    {
+      "kind": "kill",
+      "target": "Kriipa",
+      "count": 1,
+      "turnin": {
+        "class": "KocatanTown",
+        "rooms": [
+          "RID_KOCATAN"
+        ]
+      },
+      "brief": "Ah, you need a recipe for your garden variety stunted dwarf, eh? Tell you what. Prove to me you're hero enough to drink one, and I'll give you the recipe. Go kill a kriipa for me."
+    },
+    {
+      "kind": "deliver",
+      "parcel": "the stunted dwarf recipe",
+      "turnin": {
+        "class": "MarionBartender"
+      },
+      "brief": "Fine job. Take this recipe back to Tova."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "OfferingShalille"
+      },
+      {
+        "class": "OfferingRiija"
+      },
+      {
+        "class": "OfferingQor"
+      },
+      {
+        "class": "OfferingFaren"
+      },
+      {
+        "class": "OfferingKraanan"
+      }
+    ]
+  }
+}

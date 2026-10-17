@@ -1,0 +1,37 @@
+{
+  "id": 52,
+  "key": "story-polished-seraphym",
+  "name": "Gems to Polish",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_POLISH_SERAPHYM"
+  ],
+  "giver": {
+    "class": "JasperElder"
+  },
+  "band": {
+    "min": 25,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Excuse me. I've been honing my jewelling skills, and I was wondering if you have any uncut seraphym. If you bring me three, I'd be happy to polish them and give you one of the result.",
+    "complete": "Ah, thank you. Allow me to reward you."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "UncutSeraphym",
+      "count": 3
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "PolishedSeraphym"
+      }
+    ]
+  }
+}

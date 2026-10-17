@@ -1,0 +1,42 @@
+{
+  "id": 84,
+  "key": "offering-qor",
+  "name": "An Offering to Qor",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_QOR_OFFERING"
+  ],
+  "giver": {
+    "class": "QorPriestess"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "karmaMax": -1
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Dark devotee of our Mistress of the Bloody Moon, will you give of yourself so that your Mistress may be stronger? Worship with me, then. Together, we will draw upon our own life essence to birth a symbol of our Mistress' power. Incant these words with me: By the light of a bloody moon, I summon thee, Qor, Mistress of the Dark.",
+    "complete": "Ah, this is a great day for Qor! Go now, carry forth the power of our Mistress into the world! Placed at one of the Shrines around the world, it will dedicate the Shrine to Qor."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "objective": "Chant the words with them",
+      "turnin": {
+        "class": "QorPriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "OfferingQor"
+      }
+    ]
+  }
+}

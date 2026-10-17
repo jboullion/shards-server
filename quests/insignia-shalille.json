@@ -1,0 +1,36 @@
+{
+  "id": 88,
+  "key": "insignia-shalille",
+  "name": "The Sign of Shal'ille",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_PRIESTESS_INSIGNIA"
+  ],
+  "giver": {
+    "class": "ShalillePriestess"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "guildShield": true
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "I see you have an unmarked shield. I am more than willing to offer my insignia, provided you offer me a tithe. I have heard about a passage to another world opening up. I am interested in the magical reagents from that land - perhaps their emergence will result in the strengthening of magic for faithmages like you and I. Go and find me 5 of them. Wear the shield you would like the insignia on, if you carry more than one.",
+    "complete": "Excellent. The Eternal thank you for your benevolence."
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "PolishedSeraphym",
+      "count": 5
+    }
+  ],
+  "rewards": {
+    "insignia": "shalille"
+  }
+}

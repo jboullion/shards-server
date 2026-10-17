@@ -1,0 +1,35 @@
+{
+  "id": 129,
+  "key": "cornoth-merchant-way",
+  "name": "Spiders on the Merchant Way",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothSergeant"
+  },
+  "band": {
+    "min": 40,
+    "max": 50
+  },
+  "text": {
+    "offer": "Merchants are refusing to use the East Merchant Way and the Flatlands - spiders, big ones, dropping on the carts. Cor Noth lives on that trade. Kill fifteen of them and the merchants will have no more excuses.",
+    "progress": "The East Merchant Way and the Flatlands are south and east of Cor Noth.",
+    "complete": "The merchants are already back on the road. Good work."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Spider",
+      "count": 15,
+      "rooms": [
+        564,
+        584
+      ],
+      "objective": "Spiders slain",
+      "exact": true
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 150
+  }
+}

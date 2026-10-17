@@ -1,0 +1,35 @@
+{
+  "tier": "main",
+  "id": 150,
+  "key": "kocatan-dragonflies",
+  "name": "Dragonflies on the Cliffs",
+  "giver": {
+    "class": "KocatanInnkeeper"
+  },
+  "band": {
+    "min": 90,
+    "max": 110
+  },
+  "text": {
+    "offer": "You've come up through the caves? Then you can handle a few bugs. The dragonflies on the jungle cliffs have been swarming over the fishing paths - fifteen of them dead would let my suppliers back through.",
+    "progress": "The dragonflies swarm on the jungle cliffs and in the notches of the jungle.",
+    "complete": "The paths are clear and my larder thanks you. Here."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DragonFly",
+      "count": 15,
+      "rooms": [
+        2112,
+        2113,
+        2125
+      ],
+      "objective": "Dragonflies slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 800
+  }
+}

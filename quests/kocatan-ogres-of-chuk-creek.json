@@ -1,0 +1,33 @@
+{
+  "tier": "main",
+  "id": 172,
+  "key": "kocatan-ogres-of-chuk-creek",
+  "name": "Ogres of Chuk Creek",
+  "giver": {
+    "class": "KocatanInnkeeper"
+  },
+  "band": {
+    "min": 130,
+    "max": 150
+  },
+  "text": {
+    "offer": "Down in the sewers, where Chuk Creek runs foul, ogres have made their home - great brutes that come up at night and carry off whatever they can find. Kill six of them, and I'll never charge you for a room again. Well - almost never.",
+    "progress": "The ogres lurk up Chuk Creek, in Ko'catan's sewers.",
+    "complete": "Six ogres! The night watch can stop sleeping with their spears."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Ogre",
+      "count": 6,
+      "rooms": [
+        2012
+      ],
+      "objective": "Ogres slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 8000
+  }
+}

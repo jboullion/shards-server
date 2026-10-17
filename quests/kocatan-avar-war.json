@@ -1,0 +1,67 @@
+{
+  "id": 30,
+  "key": "kocatan-avar-war",
+  "name": "Aid in the War",
+  "tier": "errand",
+  "replaces": [
+    "QST_ID_AVAR_KILL"
+  ],
+  "giver": {
+    "class": "KocatanCaptainGood"
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "A strong warrior, are thee? The war against the avars has taken a toll on us. If you're willing to lend a hand, the people of Ko'catan will be thankful. Start with their warriors: slay twenty avars in the jungle.",
+    "progress": "The war still continues. Report back to Cital ko'Manca when the task is done.",
+    "complete": "Good work, warrior. Your efforts will be noted in the books."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Avar",
+      "count": 20
+    },
+    {
+      "kind": "kill",
+      "target": "AvarShaman",
+      "count": 15,
+      "brief": "Those warriors are just the fodder. We need to target their magical forces. Go kill fifteen avar shamans in the jungle."
+    },
+    {
+      "kind": "kill",
+      "target": "AvarChieftain",
+      "count": 1,
+      "brief": "A true warrior of blood! You are strong! The last thing we need to do is take out their command. Go and slay an avar chieftain in the jungle."
+    }
+  ],
+  "rewards": {
+    "oneOf": [
+      {
+        "class": "Yrxlsap",
+        "count": 500
+      },
+      {
+        "class": "WebMoss",
+        "count": 500
+      },
+      {
+        "class": "KriipaClaw",
+        "count": 500
+      },
+      {
+        "class": "RainbowFern",
+        "count": 500
+      },
+      {
+        "class": "FireSand",
+        "count": 500
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": 94,
+  "key": "insignia-duke",
+  "name": "The Insignia of Duke Akardius",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_FACTION_INSIGNIA"
+  ],
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke",
+    "guildShield": true
+  },
+  "repeat": {
+    "cooldownHours": 12
+  },
+  "text": {
+    "offer": "I see you have a shield with colors, but no insignia. If you would care to earn mine, I have a mission for you. In the midst of this political chaos, subjects openly consort against me. Fortunately, I have spies in place which keep an eye on their connivings. Reportedly, Frisconar has been conferring with Priestess Xiana, and I am naturally quite intrigued by whatever they talked about. Mention that person's name to Frisconar, and repeat for me word for word what is told to you.",
+    "complete": "Hmmm, fascinating. I will have my spies scry further, but your information has provided the insight that I required. Here, please accept my insignia as a token of my appreciation."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "TosApothecary"
+      },
+      "objective": "Ask Frisconar about Priestess Xiana"
+    },
+    {
+      "kind": "talk",
+      "brief": "Frisconar says, \"Ah, yes! We were just chatting about what a fine job the Princess is doing.\"",
+      "objective": "Tell Duke Akardius what was said",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      }
+    }
+  ],
+  "rewards": {
+    "insignia": "duke"
+  }
+}

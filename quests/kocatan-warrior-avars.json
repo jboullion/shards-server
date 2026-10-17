@@ -1,0 +1,38 @@
+{
+  "tier": "main",
+  "id": 151,
+  "key": "kocatan-warrior-avars",
+  "name": "The Warrior Avars",
+  "giver": {
+    "class": "KocatanCaptainGood"
+  },
+  "band": {
+    "min": 90,
+    "max": 110
+  },
+  "text": {
+    "offer": "Ko'catan has been at war with the avars of the jungle for generations. Their warriors raid us from their camps in the deep jungle. Every warrior that falls is one less at our walls - fifteen, and you'll have earned a place among us.",
+    "progress": "The warrior avars camp in the jungle beyond Ko'catan's guard tower.",
+    "complete": "Fifteen! The people will hear of this. You fight like one of Konima's own."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Avar",
+      "count": 15,
+      "exact": true,
+      "rooms": [
+        2114,
+        2115,
+        2122,
+        2123,
+        2132
+      ],
+      "objective": "Warrior avars slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 800
+  }
+}

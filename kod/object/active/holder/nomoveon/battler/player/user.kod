@@ -540,6 +540,12 @@ properties:
    // Ours: the words of the UC_SHARDS command being read (ShardsCommand); $ between commands
    plShardsWords = $
 
+   // Ours (util/questbook.kod): each active quest as [ id, step, count, deadline ], each quest
+   // done as [ id, times, when last done ], and the NPC we last talked to about quests
+   plQuestLog = $
+   plQuestDone = $
+   poQuestNpc = $
+
    // Ours (util/shardssocial.kod): this player's friends, the players who asked to be and
    // those this player asked, their options (SF_*), when they last left the game (Kod time),
    // whom they follow and who follows them (both cleared on entering the game), and their pet
@@ -973,6 +979,9 @@ messages:
 
       // Ok, we're logged in and good to go. Let's check our passive quest status.
       Send(Send(SYS,@GetGameQuestMaintenance),@EvaluatePlayer,#who=self);
+      // Ours: our quests, and our client's log of them (util/questbook.kod)
+      poQuestNpc = $;
+      Send(Send(SYS,@GetQuestBook),@PlayerLoggedOn,#who=self);
 
       return;
    }
@@ -3404,8 +3413,8 @@ messages:
          }
          if Send(what,@GetBehavior) & AI_NPC
          {
-            // Draw dots for NPCs.
-            return MM_NPC;
+            // Draw dots for NPCs, and ours: their quest markers (util/questbook.kod)
+            return MM_NPC | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
          }
          if IsClass(poOwner,&SurvivalRoom)
          {
@@ -3418,6 +3427,12 @@ messages:
             {
                return MM_BOSS;
             }
+         }
+
+         // Ours: a monster that counts for one of our quest steps (util/questbook.kod)
+         if plQuestLog <> $
+         {
+            return MM_MONSTER | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
          }
 
          return MM_MONSTER;
@@ -4430,6 +4445,7 @@ messages:
    //   friend ...    friends, requests, following (util/shardssocial.kod)
    //   pet ...       our pet, and the room's
    //   ambient       the crowd our client should show in this room
+   //   quest ...     quests: accept, turn in, abandon, the log (util/questbook.kod)
 
    ShardsCommand(string = $)
    {
@@ -4479,6 +4495,13 @@ messages:
          return;
       }
 
+      if StringEqual(sVerb,"quest")
+      {
+         Send(Send(SYS,@GetQuestBook),@QuestCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       Debug("Unknown UC_SHARDS command from",self);
 
       return;
@@ -4499,6 +4522,68 @@ messages:
    GetAttunedPortals()
    {
       return plAttunedPortals;
+   }
+
+   // Ours: what util/questbook.kod keeps on each player
+
+   GetQuestLog()
+   {
+      return plQuestLog;
+   }
+
+   SetQuestLog(log = $)
+   {
+      plQuestLog = log;
+
+      return;
+   }
+
+   GetQuestDone()
+   {
+      return plQuestDone;
+   }
+
+   SetQuestDone(done = $)
+   {
+      plQuestDone = done;
+
+      return;
+   }
+
+   GetQuestNpc()
+   {
+      return poQuestNpc;
+   }
+
+   GetOldQuestHistory()
+   "Ours: the old QuestEngine's history, for QuestBook.MigrateOld."
+   {
+      return plQuestHistory;
+   }
+
+   TakeOldGuideChains()
+   "Ours: the old guide chains (GameQuestMaintenance) this player finished, for QuestBook.MigrateOld. "
+   "The old guide quests go, and so do the lists of chains, so it happens once."
+   {
+      local i, lDone;
+
+      lDone = plCompletedPassiveQuestChains;
+      foreach i in plPassiveQuests
+      {
+         Send(i,@Delete);
+      }
+      plPassiveQuests = $;
+      plCompletedPassiveQuestChains = $;
+      plOngoingPassiveQuestChains = $;
+
+      return lDone;
+   }
+
+   SetQuestNpc(what = $)
+   {
+      poQuestNpc = what;
+
+      return;
    }
 
    AttunePortal(id = $)
@@ -8308,6 +8393,12 @@ messages:
          return;
       }
 
+      // Ours: a collect step counts it (util/questbook.kod), before a bag can take it
+      if plQuestLog <> $
+      {
+         Send(Send(SYS,@GetQuestBook),@ItemGained,#who=self,#what=what);
+      }
+
       lbags = Send(self,@GetBag);
 
       foreach i in lbags
@@ -9101,6 +9192,12 @@ messages:
    NewUsing(what = $)
    {
       local rName,rIcon;
+
+      // Ours: equip steps (util/questbook.kod)
+      if plQuestLog <> $
+      {
+         Send(Send(SYS,@GetQuestBook),@ItemEquipped,#who=self,#what=what);
+      }
 
       if pbLogged_on
       {
@@ -10143,6 +10240,9 @@ messages:
    {
       local i;
 
+      // Ours: deposit steps (util/questbook.kod)
+      Send(Send(SYS,@GetQuestBook),@MoneyDeposited,#who=self,#with=with,#amount=amount);
+
       foreach i in plPassiveQuests
       {
          Send(i,@MadeMoneyDeposit,#with=with,#amount=amount);
@@ -10154,6 +10254,9 @@ messages:
    MadeItemDeposit(with=$, lItems=$)
    {
       local i;
+
+      // Ours: stash steps (util/questbook.kod)
+      Send(Send(SYS,@GetQuestBook),@ItemsStashed,#who=self,#with=with,#items=lItems);
 
       foreach i in plPassiveQuests
       {
@@ -10179,6 +10282,9 @@ messages:
    {
       local i;
 
+      // Ours: buy steps (util/questbook.kod)
+      Send(Send(SYS,@GetQuestBook),@ItemBought,#who=self,#with=bought_from,#what=what);
+
       foreach i in plPassiveQuests
       {
          Send(i,@BoughtAnItem,#bought_from=bought_from,#what=what);
@@ -10190,6 +10296,9 @@ messages:
    ChoseAHometown()
    {
       local i;
+
+      // Ours: hometown steps (util/questbook.kod); posted, so the choice is made first
+      Post(Send(SYS,@GetQuestBook),@CheckStateSteps,#who=self);
 
       foreach i in plPassiveQuests
       {

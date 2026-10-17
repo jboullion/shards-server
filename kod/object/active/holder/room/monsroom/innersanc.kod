@@ -19,6 +19,10 @@ constants:
    LIFT_DELAY = 13000
 
    LEVER_REACTIVATE_DELAY = 2000    // 2 seconds
+
+   // Ours: Queen Venya'cyr walks here always, like Far'Nohl's ghost in the throne room
+   // (throne2.kod): while anyone is here, she comes back this long after she falls (seconds)
+   QUEEN_CYCLE = 600
        
    include blakston.khd
 
@@ -39,6 +43,9 @@ resources:
 
    guildh15_guildwarning = \
       "Your amulet vibrates vigorously for a moment.  Something is amiss."
+
+   innersanc_queen_spawn = \
+      "~kA cold voice fills the sanctum, \"~r~IKneel before your Queen!~I~k\""
 
 classvars:
 
@@ -71,6 +78,9 @@ properties:
    piInit_count_max = 20
 
    piMonster_count_max = 10
+
+   // The timer that brings the Queen back (QUEEN_CYCLE)
+   ptQueen = $
 
 messages:
 
@@ -111,6 +121,12 @@ messages:
 
    Delete()
    {
+      if ptQueen <> $
+      {
+         DeleteTimer(ptQueen);
+         ptQueen = $;
+      }
+
       if ptEntrance <> $ {
          DeleteTimer(ptEntrance);
          ptEntrance = $;
@@ -192,11 +208,8 @@ messages:
             #fine_row=16,#fine_col=24,
             #new_angle=ANGLE_SOUTH_EAST);
       
-      // Create either lich body or lich herself.
-      Send(self,@NewHold,#what=Create(&DeadLich),
-            #new_row=13,#new_col=49,
-            #fine_row=16,#fine_col=00,
-            #new_angle=ANGLE_WEST);
+      // Ours: no necromancer guild, and so no ghostly remains to raise her from: the Queen
+      // herself comes when someone enters (SpawnQueen), as Far'Nohl's ghost does
 
       // Create the levers.
       oLever = Create(&Lever,#description=Guildh15_lever_desc,
@@ -331,6 +344,64 @@ messages:
    "return -1 if this player cannot rent this guild hall."
    {
       return -1;   /// A player can never normally rent this guild hall.
+   }
+
+   FirstUserEntered()
+   {
+      Send(self,@SpawnQueen);
+
+      propagate;
+   }
+
+   LastUserLeft()
+   {
+      if ptQueen <> $
+      {
+         DeleteTimer(ptQueen);
+         ptQueen = $;
+      }
+
+      propagate;
+   }
+
+   QueenTimer()
+   {
+      ptQueen = $;
+      Send(self,@SpawnQueen);
+
+      return;
+   }
+
+   SpawnQueen()
+   "Queen Venya'cyr, unless she's here already; and the timer to look again."
+   {
+      local i, iTime, oQueen;
+
+      if ptQueen = $
+      {
+         // Ten percent either way, in milliseconds
+         iTime = (QUEEN_CYCLE * Random(90,110)) / 100;
+         ptQueen = CreateTimer(self,@QueenTimer,iTime * 1000);
+      }
+
+      foreach i in plActive
+      {
+         if IsClass(Send(self,@HolderExtractObject,#data=i),&Lich)
+         {
+            return FALSE;
+         }
+      }
+
+      oQueen = Create(&Lich);
+      Send(self,@NewHold,#what=oQueen,#new_row=13,#new_col=49,#fine_row=16,#fine_col=0,
+           #new_angle=ANGLE_WEST);
+
+      if pbUser_in_room
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=innersanc_queen_spawn,#what=self);
+      }
+
+      return TRUE;
    }
 
    GetRegion()

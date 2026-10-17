@@ -1,0 +1,38 @@
+{
+  "id": 54,
+  "key": "story-mystery-monster",
+  "name": "The Missing Dress Pattern",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_MYSTERY_MONSTER"
+  ],
+  "giver": {
+    "class": "Barloquetailor"
+  },
+  "band": {
+    "min": 0,
+    "max": 40
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Wouldst thou do something for me? I will reward thee. Verily, some large insect was nesting in my storage area for a while. I managed to force it out by building a small fire and blowing smoke inside, and when the smoke cleared one of my special dress patterns was missing! I'll wager it is still stuck to that insect's carapace. It looked like a centipede, and it cannot have gone far.",
+    "complete": "Bless thee, child! Here, this robe is from one of my other special patterns. It has a very ancient design indeed. Wear it well, friend."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Centipede",
+      "count": 1,
+      "objective": "The insect slain"
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "DiscipleRobe"
+      }
+    ]
+  }
+}

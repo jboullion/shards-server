@@ -1,0 +1,39 @@
+{
+  "id": 86,
+  "key": "offering-kraanan",
+  "name": "An Offering to Kraanan",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_KRAANAN_OFFERING"
+  ],
+  "giver": {
+    "class": "KraananPriestess"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Heroic champion of the Fist, will you give of yourself so that your Lord may be stronger? Worship with me, then. Together, we will draw upon our own life essence to forge a symbol of our Lord's power. Incant these words with me: By the spark of steel against steel, I summon thee, Kraanan the Fist.",
+    "complete": "Ah, this is a great day for Kraanan! Go now, carry forth the strength of our Lord into the world! Placed at one of the Shrines around the world, it will dedicate the Shrine to Kraanan."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "objective": "Chant the words with them",
+      "turnin": {
+        "class": "KraananPriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "items": [
+      {
+        "class": "OfferingKraanan"
+      }
+    ]
+  }
+}

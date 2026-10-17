@@ -1,0 +1,67 @@
+{
+  "tier": "main",
+  "id": 215,
+  "key": "rebel-waylay-oasis",
+  "name": "Waylay Oasis",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 135,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "Far across the desert lies Waylay Oasis, and the sands around it crawl with xeochicatl - creatures of raw elements - and golems of stone and fire. Whoever holds the oasis holds the desert. Clear twelve of the xeochicatl and four of the golems. Go with friends, or don't go at all.",
+    "progress": "Waylay Oasis lies across the desert; the xeochicatl and the golems roam the sands, the shores and the cliffs around it.",
+    "complete": "The desert is a little less deadly, and the oasis a little closer to being ours."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Xeochicatl",
+      "count": 12,
+      "rooms": [
+        1500,
+        1501,
+        1502,
+        1507,
+        1508,
+        1509,
+        1510,
+        1511,
+        1524,
+        1525
+      ],
+      "objective": "Xeochicatl slain"
+    },
+    {
+      "kind": "kill",
+      "target": "Elemental",
+      "count": 4,
+      "rooms": [
+        1500,
+        1501,
+        1502,
+        1507,
+        1508,
+        1509,
+        1510,
+        1511,
+        1524,
+        1525
+      ],
+      "objective": "Golems destroyed",
+      "brief": "Now the golems - four of them."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.25,
+    "shillings": 15000
+  }
+}

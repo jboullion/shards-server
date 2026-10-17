@@ -1,0 +1,45 @@
+{
+  "tier": "errand",
+  "id": 170,
+  "key": "kocatan-war-on-the-chieftains",
+  "name": "War on the Chieftains",
+  "giver": {
+    "class": "KocatanCaptainGood"
+  },
+  "band": {
+    "min": 130,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      154
+    ]
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "The noble avars choose new chieftains as fast as we kill them. If the war is to be won, it must be fought every day. Eight chieftains of the noble avars - today, and again tomorrow, if you are willing.",
+    "progress": "The noble avars' chieftains hold their territory and headquarters, the avar village and the trading post's clearing.",
+    "complete": "Another day of the war won. Come back tomorrow; there will be more."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "AvarChieftain",
+      "count": 8,
+      "rooms": [
+        2142,
+        2143,
+        2152,
+        2154,
+        2144
+      ],
+      "objective": "Avar chieftains slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 5000
+  }
+}

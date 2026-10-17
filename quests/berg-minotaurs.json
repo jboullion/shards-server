@@ -1,0 +1,40 @@
+{
+  "tier": "main",
+  "id": 204,
+  "key": "berg-minotaurs",
+  "name": "Minotaurs of the Wasteland",
+  "giver": {
+    "class": "BergLeaderM"
+  },
+  "band": {
+    "min": 135,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      203
+    ]
+  },
+  "text": {
+    "offer": "Deeper in the valley, in the bone-dry wasteland, the minotaurs rule. They are the reason no Berg caravan goes south. Kill eight of them - and take your strongest friends.",
+    "progress": "The minotaurs roam the Valley of Death, the bone-dry wasteland and the parched stretches beyond.",
+    "complete": "Eight minotaurs. The bards of Berg will sing of you."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Minotaur",
+      "count": 8,
+      "rooms": [
+        2850,
+        2851,
+        2853
+      ],
+      "objective": "Minotaurs slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 7000
+  }
+}
