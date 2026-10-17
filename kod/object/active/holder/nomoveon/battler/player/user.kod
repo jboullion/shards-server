@@ -560,6 +560,16 @@ properties:
    piPetColour = 0
    psPetName = $
 
+   // Ours (util/companionbook.kod): our companion, the bond's points, since when it's been
+   // counting (GetTime, 0 while it isn't with us), when "dismiss forever" was last asked, and
+   // this hour's points for kills shared (from when)
+   poCompanion = $
+   piCompanionBond = 0
+   piCompanionBondSince = 0
+   piCompanionForeverAt = 0
+   piCompanionKillWindow = 0
+   piCompanionKillPoints = 0
+
    piLogoffPenaltyCount = 0
 
    piTimeNewsPosted = 0
@@ -631,6 +641,9 @@ messages:
    Delete()
    {
       local i;
+
+      // Ours: a deleted character's companion goes with them (util/companionbook.kod)
+      Send(Send(SYS,@GetCompanionBook),@OwnerDeleted,#who=self);
 
       Send(SYS,@SystemUserDelete,#what=self);
 
@@ -982,6 +995,8 @@ messages:
       // Ours: our quests, and our client's log of them (util/questbook.kod)
       poQuestNpc = $;
       Send(Send(SYS,@GetQuestBook),@PlayerLoggedOn,#who=self);
+      // Ours: our companion comes back with us (util/companionbook.kod)
+      Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
 
       return;
    }
@@ -1035,6 +1050,8 @@ messages:
       Send(Send(SYS,@GetShardsSocial),@UserLeaving,#who=self);
 
       Send(self,@CancelIfOffer);
+      // Ours: our companion goes to limbo with us, before minions are released
+      Send(Send(SYS,@GetCompanionBook),@OwnerLoggingOff,#who=self);
       Send(self,@UserLogoffHook);
 
       // If player logs off somewhere other than an inn or inside a guildhall
@@ -4446,6 +4463,7 @@ messages:
    //   pet ...       our pet, and the room's
    //   ambient       the crowd our client should show in this room
    //   quest ...     quests: accept, turn in, abandon, the log (util/questbook.kod)
+   //   companion ... our companion: ask, stances, dismiss, come, looks (util/companionbook.kod)
 
    ShardsCommand(string = $)
    {
@@ -4502,6 +4520,13 @@ messages:
          return;
       }
 
+      if StringEqual(sVerb,"companion")
+      {
+         Send(Send(SYS,@GetCompanionBook),@CompanionCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       Debug("Unknown UC_SHARDS command from",self);
 
       return;
@@ -4522,6 +4547,85 @@ messages:
    GetAttunedPortals()
    {
       return plAttunedPortals;
+   }
+
+   // Ours: what util/companionbook.kod keeps on each player
+
+   GetCompanion()
+   {
+      return poCompanion;
+   }
+
+   SetCompanion(comp = $)
+   {
+      poCompanion = comp;
+
+      return;
+   }
+
+   GetCompanionBond()
+   {
+      return piCompanionBond;
+   }
+
+   SetCompanionBond(points = 0)
+   {
+      piCompanionBond = points;
+
+      return;
+   }
+
+   GetCompanionBondSince()
+   {
+      return piCompanionBondSince;
+   }
+
+   SetCompanionBondSince(when = 0)
+   {
+      piCompanionBondSince = when;
+
+      return;
+   }
+
+   GetCompanionForeverAt()
+   {
+      return piCompanionForeverAt;
+   }
+
+   SetCompanionForeverAt(when = 0)
+   {
+      piCompanionForeverAt = when;
+
+      return;
+   }
+
+   GetCompanionKillWindow()
+   {
+      return piCompanionKillWindow;
+   }
+
+   GetCompanionKillPoints()
+   {
+      return piCompanionKillPoints;
+   }
+
+   SetCompanionKillWindow(when = 0,points = 0)
+   {
+      piCompanionKillWindow = when;
+      piCompanionKillPoints = points;
+
+      return;
+   }
+
+   KilledSomething(what = $,use_weapon = $,stroke_obj = $)
+   {
+      // Ours: a kill with our companion beside us grows the bond (util/companionbook.kod)
+      if poCompanion <> $
+      {
+         Send(Send(SYS,@GetCompanionBook),@SharedKill,#who=self,#victim=what);
+      }
+
+      propagate;
    }
 
    // Ours: what util/questbook.kod keeps on each player
@@ -8563,6 +8667,8 @@ messages:
             // Ours: friends hear where we are, followers which way we went, and pets are
             // told about, now our client has the room (util/shardssocial.kod)
             Send(Send(SYS,@GetShardsSocial),@RoomChanged,#who=self,#came_from=lCameFrom);
+            // Ours: our companion follows us in, if the room will have it
+            Post(Send(SYS,@GetCompanionBook),@OwnerMoved,#who=self);
          }
       }
 

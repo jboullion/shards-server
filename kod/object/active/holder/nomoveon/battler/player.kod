@@ -5746,7 +5746,7 @@ messages:
       if what <> $
          AND IsClass(what,&Battler)
       {
-         Send(self,@CommandMinionAttack,#oTarget=what);
+         Send(self,@CommandMinionAttack,#oTarget=what,#defend=TRUE);
       }
 
       if what <> $ AND IsClass(what,&monster)
@@ -7287,6 +7287,11 @@ messages:
       // Ours: and for new quests, whose markers change, and health steps (util/questbook.kod)
       Post(Send(SYS,@GetQuestBook),@RefreshMarkers,#who=self);
       Post(Send(SYS,@GetQuestBook),@CheckStateSteps,#who=self);
+      // Ours: a companion grows with its owner (util/companionbook.kod)
+      if IsClass(self,&User)
+      {
+         Post(Send(SYS,@GetCompanionBook),@Rescale,#who=self);
+      }
 
       return;
    }
@@ -15143,7 +15148,9 @@ messages:
    }
 
    // This section deals with minion code.
-   CommandMinionAttack(oTarget=$)
+   CommandMinionAttack(oTarget=$,defend=FALSE)
+   "Sends our minions at oTarget; defend is when it hurt us (a companion's stance may only "
+   "answer that, Companion.TakesMinionCommand)."
    {
       local oActive;
 
@@ -15182,6 +15189,7 @@ messages:
             if IsClass(oActive,&Monster)
                AND Send(oActive,@GetMaster) = self
                AND Send(oActive,@GetTarget) <> oTarget
+               AND Send(oActive,@TakesMinionCommand,#defend=defend)
             {
                Send(oActive,@SetBehaviorFlag,
                      #flag=AI_MOVE_FOLLOW_MASTER,#value=FALSE);

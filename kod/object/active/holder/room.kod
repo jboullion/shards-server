@@ -4364,6 +4364,13 @@ messages:
       return FALSE;
    }
 
+   AllowsCompanion(what = $)
+   "Ours: whether a companion may come in with its owner (util/companionbook.kod). Arenas, "
+   "the survival rooms and the Underworld say no; it rejoins its owner when they leave."
+   {
+      return NOT Send(self,@IsArena);
+   }
+
    GetWatcher()
    "Used for Arenas to get the watcher."
    {

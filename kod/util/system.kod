@@ -419,6 +419,8 @@ properties:
    poShardsSocial = $
    // Ours: quests you can find (util/questbook.kod), made on demand
    poQuestBook = $
+   // Ours: companions (util/companionbook.kod), made on demand
+   poCompanionBook = $
    poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
@@ -3455,6 +3457,8 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_NIGHT_VISION,#class=&NightVision);
       Send(self,@CreateOneSpellIfNew,#num=SID_FIREBALL,#class=&Fireball);
       Send(self,@CreateOneSpellIfNew,#num=SID_ICESHARD,#class=&Iceshard);
+      // Ours: brings a fallen companion back (docs/adr/0010-followers.md)
+      Send(self,@CreateOneSpellIfNew,#num=SID_RESTORE_COMPANION,#class=&RestoreCompanion);
       Send(self,@CreateOneSpellIfNew,#num=SID_DMRESCUE,#class=&DMRescue);
       Send(self,@CreateOneSpellIfNew,#num=SID_DELIVERANCE_TOUCH,#class=&DeliveranceTouch);
       Send(self,@CreateOneSpellIfNew,#num=SID_SPECTATE,#class=&Spectate);
@@ -5243,6 +5247,17 @@ messages:
       }
 
       return poQuestBook;
+   }
+
+   GetCompanionBook()
+   "Ours: companions (util/companionbook.kod), made on demand."
+   {
+      if poCompanionBook = $
+      {
+         poCompanionBook = Create(&CompanionBook);
+      }
+
+      return poCompanionBook;
    }
 
    GetGameQuestMaintenance()

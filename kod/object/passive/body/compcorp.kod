@@ -1,0 +1,82 @@
+// Ours (Meridian Shards, docs/adr/0010-followers.md 5): a fallen companion's body. It lasts
+// ten minutes, for Restore Companion (spell/restcomp.kod) to bring it back; when it goes, the
+// companion recovers at its leader's hall (util/companionbook.kod CorpseGone).
+
+////////////////////////////////////////////////////////////////////////////////
+CompanionCorpse is DeadBody
+
+constants:
+
+   include blakston.khd
+
+   CORPSE_MS = 600000
+
+resources:
+
+classvars:
+
+properties:
+
+   poCompanion = $
+   pbRevived = FALSE
+
+messages:
+
+   Constructor(victim = $)
+   {
+      poCompanion = victim;
+
+      propagate;
+   }
+
+   Constructed()
+   {
+      // A companion's body lasts longer than a monster's
+      if ptDelete <> $
+      {
+         DeleteTimer(ptDelete);
+      }
+
+      ptDelete = CreateTimer(self,@DeleteTimerMessage,CORPSE_MS);
+
+      propagate;
+   }
+
+   IsCompanionCorpse()
+   {
+      return TRUE;
+   }
+
+   GetCompanion()
+   {
+      return poCompanion;
+   }
+
+   ReviveCompanion(caster = $)
+   {
+      if pbRevived OR poCompanion = $
+      {
+         return;
+      }
+
+      pbRevived = TRUE;
+      Send(Send(SYS,@GetCompanionBook),@Revive,#comp=poCompanion,#corpse=self,#caster=caster);
+      Send(self,@Delete);
+
+      return;
+   }
+
+   Delete()
+   {
+      if NOT pbRevived AND poCompanion <> $
+      {
+         Post(Send(SYS,@GetCompanionBook),@CorpseGone,#comp=poCompanion);
+      }
+
+      poCompanion = $;
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1321,8 +1321,9 @@ messages:
          if iRow <> 0 AND iCol <> 0
             AND Send(poMaster,@GetOwner) <> $
          {
-            if ((piRow - iRow) <= 3
-               AND (piCol - iCol) <= 3
+            // Ours: Abs, or any minion north or west of its master counted as close
+            if (Abs(piRow - iRow) <= 3
+               AND Abs(piCol - iCol) <= 3
                AND NOT (cClass = &EvilTwin
                   AND (NOT Send(self,@IsEnchanted,#byClass=&Seduce))))
                OR cClass = &Reflection // Flecs follow.
@@ -7014,6 +7015,18 @@ messages:
    CanPlayerAdvanceOnMe()
    {
       return (NOT Send(self,@IsIllusion));
+   }
+
+   // Ours: companions (battler/monster/human/companion.kod) answer these otherwise. Older
+   // code asks by message, never by class, so the build order can't trip over them.
+   IsCompanion()
+   {
+      return FALSE;
+   }
+
+   TakesMinionCommand(defend = FALSE)
+   {
+      return TRUE;
    }
 
    SetIllusion(value = $)

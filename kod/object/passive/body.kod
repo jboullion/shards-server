@@ -285,5 +285,11 @@ messages:
       return pbResurrected;
    }
 
+   // Ours: a companion's body answers otherwise (body/compcorp.kod)
+   IsCompanionCorpse()
+   {
+      return FALSE;
+   }
+
 end
 ////////////////////////////////////////////////////////////////////////////////

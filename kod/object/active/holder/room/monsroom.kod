@@ -209,7 +209,8 @@ messages:
 
    NewHold(what = $)
    {
-      if IsClass(what,&Monster)
+      // Ours: a companion doesn't take a spawn's place
+      if IsClass(what,&Monster) AND NOT Send(what,@IsCompanion)
       {
          piMonster_count = piMonster_count + 1;
       }
@@ -219,7 +220,7 @@ messages:
 
    LeaveHold(what = $)
    {
-      if IsClass(what,&Monster)
+      if IsClass(what,&Monster) AND NOT Send(what,@IsCompanion)
       {
          piMonster_count = piMonster_count - 1;
       }

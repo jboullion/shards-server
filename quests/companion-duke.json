@@ -1,0 +1,34 @@
+{
+  "tier": "main",
+  "id": 240,
+  "key": "companion-duke",
+  "name": "A Soldier at Your Side",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 90
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "text": {
+    "offer": "You have served me well enough to be trusted with one of my soldiers. Stand before me and ask for a companion, and one will swear to follow you. Look after them: a soldier who trusts you fights the harder for it.",
+    "progress": "Stand before the Duke and ask him for a companion (the Companion tab, C).",
+    "complete": "Good. Fight beside your soldier, and the bond between you will grow. Keep them close, and keep them alive."
+  },
+  "steps": [
+    {
+      "kind": "companion",
+      "objective": "Take a companion into your service",
+      "brief": "Stand before the Duke and ask him for a companion (the Companion tab, C)."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 2
+  }
+}

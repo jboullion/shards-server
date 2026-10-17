@@ -138,7 +138,9 @@ messages:
             SID_DAZZLE,
             SID_SACRED_RESONANCE,
             SID_MARTYRS_GRACE,
-            SID_SPIRITUAL_SWORD
+            SID_SPIRITUAL_SWORD,
+            // Ours (docs/adr/0010-followers.md)
+            SID_RESTORE_COMPANION
          ],
       $];
 

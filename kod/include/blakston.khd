@@ -134,6 +134,46 @@
    MM_QUEST_SILVER         = 0x00200000
    MM_QUEST_BRONZE         = 0x00400000
 
+   // Ours: companions (docs/adr/0010-followers.md, util/companionbook.kod). Its state:
+   COMP_NONE = 0
+   COMP_ACTIVE = 1        // with its owner, in the world or in limbo beside them
+   COMP_WAITING = 2       // dismissed for a while, at its leader's hall
+   COMP_FALLEN = 3        // dead, in limbo while its corpse lies where it fell
+   COMP_RECOVERING = 4    // at its leader's hall, ready to fetch after a while (or a fee)
+   // Its stance
+   COMP_FOLLOW = 1
+   COMP_DEFEND = 2
+   COMP_STAY = 3
+   COMP_PASSIVE = 4
+   // The kinds of companion, and the numbers they grow by (util/companionkinds.kod)
+   COMPANION_DUKE = 1
+   COMPANION_PRINCESS = 2
+   COMPANION_REBEL = 3
+   COMPANION_KRAANAN = 4
+   COMPANION_KINDS = 4
+
+   // A companion's health is this much of its owner's base health (percent)
+   COMPANION_HEALTH_PCT = 70
+   // Its offence and defence before the bond (percent of a monster of its owner's level)
+   COMPANION_FIGHT_PCT = 85
+
+   // The bond: a point a minute together, more for kills shared (at most so many an hour)
+   COMPANION_KILL_POINTS = 3
+   COMPANION_KILL_POINTS_HOUR = 120
+
+   // Fallen: the corpse lasts this long (ms); then it recovers at its leader's hall for this
+   // long (seconds), or is fetched at once for a fee of this many shillings per point of
+   // its owner's health
+   COMPANION_CORPSE_MS = 600000
+   COMPANION_RECOVER_SECONDS = 3600
+   COMPANION_FEE_PER_HEALTH = 25
+
+   // Base health needed to ask for one
+   COMPANION_MIN_HEALTH = 50
+
+   // Kraanan's disciple quest (QuestBook), and the old one it replaced
+   COMPANION_KRAANAN_QUEST = 82
+
    // Player name color sent as hex RGB value. Define constants
    // for ease of use as needed. Requires OF_PLAYER boolean flag
    // to be set to draw a name.
@@ -2480,6 +2520,8 @@
    SID_VAULT_LOADOUT = 200
    SID_FREEZING = 201
    SID_ICESHARD = 202
+   // Ours: brings a fallen companion back (spell/restcomp.kod)
+   SID_RESTORE_COMPANION = 203
    SID_ICEWALL             = 241
    SID_INDEST              = 242
    SID_NODROP              = 253

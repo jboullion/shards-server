@@ -182,6 +182,8 @@ properties:
    prMouth = human_mouth_ax_icon
    prNose = human_nose_ax_icon
    prToupee = human_hair_ac_icon
+   // Ours: facial hair, drawn on the mouth in the hair colour as a player's is (companions)
+   prBeard = $
 
    plUsing = $
    plOverlays = $
@@ -969,11 +971,16 @@ messages:
       local i,iOverlays,hotspot,iLeft_group,iRight_group,iSkin_xlat,
             iArms_xlat,iLegs_xlat;
 
-      // Player has 7 standard overlays: right arm, left arm, legs, head, eyes, 
+      // Player has 7 standard overlays: right arm, left arm, legs, head, eyes,
       // mouth, nose
       iOverlays = 7;
 
       if poHair_remove = $
+      {
+         iOverlays = iOverlays + 1;
+      }
+
+      if prBeard <> $
       {
          iOverlays = iOverlays + 1;
       }
@@ -1053,8 +1060,14 @@ messages:
       AddPacket(4,prEyes,1,HS_EYES,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,piAction);
       AddPacket(4,prNose,1,HS_NOSE,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,1);
 
+      if prBeard <> $
+      {
+         AddPacket(4,prBeard,1,HS_MOUTH,1,ANIMATE_TRANSLATION,1,Send(self,@GetHairColor),
+                   1,ANIMATE_NONE,2,1);
+      }
+
       if poHair_remove = $
-      {  
+      {
          AddPacket(4,prToupee,1,HS_TOUPEE,1,ANIMATE_TRANSLATION,1,
                    (piBody_translations2 & HUMAN_TRANSLATION2_HAIR_MASK)
                      / HUMAN_TRANSLATION2_HAIR_MUL);
@@ -1080,6 +1093,11 @@ messages:
       iOverlays = 7;
 
       if poHair_remove = $
+      {
+         iOverlays = iOverlays + 1;
+      }
+
+      if prBeard <> $
       {
          iOverlays = iOverlays + 1;
       }
@@ -1215,6 +1233,12 @@ messages:
       AddPacket(4,prMouth,1,HS_MOUTH,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,piAction);
       AddPacket(4,prEyes,1,HS_EYES,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,piAction);
       AddPacket(4,prNose,1,HS_NOSE,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,1);
+
+      if prBeard <> $
+      {
+         AddPacket(4,prBeard,1,HS_MOUTH,1,ANIMATE_TRANSLATION,1,Send(self,@GetHairColor),
+                   1,ANIMATE_NONE,2,1);
+      }
 
       if poHair_remove = $
       {

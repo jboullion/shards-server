@@ -1,0 +1,1386 @@
+// Ours (Meridian Shards, docs/adr/0010-followers.md): companions. One object, SYS@GetCompanionBook,
+// made on demand; it keeps nothing of its own. Each player's companion is a Companion
+// (battler/monster/human/companion.kod) kept on User (poCompanion), with the bond there too, so
+// a companion revived or fetched from its leader keeps it.
+//
+// A companion is:
+//   COMP_ACTIVE      with its owner: beside them, or in limbo while they're logged off or in a
+//                    room that won't take it (it rejoins them in the next room that will)
+//   COMP_WAITING     dismissed for a while, standing at its leader's hall, unattackable
+//   COMP_FALLEN      dead: in limbo while its corpse lies where it fell (Restore Companion on
+//                    the corpse brings it back there)
+//   COMP_RECOVERING  its corpse gone, at its leader's hall: fetched after an hour, or at once
+//                    for a fee
+//
+// Our client's commands (UC_SHARDS, User.ShardsCommand -> CompanionCommand):
+//   companion status | ask | follow | defend | stay | passive | dismiss | dismiss forever
+//   companion dismiss forever confirm | come | pay
+//   companion look <gender> <hair> <eyes> <nose> <mouth> <beard> <hair colour> <skin> <c1> <c2>
+// The look's parts are 0-based places in the lists our client was sent (BP_CHARINFO: the same
+// lists as system.kod GetAllowed*Icons, GetHairTranslations and the four skins); the beard is 0
+// for none, else its place + 1; the colours are places in its kind's palette.
+// Our client is told everything with UC_COMPANION (SendStatus, HealthChanged).
+//
+// The admin dashboard drives it over the maintenance port (Admin* messages, at the end).
+
+////////////////////////////////////////////////////////////////////////////////
+CompanionBook is CompanionKinds
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   // UC_COMPANION's kinds of packet
+   COMPANION_PKT_STATUS = 1
+   COMPANION_PKT_HEALTH = 2
+
+   // Status flags
+   COMPANION_LEFT_BEHIND = 1
+   COMPANION_FOREVER_ARMED = 2
+   COMPANION_READY = 4
+
+   // How near a leader (or a waiting companion) a player must stand, in squares
+   COMPANION_REACH = 4
+   // Seconds to say "dismiss forever" again
+   COMPANION_CONFIRM_SECONDS = 30
+
+resources:
+
+   cbook_have_one = "You already have a companion.  Dismiss yours for good first."
+   cbook_too_weak = "You need %i health before anyone will swear a companion to you."
+   cbook_no_leader = "Stand near a faction leader or a school head who gives companions."
+   cbook_wrong_faction = "%s%s gives companions only to the members of their own faction."
+   cbook_not_disciple = "%s%s gives companions only to those who have proven themselves as disciples."
+   cbook_joins = "%s joins you, sworn to fight at your side."
+   cbook_none = "You have no companion."
+   cbook_not_with_you = "%s isn't with you."
+   cbook_stance_follow = "%s follows you and fights what you fight."
+   cbook_stance_defend = "%s follows you, and fights only what attacks you."
+   cbook_stance_stay = "%s stays where it stands."
+   cbook_stance_passive = "%s follows you, and won't fight."
+   cbook_left_behind = "%s can't follow you here.  It will rejoin you when it can."
+   cbook_dismissed = "%s goes to wait for you at %s%s's side."
+   cbook_comes = "%s comes back to your side."
+   cbook_not_here = "%s is waiting for you elsewhere."
+   cbook_recovering = "%s is still recovering.  You can fetch it in %i minutes, or pay %i shillings now."
+   cbook_paid = "You pay %i shillings, and %s is ready to go."
+   cbook_cant_pay = "You need %i shillings to fetch %s now."
+   cbook_forever_empty = "Take everything out of %s's pack first."
+   cbook_forever_fallen = "%s must recover before you can dismiss it for good."
+   cbook_forever_ask = "Dismiss %s for good, and lose your bond?  Say it again within 30 seconds to confirm."
+   cbook_forever_done = "%s leaves your service for good."
+   cbook_fell = "%s has fallen!  Restore Companion on the body brings it back, or it will recover at its leader's hall."
+   cbook_corpse_gone = "%s's body is gone; it is recovering at its leader's hall."
+   cbook_revived = "%s rises again!"
+   cbook_bad_look = "That look isn't one %s can have."
+   cbook_tier = "Your bond with %s grows stronger."
+
+classvars:
+
+properties:
+
+messages:
+
+   ////////////////////////////////////////////////////////////// commands
+
+   CompanionCommand(who = $,words = $)
+   "The client's companion commands (UC_SHARDS)."
+   {
+      local sVerb;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      if Length(words) < 2
+      {
+         Send(self,@SendStatus,#who=who);
+
+         return;
+      }
+
+      sVerb = Nth(words,2);
+      if StringEqual(sVerb,"status")
+      {
+         Send(self,@SendStatus,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"ask")
+      {
+         Send(self,@Ask,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"follow")
+      {
+         Send(self,@ChangeStance,#who=who,#stance=COMP_FOLLOW);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"defend")
+      {
+         Send(self,@ChangeStance,#who=who,#stance=COMP_DEFEND);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"stay")
+      {
+         Send(self,@ChangeStance,#who=who,#stance=COMP_STAY);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"passive")
+      {
+         Send(self,@ChangeStance,#who=who,#stance=COMP_PASSIVE);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"dismiss")
+      {
+         if Length(words) >= 3 AND StringEqual(Nth(words,3),"forever")
+         {
+            Send(self,@DismissForever,#who=who,
+                 #confirm=(Length(words) >= 4 AND StringEqual(Nth(words,4),"confirm")));
+
+            return;
+         }
+
+         Send(self,@Dismiss,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"come")
+      {
+         Send(self,@Come,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"pay")
+      {
+         Send(self,@Pay,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"look")
+      {
+         Send(self,@Look,#who=who,#words=words);
+
+         return;
+      }
+
+      return;
+   }
+
+   InReach(who = $,obj = $)
+   {
+      return Send(obj,@GetOwner) <> $
+         AND Send(obj,@GetOwner) = Send(who,@GetOwner)
+         AND Abs(Send(who,@GetRow) - Send(obj,@GetRow)) <= COMPANION_REACH
+         AND Abs(Send(who,@GetCol) - Send(obj,@GetCol)) <= COMPANION_REACH;
+   }
+
+   FindLeaderNear(who = $)
+   "A leader who gives companions, close to who, or $."
+   {
+      local i, oRoom, oObj;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+      {
+         return $;
+      }
+
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         oObj = First(i);
+         if Send(self,@KindForLeader,#npc=oObj) > 0
+            AND Send(self,@InReach,#who=who,#obj=oObj)
+         {
+            return oObj;
+         }
+      }
+
+      return $;
+   }
+
+   Ask(who = $)
+   {
+      local oLeader, iKind, iFaction, oQB;
+
+      if Send(who,@GetCompanion) <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_have_one);
+
+         return;
+      }
+
+      if Send(who,@GetBaseMaxHealth) < COMPANION_MIN_HEALTH
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_too_weak,#parm1=COMPANION_MIN_HEALTH);
+
+         return;
+      }
+
+      oLeader = Send(self,@FindLeaderNear,#who=who);
+      if oLeader = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_no_leader);
+
+         return;
+      }
+
+      iKind = Send(self,@KindForLeader,#npc=oLeader);
+      iFaction = Send(self,@GetKindFaction,#kind=iKind);
+      if iFaction <> $ AND Send(who,@GetFaction) <> iFaction
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_wrong_faction,
+              #parm1=Send(oLeader,@GetCapDef),#parm2=Send(oLeader,@GetName));
+
+         return;
+      }
+
+      if iKind = COMPANION_KRAANAN
+      {
+         oQB = Send(SYS,@GetQuestBook);
+         if Send(oQB,@DoneEntry,#who=who,#id=COMPANION_KRAANAN_QUEST) = $
+            AND NOT Send(oQB,@HasDoneReplacing,#who=who,#old=QST_ID_KRAANAN_DISCIPLE)
+         {
+            Send(who,@MsgSendUser,#message_rsc=cbook_not_disciple,
+                 #parm1=Send(oLeader,@GetCapDef),#parm2=Send(oLeader,@GetName));
+
+            return;
+         }
+      }
+
+      Send(self,@Grant,#who=who,#kind=iKind);
+
+      return;
+   }
+
+   Grant(who = $,kind = COMPANION_DUKE)
+   "A new companion of this kind for who (Ask checked they may have one)."
+   {
+      local oComp;
+
+      oComp = Create(&Companion,#kind=kind,#owner=who);
+      Send(who,@SetCompanion,#comp=oComp);
+      Send(who,@SetCompanionBond,#points=0);
+      Send(who,@SetCompanionBondSince,#when=GetTime());
+      Send(oComp,@SetTier,#tier=1);
+      Send(self,@Rescale,#who=who);
+      Send(self,@PlaceWithOwner,#comp=oComp,#who=who);
+      Send(who,@MsgSendUser,#message_rsc=cbook_joins,#parm1=Send(oComp,@GetName));
+      Send(self,@SendStatus,#who=who);
+      // A guide quest's companion step (util/questbook.kod)
+      Post(Send(SYS,@GetQuestBook),@CheckStateSteps,#who=who);
+
+      return oComp;
+   }
+
+   ChangeStance(who = $,stance = COMP_FOLLOW)
+   {
+      local oComp, rMsg;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_none);
+
+         return;
+      }
+
+      Send(oComp,@SetStance,#stance=stance);
+      rMsg = cbook_stance_follow;
+      if stance = COMP_DEFEND
+      {
+         rMsg = cbook_stance_defend;
+      }
+      else if stance = COMP_STAY
+      {
+         rMsg = cbook_stance_stay;
+      }
+      else if stance = COMP_PASSIVE
+      {
+         rMsg = cbook_stance_passive;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=rMsg,#parm1=Send(oComp,@GetName));
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// where it is
+
+   PlaceWithOwner(comp = $,who = $)
+   "Beside its owner, if their room will have it (Room.AllowsCompanion and its ReqNewHold); "
+   "else limbo, to rejoin them later. Returns whether it's with them."
+   {
+      local oRoom;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $ OR NOT Send(oRoom,@AllowsCompanion,#what=comp)
+      {
+         Send(self,@ToLimbo,#comp=comp);
+
+         return FALSE;
+      }
+
+      if Send(comp,@GetOwner) <> oRoom
+      {
+         Send(comp,@SetMaster,#oMaster=$);
+         if NOT Send(SYS,@UtilGoNearSquare,#what=comp,#where=oRoom,
+                     #new_row=Send(who,@GetRow),#new_col=Send(who,@GetCol),
+                     #max_distance=4)
+         {
+            Send(self,@ToLimbo,#comp=comp);
+
+            return FALSE;
+         }
+      }
+
+      if Send(comp,@GetMaster) <> who
+      {
+         Send(comp,@SetMaster,#oMaster=who);
+      }
+
+      Send(comp,@EnterStateWait);
+
+      return TRUE;
+   }
+
+   ToLimbo(comp = $)
+   {
+      Send(comp,@SetMaster,#oMaster=$);
+      Send(comp,@EnterStateLimbo);
+      if Send(comp,@GetOwner) <> $
+      {
+         Send(comp,@NewOwner,#what=$);
+      }
+
+      return;
+   }
+
+   ToHall(comp = $)
+   "To its leader's hall, beside the leader, to wait or recover."
+   {
+      local iKind, oRoom, oLeader, iRow, iCol;
+
+      Send(comp,@SetMaster,#oMaster=$);
+      iKind = Send(comp,@GetKind);
+      oRoom = Send(SYS,@FindRoomByNum,#num=Send(self,@GetHallRoom,#kind=iKind));
+      if oRoom = $
+      {
+         Send(self,@ToLimbo,#comp=comp);
+
+         return;
+      }
+
+      iRow = 10;
+      iCol = 10;
+      oLeader = Send(oRoom,@FindHoldingActive,#class=Send(self,@GetLeaderClass,#kind=iKind));
+      if oLeader <> $
+      {
+         iRow = Send(oLeader,@GetRow) + 1;
+         iCol = Send(oLeader,@GetCol);
+      }
+
+      if Send(comp,@GetOwner) <> oRoom
+      {
+         Send(comp,@EnterStateLimbo);
+         if NOT Send(SYS,@UtilGoNearSquare,#what=comp,#where=oRoom,#new_row=iRow,
+                     #new_col=iCol,#mob_override=TRUE)
+         {
+            Send(self,@ToLimbo,#comp=comp);
+
+            return;
+         }
+      }
+
+      Send(comp,@EnterStateWait);
+
+      return;
+   }
+
+   Replace(comp = $)
+   "Something deleted it (a room rebuilt) and it parked itself: back where it belongs."
+   {
+      local oOwner, iState;
+
+      oOwner = Send(comp,@GetSworn);
+      if oOwner = $ OR Send(oOwner,@GetCompanion) <> comp
+      {
+         return;
+      }
+
+      iState = Send(comp,@GetCompanionState);
+      if iState = COMP_WAITING OR iState = COMP_RECOVERING
+      {
+         Send(self,@ToHall,#comp=comp);
+
+         return;
+      }
+
+      if iState = COMP_ACTIVE AND Send(oOwner,@GetShardsSession) <> $
+      {
+         Send(self,@PlaceWithOwner,#comp=comp,#who=oOwner);
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// its owner
+
+   OwnerMoved(who = $)
+   "Its owner entered a room (User.NewOwner): it comes along, if it may."
+   {
+      local oComp, bWasHere;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $ OR Send(oComp,@GetCompanionState) <> COMP_ACTIVE
+         OR Send(who,@GetOwner) = $
+         OR Send(oComp,@GetOwner) = Send(who,@GetOwner)
+      {
+         return;
+      }
+
+      bWasHere = Send(oComp,@GetOwner) <> $;
+      if NOT Send(self,@PlaceWithOwner,#comp=oComp,#who=who) AND bWasHere
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_left_behind,#parm1=Send(oComp,@GetName));
+         Send(self,@SendStatus,#who=who);
+      }
+
+      return;
+   }
+
+   OwnerLoggedOn(who = $)
+   {
+      local oComp;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp <> $ AND Send(oComp,@GetCompanionState) = COMP_ACTIVE
+      {
+         Send(who,@SetCompanionBondSince,#when=GetTime());
+         Send(self,@Rescale,#who=who);
+         Send(self,@PlaceWithOwner,#comp=oComp,#who=who);
+      }
+
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   OwnerLoggingOff(who = $)
+   "It goes to limbo with its owner (the evil twin's way), and comes back when they do."
+   {
+      local oComp;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return;
+      }
+
+      Send(self,@AccrueBond,#who=who);
+      Send(who,@SetCompanionBondSince,#when=0);
+      if Send(oComp,@GetCompanionState) = COMP_ACTIVE
+      {
+         Send(self,@ToLimbo,#comp=oComp);
+      }
+
+      return;
+   }
+
+   OwnerDeleted(who = $)
+   "A deleted character's companion goes with them."
+   {
+      local oComp;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return;
+      }
+
+      Send(who,@SetCompanion,#comp=$);
+      Send(oComp,@AllowDelete);
+      Send(oComp,@Delete);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// strength and the bond
+
+   Rescale(who = $)
+   "Its strength from its owner's base health and the bond tier (docs/adr/0010 3)."
+   {
+      local oComp, iH, iTier, iBonus, iHealth, iFight, lDamage, iMin, iMax;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return;
+      }
+
+      iH = Send(who,@GetBaseMaxHealth);
+      iTier = Send(self,@TierOf,#points=Send(who,@GetCompanionBond));
+      iBonus = Send(self,@BondBonus,#tier=iTier);
+
+      iHealth = iH * COMPANION_HEALTH_PCT / 100 * (100 + iBonus) / 100;
+      // A monster of its owner's level fights at 4 x level + 8 x 50 (Monster.GetOffense)
+      iFight = (4 * iH + 400) * (COMPANION_FIGHT_PCT + iBonus) / 100;
+      lDamage = Send(self,@GetDamage,#kind=Send(oComp,@GetKind));
+      iMin = Bound(iH * First(lDamage) / 1000 * (100 + iBonus) / 100,1,$);
+      iMax = Bound(iH * Nth(lDamage,2) / 1000 * (100 + iBonus) / 100,iMin,$);
+
+      Send(oComp,@ApplyScale,#level=iH,#health=iHealth,#offense=iFight,#defense=iFight,
+           #min_damage=iMin,#max_damage=iMax);
+      if Send(oComp,@GetGearTier) <> iTier
+      {
+         Send(oComp,@SetTier,#tier=iTier);
+      }
+
+      return;
+   }
+
+   AccrueBond(who = $)
+   "A point for every whole minute it's been with its owner since last counted."
+   {
+      local iSince, iMinutes;
+
+      iSince = Send(who,@GetCompanionBondSince);
+      if iSince <= 0
+      {
+         return;
+      }
+
+      iMinutes = (GetTime() - iSince) / 60;
+      if iMinutes > 0
+      {
+         Send(who,@SetCompanionBondSince,#when=iSince + iMinutes * 60);
+         Send(self,@AddBond,#who=who,#points=iMinutes);
+      }
+
+      return;
+   }
+
+   AddBond(who = $,points = 0)
+   {
+      local oComp, iOld, iNew;
+
+      oComp = Send(who,@GetCompanion);
+      iOld = Send(who,@GetCompanionBond);
+      iNew = iOld + points;
+      Send(who,@SetCompanionBond,#points=iNew);
+      if oComp <> $
+         AND Send(self,@TierOf,#points=iNew) > Send(self,@TierOf,#points=iOld)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_tier,#parm1=Send(oComp,@GetName));
+         Send(self,@Rescale,#who=who);
+         Send(self,@SendStatus,#who=who);
+      }
+
+      return;
+   }
+
+   SharedKill(who = $,victim = $)
+   "Its owner killed something worth killing with it at their side."
+   {
+      local oComp, iNow, iPoints;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $ OR victim = $ OR NOT IsClass(victim,&Monster)
+         OR Send(oComp,@GetCompanionState) <> COMP_ACTIVE
+         OR Send(oComp,@GetOwner) <> Send(who,@GetOwner)
+         OR Send(victim,@GetLevel) * 3 < Send(who,@GetBaseMaxHealth) * 2
+      {
+         return;
+      }
+
+      iNow = GetTime();
+      if iNow - Send(who,@GetCompanionKillWindow) > 3600
+      {
+         Send(who,@SetCompanionKillWindow,#when=iNow,#points=0);
+      }
+
+      iPoints = Send(who,@GetCompanionKillPoints);
+      if iPoints >= COMPANION_KILL_POINTS_HOUR
+      {
+         return;
+      }
+
+      Send(who,@SetCompanionKillWindow,#when=Send(who,@GetCompanionKillWindow),
+           #points=iPoints + COMPANION_KILL_POINTS);
+      Send(self,@AccrueBond,#who=who);
+      Send(self,@AddBond,#who=who,#points=COMPANION_KILL_POINTS);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// death and revival
+
+   CompanionFell(comp = $,corpse = $,killer = $)
+   {
+      local oOwner;
+
+      oOwner = Send(comp,@GetSworn);
+      Send(self,@ToLimbo,#comp=comp);
+      Send(comp,@SetCompanionState,#state=COMP_FALLEN);
+      if oOwner <> $
+      {
+         Send(self,@AccrueBond,#who=oOwner);
+         Send(oOwner,@MsgSendUser,#message_rsc=cbook_fell,#parm1=Send(comp,@GetName));
+         Send(self,@SendStatus,#who=oOwner);
+      }
+
+      return;
+   }
+
+   CorpseGone(comp = $)
+   "Its body decayed before anyone brought it back: it recovers at its leader's hall."
+   {
+      local oOwner;
+
+      if comp = $ OR Send(comp,@GetCompanionState) <> COMP_FALLEN
+      {
+         return;
+      }
+
+      Send(comp,@SetReadyAt,#when=GetTime() + COMPANION_RECOVER_SECONDS);
+      Send(comp,@SetCompanionState,#state=COMP_RECOVERING);
+      Send(comp,@SetHealthPercent,#percent=100);
+      Send(self,@ToHall,#comp=comp);
+      oOwner = Send(comp,@GetSworn);
+      if oOwner <> $
+      {
+         Send(oOwner,@MsgSendUser,#message_rsc=cbook_corpse_gone,#parm1=Send(comp,@GetName));
+         Send(self,@SendStatus,#who=oOwner);
+      }
+
+      return;
+   }
+
+   Revive(comp = $,corpse = $,caster = $)
+   "Restore Companion on its body: back where it lies, with half its health."
+   {
+      local oOwner, oRoom;
+
+      if comp = $ OR Send(comp,@GetCompanionState) <> COMP_FALLEN
+      {
+         return;
+      }
+
+      oOwner = Send(comp,@GetSworn);
+      Send(comp,@SetCompanionState,#state=COMP_ACTIVE);
+      Send(comp,@SetHealthPercent,#percent=50);
+      oRoom = Send(corpse,@GetOwner);
+      if oOwner <> $ AND Send(oOwner,@GetShardsSession) <> $
+      {
+         if oRoom <> $ AND Send(oOwner,@GetOwner) = oRoom
+            AND Send(oRoom,@AllowsCompanion,#what=comp)
+         {
+            Send(oRoom,@NewHold,#what=comp,#new_row=Send(corpse,@GetRow),
+                 #new_col=Send(corpse,@GetCol));
+            Send(comp,@SetMaster,#oMaster=oOwner);
+            Send(comp,@EnterStateWait);
+         }
+         else
+         {
+            Send(self,@PlaceWithOwner,#comp=comp,#who=oOwner);
+         }
+
+         Send(oOwner,@SetCompanionBondSince,#when=GetTime());
+         Send(oOwner,@MsgSendUser,#message_rsc=cbook_revived,#parm1=Send(comp,@GetName));
+         Send(self,@SendStatus,#who=oOwner);
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// dismissing it
+
+   Dismiss(who = $)
+   "Dismissed for a while: it waits at its leader's hall, keeping its pack."
+   {
+      local oComp, iKind, oRoom, oLeader;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_none);
+
+         return;
+      }
+
+      if Send(oComp,@GetCompanionState) <> COMP_ACTIVE
+      {
+         return;
+      }
+
+      Send(self,@AccrueBond,#who=who);
+      Send(who,@SetCompanionBondSince,#when=0);
+      Send(oComp,@SetCompanionState,#state=COMP_WAITING);
+      Send(self,@ToHall,#comp=oComp);
+
+      iKind = Send(oComp,@GetKind);
+      oRoom = Send(SYS,@FindRoomByNum,#num=Send(self,@GetHallRoom,#kind=iKind));
+      oLeader = $;
+      if oRoom <> $
+      {
+         oLeader = Send(oRoom,@FindHoldingActive,#class=Send(self,@GetLeaderClass,#kind=iKind));
+      }
+
+      if oLeader <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_dismissed,#parm1=Send(oComp,@GetName),
+              #parm2=Send(oLeader,@GetDef),#parm3=Send(oLeader,@GetName));
+      }
+
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   Come(who = $)
+   "Fetch it from its leader's hall (near it or the leader), or call it back from limbo."
+   {
+      local oComp, iState, iLeft;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_none);
+
+         return;
+      }
+
+      iState = Send(oComp,@GetCompanionState);
+      if iState = COMP_ACTIVE
+      {
+         Send(self,@PlaceWithOwner,#comp=oComp,#who=who);
+         Send(self,@SendStatus,#who=who);
+
+         return;
+      }
+
+      if iState = COMP_FALLEN
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_fell,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      if Send(oComp,@GetOwner) <> Send(who,@GetOwner)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_not_here,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      if iState = COMP_RECOVERING
+      {
+         iLeft = Send(oComp,@GetReadyAt) - GetTime();
+         if iLeft > 0
+         {
+            Send(who,@MsgSendUser,#message_rsc=cbook_recovering,#parm1=Send(oComp,@GetName),
+                 #parm2=(iLeft + 59) / 60,#parm3=Send(self,@GetFee,#who=who));
+
+            return;
+         }
+      }
+
+      Send(self,@Rejoin,#comp=oComp,#who=who);
+
+      return;
+   }
+
+   Rejoin(comp = $,who = $)
+   {
+      Send(comp,@SetCompanionState,#state=COMP_ACTIVE);
+      Send(who,@SetCompanionBondSince,#when=GetTime());
+      Send(self,@Rescale,#who=who);
+      Send(self,@PlaceWithOwner,#comp=comp,#who=who);
+      Send(who,@MsgSendUser,#message_rsc=cbook_comes,#parm1=Send(comp,@GetName));
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   GetFee(who = $)
+   {
+      return Send(who,@GetBaseMaxHealth) * COMPANION_FEE_PER_HEALTH;
+   }
+
+   Pay(who = $)
+   "Fetch a recovering companion at once, for a fee."
+   {
+      local oComp, iFee, oMoney;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $ OR Send(oComp,@GetCompanionState) <> COMP_RECOVERING
+      {
+         return;
+      }
+
+      if Send(oComp,@GetOwner) <> Send(who,@GetOwner)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_not_here,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      iFee = Send(self,@GetFee,#who=who);
+      oMoney = Send(who,@GetMoneyObject,#type=&Shillings);
+      if oMoney = $ OR Send(oMoney,@GetNumber) < iFee
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_cant_pay,#parm1=iFee,
+              #parm2=Send(oComp,@GetName));
+
+         return;
+      }
+
+      Send(oMoney,@SubtractNumber,#number=iFee);
+      Send(who,@MsgSendUser,#message_rsc=cbook_paid,#parm1=iFee,#parm2=Send(oComp,@GetName));
+      Send(self,@Rejoin,#comp=oComp,#who=who);
+
+      return;
+   }
+
+   DismissForever(who = $,confirm = FALSE)
+   "Dismissed for good, with its pack empty (said again within 30 s): the bond is lost."
+   {
+      local oComp;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_none);
+
+         return;
+      }
+
+      if Send(oComp,@GetCompanionState) = COMP_FALLEN
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_forever_fallen,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      if Send(oComp,@GetPack) <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_forever_empty,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      if NOT confirm
+         OR GetTime() - Send(who,@GetCompanionForeverAt) > COMPANION_CONFIRM_SECONDS
+      {
+         Send(who,@SetCompanionForeverAt,#when=GetTime());
+         Send(who,@MsgSendUser,#message_rsc=cbook_forever_ask,#parm1=Send(oComp,@GetName));
+         Send(self,@SendStatus,#who=who);
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=cbook_forever_done,#parm1=Send(oComp,@GetName));
+      Send(self,@Forget,#who=who);
+
+      return;
+   }
+
+   Forget(who = $)
+   "Its owner has no companion any more: deleted, the bond lost."
+   {
+      local oComp;
+
+      oComp = Send(who,@GetCompanion);
+      Send(who,@SetCompanion,#comp=$);
+      Send(who,@SetCompanionBond,#points=0);
+      Send(who,@SetCompanionBondSince,#when=0);
+      Send(who,@SetCompanionForeverAt,#when=0);
+      if oComp <> $
+      {
+         Send(oComp,@AllowDelete);
+         Send(oComp,@Delete);
+      }
+
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// looks
+
+   Look(who = $,words = $)
+   "companion look <gender> <hair> <eyes> <nose> <mouth> <beard> <hair colour> <skin> <c1> <c2>"
+   {
+      local oComp, lN, i, iGender, l, rHair, rEyes, rNose, rMouth, rBeard, iHairColour,
+            iSkin, lPalette;
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_none);
+
+         return;
+      }
+
+      if Length(words) < 12
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_bad_look,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      lN = $;
+      i = 3;
+      while i <= 12
+      {
+         lN = AppendListElem(StringToNumber(Nth(words,i)),lN);
+         ++i;
+      }
+
+      iGender = GENDER_MALE;
+      if First(lN) = 1
+      {
+         iGender = GENDER_FEMALE;
+      }
+
+      rHair = Send(self,@PartAt,#parts=Send(SYS,@GetAllowedHairIcons,#iGender=iGender),
+                   #at=Nth(lN,2));
+      rEyes = Send(self,@PartAt,#parts=Send(SYS,@GetAllowedEyeIcons,#iGender=iGender),
+                   #at=Nth(lN,3));
+      rNose = Send(self,@PartAt,#parts=Send(SYS,@GetAllowedNoseIcons,#iGender=iGender),
+                   #at=Nth(lN,4));
+      rMouth = Send(self,@PartAt,#parts=Send(SYS,@GetAllowedMouthIcons,#iGender=iGender),
+                    #at=Nth(lN,5));
+      rBeard = $;
+      if Nth(lN,6) > 0
+      {
+         rBeard = Send(self,@PartAt,#parts=Send(SYS,@GetAllowedBeardIcons,#iGender=iGender),
+                       #at=Nth(lN,6) - 1);
+      }
+
+      l = Send(SYS,@GetHairTranslations);
+      lPalette = Send(self,@GetPalette,#kind=Send(oComp,@GetKind));
+      if rHair = $ OR rEyes = $ OR rNose = $ OR rMouth = $
+         OR (Nth(lN,6) > 0 AND rBeard = $)
+         OR Nth(lN,7) < 0 OR Nth(lN,7) >= Length(l)
+         OR Nth(lN,8) < 0 OR Nth(lN,8) > 3
+         OR Nth(lN,9) < 0 OR Nth(lN,9) >= Length(lPalette)
+         OR Nth(lN,10) < 0 OR Nth(lN,10) >= Length(lPalette)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cbook_bad_look,#parm1=Send(oComp,@GetName));
+
+         return;
+      }
+
+      iHairColour = Nth(l,Nth(lN,7) + 1);
+      iSkin = Nth(lN,8) + 1;
+      Send(oComp,@SetLooks,#gender=iGender,#hair=rHair,#eyes=rEyes,#nose=rNose,
+           #mouth=rMouth,#beard=rBeard,#hair_colour=iHairColour,#skin=iSkin,
+           #colour1=Nth(lN,9),#colour2=Nth(lN,10));
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   PartAt(parts = $,at = 0)
+   "The list's entry at a 0-based place, or $ when there's none."
+   {
+      if at < 0 OR at >= Length(parts)
+      {
+         return $;
+      }
+
+      return Nth(parts,at + 1);
+   }
+
+   PlaceOf(parts = $,part = $)
+   "A part's 0-based place in a list (0 when it isn't there)."
+   {
+      local i;
+
+      i = FindListElem(parts,part);
+      if i > 0
+      {
+         return i - 1;
+      }
+
+      return 0;
+   }
+
+   ////////////////////////////////////////////////////////////// our client
+
+   SendStatus(who = $)
+   "UC_COMPANION, kind 1: everything our client's Companion tab shows (docs/research/protocol.md)."
+   {
+      local oSession, oComp, iState, iFlags, iBond, iTier, iH, oRoom, iReady, lParts,
+            iGender, lPalette, i, rRoom, lPack, iBulk;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      AddPacket(1,BP_USERCOMMAND, 1,UC_COMPANION, 1,COMPANION_PKT_STATUS);
+      if oComp = $
+      {
+         AddPacket(1,COMP_NONE);
+         SendPacket(oSession);
+
+         return;
+      }
+
+      Send(self,@AccrueBond,#who=who);
+      iState = Send(oComp,@GetCompanionState);
+      oRoom = Send(oComp,@GetOwner);
+      iFlags = 0;
+      if iState = COMP_ACTIVE AND oRoom = $
+      {
+         iFlags = iFlags | COMPANION_LEFT_BEHIND;
+      }
+
+      if GetTime() - Send(who,@GetCompanionForeverAt) <= COMPANION_CONFIRM_SECONDS
+      {
+         iFlags = iFlags | COMPANION_FOREVER_ARMED;
+      }
+
+      iReady = 0;
+      if iState = COMP_RECOVERING
+      {
+         iReady = Bound(Send(oComp,@GetReadyAt) - GetTime(),0,$);
+      }
+
+      if iState = COMP_WAITING OR (iState = COMP_RECOVERING AND iReady = 0)
+      {
+         iFlags = iFlags | COMPANION_READY;
+      }
+
+      iBond = Send(who,@GetCompanionBond);
+      iTier = Send(self,@TierOf,#points=iBond);
+      iH = Send(who,@GetBaseMaxHealth);
+
+      AddPacket(1,iState, 1,iFlags);
+      if oRoom <> $
+      {
+         AddPacket(4,oComp);
+      }
+      else
+      {
+         AddPacket(4,0);
+      }
+
+      AddPacket(4,Send(oComp,@GetName),
+                4,Send(self,@GetKindName,#kind=Send(oComp,@GetKind)),
+                1,Send(oComp,@GetKind),
+                2,Send(oComp,@GetHealth), 2,Send(oComp,@GetMaxHealth),
+                4,iBond, 1,iTier, 4,Send(self,@TierFloor,#tier=iTier));
+      if iTier < 5
+      {
+         AddPacket(4,Send(self,@TierFloor,#tier=iTier + 1));
+      }
+      else
+      {
+         AddPacket(4,0);
+      }
+
+      AddPacket(1,Send(oComp,@GetStance));
+
+      // Where it is: its room, or its leader's hall's while waiting or recovering
+      rRoom = $;
+      if oRoom <> $
+      {
+         rRoom = Send(oRoom,@GetName);
+      }
+
+      if rRoom = $
+      {
+         AddPacket(4,0);
+      }
+      else
+      {
+         AddPacket(4,rRoom);
+      }
+
+      AddPacket(4,iReady, 4,Send(self,@GetFee,#who=who));
+
+      lPack = Send(oComp,@GetPack);
+      iBulk = 0;
+      foreach i in lPack
+      {
+         iBulk = iBulk + Send(i,@GetBulk);
+      }
+
+      AddPacket(2,Length(lPack), 2,iBulk, 2,Send(who,@GetBulkMax));
+
+      // Its look, as places in our client's lists
+      lParts = Send(oComp,@GetLookParts);
+      iGender = First(lParts);
+      if iGender = GENDER_FEMALE
+      {
+         AddPacket(1,1);
+      }
+      else
+      {
+         AddPacket(1,0);
+      }
+
+      AddPacket(1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedHairIcons,#iGender=iGender),
+                       #part=Nth(lParts,3)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedEyeIcons,#iGender=iGender),
+                       #part=Nth(lParts,4)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedNoseIcons,#iGender=iGender),
+                       #part=Nth(lParts,5)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedMouthIcons,#iGender=iGender),
+                       #part=Nth(lParts,6)));
+      if Nth(lParts,7) = $
+      {
+         AddPacket(1,0);
+      }
+      else
+      {
+         AddPacket(1,Send(self,@PlaceOf,
+                          #parts=Send(SYS,@GetAllowedBeardIcons,#iGender=iGender),
+                          #part=Nth(lParts,7)) + 1);
+      }
+
+      AddPacket(1,Send(self,@PlaceOf,#parts=Send(SYS,@GetHairTranslations),#part=Nth(lParts,8)),
+                1,Bound(Nth(lParts,9) - 1,0,3),
+                1,Nth(lParts,10), 1,Nth(lParts,11));
+
+      lPalette = Send(self,@GetPalette,#kind=Send(oComp,@GetKind));
+      AddPacket(1,Length(lPalette));
+      foreach i in lPalette
+      {
+         AddPacket(1,i);
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   HealthChanged(comp = $)
+   "UC_COMPANION, kind 2: its health, as it changes."
+   {
+      local oOwner, oSession;
+
+      if comp = $
+      {
+         return;
+      }
+
+      oOwner = Send(comp,@GetSworn);
+      if oOwner = $
+      {
+         return;
+      }
+
+      oSession = Send(oOwner,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_COMPANION, 1,COMPANION_PKT_HEALTH,
+                2,Send(comp,@GetHealth), 2,Send(comp,@GetMaxHealth));
+      SendPacket(oSession);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// the admin dashboard
+
+   AdminState(who = $)
+   "Admin supported. [ state, kind, bond, tier, health, max, room number, pack size ], or $."
+   {
+      local oComp, oRoom, iRid;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return $;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return [ COMP_NONE ];
+      }
+
+      oRoom = Send(oComp,@GetOwner);
+      iRid = 0;
+      if oRoom <> $
+      {
+         iRid = Send(oRoom,@GetRoomNum);
+      }
+
+      return [ Send(oComp,@GetCompanionState), Send(oComp,@GetKind),
+               Send(who,@GetCompanionBond),
+               Send(self,@TierOf,#points=Send(who,@GetCompanionBond)),
+               Send(oComp,@GetHealth), Send(oComp,@GetMaxHealth), iRid,
+               Length(Send(oComp,@GetPack)) ];
+   }
+
+   AdminGrant(who = $,kind = COMPANION_DUKE)
+   "Admin supported. A companion of this kind (1-4), whatever the rules."
+   {
+      if who = $ OR NOT IsClass(who,&User) OR kind < 1 OR kind > COMPANION_KINDS
+         OR Send(who,@GetCompanion) <> $
+      {
+         return FALSE;
+      }
+
+      Send(self,@Grant,#who=who,#kind=kind);
+
+      return TRUE;
+   }
+
+   AdminRevive(who = $)
+   "Admin supported. A fallen or recovering companion back at its owner's side."
+   {
+      local oComp, iState;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return FALSE;
+      }
+
+      iState = Send(oComp,@GetCompanionState);
+      if iState <> COMP_FALLEN AND iState <> COMP_RECOVERING
+      {
+         return FALSE;
+      }
+
+      Send(oComp,@SetHealthPercent,#percent=100);
+      Send(self,@Rejoin,#comp=oComp,#who=who);
+
+      return TRUE;
+   }
+
+   AdminRecoverNow(who = $)
+   "Admin supported. A recovering companion ready to fetch now."
+   {
+      local oComp;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $ OR Send(oComp,@GetCompanionState) <> COMP_RECOVERING
+      {
+         return FALSE;
+      }
+
+      Send(oComp,@SetReadyAt,#when=GetTime());
+      Send(self,@SendStatus,#who=who);
+
+      return TRUE;
+   }
+
+   AdminSetBond(who = $,points = 0)
+   "Admin supported. Sets the bond's points (tier floors: 0, 300, 1000, 2500, 5000)."
+   {
+      if who = $ OR NOT IsClass(who,&User) OR Send(who,@GetCompanion) = $
+      {
+         return FALSE;
+      }
+
+      Send(who,@SetCompanionBond,#points=Bound(points,0,100000));
+      Send(self,@Rescale,#who=who);
+      Send(self,@SendStatus,#who=who);
+
+      return TRUE;
+   }
+
+   AdminBringHere(who = $)
+   "Admin supported. An active, waiting or recovering companion beside its owner."
+   {
+      local oComp;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $ OR Send(oComp,@GetCompanionState) = COMP_FALLEN
+      {
+         return FALSE;
+      }
+
+      Send(self,@Rejoin,#comp=oComp,#who=who);
+
+      return TRUE;
+   }
+
+   AdminKill(who = $)
+   "Admin supported. Kills an active companion where it stands (for trying death)."
+   {
+      local oComp;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $ OR Send(oComp,@GetCompanionState) <> COMP_ACTIVE
+         OR Send(oComp,@GetOwner) = $
+      {
+         return FALSE;
+      }
+
+      Send(oComp,@Killed,#what=$);
+
+      return TRUE;
+   }
+
+   AdminRemove(who = $)
+   "Admin supported. Takes the companion away; its pack goes to its owner (or their feet)."
+   {
+      local oComp;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return FALSE;
+      }
+
+      Send(oComp,@GiveAllTo,#who=who);
+      Send(self,@Forget,#who=who);
+
+      return TRUE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

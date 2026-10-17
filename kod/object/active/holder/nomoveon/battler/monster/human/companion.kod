@@ -1,0 +1,900 @@
+// Ours (Meridian Shards, docs/adr/0010-followers.md): a companion, one per character, given by a
+// faction leader or a school head. It looks like a player (Human), fights beside its owner as a
+// minion does (SetMaster, Player.CommandMinionAttack), carries a pack its owner fills and
+// empties through the vault windows, and is never lost: dead, it leaves a corpse and goes to
+// limbo; with its owner logged off it waits in limbo; dismissed, it waits at its leader's hall.
+//
+// CompanionBook (util/companionbook.kod) runs its life: getting one, placing it beside its
+// owner, scaling it to them, the bond, death and revival, dismissing it. This class is the
+// monster itself: how it fights, what it shows whom, its pack and its looks.
+
+////////////////////////////////////////////////////////////////////////////////
+Companion is Human
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   // Human's (constants aren't inherited)
+   HUMAN_TRANSLATION_LEGS_MASK = 0xff
+   HUMAN_TRANSLATION_LEGS_MUL = 1
+   HUMAN_TRANSLATION_BODY_MASK = 0xff00
+   HUMAN_TRANSLATION_BODY_MUL = 0x100
+   HUMAN_TRANSLATION2_HAIR_MASK = 0xff
+   HUMAN_TRANSLATION2_HAIR_MUL = 1
+
+   // Most things its pack holds
+   COMPANION_PACK_MAX = 100
+
+resources:
+
+   companion_name_rsc = "companion"
+   companion_desc_rsc = "%s, a %s sworn to %q."
+   companion_alone_desc_rsc = "%s, a %s."
+   companion_dead_name_rsc = "fallen companion"
+
+   companion_pack_empty = "%s carries nothing for you."
+   companion_pack_full = "%s can't carry %s%s."
+   companion_pack_cant = "%s won't carry %s%s."
+   companion_pack_too_many = "%s can't carry any more things."
+   companion_not_yours = "%s takes orders only from %q."
+   companion_owner_full = "You can't carry %s%s."
+
+classvars:
+
+   vrName = companion_name_rsc
+   vrDesc = companion_desc_rsc
+   vrDead_name = companion_dead_name_rsc
+
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+
+   viTreasure_type = TID_NONE
+   viSpeed = SPEED_FASTER
+   viAttack_type = ATCK_WEAP_SLASH
+   viAttributes = 0
+   viDefault_behavior = 0
+   viVisionDistance = 12
+   viChanceFemale = 50
+   viCashMin = 0
+   viCashMax = 0
+
+properties:
+
+   // Its owner, kept while the minion link (poMaster) is cleared
+   poSworn = $
+   piKind = 1
+   piCompState = COMP_ACTIVE
+   piStance = COMP_FOLLOW
+   // GetTime when a recovering companion may be fetched
+   piReadyAt = 0
+   prName = $
+   // Its two cosmetic colours, as positions in its kind's palette
+   piColour1 = 0
+   piColour2 = 1
+   piGearTier = 0
+   // Only its book may delete it (CompanionBook.Forget): anything else parks it
+   pbDeleteOk = FALSE
+
+messages:
+
+   Constructor(kind = 1,owner = $)
+   {
+      piKind = kind;
+      poSworn = owner;
+
+      propagate;
+   }
+
+   Constructed()
+   {
+      pbDontDispose = TRUE;
+      Send(self,@PickName);
+
+      propagate;
+   }
+
+   ////////////////////////////////////////////////////////////// looks
+
+   SetGender()
+   "Human's, but its face comes from the parts players choose from (system.kod), so our "
+   "client's look editor can show and change it."
+   {
+      if Random(1,100) <= viChanceFemale
+      {
+         Send(self,@ApplyGender,#gender=GENDER_FEMALE);
+      }
+      else
+      {
+         Send(self,@ApplyGender,#gender=GENDER_MALE);
+      }
+
+      return;
+   }
+
+   ApplyGender(gender = GENDER_MALE)
+   {
+      viGender = gender;
+      if gender = GENDER_FEMALE
+      {
+         vrIcon = human_female_icon_rsc;
+         prLegs = human_legs_b_rsc;
+         prRight_arm = human_rightarm_b_rsc;
+         prLeft_arm = human_leftarm_b_rsc;
+         vrDead_Icon = human_dead_female_icona_rsc;
+         vrDead_Legs = human_dead_female_iconb_rsc;
+         vrSound_death = human_female_sound_death;
+      }
+      else
+      {
+         vrIcon = human_male_icon_rsc;
+         prLegs = human_legs_a_rsc;
+         prRight_arm = human_rightarm_a_rsc;
+         prLeft_arm = human_leftarm_a_rsc;
+         vrDead_Icon = human_dead_male_icona_rsc;
+         vrDead_Legs = human_dead_male_iconb_rsc;
+         vrSound_death = human_male_sound_death;
+      }
+
+      prHead = First(Send(SYS,@GetAllowedHeadIcons,#iGender=gender));
+
+      return;
+   }
+
+   SetHair()
+   {
+      local lHair, lColours, lBeards;
+
+      lHair = Send(SYS,@GetAllowedHairIcons,#iGender=viGender);
+      prToupee = Nth(lHair,Random(1,Length(lHair)));
+      lColours = Send(SYS,@GetHairTranslations);
+      piBody_translations2 &= ~HUMAN_TRANSLATION2_HAIR_MASK;
+      piBody_translations2 |= Nth(lColours,Random(1,Length(lColours)))
+                              * HUMAN_TRANSLATION2_HAIR_MUL;
+
+      prBeard = $;
+      lBeards = Send(SYS,@GetAllowedBeardIcons,#iGender=viGender);
+      if lBeards <> $ AND Random(1,100) <= 30
+      {
+         prBeard = Nth(lBeards,Random(1,Length(lBeards)));
+      }
+
+      return;
+   }
+
+   SetFace()
+   {
+      local l;
+
+      l = Send(SYS,@GetAllowedEyeIcons,#iGender=viGender);
+      prEyes = Nth(l,Random(1,Length(l)));
+      l = Send(SYS,@GetAllowedNoseIcons,#iGender=viGender);
+      prNose = Nth(l,Random(1,Length(l)));
+      l = Send(SYS,@GetAllowedMouthIcons,#iGender=viGender);
+      prMouth = Nth(l,Random(1,Length(l)));
+
+      return;
+   }
+
+   SetClothes()
+   {
+      local lPalette;
+
+      lPalette = Send(Send(SYS,@GetCompanionBook),@GetPalette,#kind=piKind);
+      Send(self,@SetDefaultClothes,#shirt_color=Nth(lPalette,piColour1+1));
+      Send(self,@SetTroopLegs,#translation=Nth(lPalette,piColour2+1));
+
+      return;
+   }
+
+   // Its gear comes from its bond tier (SetTier), not Human's random kit
+   SetShield()
+   {
+      return;
+   }
+
+   SetEquipment()
+   {
+      return;
+   }
+
+   SetTier(tier = 1)
+   "Wears its kind's gear for a bond tier, in place of what it wore."
+   {
+      local i, lOld, oBook, cShield;
+
+      if tier = piGearTier
+      {
+         return;
+      }
+
+      piGearTier = tier;
+      lOld = plUsing;
+      foreach i in lOld
+      {
+         Send(i,@Delete);
+      }
+
+      oBook = Send(SYS,@GetCompanionBook);
+      foreach i in Send(oBook,@GetGear,#kind=piKind,#tier=tier)
+      {
+         Send(self,@AddEquipmentObject,#what=Create(i));
+      }
+
+      cShield = Send(oBook,@GetShield,#kind=piKind);
+      if cShield <> $
+      {
+         Send(self,@AddEquipmentObject,#what=Create(cShield));
+      }
+
+      piAttackRange = Send(self,@GetAttackRange);
+      if poOwner <> $
+      {
+         Send(poOwner,@SomethingChanged,#what=self);
+      }
+
+      return;
+   }
+
+   SetLooks(gender = GENDER_MALE,hair = $,eyes = $,nose = $,mouth = $,beard = $,
+            hair_colour = 0,skin = 1,colour1 = 0,colour2 = 1)
+   "A look its owner chose (CompanionBook.Look checked every part). Gear is worn again so "
+   "armour picks the gender's art."
+   {
+      local iTier;
+
+      Send(self,@ApplyGender,#gender=gender);
+      prToupee = hair;
+      prEyes = eyes;
+      prNose = nose;
+      prMouth = mouth;
+      prBeard = beard;
+      piColour1 = colour1;
+      piColour2 = colour2;
+      Send(self,@SetHairTranslation,#translation=hair_colour);
+      // SetSkinColor dresses it again in its default clothes, with the new skin
+      Send(self,@SetSkinColor,#color=skin);
+      Send(self,@SetClothes);
+
+      iTier = piGearTier;
+      piGearTier = 0;
+      Send(self,@SetTier,#tier=iTier);
+
+      return;
+   }
+
+   GetLookParts()
+   "[ gender, head, hair, eyes, nose, mouth, beard, hair colour, skin, colour 1, colour 2 ]"
+   {
+      return [ viGender, prHead, prToupee, prEyes, prNose, prMouth, prBeard,
+               Send(self,@GetHairColor), Send(self,@GetSkinColor), piColour1, piColour2 ];
+   }
+
+   ////////////////////////////////////////////////////////////// who it is
+
+   PickName()
+   {
+      local lNames;
+
+      lNames = Send(Send(SYS,@GetCompanionBook),@GetNames,#kind=piKind,#gender=viGender);
+      prName = Nth(lNames,Random(1,Length(lNames)));
+
+      return;
+   }
+
+   GetName()
+   {
+      return prName;
+   }
+
+   GetTrueName()
+   {
+      return prName;
+   }
+
+   GetApparentName()
+   {
+      return prName;
+   }
+
+   IsNamedMob()
+   {
+      return TRUE;
+   }
+
+   ShowDesc()
+   {
+      local rKind;
+
+      rKind = Send(Send(SYS,@GetCompanionBook),@GetKindName,#kind=piKind);
+      if poSworn = $
+      {
+         AddPacket(4,companion_alone_desc_rsc, 4,prName, 4,rKind);
+
+         return;
+      }
+
+      AddPacket(4,companion_desc_rsc, 4,prName, 4,rKind,
+                STRING_RESOURCE,Send(poSworn,@GetTrueName));
+
+      return;
+   }
+
+   IsCompanion()
+   {
+      return TRUE;
+   }
+
+   GetFaction()
+   "Its leader's faction (a school's are neutral), so it may wear that faction's soldier "
+   "shield (SoldierShield.ReqUse)."
+   {
+      local iFaction;
+
+      iFaction = Send(Send(SYS,@GetCompanionBook),@GetKindFaction,#kind=piKind);
+      if iFaction = $
+      {
+         return FACTION_NEUTRAL;
+      }
+
+      return iFaction;
+   }
+
+   GetSworn()
+   {
+      return poSworn;
+   }
+
+   GetKind()
+   {
+      return piKind;
+   }
+
+   GetCompanionState()
+   {
+      return piCompState;
+   }
+
+   SetCompanionState(state = COMP_ACTIVE)
+   {
+      piCompState = state;
+      Send(self,@ResetBehaviorFlags);
+      if poOwner <> $
+      {
+         Send(poOwner,@SomethingChanged,#what=self);
+      }
+
+      return;
+   }
+
+   GetStance()
+   {
+      return piStance;
+   }
+
+   SetStance(stance = COMP_FOLLOW)
+   {
+      piStance = stance;
+      Send(self,@ResetBehaviorFlags);
+      if poOwner <> $
+      {
+         // Drops what it was fighting, and moves (or stays) as the stance says
+         Send(self,@EnterStateWait);
+      }
+
+      return;
+   }
+
+   GetReadyAt()
+   {
+      return piReadyAt;
+   }
+
+   SetReadyAt(when = 0)
+   {
+      piReadyAt = when;
+
+      return;
+   }
+
+   GetGearTier()
+   {
+      return piGearTier;
+   }
+
+   AllowDelete()
+   {
+      pbDeleteOk = TRUE;
+
+      return;
+   }
+
+   Delete()
+   {
+      // A room being rebuilt, or anything else, would take its pack with it: only its book
+      // deletes it. Otherwise it steps out to limbo and its book puts it back.
+      if NOT pbDeleteOk
+      {
+         Send(self,@EnterStateLimbo);
+         Send(self,@NewOwner,#what=$);
+         Post(Send(SYS,@GetCompanionBook),@Replace,#comp=self);
+
+         return;
+      }
+
+      propagate;
+   }
+
+   DestroyDisposable()
+   {
+      return;
+   }
+
+   CanMorphTo()
+   {
+      return FALSE;
+   }
+
+   ////////////////////////////////////////////////////////////// fighting
+
+   CanPlayerAdvanceOnMe()
+   "Killing it teaches nothing: it can be revived for free."
+   {
+      return FALSE;
+   }
+
+   CanMonsterFight(who = $)
+   {
+      if piCompState <> COMP_ACTIVE
+      {
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   MsgSendUser(message_rsc = $)
+   "Spells cast on it (a heal) tell their target: it has nobody to tell."
+   {
+      return;
+   }
+
+   CheckPlayerFlag(flag = 0)
+   "Monsters ask a target's player flags (newbie safety): ours are its owner's."
+   {
+      if poSworn = $
+      {
+         return FALSE;
+      }
+
+      return Send(poSworn,@CheckPlayerFlag,#flag=flag);
+   }
+
+   GotoMaster()
+   "Its book places it beside its owner (CompanionBook.OwnerMoved), never a raw NewHold."
+   {
+      return;
+   }
+
+   SetBehaviorFlag(flag = 0,value = TRUE)
+   {
+      // Minion upkeep (Battler.MinionControlCheck) keeps telling minions to follow
+      if flag = AI_MOVE_FOLLOW_MASTER AND value
+         AND (piStance = COMP_STAY OR piCompState <> COMP_ACTIVE)
+      {
+         return;
+      }
+
+      propagate;
+   }
+
+   TweakBehavior()
+   {
+      if piCompState <> COMP_ACTIVE
+      {
+         piBehavior = AI_NPC | AI_NOMOVE | AI_NOFIGHT;
+
+         return;
+      }
+
+      if piStance = COMP_STAY
+      {
+         piBehavior |= AI_NOMOVE;
+         piBehavior &= ~AI_MOVE_FOLLOW_MASTER;
+      }
+
+      if piStance = COMP_PASSIVE
+      {
+         piBehavior |= AI_NOFIGHT;
+      }
+
+      propagate;
+   }
+
+   TakesMinionCommand(defend = FALSE)
+   "Whether its owner's attack (Player.CommandMinionAttack) sends it in; defending is when "
+   "something hurts its owner."
+   {
+      if piCompState <> COMP_ACTIVE OR piStance = COMP_PASSIVE
+      {
+         return FALSE;
+      }
+
+      if piStance = COMP_FOLLOW
+      {
+         return TRUE;
+      }
+
+      return defend;
+   }
+
+   GetObjectFlags(what = $)
+   "Its name always shows. Waiting or fallen, nobody can attack it; its owner never can, and "
+   "may give it things and take them back (the vault windows)."
+   {
+      local iFlags;
+
+      iFlags = viObject_flags | piDrawEffectFlag | OF_DISPLAY_NAME;
+      if piCompState <> COMP_ACTIVE
+      {
+         iFlags = iFlags & ~OF_ATTACKABLE;
+      }
+
+      if what <> $ AND what = poSworn
+      {
+         iFlags = (iFlags & ~OF_ATTACKABLE) | OF_BUYABLE | OF_OFFERABLE;
+      }
+
+      return iFlags;
+   }
+
+   ApplyScale(level = 50,health = 35,offense = 200,defense = 200,min_damage = 3,max_damage = 6)
+   "Its strength from its owner's health and the bond (CompanionBook.Rescale); it keeps the "
+   "share of its health it had."
+   {
+      local iOld;
+
+      viLevel = level;
+      piOffense = offense;
+      piDefense = defense;
+      piMinDamage = min_damage;
+      piMaxDamage = max_damage;
+
+      health = Bound(health,1,$);
+      iOld = piMax_hit_points;
+      if iOld > 0
+      {
+         piHit_points = Bound(piHit_points * health / iOld,100,health * 100);
+      }
+      else
+      {
+         piHit_points = health * 100;
+      }
+
+      piMax_hit_points = health;
+
+      return;
+   }
+
+   SetHealthPercent(percent = 100)
+   {
+      piHit_points = Bound(piMax_hit_points * percent,100,piMax_hit_points * 100);
+
+      return;
+   }
+
+   AssessDamage(what = $,damage = $,atype = 0,aspell = 0,bonus = 0,scalefactor = 1000)
+   {
+      Post(Send(SYS,@GetCompanionBook),@HealthChanged,#comp=self);
+
+      propagate;
+   }
+
+   GainHealthNormal(amount = $,precision = FALSE)
+   {
+      Post(Send(SYS,@GetCompanionBook),@HealthChanged,#comp=self);
+
+      propagate;
+   }
+
+   ////////////////////////////////////////////////////////////// death
+
+   Killed(what = $)
+   "A corpse where it fell, and limbo with its pack and gear; no quest credit, reputation or "
+   "treasure for whoever killed it."
+   {
+      local oBody, oRoom;
+
+      oRoom = poOwner;
+      if oRoom = $
+      {
+         return;
+      }
+
+      if what <> $ AND IsClass(what,&Monster) AND Send(what,@GetMaster) <> $
+      {
+         what = Send(what,@GetMaster);
+      }
+
+      oBody = Send(self,@CreateDeadBody,#killer=what);
+      if oBody <> $
+      {
+         Send(oRoom,@NewHold,#what=oBody,#new_row=piRow,#new_col=piCol,
+              #fine_row=piFine_row,#fine_col=piFine_col,#new_angle=Send(self,@GetAngle));
+      }
+
+      if vrSound_death <> $
+      {
+         Send(oRoom,@SomethingWaveRoom,#what=oBody,#wave_rsc=vrSound_death,
+              #flags=SOUND_RANDOM_PITCH);
+      }
+
+      Send(Send(SYS,@GetCompanionBook),@CompanionFell,#comp=self,#corpse=oBody,#killer=what);
+
+      return;
+   }
+
+   CreateDeadBody(killer = $)
+   {
+      return Create(&CompanionCorpse,
+                    #victim=self,
+                    #killer=killer,
+                    #PlayerBodyOverlay=vrDead_Legs,
+                    #BodyTranslation=(piBody_translations & HUMAN_TRANSLATION_BODY_MASK)
+                                     /HUMAN_TRANSLATION_BODY_MUL,
+                    #LegsTranslation=(piBody_translations & HUMAN_TRANSLATION_LEGS_MASK)
+                                     /HUMAN_TRANSLATION_LEGS_MUL);
+   }
+
+   CreateTreasure(who = $,corpse = $,funds = $)
+   "Nothing it carries is ever lost."
+   {
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// the pack
+
+   MobIsVaultman(who = $)
+   {
+      return TRUE;
+   }
+
+   GetVaultRetrievalFee(what = $,who = $)
+   {
+      return 0;
+   }
+
+   GetPack()
+   "What it carries for its owner: everything it holds but what it wears."
+   {
+      local i, lPack;
+
+      lPack = $;
+      foreach i in plPassive
+      {
+         if FindListElem(plUsing,i) = 0
+         {
+            lPack = Cons(i,lPack);
+         }
+      }
+
+      return lPack;
+   }
+
+   GetForSale(who = $)
+   "The Withdraw window's list: the pack, for its owner only."
+   {
+      local lPack;
+
+      if who = $ OR who <> poSworn OR piCompState <> COMP_ACTIVE
+      {
+         return $;
+      }
+
+      lPack = Send(self,@GetPack);
+      if lPack = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=companion_pack_empty,#parm1=prName);
+      }
+
+      return lPack;
+   }
+
+   GetBulkMax()
+   "It carries as much as its owner can, besides what it wears."
+   {
+      local i, iMax;
+
+      if poSworn = $
+      {
+         return 0;
+      }
+
+      iMax = Send(poSworn,@GetBulkMax);
+      foreach i in plUsing
+      {
+         iMax = iMax + Send(i,@GetBulk);
+      }
+
+      return iMax;
+   }
+
+   GetWeightMax()
+   {
+      local i, iMax;
+
+      if poSworn = $
+      {
+         return 0;
+      }
+
+      iMax = Send(poSworn,@GetWeightMax);
+      foreach i in plUsing
+      {
+         iMax = iMax + Send(i,@GetWeight);
+      }
+
+      return iMax;
+   }
+
+   ReqOffer(what = $,item_list = $)
+   "Its owner's Deposit window (User.UserDeposit): it takes the things into its pack here. "
+   "Stacks the window split off are copied, as a vault does (storage.kod DepositItems), and "
+   "FALSE is returned so the window's own copies are thrown away."
+   {
+      local i, oNew, iCount;
+
+      if what = $ OR what <> poSworn OR piCompState <> COMP_ACTIVE
+         OR Send(what,@GetOwner) <> poOwner
+      {
+         if what <> $ AND poSworn <> $
+         {
+            Send(what,@MsgSendUser,#message_rsc=companion_not_yours,#parm1=prName,
+                 #parm2=Send(poSworn,@GetTrueName),#type2=STRING_RESOURCE);
+         }
+
+         return FALSE;
+      }
+
+      iCount = Length(Send(self,@GetPack));
+      foreach i in item_list
+      {
+         if iCount >= COMPANION_PACK_MAX
+         {
+            Send(what,@MsgSendUser,#message_rsc=companion_pack_too_many,#parm1=prName);
+
+            break;
+         }
+
+         if NOT IsClass(i,&Item)
+            OR Send(i,@GetBulk) <= 0
+            OR NOT Send(i,@CanBeStoredInVault)
+            OR NOT Send(what,@ReqLeaveHold,#what=i)
+         {
+            Send(what,@MsgSendUser,#message_rsc=companion_pack_cant,#parm1=prName,
+                 #parm2=Send(i,@GetIndef),#parm3=Send(i,@GetName));
+
+            continue;
+         }
+
+         if NOT Send(self,@CanHoldWeightAndBulk,#weight=Send(i,@GetWeight),
+                     #bulk=Send(i,@GetBulk))
+         {
+            Send(what,@MsgSendUser,#message_rsc=companion_pack_full,#parm1=prName,
+                 #parm2=Send(i,@GetIndef),#parm3=Send(i,@GetName));
+
+            continue;
+         }
+
+         if IsClass(i,&NumberItem)
+         {
+            oNew = Create(GetClass(i),#number=Send(i,@GetNumber));
+            Send(self,@NewHold,#what=oNew);
+            Send(what,@RemoveNumberItemFromPossession,#ToBeRemoved=oNew);
+         }
+         else
+         {
+            Send(self,@NewHold,#what=i);
+         }
+
+         ++iCount;
+      }
+
+      Post(Send(SYS,@GetCompanionBook),@SendStatus,#who=what);
+
+      return FALSE;
+   }
+
+   Buy(what = $,item_list = $,number_list = $,funds = $)
+   "Its owner's Withdraw window (User.UserWithdrawalItems): things back out of the pack. "
+   "Anyone else asking to buy from it gets nothing."
+   {
+      local i, lNumbers, iNumber, oSplit;
+
+      if what = $ OR what <> poSworn OR piCompState <> COMP_ACTIVE
+         OR Send(what,@GetOwner) <> poOwner
+      {
+         return FALSE;
+      }
+
+      lNumbers = number_list;
+      foreach i in item_list
+      {
+         iNumber = $;
+         if IsClass(i,&NumberItem)
+         {
+            iNumber = Send(i,@GetNumber);
+            if lNumbers <> $
+            {
+               iNumber = Bound(First(lNumbers),1,iNumber);
+               lNumbers = Rest(lNumbers);
+            }
+         }
+
+         // Only from the pack: never what it wears
+         if Send(i,@GetOwner) <> self OR FindListElem(plUsing,i) <> 0
+         {
+            continue;
+         }
+
+         if iNumber <> $ AND iNumber < Send(i,@GetNumber)
+         {
+            oSplit = Create(GetClass(i),#number=iNumber);
+            if NOT Send(what,@ReqNewHold,#what=oSplit)
+            {
+               Send(what,@MsgSendUser,#message_rsc=companion_owner_full,
+                    #parm1=Send(oSplit,@GetIndef),#parm2=Send(oSplit,@GetName));
+               Send(oSplit,@Delete);
+
+               continue;
+            }
+
+            Send(i,@SubtractNumber,#number=iNumber);
+            Send(what,@NewHold,#what=oSplit);
+
+            continue;
+         }
+
+         if NOT Send(what,@ReqNewHold,#what=i)
+         {
+            Send(what,@MsgSendUser,#message_rsc=companion_owner_full,
+                 #parm1=Send(i,@GetIndef),#parm2=Send(i,@GetName));
+
+            continue;
+         }
+
+         Send(what,@NewHold,#what=i);
+      }
+
+      Post(Send(SYS,@GetCompanionBook),@SendStatus,#who=what);
+
+      return;
+   }
+
+   GiveAllTo(who = $)
+   "Everything in the pack to who, or at their feet (an admin removing it)."
+   {
+      local i, oRoom;
+
+      foreach i in Send(self,@GetPack)
+      {
+         if Send(who,@ReqNewHold,#what=i)
+         {
+            Send(who,@NewHold,#what=i);
+
+            continue;
+         }
+
+         oRoom = Send(who,@GetOwner);
+         if oRoom <> $
+         {
+            Send(oRoom,@NewHold,#what=i,#new_row=Send(who,@GetRow),#new_col=Send(who,@GetCol));
+         }
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -57,6 +57,7 @@ BOFS = animate.bof \
        utility.bof \
        walspell.bof \
        creaspsw.bof \
-       transmon.bof
+       transmon.bof \
+       restcomp.bof
 
 !include $(KODDIR)\kod.mak

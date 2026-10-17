@@ -1093,7 +1093,8 @@ messages:
          }
       }
 
-      if IsClass(what,&Monster)
+      // Ours: a companion is fought as a player is (util/companionbook.kod)
+      if IsClass(what,&Monster) AND NOT Send(what,@IsCompanion)
       {
          if NOT (behavior & AI_FIGHT_MONSTERS)
          {

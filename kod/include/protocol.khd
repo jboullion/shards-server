@@ -235,6 +235,8 @@
    UC_QUEST_OFFERS = 106
    UC_QUEST_LOG = 107
    UC_QUEST_PROGRESS = 108
+   // Ours: our companion's state (util/companionbook.kod SendStatus), docs/adr/0010-followers.md
+   UC_COMPANION = 109
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

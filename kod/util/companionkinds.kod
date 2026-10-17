@@ -1,0 +1,457 @@
+// Ours (Meridian Shards, docs/adr/0010-followers.md): the kinds of companion, one per leader who
+// gives them, and the numbers they grow by. CompanionBook (util/companionbook.kod) inherits
+// these tables, as QuestBook inherits QuestDefs.
+//
+// Kinds 1-4 fight; 5-9 are kept for the casters (Shal'ille, Qor, Faren, Riija, Jala), which
+// need monsters that heal and help their allies.
+
+////////////////////////////////////////////////////////////////////////////////
+CompanionKinds is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+
+   // The kinds and their numbers are in blakston.khd (COMPANION_*), for every file
+
+resources:
+
+   companion_kind_duke = "Duke soldier"
+   companion_kind_princess = "Princess knight"
+   companion_kind_rebel = "rebel fencer"
+   companion_kind_kraanan = "warrior-priest of Kraanan"
+
+   comp_name_d_m1 = "Aldric"
+   comp_name_d_m2 = "Bertram"
+   comp_name_d_m3 = "Corvin"
+   comp_name_d_m4 = "Gareth"
+   comp_name_d_m5 = "Osric"
+   comp_name_d_m6 = "Roderic"
+   comp_name_d_f1 = "Brienna"
+   comp_name_d_f2 = "Cassia"
+   comp_name_d_f3 = "Edda"
+   comp_name_d_f4 = "Helena"
+   comp_name_d_f5 = "Morwen"
+   comp_name_d_f6 = "Ysolde"
+
+   comp_name_p_m1 = "Alaric"
+   comp_name_p_m2 = "Cedric"
+   comp_name_p_m3 = "Florian"
+   comp_name_p_m4 = "Leopold"
+   comp_name_p_m5 = "Percival"
+   comp_name_p_m6 = "Tristan"
+   comp_name_p_f1 = "Adela"
+   comp_name_p_f2 = "Elowen"
+   comp_name_p_f3 = "Isolde"
+   comp_name_p_f4 = "Lianne"
+   comp_name_p_f5 = "Rosamund"
+   comp_name_p_f6 = "Seraphine"
+
+   comp_name_r_m1 = "Bram"
+   comp_name_r_m2 = "Dax"
+   comp_name_r_m3 = "Fenn"
+   comp_name_r_m4 = "Jory"
+   comp_name_r_m5 = "Kestrel"
+   comp_name_r_m6 = "Wick"
+   comp_name_r_f1 = "Ash"
+   comp_name_r_f2 = "Briar"
+   comp_name_r_f3 = "Ketta"
+   comp_name_r_f4 = "Nell"
+   comp_name_r_f5 = "Sable"
+   comp_name_r_f6 = "Tamsin"
+
+   comp_name_k_m1 = "Brannoc"
+   comp_name_k_m2 = "Durgan"
+   comp_name_k_m3 = "Hallam"
+   comp_name_k_m4 = "Ironwulf"
+   comp_name_k_m5 = "Torvald"
+   comp_name_k_m6 = "Ulfric"
+   comp_name_k_f1 = "Astrid"
+   comp_name_k_f2 = "Brynja"
+   comp_name_k_f3 = "Gudrun"
+   comp_name_k_f4 = "Hilde"
+   comp_name_k_f5 = "Sigrun"
+   comp_name_k_f6 = "Thyra"
+
+classvars:
+
+properties:
+
+messages:
+
+   KindForLeader(npc = $)
+   "The kind of companion this NPC gives, or 0."
+   {
+      if npc = $
+      {
+         return 0;
+      }
+
+      if IsClass(npc,&DukeLiege)
+      {
+         return COMPANION_DUKE;
+      }
+
+      if IsClass(npc,&PrincessLiege)
+      {
+         return COMPANION_PRINCESS;
+      }
+
+      if IsClass(npc,&RebelLiege)
+      {
+         return COMPANION_REBEL;
+      }
+
+      if IsClass(npc,&KraananPriestess)
+      {
+         return COMPANION_KRAANAN;
+      }
+
+      return 0;
+   }
+
+   GetLeaderClass(kind = 0)
+   {
+      if kind = COMPANION_DUKE
+      {
+         return &DukeLiege;
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         return &PrincessLiege;
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         return &RebelLiege;
+      }
+
+      if kind = COMPANION_KRAANAN
+      {
+         return &KraananPriestess;
+      }
+
+      return $;
+   }
+
+   GetHallRoom(kind = 0)
+   "Where its leader is: the room it waits and recovers in."
+   {
+      if kind = COMPANION_DUKE
+      {
+         return RID_DUKE3;
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         return RID_CASTLE2C;
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         return RID_JAS_BAR;
+      }
+
+      if kind = COMPANION_KRAANAN
+      {
+         return RID_TEMPLE_KRAANAN;
+      }
+
+      return $;
+   }
+
+   GetKindFaction(kind = 0)
+   "The faction a leader gives its companions to the members of, or $ for a school's."
+   {
+      if kind = COMPANION_DUKE
+      {
+         return FACTION_DUKE;
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         return FACTION_PRINCESS;
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         return FACTION_REBEL;
+      }
+
+      return $;
+   }
+
+   GetKindName(kind = 0)
+   {
+      if kind = COMPANION_DUKE
+      {
+         return companion_kind_duke;
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         return companion_kind_princess;
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         return companion_kind_rebel;
+      }
+
+      return companion_kind_kraanan;
+   }
+
+   GetNames(kind = 0,gender = GENDER_MALE)
+   {
+      if kind = COMPANION_DUKE
+      {
+         if gender = GENDER_MALE
+         {
+            return [comp_name_d_m1, comp_name_d_m2, comp_name_d_m3, comp_name_d_m4,
+                    comp_name_d_m5, comp_name_d_m6];
+         }
+
+         return [comp_name_d_f1, comp_name_d_f2, comp_name_d_f3, comp_name_d_f4,
+                 comp_name_d_f5, comp_name_d_f6];
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         if gender = GENDER_MALE
+         {
+            return [comp_name_p_m1, comp_name_p_m2, comp_name_p_m3, comp_name_p_m4,
+                    comp_name_p_m5, comp_name_p_m6];
+         }
+
+         return [comp_name_p_f1, comp_name_p_f2, comp_name_p_f3, comp_name_p_f4,
+                 comp_name_p_f5, comp_name_p_f6];
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         if gender = GENDER_MALE
+         {
+            return [comp_name_r_m1, comp_name_r_m2, comp_name_r_m3, comp_name_r_m4,
+                    comp_name_r_m5, comp_name_r_m6];
+         }
+
+         return [comp_name_r_f1, comp_name_r_f2, comp_name_r_f3, comp_name_r_f4,
+                 comp_name_r_f5, comp_name_r_f6];
+      }
+
+      if gender = GENDER_MALE
+      {
+         return [comp_name_k_m1, comp_name_k_m2, comp_name_k_m3, comp_name_k_m4,
+                 comp_name_k_m5, comp_name_k_m6];
+      }
+
+      return [comp_name_k_f1, comp_name_k_f2, comp_name_k_f3, comp_name_k_f4,
+              comp_name_k_f5, comp_name_k_f6];
+   }
+
+   GetDamage(kind = 0)
+   "[ least, most ] damage, in thousandths of the owner's base health."
+   {
+      // A monster of the owner's level hits for about 8 per 100 levels (Monster.GetDamage)
+      if kind = COMPANION_REBEL
+      {
+         // Quick and light
+         return [ 45, 95 ];
+      }
+
+      if kind = COMPANION_KRAANAN
+      {
+         // Heavy blows
+         return [ 55, 125 ];
+      }
+
+      return [ 50, 110 ];
+   }
+
+   GetGear(kind = 0,tier = 1)
+   "The gear it wears at a bond tier (1-5): item classes, made and worn in turn."
+   {
+      if kind = COMPANION_DUKE OR kind = COMPANION_PRINCESS
+      {
+         if tier <= 1
+         {
+            return [ &ShortSword, &LeatherArmor ];
+         }
+
+         if tier = 2
+         {
+            return [ &LongSword, &ChainArmor ];
+         }
+
+         if tier = 3
+         {
+            return [ &LongSword, &ScaleArmor, &SimpleHelm ];
+         }
+
+         if tier = 4
+         {
+            return [ &MysticSword, &PlateArmor, &Helm, &Gauntlet ];
+         }
+
+         return [ &NeruditeSword, &PlateArmor, &KnightsHelm, &Gauntlet ];
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         if tier <= 1
+         {
+            return [ &ShortSword, &LeatherArmor ];
+         }
+
+         if tier = 2
+         {
+            return [ &Scimitar, &LeatherArmor ];
+         }
+
+         if tier = 3
+         {
+            return [ &Scimitar, &ChainArmor, &SimpleHelm ];
+         }
+
+         if tier = 4
+         {
+            return [ &MysticSword, &ScaleArmor, &Helm, &Gauntlet ];
+         }
+
+         return [ &NeruditeSword, &ScaleArmor, &KnightsHelm, &Gauntlet ];
+      }
+
+      // Kraanan: maces and hammers
+      if tier <= 1
+      {
+         return [ &Mace, &LeatherArmor, &MetalShield ];
+      }
+
+      if tier = 2
+      {
+         return [ &Hammer, &ChainArmor, &MetalShield ];
+      }
+
+      if tier = 3
+      {
+         return [ &Hammer, &ScaleArmor, &SimpleHelm, &MetalShield ];
+      }
+
+      if tier = 4
+      {
+         return [ &Hammer, &PlateArmor, &Helm, &Gauntlet, &Knightshield ];
+      }
+
+      return [ &Hammer, &PlateArmor, &DaemonHelm, &Gauntlet, &Knightshield ];
+   }
+
+   GetShield(kind = 0)
+   "The soldier's shield of a faction's companions (worn at every tier), or $."
+   {
+      if kind = COMPANION_DUKE
+      {
+         return &DukeShield;
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         return &PrincessShield;
+      }
+
+      return $;
+   }
+
+   GetPalette(kind = 0)
+   "The colours its clothes may be given (XLAT_TO_*); the first two are its own at first."
+   {
+      if kind = COMPANION_DUKE
+      {
+         return [ XLAT_TO_PURPLE, XLAT_TO_BLUE, XLAT_TO_BLACK, XLAT_TO_GRAY, XLAT_TO_SKY ];
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         return [ XLAT_TO_BLUE, XLAT_TO_SKY, XLAT_TO_YELLOW, XLAT_TO_GRAY, XLAT_TO_PURPLE ];
+      }
+
+      if kind = COMPANION_REBEL
+      {
+         return [ XLAT_TO_RED, XLAT_TO_BLACK, XLAT_TO_DGREEN, XLAT_TO_ORANGE, XLAT_TO_GRAY ];
+      }
+
+      return [ XLAT_TO_ORANGE, XLAT_TO_BLACK, XLAT_TO_RED, XLAT_TO_YELLOW, XLAT_TO_GRAY ];
+   }
+
+   TierFloor(tier = 1)
+   "Bond points a tier starts at."
+   {
+      if tier <= 1
+      {
+         return 0;
+      }
+
+      if tier = 2
+      {
+         return 300;
+      }
+
+      if tier = 3
+      {
+         return 1000;
+      }
+
+      if tier = 4
+      {
+         return 2500;
+      }
+
+      return 5000;
+   }
+
+   TierOf(points = 0)
+   {
+      local i;
+
+      i = 5;
+      while i > 1
+      {
+         if points >= Send(self,@TierFloor,#tier=i)
+         {
+            return i;
+         }
+
+         --i;
+      }
+
+      return 1;
+   }
+
+   BondBonus(tier = 1)
+   "Percent more health and damage a bond tier gives."
+   {
+      if tier <= 1
+      {
+         return 0;
+      }
+
+      if tier = 2
+      {
+         return 3;
+      }
+
+      if tier = 3
+      {
+         return 7;
+      }
+
+      if tier = 4
+      {
+         return 11;
+      }
+
+      return 15;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

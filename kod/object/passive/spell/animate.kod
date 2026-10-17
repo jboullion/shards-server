@@ -82,8 +82,10 @@ messages:
       oRoom = Send(who,@GetOwner);
       oTarget = First(lTargets);
 
+      // Ours: never a companion's body
       if oTarget = $
          OR NOT IsClass(oTarget,&DeadBody)
+         OR Send(oTarget,@IsCompanionCorpse)
       {
          Send(who,@MsgSendUser,#message_rsc=Animate_bad_target,
                #parm1=Send(oTarget,@GetDef),

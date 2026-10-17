@@ -1,0 +1,84 @@
+// Ours (Meridian Shards, docs/adr/0010-followers.md 5.2): brings a fallen companion back where
+// its corpse lies, with half its health. Anyone may cast it on anyone's companion's corpse.
+
+////////////////////////////////////////////////////////////////////////////////
+RestoreCompanion is Spell
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   restorecompanion_name_rsc = "restore companion"
+   // Portal of Life's icon for now
+   restorecompanion_icon_rsc = irasdead.bgf
+   restorecompanion_desc_rsc = \
+      "Calls a fallen companion back from the edge of death, to stand where its body lies "
+      "with half its strength.  Requires two emeralds and two elderberries to cast."
+   restorecompanion_not_corpse = "Only a fallen companion's body answers %s."
+
+classvars:
+
+   vrName = restorecompanion_name_rsc
+   vrIcon = restorecompanion_icon_rsc
+   vrDesc = restorecompanion_desc_rsc
+
+   viSpell_num = SID_RESTORE_COMPANION
+   viSchool = SS_SHALILLE
+   viMana = 15
+   viSpell_level = 4
+
+   viChance_To_Increase = 30
+   viMeditate_ratio = 40
+
+   viFlash = FLASH_GOOD
+
+properties:
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+      plReagents = Cons([&Emerald,2],plReagents);
+      plReagents = Cons([&ElderBerry,2],plReagents);
+
+      return;
+   }
+
+   GetNumSpellTargets()
+   {
+      return 1;
+   }
+
+   CanPayCosts(who = $,lTargets = $)
+   {
+      local oTarget;
+
+      if Length(lTargets) <> 1
+      {
+         return FALSE;
+      }
+
+      oTarget = First(lTargets);
+      if NOT Send(oTarget,@IsCompanionCorpse)
+         OR Send(oTarget,@GetOwner) <> Send(who,@GetOwner)
+      {
+         Send(who,@MsgSendUser,#message_rsc=restorecompanion_not_corpse,#parm1=vrName);
+
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   CastSpell(who = $,lTargets = $,iSpellpower = 0)
+   {
+      Send(First(lTargets),@ReviveCompanion,#caster=who);
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -701,6 +701,18 @@ resources:
    qd_230_name = "Mollusk Shell"
    qd_230_s1 = "Mollusks slain"
    qd_230_t1 = "Fehr'loi Qan"
+   qd_240_name = "A Soldier at Your Side"
+   qd_240_s1 = "Take a companion into your service"
+   qd_240_t1 = "Duke Akardius"
+   qd_241_name = "A Knight Sworn to You"
+   qd_241_s1 = "Take a companion into your service"
+   qd_241_t1 = "Princess Kateriina"
+   qd_242_name = "A Blade from the Underground"
+   qd_242_s1 = "Take a companion into your service"
+   qd_242_t1 = "Jonas D'Accor"
+   qd_243_name = "A Warrior of Kraanan"
+   qd_243_s1 = "Take a companion into your service"
+   qd_243_t1 = "Priestess Qerti'nya"
 
 classvars:
 
@@ -711,7 +723,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 26559696;
+      return 509023;
    }
 
    GetQuests()
@@ -1841,7 +1853,31 @@ messages:
            $, $, 86400, $,
            [ [ 1, &MolluskMonster, 6, 0, &BarloqueBlacksmith, 0, qd_230_s1, $, $, qd_230_t1,
                0, $, $, $, 0 ] ],
-           12871, 5000, $, 0, 3, $, $, 0, $, $ ]
+           12871, 5000, $, 0, 3, $, $, 0, $, $ ],
+         // companion-duke
+         [ 240, qd_240_name, &DukeLiege, 0, 50, 90, $,
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &DukeLiege, 0, qd_240_s1, $, $, qd_240_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, 1, $, 0, $, $ ],
+         // companion-princess
+         [ 241, qd_241_name, &PrincessLiege, 0, 50, 90, $,
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &PrincessLiege, 0, qd_241_s1, $, $, qd_241_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, 2, $, 0, $, $ ],
+         // companion-rebel
+         [ 242, qd_242_name, &RebelLiege, 0, 50, 90, $,
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &RebelLiege, 0, qd_242_s1, $, $, qd_242_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, 3, $, 0, $, $ ],
+         // companion-kraanan
+         [ 243, qd_243_name, &KraananPriestess, 0, 50, 90, [ 82 ],
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &KraananPriestess, 0, qd_243_s1, $, $, qd_243_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, $, $, 0, $, $ ]
          ]
       ];
    }

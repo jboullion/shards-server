@@ -1,0 +1,34 @@
+{
+  "tier": "main",
+  "id": 241,
+  "key": "companion-princess",
+  "name": "A Knight Sworn to You",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 90
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "My knights ride where I cannot. One of them would gladly ride with you, if you ask it of me. Ask, and a knight will swear to you in my name.",
+    "progress": "Stand before the Princess and ask her for a companion (the Companion tab, C).",
+    "complete": "May they guard you as they would guard me. Their loyalty grows with every battle you share."
+  },
+  "steps": [
+    {
+      "kind": "companion",
+      "objective": "Take a companion into your service",
+      "brief": "Stand before the Princess and ask her for a companion (the Companion tab, C)."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 2
+  }
+}

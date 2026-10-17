@@ -62,7 +62,9 @@ messages:
       }
 
       oTarget = First(lTargets);
+      // Ours: and the caster's companion, or a groupmate's (util/companionbook.kod)
       if NOT IsClass(oTarget,&User)
+         AND NOT Send(self,@IsHealableCompanion,#who=who,#target=oTarget)
       {
          if NOT bItemCast
          {
@@ -87,6 +89,27 @@ messages:
       }
 
       propagate;
+   }
+
+   IsHealableCompanion(who = $,target = $)
+   {
+      local oOwner, oRoom;
+
+      if target = $ OR NOT IsClass(target,&Monster) OR NOT Send(target,@IsCompanion)
+         OR Send(target,@GetCompanionState) <> COMP_ACTIVE
+      {
+         return FALSE;
+      }
+
+      oOwner = Send(target,@GetSworn);
+      if oOwner = who
+      {
+         return TRUE;
+      }
+
+      oRoom = Send(who,@GetOwner);
+
+      return oRoom <> $ AND Send(oRoom,@AreGroupedHere,#who=who,#what=oOwner);
    }
 
    CastSpell(who = $, lTargets = $, iSpellPower = 0)

@@ -1,0 +1,34 @@
+{
+  "tier": "main",
+  "id": 242,
+  "key": "companion-rebel",
+  "name": "A Blade from the Underground",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 90
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "Our fighters are few, but each is worth three of the Duke's. One of them has asked to fight beside you. Say the word and they are yours.",
+    "progress": "Stand before the rebels' leader and ask for a companion (the Companion tab, C).",
+    "complete": "Watch each other's backs. That is how we have survived this long."
+  },
+  "steps": [
+    {
+      "kind": "companion",
+      "objective": "Take a companion into your service",
+      "brief": "Stand before the rebels' leader and ask for a companion (the Companion tab, C)."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 2
+  }
+}

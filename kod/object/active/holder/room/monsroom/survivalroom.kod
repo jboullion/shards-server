@@ -171,6 +171,12 @@ properties:
 
 messages:
 
+   AllowsCompanion(what = $)
+   "Ours: no companions here (util/companionbook.kod)."
+   {
+      return FALSE;
+   }
+
    Constructor(iRID=RID_SURVIVAL_START,base_room=$,poGuild=$,iPublic=FALSE,
                iPvP=FALSE)
    {

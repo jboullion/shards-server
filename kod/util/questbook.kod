@@ -113,6 +113,8 @@ constants:
    QK_HEALTH = 11
    QK_HOMETOWN = 12
    QK_NODES = 13
+   // Ours: having a companion (docs/adr/0010-followers.md; util/companionbook.kod)
+   QK_COMPANION = 14
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -1688,7 +1690,8 @@ messages:
 
    CheckStateSteps(who = $)
    "Steps that are a state, not a deed: a base health reached, a hometown chosen, every mana "
-   "node bonded. Checked at logon, when a step starts, on a health gain, a hometown, a node."
+   "node bonded, a companion. Checked at logon, when a step starts, on a health gain, a "
+   "hometown, a node, a companion sworn."
    {
       local i, lQuest, lStep, iKind, bDone;
 
@@ -1718,6 +1721,10 @@ messages:
                if iKind = QK_NODES
                {
                   bDone = Send(who,@NumManaNodes) >= Nth(lStep,QBS_AMOUNT);
+               }
+               if iKind = QK_COMPANION
+               {
+                  bDone = Send(who,@GetCompanion) <> $;
                }
 
                if bDone

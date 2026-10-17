@@ -1657,14 +1657,23 @@ messages:
 
    RemoveAllMinions()
    "Removes all minions, including seduced, charmed, dragonfly queens etc."
+   "Ours: but not a companion, which its book takes care of (util/companionbook.kod)."
    {
-      local i;
+      local i, lKeep;
 
       // Delete our reflections.
       Send(SYS,@DeletePlayerReflections,#who=self);
 
+      lKeep = $;
       foreach i in plControlledMinions
       {
+         if Send(i,@IsCompanion)
+         {
+            lKeep = Cons(i,lKeep);
+
+            continue;
+         }
+
          // Reflections.
          if (IsClass(i,&Reflection)
             OR IsClass(i,&EvilTwin))
@@ -1684,7 +1693,7 @@ messages:
          }
       }
 
-      plControlledMinions = $;
+      plControlledMinions = lKeep;
 
       return;
    }
@@ -1702,7 +1711,8 @@ messages:
 
       foreach i in plControlledMinions
       {
-         if NOT IsClass(i,&Reflection)
+         // Ours: a companion doesn't count against the minion limit
+         if NOT IsClass(i,&Reflection) AND NOT Send(i,@IsCompanion)
          {
             ++iMinionCount;
          }
