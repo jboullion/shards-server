@@ -1049,6 +1049,8 @@ properties:
    prMouth = charinfo_mouth_ax_icon
    prNose = charinfo_nose_ax_icon
    prToupee = charinfo_hair_cd_icon
+   // Shards: facial hair (a resource, or $ for none)
+   prBeard = $
 
    // Animation type.  If none, then use piAction
    // piAnimation should be PANM_NONE in between KOD calls.
@@ -2606,7 +2608,8 @@ messages:
       // list of initial skills
 
       lFaceparts = First(charinfo);
-      if (Length(lFaceparts) <> 5)
+      // Shards: a 6th part is the facial hair
+      if Length(lFaceparts) <> 5 AND Length(lFaceparts) <> 6
       {
          // Hacking the protocol -> default char
          gender = GENDER_MALE;
@@ -2631,23 +2634,20 @@ messages:
       prMouth = Send(self, @RestrictToResourceList, #res = Nth(lFaceparts,5), 
           #res_list = Send(SYS, @GetAllowedMouthIcons, #iGender = gender));
 
+      // Shards: facial hair, the optional 6th part; none unless the creator offers it
+      prBeard = $;
+      if Length(lFaceparts) = 6
+         AND FindListElem(Send(SYS,@GetAllowedBeardIcons,#iGender=gender),
+                          Nth(lFaceparts,6)) <> 0
+      {
+         prBeard = Nth(lFaceparts,6);
+      }
+
       iHair_translation = Nth(charinfo,2);
       iSkin_translation = Nth(charinfo,3);
 
-      if iHair_translation <> 0
-         AND iHair_translation <> PT_GRAY_TO_ORANGE
-         AND iHair_translation <> PT_GRAY_TO_RED
-         AND iHair_translation <> PT_GRAY_TO_SKIN1
-         AND iHair_translation <> PT_GRAY_TO_SKIN2
-         AND iHair_translation <> PT_GRAY_TO_SKIN3
-         AND iHair_translation <> PT_GRAY_TO_SKIN4
-         AND iHair_translation <> PT_GRAY_TO_SKIN5
-         AND iHair_translation <> PT_GRAY_TO_PLATBLOND
-         AND iHair_translation <> PT_GRAY_TO_KORANGE
-         AND iHair_translation <> PT_GRAY_TO_KRED
-         AND iHair_translation <> PT_GRAY_TO_KGRAY
-         AND iHair_translation <> PT_GRAY_TO_BLACK
-         AND iHair_translation <> PT_GRAY_TO_BLOND
+      // Only the colours the creator offers (system.kod GetHairTranslations)
+      if FindListElem(Send(SYS,@GetHairTranslations),iHair_translation) = 0
       {
          // if they hacked char.dll...
          iHair_translation = PT_GRAY_TO_BLOND;
@@ -11342,6 +11342,11 @@ messages:
          iOverlays = iOverlays + 1;
       }
 
+      if prBeard <> $
+      {
+         iOverlays = iOverlays + 1;
+      }
+
       // Which group of arm images do we use?
       iLeft_group = 1;
       iRight_group = 1;
@@ -11446,6 +11451,13 @@ messages:
                    1,ANIMATE_NONE, 2,1);
 //      }
 
+      // Shards: facial hair on the mouth's hotspot, in the hair colour
+      if prBeard <> $
+      {
+         AddPacket(4,prBeard, 1,HS_MOUTH, 1,ANIMATE_TRANSLATION,
+                   1,Send(self,@GetHairColor), 1,ANIMATE_NONE, 2,1);
+      }
+
       if poHair_remove = $
       {  
          AddPacket(4,prToupee, 1,HS_TOUPEE, 1,ANIMATE_TRANSLATION,
@@ -11495,6 +11507,11 @@ messages:
       iOverlays = 7;
 
       if poHair_remove = $
+      {
+         iOverlays = iOverlays + 1;
+      }
+
+      if prBeard <> $
       {
          iOverlays = iOverlays + 1;
       }
@@ -11637,6 +11654,13 @@ messages:
          AddPacket(4,prNose, 1,HS_NOSE, 1,ANIMATE_TRANSLATION, 1,iSkin_xlat,
                    1,ANIMATE_NONE, 2,1);
 //      }
+
+      // Shards: facial hair on the mouth's hotspot, in the hair colour
+      if prBeard <> $
+      {
+         AddPacket(4,prBeard, 1,HS_MOUTH, 1,ANIMATE_TRANSLATION,
+                   1,Send(self,@GetHairColor), 1,ANIMATE_NONE, 2,1);
+      }
 
       if poHair_remove = $
       {
@@ -14459,6 +14483,12 @@ messages:
    GetMouthRsc()
    {
       return prMouth;
+   }
+
+   GetBeardRsc()
+   "Shards: the facial hair, or $."
+   {
+      return prBeard;
    }
 
    GetNoseRsc()

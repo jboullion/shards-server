@@ -173,8 +173,31 @@ resources:
    charinfo_hair_dr_icon = ptdr.bgf  // dreads
    charinfo_hair_xa_icon = ptxa.bgf  // bald head/Ben Franklin Look
    charinfo_hair_xb_icon = ptxb.bgf  // Curly hair bun look
+   charinfo_hair_ce_icon = ptce.bgf  // Mohawk with a long braid
+
+   // Shards: new styles, drawn in the hair's grey ramp so every hair colour applies
+   charinfo_hair_sa_icon = ptsa.bgf  // Warrior's top knot, shaved sides
+   charinfo_hair_sb_icon = ptsb.bgf  // Short tousled crop
+   charinfo_hair_sc_icon = ptsc.bgf  // Short tight curls
+   charinfo_hair_sd_icon = ptsd.bgf  // Shoulder-length waves, centre parting
+   charinfo_hair_se_icon = ptse.bgf  // Slicked back
+   charinfo_hair_sf_icon = ptsf.bgf  // Monk's tonsure
+   charinfo_hair_sg_icon = ptsg.bgf  // Long braid down the back
+   charinfo_hair_sh_icon = ptsh.bgf  // Long braid over the shoulder
+   charinfo_hair_si_icon = ptsi.bgf  // High ponytail
+   charinfo_hair_sj_icon = ptsj.bgf  // Twin braids
+   charinfo_hair_sk_icon = ptsk.bgf  // Low bun at the nape
+   charinfo_hair_sl_icon = ptsl.bgf  // Pixie crop
 
    charinfo_hair_bald_icon = blank.bgf   // bald.
+
+   // Shards: facial hair, on the mouth's hotspot in the hair colour
+   charinfo_beard_a_icon = pbda.bgf  // Short trimmed full beard
+   charinfo_beard_b_icon = pbdb.bgf  // Long full beard
+   charinfo_beard_c_icon = pbdc.bgf  // Goatee
+   charinfo_beard_d_icon = pbdd.bgf  // Thick moustache
+   charinfo_beard_e_icon = pbde.bgf  // Handlebar moustache
+   charinfo_beard_f_icon = pbdf.bgf  // Braided long beard
 
    // What's substitutded for swear words when cleansing strings.
    system_swear_symbols = "#@$%!"
@@ -2112,17 +2135,33 @@ messages:
    }
 
    GetAllowedHairIcons(iGender = GENDER_MALE)
+   "Shards: every hairstyle is offered to both genders (each sits right on both heads)."
    {
-      if iGender = GENDER_MALE
-      {
-         return [charinfo_hair_cd_icon, charinfo_hair_ac_icon,
-             charinfo_hair_ba_icon, charinfo_hair_ad_icon, charinfo_hair_bb_icon,
-             charinfo_hair_bald_icon, charinfo_hair_xa_icon];
-      }
-      return [charinfo_hair_cd_icon, charinfo_hair_bc_icon, charinfo_hair_ca_icon,
-          charinfo_hair_db_icon, charinfo_hair_bd_icon, charinfo_hair_cb_icon,
-          charinfo_hair_dc_icon, charinfo_hair_dr_icon, charinfo_hair_xb_icon,
+      return [charinfo_hair_cd_icon, charinfo_hair_ac_icon, charinfo_hair_ba_icon,
+          charinfo_hair_ad_icon, charinfo_hair_bb_icon, charinfo_hair_bc_icon,
+          charinfo_hair_ca_icon, charinfo_hair_db_icon, charinfo_hair_bd_icon,
+          charinfo_hair_cb_icon, charinfo_hair_dc_icon, charinfo_hair_dr_icon,
+          charinfo_hair_xa_icon, charinfo_hair_xb_icon, charinfo_hair_ce_icon,
+          charinfo_hair_sa_icon, charinfo_hair_sb_icon, charinfo_hair_sc_icon,
+          charinfo_hair_sd_icon, charinfo_hair_se_icon, charinfo_hair_sf_icon,
+          charinfo_hair_sg_icon, charinfo_hair_sh_icon, charinfo_hair_si_icon,
+          charinfo_hair_sj_icon, charinfo_hair_sk_icon, charinfo_hair_sl_icon,
           charinfo_hair_bald_icon];
+   }
+
+   GetHairTranslations()
+   "The hair colours the character creator offers, and the only ones it accepts "
+   "(player.kod PlayerNewCharInfo). 0 leaves the hair its own grey. Shards added the "
+   "last eight: two browns, three golds and three dyed colours."
+   {
+      return [0, PT_GRAY_TO_ORANGE, PT_GRAY_TO_RED,
+          PT_GRAY_TO_SKIN1, PT_GRAY_TO_SKIN2, PT_GRAY_TO_SKIN3,
+          PT_GRAY_TO_SKIN4, PT_GRAY_TO_SKIN5, PT_GRAY_TO_PLATBLOND,
+          PT_GRAY_TO_KORANGE, PT_GRAY_TO_KRED, PT_GRAY_TO_KGRAY,
+          PT_GRAY_TO_BLACK, PT_GRAY_TO_BLOND,
+          PT_HAIR_OLDHAIR1, PT_HAIR_OLDHAIR2,
+          PT_GRAY_TO_LGOLD, PT_GRAY_TO_GOLD, PT_GRAY_TO_KGOLD,
+          PT_GRAY_TO_BBLUE, PT_GRAY_TO_PURPLE, PT_GRAY_TO_LGREEN];
    }
 
    GetAllowedEyeIcons(iGender = GENDER_MALE)
@@ -2156,6 +2195,17 @@ messages:
           charinfo_mouth_mx_icon];
    }
 
+   GetAllowedBeardIcons(iGender = GENDER_MALE)
+   "Shards: the facial hair the character creator offers (none is always allowed)."
+   {
+      if iGender = GENDER_MALE
+      {
+         return [charinfo_beard_a_icon, charinfo_beard_b_icon, charinfo_beard_c_icon,
+             charinfo_beard_d_icon, charinfo_beard_e_icon, charinfo_beard_f_icon];
+      }
+      return [];
+   }
+
    AddIconsToPacket(lIcons = $)
    {
       local i;
@@ -2184,17 +2234,17 @@ messages:
 
    SendCharInfo(session_id = $)
    {
-      local i, iCount;
+      local i, iCount, lHair;
 
       AddPacket(1,BP_CHARINFO);
 
-      // 14 hair translations
-      AddPacket(1,14);
-      AddPacket(1,0, 1,PT_GRAY_TO_ORANGE, 1,PT_GRAY_TO_RED);
-      AddPacket(1,PT_GRAY_TO_SKIN1, 1,PT_GRAY_TO_SKIN2, 1,PT_GRAY_TO_SKIN3);
-      AddPacket(1,PT_GRAY_TO_SKIN4, 1,PT_GRAY_TO_SKIN5, 1,PT_GRAY_TO_PLATBLOND);
-      AddPacket(1,PT_GRAY_TO_KORANGE, 1,PT_GRAY_TO_KRED, 1,PT_GRAY_TO_KGRAY);
-      AddPacket(1,PT_GRAY_TO_BLACK, 1,PT_GRAY_TO_BLOND);
+      // The hair translations
+      lHair = Send(self,@GetHairTranslations);
+      AddPacket(1,Length(lHair));
+      foreach i in lHair
+      {
+         AddPacket(1,i);
+      }
 
       // 4 skin translations
       AddPacket(1,4);
@@ -2260,6 +2310,13 @@ messages:
          }
          AddPacket(1, Send(i, @GetSchool));
       }
+
+      // Shards: the facial hair choices, male then female, after everything the
+      // original client reads
+      Send(self,@AddIconsToPacket,
+          #lIcons=Send(self,@GetAllowedBeardIcons,#iGender=GENDER_MALE));
+      Send(self,@AddIconsToPacket,
+          #lIcons=Send(self,@GetAllowedBeardIcons,#iGender=GENDER_FEMALE));
 
       SendPacket(session_id);
 

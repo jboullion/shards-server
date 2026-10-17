@@ -61,6 +61,8 @@ properties:
    prToupee = $
    prEyes = $
    prMouth = $
+   // Shards: the player's facial hair, or $
+   prBeard = $
    prNose = $
    prHead = $
    prRight_arm = $
@@ -467,6 +469,10 @@ messages:
       prMouth = Send(poOriginal,@GetMouthRsc);
       prNose = Send(poOriginal,@GetNoseRsc);
       prToupee = Send(poOriginal,@GetHairRsc);
+      if IsClass(poOriginal,&Player)
+      {
+         prBeard = Send(poOriginal,@GetBeardRsc);
+      }
       Send(self,@ValidateGraphics,#gender=Send(poOriginal,@GetGender));
 
       oWeapon = Send(poOriginal,@LookUpPlayerWeapon);
@@ -519,7 +525,14 @@ messages:
       // mouth, nose, hair
 
       /// number of overlays
-      AddPacket(1, piOverlays);
+      if prBeard <> $
+      {
+         AddPacket(1, piOverlays + 1);
+      }
+      else
+      {
+         AddPacket(1, piOverlays);
+      }
 
       /// left hand
       AddPacket(4,prLeft_arm,1,HS_LEFT_HAND);
@@ -554,6 +567,10 @@ messages:
       AddPacket(4,prMouth,1,HS_MOUTH,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,piExpression);
       AddPacket(4,prEyes,1,HS_EYES,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,piExpression);
       AddPacket(4,prNose,1,HS_NOSE,1,ANIMATE_TRANSLATION,1,iSkin_xlat,1,ANIMATE_NONE,2,1);
+      if prBeard <> $
+      {
+         AddPacket(4,prBeard,1,HS_MOUTH,1,ANIMATE_TRANSLATION,1,piHair_translation,1,ANIMATE_NONE,2,1);
+      }
       AddPacket(4,prToupee,1,HS_TOUPEE,1,ANIMATE_TRANSLATION,1,piHair_translation);
       AddPacket(1,ANIMATE_NONE,2,1); 
 

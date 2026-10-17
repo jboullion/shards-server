@@ -73,12 +73,27 @@ Model results are cached in `build/iconforge/cache/`, keyed on input, prompt, mo
 variant number. Re-running a batch, or re-pixelizing with another `--shrink` or `--outline`, never
 pays twice. Changing `style/style.md` or a reject note does make a new request.
 
+## Hairstyles and facial hair (`hair.py`)
+
+New player hair and beards, drawn on the game's own heads and kept recolourable:
+
+```
+python tools/iconforge/hair.py hair  ptsb --ref ptad --describe "a short, tousled crop"
+python tools/iconforge/hair.py beard pbdc --describe "a pointed goatee with a thin moustache"
+```
+
+- `headrender.ts` renders the head and face with meridian-browser's own compositor, so placement matches the game.
+- One request redraws a sheet of every view in neutral grey. The part is matted (grey, not green, not the skin under it, clear of the eyes and nose), snapped to the hair ramp (`D0`–`DF`) plus black, and written as a shrink-14 BGF placed from the head's hotspot: 13 for hair (6 views), 12 for facial hair (5 views, no back).
+- Outputs go to `build/iconforge/hair/<name>/` (`raw.png` is cached, `preview.png` shows the part on both heads in four hair colours). Install by copying the BGF to `resource/graphics/shards/` and listing it in `kod/util/system.kod` (`GetAllowedHairIcons`, `GetAllowedBeardIcons`).
+- `data/iconforge/hair.json` lists every style made so far, with its reference and description.
+
 ## Files
 
 - `forge.py`: the CLI.
 - `inventory.py`: finds icons and classifies them.
 - `providers.py`: the model calls.
 - `pixelize.py`: matte, fit, downscale and palette mapping.
+- `hair.py`, `headrender.ts`: player hairstyles and facial hair.
 - `bgf.py`: BGF read/write (round-trip tested on the 104 client's files).
 - `review.py`: contact sheets and the review page.
 - `style/style.md`: the style prompt and the list of reference icons.

@@ -130,6 +130,8 @@ properties:
    prToupee = charinfo_hair_cb_icon
    prEyes = charinfo_eyes_kx_icon
    prMouth = charinfo_mouth_lx_icon
+   // Shards: the player's facial hair, or $
+   prBeard = $
    prNose = charinfo_nose_mx_icon
    prHead = charinfo_head_kx_icon
    prRight_arm = logoffghost_default_rarm
@@ -462,6 +464,7 @@ messages:
       prMouth = Send(poGhostedPlayer,@GetMouthRsc);
       prNose = Send(poGhostedPlayer,@GetNoseRsc);
       prToupee = Send(poGhostedPlayer,@GetHairRsc);
+      prBeard = Send(poGhostedPlayer,@GetBeardRsc);
 
       prLeft_arm = Send(poGhostedPlayer,@GetLeftArmRsc);
 
@@ -526,7 +529,14 @@ messages:
       //  mouth, nose, hair
 
       // Number of overlays
-      AddPacket(1,piOverlays);
+      if prBeard <> $
+      {
+         AddPacket(1,piOverlays + 1);
+      }
+      else
+      {
+         AddPacket(1,piOverlays);
+      }
 
       // Left hand
       AddPacket(4,prLeft_arm, 1,HS_LEFT_HAND);
@@ -565,6 +575,11 @@ messages:
                 1,ANIMATE_NONE, 2,piExpression);
       AddPacket(4,prNose, 1,HS_NOSE, 1,ANIMATE_TRANSLATION, 1,iSkin_xlat,
                 1,ANIMATE_NONE, 2,1);
+      if prBeard <> $
+      {
+         AddPacket(4,prBeard, 1,HS_MOUTH, 1,ANIMATE_TRANSLATION,
+                   1,piHair_translation, 1,ANIMATE_NONE, 2,1);
+      }
       AddPacket(4,prToupee, 1,HS_TOUPEE, 1,ANIMATE_TRANSLATION,
                 1,piHair_translation, 1,ANIMATE_NONE, 2,1);
 

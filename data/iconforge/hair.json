@@ -1,0 +1,113 @@
+{
+ "about": "The player hairstyles and facial hair made by tools/iconforge/hair.py: kind, file name, the existing style shown as the starting point, and the description. Rebuild one with: python tools/iconforge/hair.py <kind> <name> --ref <ref> --describe \"<description>\" (cached; --force asks the model again).",
+ "styles": [
+  {
+   "kind": "hair",
+   "name": "ptsa",
+   "ref": "ptad",
+   "describe": "shaved sides with the hair on top gathered into a tight warrior's top knot, with short stubble on the shaved sides"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsb",
+   "ref": "ptad",
+   "describe": "a short, tousled crop, messy and textured on top, short at the back and sides"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsc",
+   "ref": "ptad",
+   "describe": "short, tight curls close to the head all over"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsd",
+   "ref": "ptbb",
+   "describe": "shoulder-length loose waves with a centre parting, falling to the shoulders all around"
+  },
+  {
+   "kind": "hair",
+   "name": "ptse",
+   "ref": "ptad",
+   "describe": "hair slicked straight back from the forehead, smooth and close to the head, ending at the nape"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsf",
+   "ref": "ptxa",
+   "describe": "a monk's tonsure: the crown shaved bald in a round patch, with a short ring of hair all around the head above the ears"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsg",
+   "ref": "ptcb",
+   "describe": "long hair pulled back from the face into one long single braid hanging down the middle of the back"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsh",
+   "ref": "ptcb",
+   "describe": "long hair gathered into one thick braid that hangs forward over the left shoulder"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsi",
+   "ref": "ptbc",
+   "describe": "hair pulled up into a high ponytail at the crown of the head, the tail hanging down the back"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsj",
+   "ref": "ptcb",
+   "describe": "hair parted in the middle into two long twin braids, one hanging behind each ear"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsk",
+   "ref": "ptca",
+   "describe": "hair swept back smoothly into a neat low bun at the nape of the neck"
+  },
+  {
+   "kind": "hair",
+   "name": "ptsl",
+   "ref": "ptad",
+   "describe": "a very short pixie crop with a short side-swept fringe over the forehead"
+  },
+  {
+   "kind": "beard",
+   "name": "pbda",
+   "ref": "ptad",
+   "describe": "a short, neatly trimmed full beard and moustache that covers the whole jaw and both cheeks up to the cheekbones"
+  },
+  {
+   "kind": "beard",
+   "name": "pbdb",
+   "ref": "ptad",
+   "describe": "a long, full flowing beard reaching well below the chin, with a full moustache, covering the cheeks and jaw"
+  },
+  {
+   "kind": "beard",
+   "name": "pbdc",
+   "ref": "ptad",
+   "describe": "a pointed goatee on the chin with a thin moustache; the cheeks clean shaven"
+  },
+  {
+   "kind": "beard",
+   "name": "pbdd",
+   "ref": "ptad",
+   "describe": "a thick, bushy moustache only; the chin and cheeks clean shaven"
+  },
+  {
+   "kind": "beard",
+   "name": "pbde",
+   "ref": "ptad",
+   "describe": "a long handlebar moustache with curled upturned ends; the chin and cheeks clean shaven"
+  },
+  {
+   "kind": "beard",
+   "name": "pbdf",
+   "ref": "ptad",
+   "describe": "a long beard braided into one thick braid hanging below the chin, with a full moustache, covering the cheeks"
+  }
+ ]
+}
