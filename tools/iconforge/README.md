@@ -87,6 +87,21 @@ python tools/iconforge/hair.py beard pbdc --describe "a pointed goatee with a th
 - Outputs go to `build/iconforge/hair/<name>/` (`raw.png` is cached, `preview.png` shows the part on both heads in four hair colours). Install by copying the BGF to `resource/graphics/shards/` and listing it in `kod/util/system.kod` (`GetAllowedHairIcons`, `GetAllowedBeardIcons`).
 - `data/iconforge/hair.json` lists every style made so far, with its reference and description.
 
+## Weapons in every view (`weapon.py`)
+
+A weapon has up to three sprites: its icon, the overlay in the player's hand (24 frames) and the first-person view (5 frames). `weapon.py` gets one large upright drawing from the model and poses it into every frame of all three, so they show the same object:
+
+```
+python tools/iconforge/weapon.py masterwand --install
+```
+
+- The weapons and their sprites are listed in `data/iconforge/weapons.json` (first the apprentice and master wands).
+- Each frame of the original sprite gives the pose: its axis, its two ends, the head (the wider end) and the head's size. The drawing is scaled, rotated and placed on those, 4x finer, then area-averaged down.
+- The head's neutral greys go to the grey ramp (`D0`–`DF`), which the wands' school xlat recolours on all three sprites. Nothing else may use that ramp.
+- In-hand overlays can change shrink (`wandov.bgf` went from 30 to 6): the offsets are in the player body's pixels, so they stay put.
+- Outputs go to `build/iconforge/weapon/<name>/`. `preview.png` shows the old frames, the new ones, and the new ones in each school's colour. `raw.png` is cached; `--force` asks the model again.
+- `--install` also replaces the copies `forge.py install` would otherwise copy back over these.
+
 ## Fixing sprites by hand
 
 meridian-browser's admin dashboard (`npm run dev`, then `localhost:5173/admin.html`) has a **Sprites** tab: a pixel editor for any `.bgf`, with hair and facial hair previewed on both heads in every hair colour. It saves to `resource/graphics/shards/`, keeping the copy it replaces in `build/spriteforge/backups/`. It can also import a PNG and list a new style in `system.kod`.
@@ -100,6 +115,7 @@ Hand fixes live in the same folder iconforge installs to. Re-running `forge.py i
 - `providers.py`: the model calls.
 - `pixelize.py`: matte, fit, downscale and palette mapping.
 - `hair.py`, `headrender.ts`: player hairstyles and facial hair.
+- `weapon.py`, `xlats.ts`: one drawing posed into a weapon's icon, in-hand and first-person sprites (`xlats.ts` gives the previews the client's palette translations).
 - `bgf.py`: BGF read/write (round-trip tested on the 104 client's files).
 - `review.py`: contact sheets and the review page.
 - `style/style.md`: the style prompt and the list of reference icons.
