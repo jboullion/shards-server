@@ -713,6 +713,15 @@ resources:
    qd_243_name = "A Warrior of Kraanan"
    qd_243_s1 = "Take a companion into your service"
    qd_243_t1 = "Priestess Qerti'nya"
+   qd_244_name = "A Healer at Your Side"
+   qd_244_s1 = "Take a companion into your service"
+   qd_244_t1 = "Priestess Xiana"
+   qd_245_name = "A Servant of Qor"
+   qd_245_s1 = "Take a companion into your service"
+   qd_245_t1 = "Priestess Zuxana"
+   qd_246_name = "A Mage of Faren"
+   qd_246_s1 = "Take a companion into your service"
+   qd_246_t1 = "Priestess Tenuv'vyal"
 
 classvars:
 
@@ -723,7 +732,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 509023;
+      return 71108838;
    }
 
    GetQuests()
@@ -1876,6 +1885,24 @@ messages:
          [ 243, qd_243_name, &KraananPriestess, 0, 50, 90, [ 82 ],
            $, $, $, $,
            [ [ 14, $, 1, 0, &KraananPriestess, 0, qd_243_s1, $, $, qd_243_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, $, $, 0, $, $ ],
+         // companion-shalille
+         [ 244, qd_244_name, &ShalillePriestess, 0, 50, 90, [ 79 ],
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &ShalillePriestess, 0, qd_244_s1, $, $, qd_244_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, $, $, 0, $, $ ],
+         // companion-qor
+         [ 245, qd_245_name, &QorPriestess, 0, 50, 90, [ 80 ],
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &QorPriestess, 0, qd_245_s1, $, $, qd_245_t1,
+               1, $, $, $, 0 ] ],
+           5202, 0, $, 0, 1, $, $, 0, $, $ ],
+         // companion-faren
+         [ 246, qd_246_name, &FarenPriestess, 0, 50, 90, [ 81 ],
+           $, $, $, $,
+           [ [ 14, $, 1, 0, &FarenPriestess, 0, qd_246_s1, $, $, qd_246_t1,
                1, $, $, $, 0 ] ],
            5202, 0, $, 0, 1, $, $, 0, $, $ ]
          ]

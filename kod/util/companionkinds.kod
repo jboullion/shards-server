@@ -2,8 +2,9 @@
 // gives them, and the numbers they grow by. CompanionBook (util/companionbook.kod) inherits
 // these tables, as QuestBook inherits QuestDefs.
 //
-// Kinds 1-4 fight; 5-9 are kept for the casters (Shal'ille, Qor, Faren, Riija, Jala), which
-// need monsters that heal and help their allies.
+// Kinds 1-4 fight; 5-7 cast (Shal'ille's healer, Qor's dark caster, Faren's mage: spell books
+// of damage spells, and the healer's heals, Companion.SupportTimer). 8-9 are kept for Riija and
+// Jala, later.
 
 ////////////////////////////////////////////////////////////////////////////////
 CompanionKinds is UtilityFunctions
@@ -20,6 +21,9 @@ resources:
    companion_kind_princess = "Princess knight"
    companion_kind_rebel = "rebel fencer"
    companion_kind_kraanan = "warrior-priest of Kraanan"
+   companion_kind_shalille = "healer of Shal'ille"
+   companion_kind_qor = "dark caster of Qor"
+   companion_kind_faren = "mage of Faren"
 
    comp_name_d_m1 = "Aldric"
    comp_name_d_m2 = "Bertram"
@@ -73,6 +77,45 @@ resources:
    comp_name_k_f5 = "Sigrun"
    comp_name_k_f6 = "Thyra"
 
+   comp_name_s_m1 = "Anselm"
+   comp_name_s_m2 = "Benedict"
+   comp_name_s_m3 = "Caius"
+   comp_name_s_m4 = "Elias"
+   comp_name_s_m5 = "Lucan"
+   comp_name_s_m6 = "Silvan"
+   comp_name_s_f1 = "Aurelia"
+   comp_name_s_f2 = "Celeste"
+   comp_name_s_f3 = "Ilse"
+   comp_name_s_f4 = "Liora"
+   comp_name_s_f5 = "Mirabel"
+   comp_name_s_f6 = "Seren"
+
+   comp_name_q_m1 = "Corvus"
+   comp_name_q_m2 = "Draven"
+   comp_name_q_m3 = "Malachai"
+   comp_name_q_m4 = "Morrik"
+   comp_name_q_m5 = "Sorin"
+   comp_name_q_m6 = "Vesper"
+   comp_name_q_f1 = "Morrigan"
+   comp_name_q_f2 = "Nyx"
+   comp_name_q_f3 = "Ravenna"
+   comp_name_q_f4 = "Sabine"
+   comp_name_q_f5 = "Vesna"
+   comp_name_q_f6 = "Zora"
+
+   comp_name_f_m1 = "Aldous"
+   comp_name_f_m2 = "Emrys"
+   comp_name_f_m3 = "Fenwick"
+   comp_name_f_m4 = "Orrin"
+   comp_name_f_m5 = "Pyrus"
+   comp_name_f_m6 = "Talon"
+   comp_name_f_f1 = "Aerin"
+   comp_name_f_f2 = "Brisa"
+   comp_name_f_f3 = "Cinder"
+   comp_name_f_f4 = "Ember"
+   comp_name_f_f5 = "Neve"
+   comp_name_f_f6 = "Thessaly"
+
 classvars:
 
 properties:
@@ -107,6 +150,21 @@ messages:
          return COMPANION_KRAANAN;
       }
 
+      if IsClass(npc,&ShalillePriestess)
+      {
+         return COMPANION_SHALILLE;
+      }
+
+      if IsClass(npc,&QorPriestess)
+      {
+         return COMPANION_QOR;
+      }
+
+      if IsClass(npc,&FarenPriestess)
+      {
+         return COMPANION_FAREN;
+      }
+
       return 0;
    }
 
@@ -130,6 +188,21 @@ messages:
       if kind = COMPANION_KRAANAN
       {
          return &KraananPriestess;
+      }
+
+      if kind = COMPANION_SHALILLE
+      {
+         return &ShalillePriestess;
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return &QorPriestess;
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         return &FarenPriestess;
       }
 
       return $;
@@ -156,6 +229,22 @@ messages:
       if kind = COMPANION_KRAANAN
       {
          return RID_TEMPLE_KRAANAN;
+      }
+
+      if kind = COMPANION_SHALILLE
+      {
+         return RID_TEMPLE_SHALILLE;
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return RID_TEMPLE_QOR;
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         // Faren's priestess stands in the badlands (badland1.kod)
+         return RID_BADLAND1;
       }
 
       return $;
@@ -199,7 +288,201 @@ messages:
          return companion_kind_rebel;
       }
 
+      if kind = COMPANION_SHALILLE
+      {
+         return companion_kind_shalille;
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return companion_kind_qor;
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         return companion_kind_faren;
+      }
+
       return companion_kind_kraanan;
+   }
+
+   GetSchool(kind = 0)
+   "A school head's companions' school (SS_*), or 0 for a faction's."
+   {
+      if kind = COMPANION_KRAANAN
+      {
+         return SS_KRAANAN;
+      }
+
+      if kind = COMPANION_SHALILLE
+      {
+         return SS_SHALILLE;
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return SS_QOR;
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         return SS_FAREN;
+      }
+
+      return 0;
+   }
+
+   IsCaster(kind = 0)
+   "Whether it fights with spells (and wears robes, not armour)."
+   {
+      return kind = COMPANION_SHALILLE OR kind = COMPANION_QOR OR kind = COMPANION_FAREN;
+   }
+
+   GetDiscipleQuest(kind = 0)
+   "The school's disciple quest (QuestBook ids), which its head asks for; 0 for a faction's."
+   {
+      if kind = COMPANION_KRAANAN
+      {
+         return COMPANION_KRAANAN_QUEST;
+      }
+
+      if kind = COMPANION_SHALILLE
+      {
+         return COMPANION_SHALILLE_QUEST;
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return COMPANION_QOR_QUEST;
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         return COMPANION_FAREN_QUEST;
+      }
+
+      return 0;
+   }
+
+   GetOldDisciple(kind = 0)
+   "The old QuestEngine's disciple quest (QST_ID_*), which counts too (HasDoneReplacing)."
+   {
+      if kind = COMPANION_KRAANAN
+      {
+         return QST_ID_KRAANAN_DISCIPLE;
+      }
+
+      if kind = COMPANION_SHALILLE
+      {
+         return QST_ID_SHALILLE_DISCIPLE;
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return QST_ID_QOR_DISCIPLE;
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         return QST_ID_FAREN_DISCIPLE;
+      }
+
+      return $;
+   }
+
+   GetSpellBook(kind = 0,tier = 1)
+   "A caster's attack spells at a bond tier, as Monster.plSpellBook has them: [ spell, mana, "
+   "cumulative chance ]. Damage only: no holds, blinds or spells that hit a whole area."
+   {
+      if kind = COMPANION_QOR
+      {
+         if tier <= 1
+         {
+            return [ [SID_POISON,4,100] ];
+         }
+
+         if tier = 2
+         {
+            return [ [SID_POISON,4,40], [SID_VAMPIRIC_DRAIN,6,100] ];
+         }
+
+         if tier = 3
+         {
+            return [ [SID_VAMPIRIC_DRAIN,6,60], [SID_SPLASH_OF_ACID,8,100] ];
+         }
+
+         if tier = 4
+         {
+            return [ [SID_VAMPIRIC_DRAIN,6,45], [SID_SPLASH_OF_ACID,8,100] ];
+         }
+
+         return [ [SID_VAMPIRIC_DRAIN,6,30], [SID_SPLASH_OF_ACID,8,100] ];
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         if tier <= 1
+         {
+            return [ [SID_SHOCKING_FURY,4,100] ];
+         }
+
+         if tier = 2
+         {
+            return [ [SID_SHOCKING_FURY,4,50], [SID_FIREBALL,6,100] ];
+         }
+
+         if tier = 3
+         {
+            return [ [SID_SHOCKING_FURY,4,30], [SID_FIREBALL,6,65], [SID_ICESHARD,6,100] ];
+         }
+
+         if tier = 4
+         {
+            return [ [SID_FIREBALL,6,35], [SID_ICESHARD,6,70], [SID_LIGHTNING_BOLT,8,100] ];
+         }
+
+         return [ [SID_FIREBALL,6,25], [SID_ICESHARD,6,50], [SID_LIGHTNING_BOLT,8,80],
+                  [SID_BLAST_OF_FIRE,8,100] ];
+      }
+
+      if kind = COMPANION_SHALILLE AND tier >= 3
+      {
+         // Only when nobody needs healing (Companion.SupportTimer comes first)
+         return [ [SID_HOLY_BLAZE,8,100] ];
+      }
+
+      return $;
+   }
+
+   GetHeals(kind = 0,tier = 1)
+   "A healer's heals at a bond tier: [ small heal, big heal or $ ], each [ spell, mana ]."
+   {
+      if kind <> COMPANION_SHALILLE
+      {
+         return $;
+      }
+
+      if tier <= 2
+      {
+         return [ [SID_MINOR_HEAL,4], $ ];
+      }
+
+      return [ [SID_MINOR_HEAL,4], [SID_MAJOR_HEAL,10] ];
+   }
+
+   GetCasterNumbers(kind = 0,tier = 1,health = 50)
+   "[ chance to cast in a fight (percent), spell power, maximum mana ] for a caster."
+   {
+      local iChance;
+
+      iChance = 45;
+      if kind = COMPANION_SHALILLE
+      {
+         // It saves its mana for healing
+         iChance = 25;
+      }
+
+      return [ iChance + 5 * tier, Bound(40 + 12 * tier,1,99), 40 + health / 2 ];
    }
 
    GetNames(kind = 0,gender = GENDER_MALE)
@@ -240,6 +523,42 @@ messages:
                  comp_name_r_f5, comp_name_r_f6];
       }
 
+      if kind = COMPANION_SHALILLE
+      {
+         if gender = GENDER_MALE
+         {
+            return [comp_name_s_m1, comp_name_s_m2, comp_name_s_m3, comp_name_s_m4,
+                    comp_name_s_m5, comp_name_s_m6];
+         }
+
+         return [comp_name_s_f1, comp_name_s_f2, comp_name_s_f3, comp_name_s_f4,
+                 comp_name_s_f5, comp_name_s_f6];
+      }
+
+      if kind = COMPANION_QOR
+      {
+         if gender = GENDER_MALE
+         {
+            return [comp_name_q_m1, comp_name_q_m2, comp_name_q_m3, comp_name_q_m4,
+                    comp_name_q_m5, comp_name_q_m6];
+         }
+
+         return [comp_name_q_f1, comp_name_q_f2, comp_name_q_f3, comp_name_q_f4,
+                 comp_name_q_f5, comp_name_q_f6];
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         if gender = GENDER_MALE
+         {
+            return [comp_name_f_m1, comp_name_f_m2, comp_name_f_m3, comp_name_f_m4,
+                    comp_name_f_m5, comp_name_f_m6];
+         }
+
+         return [comp_name_f_f1, comp_name_f_f2, comp_name_f_f3, comp_name_f_f4,
+                 comp_name_f_f5, comp_name_f_f6];
+      }
+
       if gender = GENDER_MALE
       {
          return [comp_name_k_m1, comp_name_k_m2, comp_name_k_m3, comp_name_k_m4,
@@ -266,12 +585,50 @@ messages:
          return [ 55, 125 ];
       }
 
+      if Send(self,@IsCaster,#kind=kind)
+      {
+         // A wand's knock: its spells do the work
+         return [ 25, 55 ];
+      }
+
       return [ 50, 110 ];
    }
 
    GetGear(kind = 0,tier = 1)
-   "The gear it wears at a bond tier (1-5): item classes, made and worn in turn."
+   "The gear it wears at a bond tier (1-5): item classes, made and worn in turn. A caster's "
+   "robe and wands are made for its school (Companion.SetTier passes #school and #color)."
    {
+      if Send(self,@IsCaster,#kind=kind)
+      {
+         if tier <= 1
+         {
+            return [ &ApprenticeWand, &Robe ];
+         }
+
+         if tier = 2
+         {
+            return [ &ApprenticeWand, &DiscipleRobe ];
+         }
+
+         if tier = 3
+         {
+            return [ &ApprenticeWand, &DiscipleRobe, &Circlet ];
+         }
+
+         if tier = 4
+         {
+            return [ &MasterWand, &DiscipleRobe, &Circlet ];
+         }
+
+         if kind = COMPANION_QOR
+         {
+            return [ &MasterWand, &DiscipleRobe, &QormasHelm ];
+         }
+
+         // (The Ivy Circlet asks its wearer for Shal'ille spells, which a monster hasn't)
+         return [ &MasterWand, &DiscipleRobe, &Circlet ];
+      }
+
       if kind = COMPANION_DUKE OR kind = COMPANION_PRINCESS
       {
          if tier <= 1
@@ -378,6 +735,21 @@ messages:
       if kind = COMPANION_REBEL
       {
          return [ XLAT_TO_RED, XLAT_TO_BLACK, XLAT_TO_DGREEN, XLAT_TO_ORANGE, XLAT_TO_GRAY ];
+      }
+
+      if kind = COMPANION_SHALILLE
+      {
+         return [ XLAT_TO_SKY, XLAT_TO_GRAY, XLAT_TO_YELLOW, XLAT_TO_BLUE, XLAT_TO_GREEN ];
+      }
+
+      if kind = COMPANION_QOR
+      {
+         return [ XLAT_TO_BLACK, XLAT_TO_PURPLE, XLAT_TO_RED, XLAT_TO_DGREEN, XLAT_TO_GRAY ];
+      }
+
+      if kind = COMPANION_FAREN
+      {
+         return [ XLAT_TO_RED, XLAT_TO_ORANGE, XLAT_TO_BLUE, XLAT_TO_YELLOW, XLAT_TO_DGREEN ];
       }
 
       return [ XLAT_TO_ORANGE, XLAT_TO_BLACK, XLAT_TO_RED, XLAT_TO_YELLOW, XLAT_TO_GRAY ];

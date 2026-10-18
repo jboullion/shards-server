@@ -7,6 +7,10 @@
 // CompanionBook (util/companionbook.kod) runs its life: getting one, placing it beside its
 // owner, scaling it to them, the bond, death and revival, dismissing it. This class is the
 // monster itself: how it fights, what it shows whom, its pack and its looks.
+//
+// The casters (Shal'ille, Qor, Faren) fight with Monster's spell book (plSpellBook), casting in
+// reach as well as from afar; Shal'ille's healer also looks after its owner, itself and its
+// owner's group every few seconds (SupportTimer).
 
 ////////////////////////////////////////////////////////////////////////////////
 Companion is Human
@@ -76,6 +80,14 @@ properties:
    piGearTier = 0
    // Only its book may delete it (CompanionBook.Forget): anything else parks it
    pbDeleteOk = FALSE
+
+   // A caster's chance to cast in a fight (percent), and a healer's heals
+   // ([ [spell, mana], [spell, mana] or $ ], CompanionKinds.GetHeals) and their timer
+   piCastChance = 0
+   plHeals = $
+   ptSupport = $
+   // GetTime before which it can't cast again (COMPANION_CAST_SECONDS)
+   piNextCast = 0
 
 messages:
 
@@ -200,9 +212,10 @@ messages:
    }
 
    SetTier(tier = 1)
-   "Wears its kind's gear for a bond tier, in place of what it wore."
+   "Wears its kind's gear for a bond tier, in place of what it wore. A caster's wands and "
+   "disciple robe are its school's, and a plain robe is in its first colour."
    {
-      local i, lOld, oBook, cShield;
+      local i, lOld, oBook, cShield, iSchool, iColour;
 
       if tier = piGearTier
       {
@@ -217,9 +230,18 @@ messages:
       }
 
       oBook = Send(SYS,@GetCompanionBook);
+      iSchool = Send(oBook,@GetSchool,#kind=piKind);
+      iColour = Nth(Send(oBook,@GetPalette,#kind=piKind),piColour1 + 1);
       foreach i in Send(oBook,@GetGear,#kind=piKind,#tier=tier)
       {
-         Send(self,@AddEquipmentObject,#what=Create(i));
+         if iSchool > 0
+         {
+            Send(self,@AddEquipmentObject,#what=Create(i,#school=iSchool,#color=iColour));
+         }
+         else
+         {
+            Send(self,@AddEquipmentObject,#what=Create(i));
+         }
       }
 
       cShield = Send(oBook,@GetShield,#kind=piKind);
@@ -423,6 +445,12 @@ messages:
          return;
       }
 
+      if ptSupport <> $
+      {
+         DeleteTimer(ptSupport);
+         ptSupport = $;
+      }
+
       propagate;
    }
 
@@ -529,6 +557,237 @@ messages:
       return defend;
    }
 
+   ////////////////////////////////////////////////////////////// casting
+
+   ApplyCaster(tier = 1,health = 50)
+   "A caster's spell book, heals, chance to cast, spell power and mana for a bond tier and its "
+   "owner's health (CompanionBook.Rescale). It keeps the share of its mana it had."
+   {
+      local oBook, lNumbers, iMax;
+
+      oBook = Send(SYS,@GetCompanionBook);
+      if NOT Send(oBook,@IsCaster,#kind=piKind)
+      {
+         return;
+      }
+
+      plSpellBook = Send(oBook,@GetSpellBook,#kind=piKind,#tier=tier);
+      plHeals = Send(oBook,@GetHeals,#kind=piKind,#tier=tier);
+      lNumbers = Send(oBook,@GetCasterNumbers,#kind=piKind,#tier=tier,#health=health);
+      piCastChance = First(lNumbers);
+      piSpellPower = Nth(lNumbers,2);
+      iMax = Nth(lNumbers,3);
+      if piMax_Mana > 0
+      {
+         piMana = piMana * iMax / piMax_Mana;
+      }
+      else
+      {
+         piMana = iMax;
+      }
+
+      piMax_Mana = iMax;
+      piMana = Bound(piMana,0,iMax);
+      Send(self,@NewMana);
+
+      if plHeals <> $ AND ptSupport = $
+      {
+         ptSupport = CreateTimer(self,@SupportTimer,COMPANION_SUPPORT_MS);
+      }
+
+      return;
+   }
+
+   CastAt(sid = 0,mana = 0,target = $)
+   "One of its spells on a target, as Monster.MonsterCastSpell casts: its mana, the spell's "
+   "own checks and the room's. Returns whether it cast."
+   {
+      local oSpell, lTargets;
+
+      if poOwner = $ OR target = $ OR piMana < mana OR GetTime() < piNextCast
+      {
+         return FALSE;
+      }
+
+      oSpell = Send(SYS,@FindSpellByNum,#num=sid);
+      if oSpell = $
+      {
+         return FALSE;
+      }
+
+      lTargets = Send(oSpell,@GetTargets,#who=self,#lTargets=[target]);
+      if NOT Send(oSpell,@CanPayMonsterCosts,#who=self,#lTargets=lTargets,
+                  #iSpellPower=piSpellPower)
+         OR NOT Send(poOwner,@ReqSpellCast,#who=self,#oSpell=oSpell,#lItems=lTargets)
+      {
+         return FALSE;
+      }
+
+      piMana = piMana - mana;
+      piNextCast = GetTime() + COMPANION_CAST_SECONDS;
+      Send(self,@NewMana);
+      Send(self,@MonsterCastAnimation,#iSpellNum=sid);
+      Send(oSpell,@CastSpell,#who=self,#lTargets=lTargets,#iSpellPower=piSpellPower);
+
+      return TRUE;
+   }
+
+   MonsterCastSpell()
+   "A caster casts at its target in reach as well as from afar (Monster's waits until the "
+   "target is out of reach), at its own chance, and only at what it may attack."
+   {
+      local i, iRandom, iSpell, iMana;
+
+      if plSpellBook = $ OR poTarget = $ OR poOwner = $
+      {
+         return FALSE;
+      }
+
+      if Random(1,100) > piCastChance
+      {
+         return FALSE;
+      }
+
+      if Send(self,@SquaredFineDistanceTo3D,#what=poTarget) > piSpellRange * piSpellRange
+         OR NOT Send(poOwner,@LineOfSight,#obj1=self,#obj2=poTarget)
+         OR NOT Send(poOwner,@ReqSomethingAttack,#what=self,#victim=poTarget,
+                     #use_weapon=self)
+         OR NOT Send(self,@AllowBattlerAttack,#victim=poTarget,#stroke_obj=self)
+      {
+         return FALSE;
+      }
+
+      iRandom = Random(1,100);
+      iSpell = $;
+      foreach i in plSpellBook
+      {
+         if iRandom <= Nth(i,3)
+         {
+            iSpell = First(i);
+            iMana = Nth(i,2);
+
+            break;
+         }
+      }
+
+      if iSpell = $
+      {
+         return FALSE;
+      }
+
+      return Send(self,@CastAt,#sid=iSpell,#mana=iMana,#target=poTarget);
+   }
+
+   TryAttack(what = $,stroke_obj = $)
+   "A caster tries a spell before its wand."
+   {
+      if plSpellBook <> $
+         AND NOT (piBehavior & AI_NOFIGHT)
+         AND Send(self,@MonsterCanCastSpell)
+         AND Send(self,@MonsterCastSpell)
+      {
+         return TRUE;
+      }
+
+      propagate;
+   }
+
+   SupportTimer()
+   "A healer looks after its owner, then itself, then its owner's group in the room."
+   {
+      local oTarget;
+
+      ptSupport = $;
+      if plHeals = $
+      {
+         return;
+      }
+
+      ptSupport = CreateTimer(self,@SupportTimer,COMPANION_SUPPORT_MS);
+      if piCompState <> COMP_ACTIVE OR poOwner = $ OR poSworn = $
+         OR piStance = COMP_PASSIVE
+      {
+         return;
+      }
+
+      oTarget = Send(self,@WhoNeedsHealing);
+      if oTarget <> $
+      {
+         Send(self,@HealTarget,#target=oTarget);
+      }
+
+      return;
+   }
+
+   HealthShare(who = $)
+   "Percent of its maximum health someone has."
+   {
+      local iMax;
+
+      iMax = Send(who,@GetMaxHealth);
+      if iMax <= 0
+      {
+         return 100;
+      }
+
+      return Send(who,@GetHealth) * 100 / iMax;
+   }
+
+   WhoNeedsHealing()
+   {
+      local i, oObj, oBest, iBest, iShare;
+
+      if Send(poSworn,@GetOwner) = poOwner
+         AND Send(self,@HealthShare,#who=poSworn) < COMPANION_HEAL_OWNER_PCT
+         AND Send(poOwner,@LineOfSight,#obj1=self,#obj2=poSworn)
+      {
+         return poSworn;
+      }
+
+      if Send(self,@HealthShare,#who=self) < COMPANION_HEAL_SELF_PCT
+      {
+         return self;
+      }
+
+      oBest = $;
+      iBest = COMPANION_HEAL_OWNER_PCT;
+      foreach i in Send(poOwner,@GetHolderActive)
+      {
+         oObj = First(i);
+         if oObj <> poSworn AND IsClass(oObj,&User)
+            AND Send(poOwner,@AreGroupedHere,#who=poSworn,#what=oObj)
+         {
+            iShare = Send(self,@HealthShare,#who=oObj);
+            if iShare < iBest AND Send(poOwner,@LineOfSight,#obj1=self,#obj2=oObj)
+            {
+               oBest = oObj;
+               iBest = iShare;
+            }
+         }
+      }
+
+      return oBest;
+   }
+
+   HealTarget(target = $)
+   "Its big heal on someone below half their health, if it has one and the mana; else its "
+   "small one."
+   {
+      local lSmall, lBig;
+
+      lSmall = First(plHeals);
+      lBig = Nth(plHeals,2);
+      if lBig <> $ AND Send(self,@HealthShare,#who=target) < 50
+         AND Send(self,@CastAt,#sid=First(lBig),#mana=Nth(lBig,2),#target=target)
+      {
+         return;
+      }
+
+      Send(self,@CastAt,#sid=First(lSmall),#mana=Nth(lSmall,2),#target=target);
+
+      return;
+   }
+
    GetObjectFlags(what = $)
    "Its name always shows. Waiting or fallen, nobody can attack it; its owner never can, and "
    "may give it things and take them back (the vault windows)."
@@ -577,6 +836,13 @@ messages:
       return;
    }
 
+   GainMaxHealth(amount = 0)
+   "Its health comes only from its owner and the bond (CompanionBook.Rescale): what it wears "
+   "(a circlet trades health for mana) changes nothing."
+   {
+      return 0;
+   }
+
    SetHealthPercent(percent = 100)
    {
       piHit_points = Bound(piMax_hit_points * percent,100,piMax_hit_points * 100);
@@ -592,10 +858,32 @@ messages:
    }
 
    GainHealthNormal(amount = $,precision = FALSE)
+   "Monster's, but it returns what it gained in hundredths, as Player's does: heal.kod reports "
+   "it (a heal cast on a companion)."
    {
+      local iBefore;
+
+      if amount = $
+      {
+         return 0;
+      }
+
+      if NOT precision
+      {
+         amount = amount * 100;
+      }
+
+      iBefore = piHit_points;
+      piHit_points = Bound(piHit_points + amount,1,piMax_hit_points * 100);
       Post(Send(SYS,@GetCompanionBook),@HealthChanged,#comp=self);
 
-      propagate;
+      return piHit_points - iBefore;
+   }
+
+   GainHealth(amount = $,precision = FALSE)
+   "Player's name for it, which Vampiric Drain sends its caster."
+   {
+      return Send(self,@GainHealthNormal,#amount=amount,#precision=precision);
    }
 
    ////////////////////////////////////////////////////////////// death
@@ -637,6 +925,12 @@ messages:
 
    CreateDeadBody(killer = $)
    {
+      // DeadBody asks its killer's name; with none (the dashboard's Kill), its own
+      if killer = $
+      {
+         killer = self;
+      }
+
       return Create(&CompanionCorpse,
                     #victim=self,
                     #killer=killer,

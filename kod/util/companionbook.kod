@@ -251,11 +251,13 @@ messages:
          return;
       }
 
-      if iKind = COMPANION_KRAANAN
+      // A school's head asks for its disciple quest, new or old
+      if Send(self,@GetDiscipleQuest,#kind=iKind) > 0
       {
          oQB = Send(SYS,@GetQuestBook);
-         if Send(oQB,@DoneEntry,#who=who,#id=COMPANION_KRAANAN_QUEST) = $
-            AND NOT Send(oQB,@HasDoneReplacing,#who=who,#old=QST_ID_KRAANAN_DISCIPLE)
+         if Send(oQB,@DoneEntry,#who=who,#id=Send(self,@GetDiscipleQuest,#kind=iKind)) = $
+            AND NOT Send(oQB,@HasDoneReplacing,#who=who,
+                         #old=Send(self,@GetOldDisciple,#kind=iKind))
          {
             Send(who,@MsgSendUser,#message_rsc=cbook_not_disciple,
                  #parm1=Send(oLeader,@GetCapDef),#parm2=Send(oLeader,@GetName));
@@ -552,6 +554,9 @@ messages:
       {
          Send(oComp,@SetTier,#tier=iTier);
       }
+
+      // A caster's spells and mana (nothing for a fighter)
+      Send(oComp,@ApplyCaster,#tier=iTier,#health=iH);
 
       return;
    }

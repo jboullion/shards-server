@@ -150,7 +150,11 @@
    COMPANION_PRINCESS = 2
    COMPANION_REBEL = 3
    COMPANION_KRAANAN = 4
-   COMPANION_KINDS = 4
+   // The casters (Riija and Jala, 8 and 9, are for later)
+   COMPANION_SHALILLE = 5
+   COMPANION_QOR = 6
+   COMPANION_FAREN = 7
+   COMPANION_KINDS = 7
 
    // A companion's health is this much of its owner's base health (percent)
    COMPANION_HEALTH_PCT = 70
@@ -171,8 +175,19 @@
    // Base health needed to ask for one
    COMPANION_MIN_HEALTH = 50
 
-   // Kraanan's disciple quest (QuestBook), and the old one it replaced
+   // The schools' disciple quests (QuestBook), which their heads ask for
+   COMPANION_SHALILLE_QUEST = 79
+   COMPANION_QOR_QUEST = 80
+   COMPANION_FAREN_QUEST = 81
    COMPANION_KRAANAN_QUEST = 82
+
+   // A healer heals its owner or a groupmate below this share of their health, itself below
+   // the second (percent); it looks every so often (ms)
+   COMPANION_HEAL_OWNER_PCT = 70
+   COMPANION_HEAL_SELF_PCT = 50
+   COMPANION_SUPPORT_MS = 2500
+   // A caster casts at most once in this many seconds (heals and attacks alike)
+   COMPANION_CAST_SECONDS = 2
 
    // Player name color sent as hex RGB value. Define constants
    // for ease of use as needed. Requires OF_PLAYER boolean flag
