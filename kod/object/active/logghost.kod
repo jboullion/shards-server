@@ -152,6 +152,10 @@ properties:
    piIcon_translation = 0
    piLegs_translation = 0
    piArms_translation = 0
+   // Ours (docs/adr/0012-cosmetics.md): the player's dyed parts (ANIMATE_DYE WORDs, 0 none)
+   piIcon_dye = 0
+   piLegs_dye = 0
+   piArms_dye = 0
    piWeapon_translation = 0
    piShield_translation = 0
    piSkin_translation = 3
@@ -431,6 +435,9 @@ messages:
       piIcon_translation = Send(poGhostedPlayer,@GetBodyTranslation);
       piLegs_translation = Send(poGhostedPlayer,@GetLegsTranslation);
       piArms_translation = Send(poGhostedPlayer,@GetArmsTranslation);
+      piIcon_dye = Send(poGhostedPlayer,@GetPartDyeCode,#part=DYE_PART_BODY);
+      piLegs_dye = Send(poGhostedPlayer,@GetPartDyeCode,#part=DYE_PART_LEGS);
+      piArms_dye = Send(poGhostedPlayer,@GetPartDyeCode,#part=DYE_PART_ARMS);
       piHair_translation = Send(poGhostedPlayer,@getHairColor);
       piSkin_Translation = Send(poGhostedPlayer,@GetSkinColor);
       piExpression = Send(poGhostedPlayer,@GetExpression);
@@ -508,7 +515,11 @@ messages:
 
    SendAnimation()
    {
-      if (piIcon_translation) <> 0
+      if piIcon_dye <> 0
+      {
+         AddPacket(1,ANIMATE_DYE, 2,piIcon_dye);
+      }
+      else if (piIcon_translation) <> 0
       {
          AddPacket(1,ANIMATE_TRANSLATION, 1,piIcon_translation);
       }
@@ -540,7 +551,11 @@ messages:
 
       // Left hand
       AddPacket(4,prLeft_arm, 1,HS_LEFT_HAND);
-      if piArms_translation <> 0
+      if piArms_dye <> 0
+      {
+         AddPacket(1,ANIMATE_DYE, 2,piArms_dye);
+      }
+      else if piArms_translation <> 0
       {
          AddPacket(1,ANIMATE_TRANSLATION, 1,piArms_translation);
       }
@@ -549,7 +564,11 @@ messages:
 
       // Right hand
       AddPacket(4,prRight_arm, 1,HS_RIGHT_HAND);
-      if piArms_translation <> 0
+      if piArms_dye <> 0
+      {
+         AddPacket(1,ANIMATE_DYE, 2,piArms_dye);
+      }
+      else if piArms_translation <> 0
       {
          AddPacket(1,ANIMATE_TRANSLATION, 1,piArms_translation);
       }
@@ -558,7 +577,11 @@ messages:
 
       // Legs
       AddPacket(4,prLegs, 1,HS_LEGS);
-      if piLegs_translation <> 0
+      if piLegs_dye <> 0
+      {
+         AddPacket(1,ANIMATE_DYE, 2,piLegs_dye);
+      }
+      else if piLegs_translation <> 0
       {
          AddPacket(1,ANIMATE_TRANSLATION, 1,piLegs_translation);
       }

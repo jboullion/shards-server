@@ -7024,6 +7024,13 @@ messages:
       return FALSE;
    }
 
+   GetShardsService()
+   "Ours: what it does for players besides its shop (SERVICE_TAILOR, SERVICE_BARBER), 0 for "
+   "nothing (util/cosmeticsbook.kod)."
+   {
+      return 0;
+   }
+
    TakesMinionCommand(defend = FALSE)
    {
       return TRUE;

@@ -36,6 +36,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours nothing (not dyeable)
+   viDyeRamp = DYE_RAMP_NONE
+
    viHits_init_min = 200
    viHits_init_max = 250
 

@@ -237,6 +237,8 @@
    UC_QUEST_PROGRESS = 108
    // Ours: our companion's state (util/companionbook.kod SendStatus), docs/adr/0010-followers.md
    UC_COMPANION = 109
+   // Ours: a tailor's or barber's menu (util/cosmeticsbook.kod)
+   UC_COSMETICS = 110
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

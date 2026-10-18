@@ -48,6 +48,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours its cloth (the red ramp)
+   viDyeRamp = DYE_RAMP_CLOTH
+
    vrName = robe_name_rsc
    vrIcon = robe_icon_rsc
    vrDesc = robe_desc_rsc

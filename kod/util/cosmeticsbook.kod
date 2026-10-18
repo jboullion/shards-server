@@ -1,0 +1,576 @@
+// Ours (Meridian Shards, docs/adr/0012-cosmetics.md): tailors and barbers. Activating one (an NPC
+// whose GetShardsService says so; QuestBook.NpcActivated) sends our client its menu
+// (UC_COSMETICS), and the client's window answers with the `tailor` and `barber` commands
+// (UC_SHARDS, user.kod ShardsCommand).
+//
+// A tailor dyes what its customer carries or wears: one of the dyes below (a palette ramp in a
+// light, full or dark shade, SYS MakeDye), on whichever ramp the item's art dyes (Item.SetDye).
+// Kod can't turn an object number in a command back into an object, so the menu's items are
+// remembered on the player (User.plServiceItems) and the command names one by its slot.
+//
+// The barber cuts and colours hair and facial hair: places in the character creator's lists
+// (BP_CHARINFO; SYS GetAllowedHairIcons, GetAllowedBeardIcons, GetHairTranslations), as a
+// companion's looks are (CompanionBook.Look).
+
+////////////////////////////////////////////////////////////////////////////////
+CosmeticsBook is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   COSMETICS_PKT_TAILOR = 1
+   COSMETICS_PKT_BARBER = 2
+
+resources:
+
+   cosm_dye_scarlet = "scarlet"
+   cosm_dye_crimson = "crimson"
+   cosm_dye_maroon = "maroon"
+   cosm_dye_sand = "sand"
+   cosm_dye_tan = "tan"
+   cosm_dye_taupe = "taupe"
+   cosm_dye_copper = "copper"
+   cosm_dye_brown = "brown"
+   cosm_dye_chestnut = "chestnut"
+   cosm_dye_rust = "rust"
+   cosm_dye_umber = "umber"
+   cosm_dye_sepia = "sepia"
+   cosm_dye_amber = "amber"
+   cosm_dye_orange = "orange"
+   cosm_dye_bronze = "bronze"
+   cosm_dye_sage = "sage"
+   cosm_dye_olive = "olive"
+   cosm_dye_moss = "moss"
+   cosm_dye_emerald = "emerald"
+   cosm_dye_green = "green"
+   cosm_dye_forest = "forest green"
+   cosm_dye_seafoam = "seafoam"
+   cosm_dye_teal = "teal"
+   cosm_dye_deepteal = "deep teal"
+   cosm_dye_cobalt = "cobalt"
+   cosm_dye_royal = "royal blue"
+   cosm_dye_navy = "navy"
+   cosm_dye_violet = "violet"
+   cosm_dye_purple = "purple"
+   cosm_dye_plum = "plum"
+   cosm_dye_yellow = "yellow"
+   cosm_dye_gold = "gold"
+   cosm_dye_ochre = "ochre"
+   cosm_dye_silver = "silver"
+   cosm_dye_grey = "grey"
+   cosm_dye_charcoal = "charcoal"
+   cosm_dye_sky = "sky blue"
+   cosm_dye_steel = "steel blue"
+   cosm_dye_midnight = "midnight blue"
+
+   cosm_too_far = "Stand closer to them."
+   cosm_no_npc = "There's nobody here to do that."
+   cosm_not_tailor = "%s%s doesn't dye things."
+   cosm_not_barber = "%s%s doesn't cut hair."
+   cosm_gone = "You don't have that any more."
+   cosm_cant_dye = "%s%s can't be dyed."
+   cosm_no_such_dye = "There's no such dye."
+   cosm_not_dyed = "%s%s isn't dyed."
+   cosm_cant_pay = "That costs %i shillings, which you don't have."
+   cosm_dyed = "%s%s dyes your %s %s. That was %i shillings."
+   cosm_undyed = "%s%s takes the dye out of your %s. That was %i shillings."
+   cosm_bad_look = "That isn't a style the barber knows."
+   cosm_cut = "You look in the mirror and like what you see. That was %i shillings."
+
+classvars:
+
+properties:
+
+messages:
+
+   ////////////////////////////////////////////////////////////// the dyes
+
+   GetDyes()
+   "Every dye a tailor offers: [ dye field (SYS MakeDye), name ]. A palette ramp (the ramp at "
+   "16 x ramp) in its light, full and dark shades."
+   {
+      local i, j, lRamps, lOut, lNames;
+
+      lRamps = [ [ 0x1, cosm_dye_scarlet, cosm_dye_crimson, cosm_dye_maroon ],
+                 [ 0x2, cosm_dye_sand, cosm_dye_tan, cosm_dye_taupe ],
+                 [ 0x3, cosm_dye_copper, cosm_dye_brown, cosm_dye_chestnut ],
+                 [ 0x4, cosm_dye_rust, cosm_dye_umber, cosm_dye_sepia ],
+                 [ 0x5, cosm_dye_amber, cosm_dye_orange, cosm_dye_bronze ],
+                 [ 0x6, cosm_dye_sage, cosm_dye_olive, cosm_dye_moss ],
+                 [ 0x7, cosm_dye_emerald, cosm_dye_green, cosm_dye_forest ],
+                 [ 0x8, cosm_dye_seafoam, cosm_dye_teal, cosm_dye_deepteal ],
+                 [ 0x9, cosm_dye_cobalt, cosm_dye_royal, cosm_dye_navy ],
+                 [ 0xa, cosm_dye_violet, cosm_dye_purple, cosm_dye_plum ],
+                 [ 0xc, cosm_dye_yellow, cosm_dye_gold, cosm_dye_ochre ],
+                 [ 0xd, cosm_dye_silver, cosm_dye_grey, cosm_dye_charcoal ],
+                 [ 0xe, cosm_dye_sky, cosm_dye_steel, cosm_dye_midnight ] ];
+
+      lOut = $;
+      foreach i in lRamps
+      {
+         j = DYE_SHADE_LIGHT;
+         lNames = Rest(i);
+         while j <= DYE_SHADE_DARK
+         {
+            lOut = AppendListElem([ Send(SYS,@MakeDye,#ramp=First(i),#shade=j),
+                                    Nth(lNames,j) ],lOut);
+            ++j;
+         }
+      }
+
+      return lOut;
+   }
+
+   DyeName(dye = 0)
+   "A dye's name, or $ for no such dye."
+   {
+      local i;
+
+      foreach i in Send(self,@GetDyes)
+      {
+         if First(i) = dye
+         {
+            return Nth(i,2);
+         }
+      }
+
+      return $;
+   }
+
+   ////////////////////////////////////////////////////////////// talking to them
+
+   ServiceActivated(who = $,npc = $)
+   "QuestBook.NpcActivated: a tailor or a barber sends who its menu, and is who's to deal with."
+   {
+      local iService;
+
+      if who = $ OR npc = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      iService = Send(npc,@GetShardsService);
+      if iService = SERVICE_TAILOR
+      {
+         Send(who,@SetServiceNpc,#what=npc);
+         Send(self,@SendTailorMenu,#who=who);
+
+         return TRUE;
+      }
+
+      if iService = SERVICE_BARBER
+      {
+         Send(who,@SetServiceNpc,#what=npc);
+         Send(self,@SendBarberMenu,#who=who);
+
+         return TRUE;
+      }
+
+      return FALSE;
+   }
+
+   InReach(who = $,obj = $)
+   {
+      return obj <> $ AND Send(obj,@GetOwner) <> $
+         AND Send(obj,@GetOwner) = Send(who,@GetOwner)
+         AND Abs(Send(who,@GetRow) - Send(obj,@GetRow)) <= COSMETIC_REACH
+         AND Abs(Send(who,@GetCol) - Send(obj,@GetCol)) <= COSMETIC_REACH;
+   }
+
+   ServiceNpc(who = $,service = 0)
+   "who's tailor or barber, still near; else who is told why and it's $."
+   {
+      local oNpc;
+
+      oNpc = Send(who,@GetServiceNpc);
+      if oNpc = $ OR Send(oNpc,@GetShardsService) <> service
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_no_npc);
+
+         return $;
+      }
+
+      if NOT Send(self,@InReach,#who=who,#obj=oNpc)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_too_far);
+
+         return $;
+      }
+
+      return oNpc;
+   }
+
+   Charge(who = $,price = 0)
+   "Takes price shillings from who, or says they can't pay. Returns whether it did."
+   {
+      local oMoney;
+
+      if price <= 0
+      {
+         return TRUE;
+      }
+
+      oMoney = Send(who,@GetMoneyObject,#type=&Shillings);
+      if oMoney = $ OR Send(oMoney,@GetNumber) < price
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_cant_pay,#parm1=price);
+
+         return FALSE;
+      }
+
+      Send(oMoney,@SubtractNumber,#number=price);
+
+      return TRUE;
+   }
+
+   ////////////////////////////////////////////////////////////// the client's commands
+
+   CosmeticsCommand(who = $,words = $)
+   "tailor dye <item> <dye> | tailor undye <item> | tailor menu | barber <hair> <beard> <colour> "
+   "| barber menu. <item> is a slot in the last tailor's menu (from 1)."
+   {
+      local sVerb, sWhat;
+
+      if who = $ OR NOT IsClass(who,&User) OR words = $
+      {
+         return;
+      }
+
+      sVerb = First(words);
+      sWhat = $;
+      if Length(words) >= 2
+      {
+         sWhat = Nth(words,2);
+      }
+
+      if StringEqual(sVerb,"tailor")
+      {
+         if sWhat <> $ AND StringEqual(sWhat,"dye") AND Length(words) >= 4
+         {
+            Send(self,@DyeItem,#who=who,#slot=StringToNumber(Nth(words,3)),
+                 #dye=StringToNumber(Nth(words,4)));
+
+            return;
+         }
+
+         if sWhat <> $ AND StringEqual(sWhat,"undye") AND Length(words) >= 3
+         {
+            Send(self,@UndyeItem,#who=who,#slot=StringToNumber(Nth(words,3)));
+
+            return;
+         }
+
+         if Send(self,@ServiceNpc,#who=who,#service=SERVICE_TAILOR) <> $
+         {
+            Send(self,@SendTailorMenu,#who=who);
+         }
+
+         return;
+      }
+
+      if StringEqual(sVerb,"barber")
+      {
+         if Length(words) >= 4
+         {
+            Send(self,@CutHair,#who=who,#hair=StringToNumber(Nth(words,2)),
+                 #beard=StringToNumber(Nth(words,3)),#colour=StringToNumber(Nth(words,4)));
+
+            return;
+         }
+
+         if Send(self,@ServiceNpc,#who=who,#service=SERVICE_BARBER) <> $
+         {
+            Send(self,@SendBarberMenu,#who=who);
+         }
+      }
+
+      return;
+   }
+
+   ItemAt(who = $,slot = 0)
+   "The menu's item at slot, if who still carries or wears it."
+   {
+      local lItems, oItem;
+
+      lItems = Send(who,@GetServiceItems);
+      if slot < 1 OR slot > Length(lItems)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_gone);
+
+         return $;
+      }
+
+      oItem = Nth(lItems,slot);
+      if oItem = $ OR Send(oItem,@GetOwner) <> who
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_gone);
+
+         return $;
+      }
+
+      return oItem;
+   }
+
+   DyeItem(who = $,slot = 0,dye = 0)
+   {
+      local oNpc, oItem, rName;
+
+      oNpc = Send(self,@ServiceNpc,#who=who,#service=SERVICE_TAILOR);
+      if oNpc = $
+      {
+         return;
+      }
+
+      oItem = Send(self,@ItemAt,#who=who,#slot=slot);
+      if oItem = $
+      {
+         return;
+      }
+
+      if Send(oItem,@GetDyeRamp) = DYE_RAMP_NONE
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_cant_dye,#parm1=Send(oItem,@GetCapDef),
+              #parm2=Send(oItem,@GetName));
+
+         return;
+      }
+
+      rName = Send(self,@DyeName,#dye=dye);
+      if rName = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_no_such_dye);
+
+         return;
+      }
+
+      if NOT Send(self,@Charge,#who=who,#price=COSMETIC_DYE_PRICE)
+      {
+         return;
+      }
+
+      Send(oItem,@SetDye,#dye=dye);
+      Send(who,@MsgSendUser,#message_rsc=cosm_dyed,#parm1=Send(oNpc,@GetCapDef),
+           #parm2=Send(oNpc,@GetName),#parm3=Send(oItem,@GetName),#parm4=rName,
+           #parm5=COSMETIC_DYE_PRICE);
+      Send(self,@SendTailorMenu,#who=who);
+
+      return;
+   }
+
+   UndyeItem(who = $,slot = 0)
+   {
+      local oNpc, oItem;
+
+      oNpc = Send(self,@ServiceNpc,#who=who,#service=SERVICE_TAILOR);
+      if oNpc = $
+      {
+         return;
+      }
+
+      oItem = Send(self,@ItemAt,#who=who,#slot=slot);
+      if oItem = $
+      {
+         return;
+      }
+
+      if Send(oItem,@GetDye) = 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_not_dyed,#parm1=Send(oItem,@GetCapDef),
+              #parm2=Send(oItem,@GetName));
+
+         return;
+      }
+
+      if NOT Send(self,@Charge,#who=who,#price=COSMETIC_UNDYE_PRICE)
+      {
+         return;
+      }
+
+      Send(oItem,@SetDye,#dye=0);
+      Send(who,@MsgSendUser,#message_rsc=cosm_undyed,#parm1=Send(oNpc,@GetCapDef),
+           #parm2=Send(oNpc,@GetName),#parm3=Send(oItem,@GetName),#parm4=COSMETIC_UNDYE_PRICE);
+      Send(self,@SendTailorMenu,#who=who);
+
+      return;
+   }
+
+   CutHair(who = $,hair = 0,beard = 0,colour = 0)
+   "The barber: hair, facial hair (0 none, else its slot + 1) and hair colour, as places in "
+   "BP_CHARINFO's lists for who's gender."
+   {
+      local oNpc, iGender, rHair, rBeard, lColours, lBeards;
+
+      oNpc = Send(self,@ServiceNpc,#who=who,#service=SERVICE_BARBER);
+      if oNpc = $
+      {
+         return;
+      }
+
+      iGender = Send(who,@GetGender);
+      rHair = Send(self,@PartAt,#parts=Send(SYS,@GetAllowedHairIcons,#iGender=iGender),
+                   #at=hair);
+      rBeard = $;
+      if beard > 0
+      {
+         lBeards = Send(SYS,@GetAllowedBeardIcons,#iGender=iGender);
+         rBeard = Send(self,@PartAt,#parts=lBeards,#at=beard - 1);
+      }
+
+      lColours = Send(SYS,@GetHairTranslations);
+      if rHair = $ OR (beard > 0 AND rBeard = $) OR colour < 0 OR colour >= Length(lColours)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cosm_bad_look);
+
+         return;
+      }
+
+      if NOT Send(self,@Charge,#who=who,#price=COSMETIC_HAIRCUT_PRICE)
+      {
+         return;
+      }
+
+      Send(who,@SetCosmeticHair,#hair=rHair,#beard=rBeard,#colour=Nth(lColours,colour + 1));
+      // No new menu: the barber's window closes on a cut (the tailor's stays, for the next thing)
+      Send(who,@MsgSendUser,#message_rsc=cosm_cut,#parm1=COSMETIC_HAIRCUT_PRICE);
+
+      return;
+   }
+
+   PartAt(parts = $,at = 0)
+   "The list's entry at a 0-based slot, or $ when there's none."
+   {
+      if parts = $ OR at < 0 OR at >= Length(parts)
+      {
+         return $;
+      }
+
+      return Nth(parts,at + 1);
+   }
+
+   PlaceOf(parts = $,part = $)
+   "A part's 0-based slot in a list (0 when it isn't there)."
+   {
+      local i;
+
+      i = FindListElem(parts,part);
+      if i > 0
+      {
+         return i - 1;
+      }
+
+      return 0;
+   }
+
+   ////////////////////////////////////////////////////////////// our client
+
+   SendTailorMenu(who = $)
+   "UC_COSMETICS kind 1: the tailor, the prices, the dyes, and who's dyeable things (worn first), "
+   "which are remembered for the commands."
+   {
+      local oSession, oNpc, i, lItems, lDyes;
+
+      oSession = Send(who,@GetShardsSession);
+      oNpc = Send(who,@GetServiceNpc);
+      if oSession = $ OR oNpc = $
+      {
+         return;
+      }
+
+      lItems = $;
+      foreach i in Send(who,@GetPlayerUsing)
+      {
+         if Send(i,@GetDyeRamp) <> DYE_RAMP_NONE AND Length(lItems) < COSMETIC_MENU_ITEMS
+         {
+            lItems = AppendListElem(i,lItems);
+         }
+      }
+
+      foreach i in Send(who,@GetHolderPassive)
+      {
+         if IsClass(i,&Item) AND Send(i,@GetDyeRamp) <> DYE_RAMP_NONE
+            AND FindListElem(lItems,i) = 0 AND Length(lItems) < COSMETIC_MENU_ITEMS
+         {
+            lItems = AppendListElem(i,lItems);
+         }
+      }
+
+      Send(who,@SetServiceItems,#items=lItems);
+      lDyes = Send(self,@GetDyes);
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_COSMETICS, 1,COSMETICS_PKT_TAILOR, 4,oNpc,
+                4,COSMETIC_DYE_PRICE, 4,COSMETIC_UNDYE_PRICE, 1,Length(lDyes));
+      foreach i in lDyes
+      {
+         AddPacket(1,First(i), 4,Nth(i,2));
+      }
+
+      AddPacket(1,Length(lItems));
+      foreach i in lItems
+      {
+         AddPacket(4,i, 1,Send(i,@GetDyeRamp), 1,Send(i,@GetDyeField),
+                   1,Send(i,@IsInUse));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendBarberMenu(who = $)
+   "UC_COSMETICS kind 2: the barber, the price, and who's look as places in BP_CHARINFO's lists "
+   "(gender 0 male 1 female; hair; beard 0 none else slot + 1; hair colour; then head, eyes, "
+   "nose, mouth and skin for the preview)."
+   {
+      local oSession, oNpc, iGender, lParts, rBeard, iBeard;
+
+      oSession = Send(who,@GetShardsSession);
+      oNpc = Send(who,@GetServiceNpc);
+      if oSession = $ OR oNpc = $
+      {
+         return;
+      }
+
+      iGender = Send(who,@GetGender);
+      lParts = Send(who,@GetFaceParts);
+      rBeard = Nth(lParts,6);
+      iBeard = 0;
+      if rBeard <> $
+      {
+         iBeard = Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedBeardIcons,#iGender=iGender),
+                       #part=rBeard) + 1;
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_COSMETICS, 1,COSMETICS_PKT_BARBER, 4,oNpc,
+                4,COSMETIC_HAIRCUT_PRICE);
+      if iGender = GENDER_FEMALE
+      {
+         AddPacket(1,1);
+      }
+      else
+      {
+         AddPacket(1,0);
+      }
+
+      AddPacket(1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedHairIcons,#iGender=iGender),
+                       #part=Nth(lParts,2)),
+                1,iBeard,
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetHairTranslations),
+                       #part=Send(who,@GetHairColor)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedHeadIcons,#iGender=iGender),
+                       #part=First(lParts)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedEyeIcons,#iGender=iGender),
+                       #part=Nth(lParts,3)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedNoseIcons,#iGender=iGender),
+                       #part=Nth(lParts,4)),
+                1,Send(self,@PlaceOf,#parts=Send(SYS,@GetAllowedMouthIcons,#iGender=iGender),
+                       #part=Nth(lParts,5)),
+                1,Bound(Send(who,@GetSkinColor) - 1,0,3));
+      SendPacket(oSession);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -227,10 +227,7 @@ messages:
 
    SendSecondaryOverlayAnimation(iAnimation = $)
    {
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION,1,piItem_flags & ITEM_PALETTE_MASK);
-      }
+      Send(self,@AddColour);
 
       if iAnimation <> $
          AND (piUsed = ATTACKING
@@ -252,10 +249,7 @@ messages:
 
    SendOverlayAnimation(ianimation = $)
    {
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION,1,piItem_flags & ITEM_PALETTE_MASK);
-      }
+      Send(self,@AddColour);
 
       if iAnimation <> $
          AND (piUsed = ATTACKING

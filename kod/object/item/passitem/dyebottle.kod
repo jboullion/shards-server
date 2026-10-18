@@ -277,6 +277,138 @@ messages:
       return piItem_flags;
    }
 
+   GetDyeField()
+   "Ours (docs/adr/0012-cosmetics.md): its colour as a dye (SYS MakeDye: a palette ramp in a "
+   "shade), so a dyed thing keeps its wearer's skin. 0 for a colour with no dye."
+   {
+      local c;
+
+      c = piItem_flags;
+      // Black and white: the grey ramp, dark and light
+      if c = 44
+      {
+         return Send(SYS,@MakeDye,#ramp=0xd,#shade=DYE_SHADE_DARK);
+      }
+
+      if c = 48 OR c = 6007
+      {
+         return Send(SYS,@MakeDye,#ramp=0xd,#shade=DYE_SHADE_LIGHT);
+      }
+
+      // Blues
+      if c = 32
+      {
+         return Send(SYS,@MakeDye,#ramp=0xe,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 23
+      {
+         return Send(SYS,@MakeDye,#ramp=0xe,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if c = 41
+      {
+         return Send(SYS,@MakeDye,#ramp=0x9,#shade=DYE_SHADE_DARK);
+      }
+
+      if c = 78
+      {
+         return Send(SYS,@MakeDye,#ramp=0x8,#shade=DYE_SHADE_LIGHT);
+      }
+
+      // Browns
+      if c = 28
+      {
+         return Send(SYS,@MakeDye,#ramp=0x3,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 29
+      {
+         return Send(SYS,@MakeDye,#ramp=0x4,#shade=DYE_SHADE_FULL);
+      }
+
+      // Greens
+      if c = 12
+      {
+         return Send(SYS,@MakeDye,#ramp=0x7,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 21
+      {
+         return Send(SYS,@MakeDye,#ramp=0x7,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if c = 36
+      {
+         return Send(SYS,@MakeDye,#ramp=0x7,#shade=DYE_SHADE_DARK);
+      }
+
+      if c = 89
+      {
+         return Send(SYS,@MakeDye,#ramp=0x6,#shade=DYE_SHADE_LIGHT);
+      }
+
+      // Purples
+      if c = 15
+      {
+         return Send(SYS,@MakeDye,#ramp=0xa,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 24
+      {
+         return Send(SYS,@MakeDye,#ramp=0xa,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if c = 39
+      {
+         return Send(SYS,@MakeDye,#ramp=0xa,#shade=DYE_SHADE_DARK);
+      }
+
+      // Reds and pinks
+      if c = 33
+      {
+         return Send(SYS,@MakeDye,#ramp=0x1,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 42
+      {
+         return Send(SYS,@MakeDye,#ramp=0x1,#shade=DYE_SHADE_DARK);
+      }
+
+      if c = 68 OR c = 77
+      {
+         return Send(SYS,@MakeDye,#ramp=0x1,#shade=DYE_SHADE_LIGHT);
+      }
+
+      // Yellows and oranges
+      if c = 16
+      {
+         return Send(SYS,@MakeDye,#ramp=0xc,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 25
+      {
+         return Send(SYS,@MakeDye,#ramp=0xc,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if c = 47
+      {
+         return Send(SYS,@MakeDye,#ramp=0x5,#shade=DYE_SHADE_FULL);
+      }
+
+      if c = 19
+      {
+         return Send(SYS,@MakeDye,#ramp=0x5,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if c = 10
+      {
+         return Send(SYS,@MakeDye,#ramp=0x5,#shade=DYE_SHADE_DARK);
+      }
+
+      return 0;
+   }
+
    AppendDesc()
    {
       AddPacket(4,vrColorDec);
@@ -298,43 +430,27 @@ messages:
          return;
       }
 
-      if IsClass(apply_on,&LeatherArmor)
-      OR IsClass(apply_on,&RangedWeapon)
-      OR IsClass(apply_on,&FistWeapons)
-      OR IsClass(apply_on,&BaseWand)
-      OR IsClass(apply_on,&RobeBase)
-      OR IsClass(apply_on,&Circlet)
-      OR IsClass(apply_on,&IvyCirclet)
-      OR IsClass(apply_on,&Wizardhat)
-      OR IsClass(apply_on,&GoldShield)
+      // Ours: whatever a dye can go on (Item.viDyeRamp: shirts, pants and robes now too, but
+      // not disciple robes, wands, bows, circlets or the special shields)
+      if NOT IsClass(apply_on,&Item)
+         OR Send(apply_on,@GetDyeRamp) = DYE_RAMP_NONE
+         OR Send(self,@GetDyeField) = 0
       {
          Send(what,@MsgSendUser,#message_rsc=cant_dye);
 
          return;
       }
 
-      if IsClass(apply_on,&Weapon)
-      OR IsClass(apply_on,&FaceMask)
-      OR IsClass(apply_on,&Armor)
-      OR IsClass(apply_on,&Shield)
-      OR IsClass(apply_on,&Helmet)
-      OR IsClass(apply_on,&Pants)
-      {
-         return TRUE;
-      }
-
-      Send(what,@MsgSendUser,#message_rsc=cant_dye);
-
-      return;
+      return TRUE;
    }
 
    NewApplied(what = $,apply_on = $)
    {
-      Send(apply_on,@SetItemColor,#flags=piItem_flags);
+      // Ours: a dye, not a raw translation, so its wearer's skin and its other flags are kept
+      // and a worn thing is redrawn (Item.SetDye)
+      Send(apply_on,@SetDye,#dye=Send(self,@GetDyeField));
 
       Send(what,@MsgSendUser,#message_rsc=dyed_item,#parm1=send(apply_on,@GetName),#parm2=vrColor);
-
-      Send(poOwner,@SomethingChanged,#what=apply_on);
 
       Send(self,@Delete);
 

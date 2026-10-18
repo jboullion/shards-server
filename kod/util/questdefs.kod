@@ -722,6 +722,11 @@ resources:
    qd_246_name = "A Mage of Faren"
    qd_246_s1 = "Take a companion into your service"
    qd_246_t1 = "Priestess Tenuv'vyal"
+   qg_1_name = "Pellam the barber"
+   qg_1_desc = \
+      "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
+      "shears. For a few hundred shillings he will give you a new cut, or a new colour."
+   qg_1_icon = bqclerk.bgf
 
 classvars:
 
@@ -732,7 +737,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 71108838;
+      return 128407280;
    }
 
    GetQuests()
@@ -2010,7 +2015,11 @@ messages:
    GetGivers()
    "The quest givers the rooms place (QuestBook.PlaceGivers)."
    {
-      return $;
+      return [
+         [
+         [ 1, qg_1_name, qg_1_icon, qg_1_desc, 856, 7, 3, 32, 32, ANGLE_EAST, 2 ]
+         ]
+      ];
    }
 
 end

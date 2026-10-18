@@ -47,6 +47,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours its cloth (the red ramp)
+   viDyeRamp = DYE_RAMP_CLOTH
+
    vrPoss_Article = shirt_this
 
    viUse_type = ITEM_USE_SHIRT
@@ -150,7 +153,7 @@ messages:
       if Send(poOwner,@GetArmor) = $
       {
          Send(poOwner,@SetPlayerIcon,#what=self,#new_icon=Send(self,@GetShirtIcon,#who=poOwner),
-              #alldone=FALSE, #translation=Send(self,@GetPaletteTranslation));
+              #alldone=FALSE, #translation=Send(self,@GetPaletteTranslation),#dye=piDye);
       }
 
       return;

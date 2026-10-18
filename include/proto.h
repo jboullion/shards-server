@@ -295,6 +295,7 @@ enum {
    UC_QUEST_LOG = 107,
    UC_QUEST_PROGRESS = 108,
    UC_COMPANION = 109,
+   UC_COSMETICS = 110,
 };
 
 // Login error action constants

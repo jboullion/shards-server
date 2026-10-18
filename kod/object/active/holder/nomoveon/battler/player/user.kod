@@ -545,6 +545,10 @@ properties:
    plQuestLog = $
    plQuestDone = $
    poQuestNpc = $
+   // Ours (util/cosmeticsbook.kod): the tailor or barber we last talked to, and the
+   // things its menu listed, in order (the commands name them by place)
+   poServiceNpc = $
+   plServiceItems = $
 
    // Ours (util/shardssocial.kod): this player's friends, the players who asked to be and
    // those this player asked, their options (SF_*), when they last left the game (Kod time),
@@ -994,6 +998,8 @@ messages:
       Send(Send(SYS,@GetGameQuestMaintenance),@EvaluatePlayer,#who=self);
       // Ours: our quests, and our client's log of them (util/questbook.kod)
       poQuestNpc = $;
+      poServiceNpc = $;
+      plServiceItems = $;
       Send(Send(SYS,@GetQuestBook),@PlayerLoggedOn,#who=self);
       // Ours: our companion comes back with us (util/companionbook.kod)
       Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
@@ -3430,7 +3436,14 @@ messages:
          }
          if Send(what,@GetBehavior) & AI_NPC
          {
-            // Draw dots for NPCs, and ours: their quest markers (util/questbook.kod)
+            // Draw dots for NPCs, and ours: their quest markers (util/questbook.kod), and
+            // whether they're a tailor or barber (util/cosmeticsbook.kod)
+            if Send(what,@GetShardsService) <> 0
+            {
+               return MM_NPC | MM_SERVICE
+                  | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
+            }
+
             return MM_NPC | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
          }
          if IsClass(poOwner,&SurvivalRoom)
@@ -4527,6 +4540,13 @@ messages:
          return;
       }
 
+      if StringEqual(sVerb,"tailor") OR StringEqual(sVerb,"barber")
+      {
+         Send(Send(SYS,@GetCosmeticsBook),@CosmeticsCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       Debug("Unknown UC_SHARDS command from",self);
 
       return;
@@ -4547,6 +4567,32 @@ messages:
    GetAttunedPortals()
    {
       return plAttunedPortals;
+   }
+
+   // Ours: the tailor or barber we last talked to, and the things the tailor's menu listed
+   // (util/cosmeticsbook.kod)
+   GetServiceNpc()
+   {
+      return poServiceNpc;
+   }
+
+   SetServiceNpc(what = $)
+   {
+      poServiceNpc = what;
+
+      return;
+   }
+
+   GetServiceItems()
+   {
+      return plServiceItems;
+   }
+
+   SetServiceItems(items = $)
+   {
+      plServiceItems = items;
+
+      return;
    }
 
    // Ours: what util/companionbook.kod keeps on each player

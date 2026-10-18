@@ -421,6 +421,7 @@ properties:
    poQuestBook = $
    // Ours: companions (util/companionbook.kod), made on demand
    poCompanionBook = $
+   poCosmeticsBook = $
    poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
@@ -5258,6 +5259,17 @@ messages:
       }
 
       return poCompanionBook;
+   }
+
+   GetCosmeticsBook()
+   "Ours: tailors and barbers (util/cosmeticsbook.kod), made on demand."
+   {
+      if poCosmeticsBook = $
+      {
+         poCosmeticsBook = Create(&CosmeticsBook);
+      }
+
+      return poCosmeticsBook;
    }
 
    GetGameQuestMaintenance()

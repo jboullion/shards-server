@@ -74,6 +74,12 @@ properties:
 
 messages:
 
+   GetShardsService()
+   "Ours (util/cosmeticsbook.kod): dyes clothes for players, as well as its shop."
+   {
+      return SERVICE_TAILOR;
+   }
+
    SetForSale()
    {
       plFor_sale = [

@@ -54,6 +54,12 @@ properties:
 
 messages:
 
+   GetShardsService()
+   "Ours (util/cosmeticsbook.kod): dyes clothes for players, as well as its shop."
+   {
+      return SERVICE_TAILOR;
+   }
+
    AffectMood(why=$,what=$)
    {
       if (why = MOODMOD_FACTION_CHANGE)

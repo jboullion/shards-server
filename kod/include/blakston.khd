@@ -133,6 +133,9 @@
    // ... and the quest's tier, for the mark's colour: neither is gold (main and levelling chains)
    MM_QUEST_SILVER         = 0x00200000
    MM_QUEST_BRONZE         = 0x00400000
+   // Ours (util/cosmeticsbook.kod): a tailor or barber, which our client talks to on a
+   // double-click rather than opening its shop
+   MM_SERVICE              = 0x00800000
 
    // Ours: companions (docs/adr/0010-followers.md, util/companionbook.kod). Its state:
    COMP_NONE = 0
@@ -3067,6 +3070,37 @@
    ANIMATE_CEILING_LIFT = 5
    ANIMATE_TRANSLATION  = 9
    ANIMATE_EFFECT       = 10
+   // Ours (docs/adr/0012-cosmetics.md): a dye in place of a translation byte, a WORD made
+   // by EncodeDye (util.kod): the cloth (red ramp) in bits 0-5, the trim (grey ramp) in
+   // 6-11, the wearer's skin (blue ramp) in 12-15. A dye field is a palette ramp (bits 2-5,
+   // ramp << 4) and a shade (bits 0-1: 0 undyed, 1 light, 2 full, 3 dark). Our client only.
+   ANIMATE_DYE          = 11
+
+   DYE_SHADE_LIGHT = 1
+   DYE_SHADE_FULL = 2
+   DYE_SHADE_DARK = 3
+   DYE_FIELD_MASK = 0x3f
+   DYE_TRIM_MUL = 0x40
+   DYE_SKIN_MUL = 0x1000
+   // Which ramp an item's dye goes on (Item.viDyeRamp)
+   DYE_RAMP_NONE = 0
+   DYE_RAMP_CLOTH = 1
+   DYE_RAMP_TRIM = 2
+   // The player's dyed parts (Player.AddPartColour)
+   DYE_PART_BODY = 1
+   DYE_PART_ARMS = 2
+   DYE_PART_LEGS = 3
+
+   // Ours: what an NPC does for players besides its shop (Monster.GetShardsService,
+   // util/cosmeticsbook.kod), and what it costs
+   SERVICE_TAILOR = 1
+   SERVICE_BARBER = 2
+   COSMETIC_DYE_PRICE = 250
+   COSMETIC_UNDYE_PRICE = 50
+   COSMETIC_HAIRCUT_PRICE = 500
+   // How near (squares), and the most things a tailor's menu lists
+   COSMETIC_REACH = 4
+   COSMETIC_MENU_ITEMS = 40
 
    // Normal animations--all are object specific, except ANIM_NONE & ANIM_ATTACK
    //  for monsters

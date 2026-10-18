@@ -107,6 +107,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours its grey art
+   viDyeRamp = DYE_RAMP_TRIM
+
    viUse_type = ITEM_USE_HAND
    viItem_Type = ITEMTYPE_WEAPON
    viUse_amount = 1
@@ -881,11 +884,7 @@ messages:
    {
       local iFlags;
 
-      iFlags = piItem_flags & ITEM_PALETTE_MASK;
-      if iFlags <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iFlags);
-      }
+      Send(self,@AddColour);
 
       if piUsed = ATTACKING
       {
@@ -926,11 +925,7 @@ messages:
    {
       local iFlags;
 
-      iFlags = piItem_flags & ITEM_PALETTE_MASK;
-      if iFlags <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iFlags);
-      }
+      Send(self,@AddColour);
 
       if iAnimation = PANM_WEAPON_ATTACK 
       {
@@ -962,11 +957,7 @@ messages:
          propagate;
       }
 
-      iFlags = piItem_flags & ITEM_PALETTE_MASK;
-      if iFlags <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iFlags);
-      }
+      Send(self,@AddColour);
 
       AddPacket(1,ANIMATE_NONE, 2,viBroken_group);
 
@@ -982,10 +973,7 @@ messages:
          propagate;
       }
 
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION,1,piItem_flags & ITEM_PALETTE_MASK);
-      }
+      Send(self,@AddColour);
 
       AddPacket(1,ANIMATE_NONE,2,viBroken_group);
 
@@ -1001,11 +989,7 @@ messages:
          propagate;
       }
 
-      iFlags = piItem_flags & ITEM_PALETTE_MASK;
-      if iFlags <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iFlags);
-      }
+      Send(self,@AddColour);
 
       AddPacket(1,ANIMATE_NONE, 2,viBroken_group);
 

@@ -30,6 +30,8 @@ properties:
    prGiverName = $
    prGiverIcon = $
    prGiverDesc = $
+   // Ours (docs/adr/0012-cosmetics.md): SERVICE_* if it also cuts hair or dyes clothes
+   piService = 0
 
 messages:
 
@@ -44,6 +46,10 @@ messages:
          prGiverName = Nth(lGiver,2);
          prGiverIcon = Nth(lGiver,3);
          prGiverDesc = Nth(lGiver,4);
+         if Length(lGiver) >= 11
+         {
+            piService = Nth(lGiver,11);
+         }
       }
 
       propagate;
@@ -52,6 +58,12 @@ messages:
    GetGiverId()
    {
       return piGiver;
+   }
+
+   GetShardsService()
+   "Ours (util/cosmeticsbook.kod): the service givers.json gives it, if any."
+   {
+      return piService;
    }
 
    GetName()

@@ -1014,6 +1014,11 @@ properties:
 
    piBody_translations = 0
    piBody_translations2 = 0
+   // Ours (docs/adr/0012-cosmetics.md): the dyes of what draws our torso, arms and legs
+   // (Item.piDye), sent as ANIMATE_DYE with our skin (AddPartColour)
+   piDyeBody = 0
+   piDyeArms = 0
+   piDyeLegs = 0
 
    // Default: green shirt, brown pants.
    piDefault_Clothes = 143 | (121 * PANTS_MUL)
@@ -10717,12 +10722,13 @@ messages:
       return;
    }
 
-   SetPlayerIcon(what = $,new_icon = $,translation = $, alldone = TRUE)
+   SetPlayerIcon(what = $,new_icon = $,translation = $,dye = 0,alldone = TRUE)
    "Sets our icon to <new_icon>, and keeps track of <what> to undo "
    "when necessary. Tells everyone we changed."
    {
       poIcon_set = what;
       vrIcon = new_icon;
+      piDyeBody = dye;
 
       piBody_translations = piBody_translations & ~PLAYER_TRANSLATION_BODY_MASK;
       piBody_translations = piBody_translations |
@@ -10747,6 +10753,7 @@ messages:
       local i;
 
       poIcon_set = $;
+      piDyeBody = 0;
 
       // A player may be wearing something under his armor.
       foreach i in plUsing
@@ -10782,13 +10789,14 @@ messages:
       return;
    }
 
-   SetPlayerArms(what=$,new_left_arm=$,new_right_arm=$,translation=$,alldone=TRUE)
+   SetPlayerArms(what=$,new_left_arm=$,new_right_arm=$,translation=$,dye=0,alldone=TRUE)
    "Sets our legs to <new_legs>, and keeps track of <what> to undo "
    "when necessary. Tells everyone we changed."
    {
       poArms_set = what;
       prleft_Arm = new_left_arm;
       prRight_Arm = new_right_arm;
+      piDyeArms = dye;
 
       piBody_translations2 = piBody_translations2 & ~PLAYER_TRANSLATION2_ARMS_MASK;
       piBody_translations2 = piBody_translations2 |
@@ -10807,6 +10815,7 @@ messages:
    {
       local iShirt_xlat, i, bFound;
       poArms_set = $;
+      piDyeArms = 0;
 
       bFound = FALSE;
       foreach i in plUsing
@@ -10847,12 +10856,13 @@ messages:
       return;
    }
 
-   SetPlayerLegs(what = $,new_legs = $,translation = $)
+   SetPlayerLegs(what = $,new_legs = $,translation = $,dye = 0)
    "Sets our legs to <new_legs>, and keeps track of <what> to "
    "undo when necessary. Tells everyone we changed."
    {
       poLegs_set = what;
       prLegs = new_legs;
+      piDyeLegs = dye;
 
       piBody_translations = piBody_translations & ~PLAYER_TRANSLATION_LEGS_MASK;
       piBody_translations = piBody_translations |
@@ -10870,6 +10880,7 @@ messages:
    "Sets our icon to its natural, un-panted state."
    {
       poLegs_set = $;
+      piDyeLegs = 0;
 
       if piGender = GENDER_MALE
       {
@@ -11167,6 +11178,23 @@ messages:
       return;
    }
 
+   GetFaceParts()
+   "Ours (util/cosmeticsbook.kod): [ head, hair, eyes, nose, mouth, facial hair or $ ], as the "
+   "character creator sends them (PlayerNewCharInfo)."
+   {
+      return [ prHead, prToupee, prEyes, prNose, prMouth, prBeard ];
+   }
+
+   SetCosmeticHair(hair = $,beard = $,colour = 0)
+   "Ours: the barber's work (CosmeticsBook.CutHair checked every part against the creator's lists)."
+   {
+      prToupee = hair;
+      prBeard = beard;
+      Send(self,@SetHairTranslation,#translation=colour);
+
+      return;
+   }
+
    SetPlayerIllusion(what = $)
    "Stores <what> as the object to call back to get our animation and overlays."
    "Tells everyone we changed."
@@ -11247,10 +11275,7 @@ messages:
          return;
       }
 
-      if Send(self,@GetBodyTranslation) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION,1,Send(self,@GetBodyTranslation));
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_BODY);
 
       if iAnimation = PANM_WEAPON_ATTACK
       {
@@ -11304,10 +11329,7 @@ messages:
          return;
       }
 
-      if Send(self,@GetBodyTranslation) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,Send(self,@GetBodyTranslation));
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_BODY);
 
       if iAnimation = PANM_DANCE
       {    
@@ -11388,10 +11410,7 @@ messages:
 
       AddPacket(4,prLeft_arm, 1,HS_LEFT_HAND);
       iArms_xlat = Send(self,@GetArmsTranslation);
-      if iArms_xlat <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iArms_xlat);
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_ARMS);
 
       if iLeft_group = 1
       {
@@ -11410,10 +11429,7 @@ messages:
       }
 
       AddPacket(4,prRight_arm, 1,HS_RIGHT_HAND);
-      if iArms_xlat <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iArms_xlat);
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_ARMS);
 
       if iRight_group = 1
       {
@@ -11432,10 +11448,7 @@ messages:
       }
 
       AddPacket(4,prLegs, 1,HS_LEGS);
-      if Send(self,@GetLegsTranslation) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,Send(self,@GetLegsTranslation));
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_LEGS);
       
       if iAnimation = PANM_DANCE
       {
@@ -11556,10 +11569,7 @@ messages:
       iArms_xlat = Send(self,@GetArmsTranslation);
 
       AddPacket(4,prLeft_arm, 1,HS_LEFT_HAND);
-      if iArms_Xlat <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iArms_xlat);
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_ARMS);
 
       if iAnimation = PANM_CAST
       {
@@ -11587,10 +11597,7 @@ messages:
       }
 
       AddPacket(4,prRight_arm, 1,HS_RIGHT_HAND);
-      if iArms_xlat <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,iArms_xlat);
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_ARMS);
 
       if iAnimation = PANM_NONE
       {
@@ -11626,10 +11633,7 @@ messages:
       }
 
       AddPacket(4,prLegs, 1,HS_LEGS);
-      if Send(self,@GetLegsTranslation) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,Send(self,@GetLegsTranslation));
-      }
+      Send(self,@AddPartColour,#part=DYE_PART_LEGS);
 
       if iAnimation = PANM_WEAPON_ATTACK
       {
@@ -14283,6 +14287,64 @@ messages:
    {
       return (piBody_translations2 & PLAYER_TRANSLATION2_HAIR_MASK)
                   /PLAYER_TRANSLATION2_HAIR_MUL;
+   }
+
+   GetPartDyeCode(part = DYE_PART_BODY)
+   "Ours (docs/adr/0012-cosmetics.md): ANIMATE_DYE's WORD for a body part, with our skin, "
+   "or 0 when what draws it isn't dyed."
+   {
+      local iDye;
+
+      iDye = piDyeBody;
+      if part = DYE_PART_ARMS
+      {
+         iDye = piDyeArms;
+      }
+      else if part = DYE_PART_LEGS
+      {
+         iDye = piDyeLegs;
+      }
+
+      if iDye = 0
+      {
+         return 0;
+      }
+
+      return Send(SYS,@EncodeDye,#main=iDye & DYE_FIELD_MASK,
+                  #trim=(iDye / DYE_TRIM_MUL) & DYE_FIELD_MASK,
+                  #skin=Send(self,@ConvertSkinColorToXLAT,#skin_color=Send(self,@GetSkinColor)));
+   }
+
+   AddPartColour(part = DYE_PART_BODY)
+   "Ours: a body part's colour before its animation: the dye of what draws it (ANIMATE_DYE), "
+   "else its translation byte as before."
+   {
+      local iCode, iXlat;
+
+      iCode = Send(self,@GetPartDyeCode,#part=part);
+      if iCode <> 0
+      {
+         AddPacket(1,ANIMATE_DYE, 2,iCode);
+
+         return;
+      }
+
+      iXlat = Send(self,@GetBodyTranslation);
+      if part = DYE_PART_ARMS
+      {
+         iXlat = Send(self,@GetArmsTranslation);
+      }
+      else if part = DYE_PART_LEGS
+      {
+         iXlat = Send(self,@GetLegsTranslation);
+      }
+
+      if iXlat <> 0
+      {
+         AddPacket(1,ANIMATE_TRANSLATION, 1,iXlat);
+      }
+
+      return;
    }
 
    GetLegsTranslation()

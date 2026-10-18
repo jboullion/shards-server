@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "key": "barloque-barber",
+    "id": 1,
+    "name": "Pellam the barber",
+    "look": "BarloqueClerk",
+    "rid": "RID_CASTLE2E",
+    "row": 7,
+    "col": 3,
+    "angle": "ANGLE_EAST",
+    "desc": "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of shears. For a few hundred shillings he will give you a new cut, or a new colour.",
+    "service": "barber"
+  }
+]

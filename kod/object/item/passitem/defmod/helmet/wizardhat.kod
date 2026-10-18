@@ -26,6 +26,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours nothing (not dyeable)
+   viDyeRamp = DYE_RAMP_NONE
+
    vrName = wiz_name_rsc
    vrDesc = wiz_desc_rsc
    vrIcon = wiz_icon_male_rsc

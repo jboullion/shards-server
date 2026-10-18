@@ -114,6 +114,9 @@ classvars:
    viInventory_group = 1
    viBroken_group = $    // if set to nil, no group exists
 
+   // Ours (docs/adr/0012-cosmetics.md): which of its art's ramps a dye recolours
+   viDyeRamp = DYE_RAMP_NONE
+
    // How much this item will help or hinder spell usage.
    viSpell_modifier = 0
 
@@ -159,6 +162,8 @@ properties:
 
    // Item is colored
    pbColored = FALSE
+   // Ours: its dye (ANIMATE_DYE's cloth and trim fields, no skin), 0 for none
+   piDye = 0
    piSpecial = $
 
    piIndestructible = FALSE
@@ -1291,10 +1296,7 @@ messages:
    
    SendAnimation()
    {
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,piItem_flags&ITEM_PALETTE_MASK);
-      }
+      Send(self,@AddColour);
 
       if piHits > 0 OR viBroken_group = $
       {
@@ -1310,11 +1312,7 @@ messages:
 
    SendLookAnimation()
    {
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,piItem_flags&ITEM_PALETTE_MASK);
-
-      }
+      Send(self,@AddColour);
 
       if piHits > 0 OR viBroken_group = $
       {
@@ -1330,11 +1328,7 @@ messages:
 
    SendInventoryAnimation()
    {
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION, 1,piItem_flags&ITEM_PALETTE_MASK);
-
-      }
+      Send(self,@AddColour);
       
       if piHits > 0 OR viBroken_group = $
       {
@@ -2555,7 +2549,7 @@ messages:
       Send(poOwner,@SetPlayerArms,#what=self,
             #new_left_arm=Send(self,@GetLeftArm,#who=poOwner),
             #new_right_arm=Send(self,@GetRightArm,#who=poOwner),
-            #translation=Send(self,@GetPaletteTranslation),#alldone=FALSE);
+            #translation=Send(self,@GetPaletteTranslation),#dye=piDye,#alldone=FALSE);
 
       return;
    }
@@ -2564,7 +2558,7 @@ messages:
    {
       Send(poOwner,@SetPlayerIcon,#what=self,
             #new_icon=Send(self,@GetShirtIcon,#who=poOwner),
-            #translation=Send(self,@GetPaletteTranslation),#alldone=FALSE);
+            #translation=Send(self,@GetPaletteTranslation),#dye=piDye,#alldone=FALSE);
 
       return;
    }
@@ -2573,7 +2567,7 @@ messages:
    {
       Send(poOwner,@SetPlayerLegs,#what=self,
             #new_legs=Send(self,@GetLegs,#who=poOwner),
-            #translation=Send(self,@GetPaletteTranslation),#alldone=FALSE);
+            #translation=Send(self,@GetPaletteTranslation),#dye=piDye,#alldone=FALSE);
 
       return;
    }
@@ -2804,7 +2798,8 @@ messages:
    
    IsColored()
    {
-	   return pbColored;
+	   // Ours: a dye (piDye) counts too (docs/adr/0012-cosmetics.md)
+	   return pbColored OR piDye <> 0;
    }
 
    SetDefense(number = $)
@@ -2867,9 +2862,121 @@ messages:
 
    RemoveDye()
    {
+      // Ours: a dye (piDye) goes too; the old palette dyes (piOriginalColor) as before
+      if piDye <> 0
+      {
+         piDye = 0;
+         Send(self,@DyeChanged);
+
+         return;
+      }
+
       piItem_flags = piOriginalColor;
 
       pbColored = FALSE;
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// ours: dyes
+
+   GetDyeRamp()
+   "Ours (docs/adr/0012-cosmetics.md): which of its art's ramps a dye recolours (DYE_RAMP_*)."
+   {
+      return viDyeRamp;
+   }
+
+   IsInUse()
+   "Whether it's worn or wielded."
+   {
+      return pbIn_use;
+   }
+
+   GetDye()
+   "ANIMATE_DYE's cloth and trim fields, 0 when it isn't dyed."
+   {
+      return piDye;
+   }
+
+   SetDye(dye = 0)
+   "A dye field (SYS MakeDye) on the ramp it dyes, or 0 to take it off. FALSE if it can't be "
+   "dyed."
+   {
+      if viDyeRamp = DYE_RAMP_NONE
+      {
+         return FALSE;
+      }
+
+      if dye = 0
+      {
+         piDye = 0;
+      }
+      else if viDyeRamp = DYE_RAMP_TRIM
+      {
+         piDye = (dye & DYE_FIELD_MASK) * DYE_TRIM_MUL;
+      }
+      else
+      {
+         piDye = dye & DYE_FIELD_MASK;
+      }
+
+      Send(self,@DyeChanged);
+
+      return TRUE;
+   }
+
+   GetDyeField()
+   "Its dye as one field (on whichever ramp it dyes), 0 for none."
+   {
+      if viDyeRamp = DYE_RAMP_TRIM
+      {
+         return (piDye / DYE_TRIM_MUL) & DYE_FIELD_MASK;
+      }
+
+      return piDye & DYE_FIELD_MASK;
+   }
+
+   AddColour()
+   "The colour before an animation: its dye (ANIMATE_DYE), else its palette translation as "
+   "before, else nothing."
+   {
+      if piDye <> 0
+      {
+         AddPacket(1,ANIMATE_DYE, 2,piDye);
+
+         return;
+      }
+
+      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
+      {
+         AddPacket(1,ANIMATE_TRANSLATION, 1,piItem_flags & ITEM_PALETTE_MASK);
+      }
+
+      return;
+   }
+
+   DyeChanged()
+   "Everyone who sees it sees the new colour: its wearer redrawn, or the holder told."
+   {
+      local oRoom;
+
+      if poOwner = $
+      {
+         return;
+      }
+
+      if pbIn_use AND IsClass(poOwner,&Player)
+      {
+         // Its part of the figure (shirt, arms, legs), then the overlays (helmet, weapon)
+         Send(self,@DoPlayerArt);
+         oRoom = Send(poOwner,@GetOwner);
+         if oRoom <> $
+         {
+            Send(oRoom,@SomethingChanged,#what=poOwner);
+         }
+      }
+
+      Send(poOwner,@SomethingChanged,#what=self);
 
       return;
    }

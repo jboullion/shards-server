@@ -301,6 +301,21 @@ messages:
       return FALSE;
    }
 
+   EncodeDye(main = 0, trim = 0, skin = 0)
+   "Ours (docs/adr/0012-cosmetics.md): ANIMATE_DYE's WORD. main and trim are dye fields "
+   "(ramp << 2 | shade, 0 for none: MakeDye), skin a clothing skin colour (XLAT_TO_SKIN*) "
+   "or -1 for none."
+   {
+      return (main & DYE_FIELD_MASK) | ((trim & DYE_FIELD_MASK) * DYE_TRIM_MUL)
+             | ((skin + 1) * DYE_SKIN_MUL);
+   }
+
+   MakeDye(ramp = 1, shade = DYE_SHADE_FULL)
+   "A dye field: a palette ramp (1-15, the ramp starting at ramp * 16) in a shade."
+   {
+      return ((ramp & 0xf) * 4) | (shade & 3);
+   }
+
    EncodeTwoColorXLAT(color1 = 0, color2 = 0)
    "This is used by guild shields and player art to color translate a "
    "red/blue bgf into the correct colors."

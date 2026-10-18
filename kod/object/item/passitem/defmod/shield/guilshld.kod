@@ -94,6 +94,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours nothing (not dyeable)
+   viDyeRamp = DYE_RAMP_NONE
+
    vrName = guildshield_name_rsc
 
    viHits_init_min = 600

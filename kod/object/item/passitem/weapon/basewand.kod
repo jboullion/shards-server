@@ -27,6 +27,9 @@ resources:
    basewand_player_overlay = wandov.bgf
 
 classvars:
+
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours nothing (not dyeable)
+   viDyeRamp = DYE_RAMP_NONE
    vrName = basewand_name_rsc
    vrIcon = basewand_icon_rsc
    vrDesc = basewand_desc_rsc

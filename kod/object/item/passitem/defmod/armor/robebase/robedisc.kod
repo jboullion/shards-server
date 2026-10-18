@@ -44,6 +44,9 @@ resources:
 
 classvars:
 
+   // Ours (docs/adr/0012-cosmetics.md): a dye recolours nothing (not dyeable)
+   viDyeRamp = DYE_RAMP_NONE
+
    vrName = RobeInsignia_name_rsc
    vrIcon = RobeInsignia_icon_rsc
    vrDesc = RobeInsignia_desc_rsc
@@ -293,10 +296,7 @@ messages:
 
    SendOverlayAnimation(iAnimation = $)
    {
-      if (piItem_flags & ITEM_PALETTE_MASK) <> 0
-      {
-         AddPacket(1,ANIMATE_TRANSLATION,1,piItem_flags & ITEM_PALETTE_MASK);
-      }
+      Send(self,@AddColour);
 
       if iAnimation = PANM_WEAPON_ATTACK
       {

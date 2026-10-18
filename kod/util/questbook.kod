@@ -766,6 +766,8 @@ messages:
       Send(who,@SetQuestNpc,#what=npcobj);
       Send(self,@CheckDeadlines,#who=who);
       Send(self,@SendOffers,#who=who,#npcobj=npcobj);
+      // Ours: a tailor's or barber's menu (util/cosmeticsbook.kod)
+      Send(Send(SYS,@GetCosmeticsBook),@ServiceActivated,#who=who,#npc=npcobj);
 
       return;
    }
@@ -936,7 +938,8 @@ messages:
       }
 
       lOffers = Send(self,@OffersFrom,#who=who,#npcobj=npcobj);
-      if lOffers = $
+      // Ours: a tailor or barber says nothing of quests (its menu opens: util/cosmeticsbook.kod)
+      if lOffers = $ AND Send(npcobj,@GetShardsService) = 0
       {
          Send(who,@MsgSendUser,#message_rsc=quest_nothing);
       }
