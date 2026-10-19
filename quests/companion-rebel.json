@@ -17,9 +17,9 @@
     "faction": "rebel"
   },
   "text": {
-    "offer": "Our fighters are few, but each is worth three of the Duke's. One of them has asked to fight beside you. Say the word and they are yours.",
+    "offer": "Our fighters are few, but each is worth three of the Duke's. One of our war-priests has asked to fight beside you: a scimitar at your side and Kraanan's blessings on your back. Say the word and they are yours.",
     "progress": "Stand before the rebels' leader and ask for a companion (the Companion tab, C).",
-    "complete": "Watch each other's backs. That is how we have survived this long."
+    "complete": "Watch each other's backs. They will keep Kraanan's favour on you, and more of it as you grow. That is how we have survived this long."
   },
   "steps": [
     {

@@ -729,18 +729,6 @@ resources:
    qd_242_name = "A Blade from the Underground"
    qd_242_s1 = "Take a companion into your service"
    qd_242_t1 = "Jonas D'Accor"
-   qd_243_name = "A Warrior of Kraanan"
-   qd_243_s1 = "Take a companion into your service"
-   qd_243_t1 = "Priestess Qerti'nya"
-   qd_244_name = "A Healer at Your Side"
-   qd_244_s1 = "Take a companion into your service"
-   qd_244_t1 = "Priestess Xiana"
-   qd_245_name = "A Servant of Qor"
-   qd_245_s1 = "Take a companion into your service"
-   qd_245_t1 = "Priestess Zuxana"
-   qd_246_name = "A Mage of Faren"
-   qd_246_s1 = "Take a companion into your service"
-   qd_246_t1 = "Priestess Tenuv'vyal"
    qd_250_name = "Blood and Sand"
    qd_250_s1 = "Fight a mock bout in the Arena of Kraanan"
    qd_250_t1 = "Paddock"
@@ -894,7 +882,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 49223328;
+      return 79103540;
    }
 
    GetQuests()
@@ -2081,30 +2069,6 @@ messages:
            [ [ 14, $, 1, 0, &RebelLiege, 0, qd_242_s1, $, $, qd_242_t1,
                1, $, $, $, 0 ] ],
            5202, 0, $, 0, 1, 3, $, 0, $, $, $ ],
-         // companion-kraanan
-         [ 243, qd_243_name, &KraananPriestess, 0, 50, 90, [ 82 ],
-           $, $, $, $,
-           [ [ 14, $, 1, 0, &KraananPriestess, 0, qd_243_s1, $, $, qd_243_t1,
-               1, $, $, $, 0 ] ],
-           5202, 0, $, 0, 1, $, $, 0, $, $, $ ],
-         // companion-shalille
-         [ 244, qd_244_name, &ShalillePriestess, 0, 50, 90, [ 79 ],
-           $, $, $, $,
-           [ [ 14, $, 1, 0, &ShalillePriestess, 0, qd_244_s1, $, $, qd_244_t1,
-               1, $, $, $, 0 ] ],
-           5202, 0, $, 0, 1, $, $, 0, $, $, $ ],
-         // companion-qor
-         [ 245, qd_245_name, &QorPriestess, 0, 50, 90, [ 80 ],
-           $, $, $, $,
-           [ [ 14, $, 1, 0, &QorPriestess, 0, qd_245_s1, $, $, qd_245_t1,
-               1, $, $, $, 0 ] ],
-           5202, 0, $, 0, 1, $, $, 0, $, $, $ ],
-         // companion-faren
-         [ 246, qd_246_name, &FarenPriestess, 0, 50, 90, [ 81 ],
-           $, $, $, $,
-           [ [ 14, $, 1, 0, &FarenPriestess, 0, qd_246_s1, $, $, qd_246_t1,
-               1, $, $, $, 0 ] ],
-           5202, 0, $, 0, 1, $, $, 0, $, $, $ ],
          // tos-blood-and-sand
          [ 250, qd_250_name, &TosInnKeeper, 0, 0, 200, $,
            $, $, $, $,
@@ -2192,9 +2156,7 @@ messages:
                1, $, $, $, 0 ],
              [ 20, $, 1, 0, &ShalillePriestess, 0, qd_261_s2, $, $, qd_261_t2,
                1, $, $, $, 512 ] ],
-           841, 0, $, 300, 2, $, $, 0, $, $, $ ]
-         ],
-         [
+           841, 0, $, 300, 2, $, $, 0, $, $, $ ],
          // node-vale-of-shadow
          [ 262, qd_262_name, &QorPriestess, 0, 40, 90, $,
            $, $, $, $,
@@ -2220,7 +2182,9 @@ messages:
            $, $, $, $,
            [ [ 20, $, 1, 0, &KraananPriestess, 0, qd_265_s1, $, $, qd_265_t1,
                1, $, $, $, 2048 ] ],
-           4969, 0, $, 400, 2, $, $, 0, $, $, $ ],
+           4969, 0, $, 400, 2, $, $, 0, $, $, $ ]
+         ],
+         [
          // node-icky-cave
          [ 266, qd_266_name, &TosInnKeeper, 0, 60, 100, $,
            $, $, $, $,

@@ -17,9 +17,9 @@
     "faction": "duke"
   },
   "text": {
-    "offer": "You have served me well enough to be trusted with one of my soldiers. Stand before me and ask for a companion, and one will swear to follow you. Look after them: a soldier who trusts you fights the harder for it.",
+    "offer": "You have served me well enough to be trusted with one of my battle-mages: an axe in one hand and Qor's acids in the other. Stand before me and ask for a companion, and one will swear to follow you. Look after them: their spells grow fiercer as you grow stronger.",
     "progress": "Stand before the Duke and ask him for a companion (the Companion tab, C).",
-    "complete": "Good. Fight beside your soldier, and the bond between you will grow. Keep them close, and keep them alive."
+    "complete": "Good. Fight beside your battle-mage, and the bond between you will grow. Keep them close, and keep them alive."
   },
   "steps": [
     {

@@ -148,16 +148,13 @@
    COMP_DEFEND = 2
    COMP_STAY = 3
    COMP_PASSIVE = 4
-   // The kinds of companion, and the numbers they grow by (util/companionkinds.kod)
+   // The kinds of companion, one per faction leader, and the numbers they grow by
+   // (util/companionkinds.kod). Kinds 4-7 were the schools' (retired 2026-10-19): a companion
+   // of one is released when its owner logs on (CompanionBook.OwnerLoggedOn).
    COMPANION_DUKE = 1
    COMPANION_PRINCESS = 2
    COMPANION_REBEL = 3
-   COMPANION_KRAANAN = 4
-   // The casters (Riija and Jala, 8 and 9, are for later)
-   COMPANION_SHALILLE = 5
-   COMPANION_QOR = 6
-   COMPANION_FAREN = 7
-   COMPANION_KINDS = 7
+   COMPANION_KINDS = 3
 
    // A companion's health is this much of its owner's base health (percent)
    COMPANION_HEALTH_PCT = 70
@@ -177,19 +174,18 @@
 
    // Base health needed to ask for one
    COMPANION_MIN_HEALTH = 50
+   // Its owner's base health at which its second and third spells come
+   COMPANION_SPELL2_HEALTH = 70
+   COMPANION_SPELL3_HEALTH = 90
 
-   // The schools' disciple quests (QuestBook), which their heads ask for
-   COMPANION_SHALILLE_QUEST = 79
-   COMPANION_QOR_QUEST = 80
-   COMPANION_FAREN_QUEST = 81
-   COMPANION_KRAANAN_QUEST = 82
-
-   // A healer heals its owner or a groupmate below this share of their health, itself below
-   // the second (percent); it looks every so often (ms)
-   COMPANION_HEAL_OWNER_PCT = 70
-   COMPANION_HEAL_SELF_PCT = 50
-   COMPANION_SUPPORT_MS = 2500
-   // A caster casts at most once in this many seconds (heals and attacks alike)
+   // The rebel's buffs on its owner: cast every so often (seconds), lasting as long; it looks
+   // whether one is due every so often (ms)
+   COMPANION_BUFF_SECONDS = 1800
+   COMPANION_BUFF_CHECK_MS = 5000
+   // A touch spell (Acid Touch, Touch of Flame, Icy Fingers) hits for this share of its
+   // melee damage (percent)
+   COMPANION_TOUCH_PCT = 150
+   // It casts at most once in this many seconds
    COMPANION_CAST_SECONDS = 2
 
    // Ours (docs/adr/0019-arena-bouts.md): mock bouts against arena fighters (util/arenabouts.kod)

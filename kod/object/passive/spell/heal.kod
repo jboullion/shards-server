@@ -101,7 +101,7 @@ messages:
          return FALSE;
       }
 
-      // Its owner, or a healer companion tending itself (Companion.SupportTimer)
+      // Its owner, or the companion itself
       oOwner = Send(target,@GetSworn);
       if oOwner = who OR target = who
       {

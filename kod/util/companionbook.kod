@@ -49,9 +49,9 @@ resources:
 
    cbook_have_one = "You already have a companion.  Dismiss yours for good first."
    cbook_too_weak = "You need %i health before anyone will swear a companion to you."
-   cbook_no_leader = "Stand near a faction leader or a school head who gives companions."
+   cbook_no_leader = "Stand near your faction's leader to ask for a companion."
    cbook_wrong_faction = "%s%s gives companions only to the members of their own faction."
-   cbook_not_disciple = "%s%s gives companions only to those who have proven themselves as disciples."
+   cbook_retired = "%s leaves your service: the schools no longer swear companions.  Your faction's leader can give you one.  Anything %s carried is yours again."
    cbook_joins = "%s joins you, sworn to fight at your side."
    cbook_none = "You have no companion."
    cbook_not_with_you = "%s isn't with you."
@@ -217,7 +217,7 @@ messages:
 
    Ask(who = $)
    {
-      local oLeader, iKind, iFaction, oQB;
+      local oLeader, iKind, iFaction;
 
       if Send(who,@GetCompanion) <> $
       {
@@ -249,21 +249,6 @@ messages:
               #parm1=Send(oLeader,@GetCapDef),#parm2=Send(oLeader,@GetName));
 
          return;
-      }
-
-      // A school's head asks for its disciple quest, new or old
-      if Send(self,@GetDiscipleQuest,#kind=iKind) > 0
-      {
-         oQB = Send(SYS,@GetQuestBook);
-         if Send(oQB,@DoneEntry,#who=who,#id=Send(self,@GetDiscipleQuest,#kind=iKind)) = $
-            AND NOT Send(oQB,@HasDoneReplacing,#who=who,
-                         #old=Send(self,@GetOldDisciple,#kind=iKind))
-         {
-            Send(who,@MsgSendUser,#message_rsc=cbook_not_disciple,
-                 #parm1=Send(oLeader,@GetCapDef),#parm2=Send(oLeader,@GetName));
-
-            return;
-         }
       }
 
       Send(self,@Grant,#who=who,#kind=iKind);
@@ -473,6 +458,24 @@ messages:
       local oComp;
 
       oComp = Send(who,@GetCompanion);
+      if oComp <> $ AND Send(oComp,@GetKind) > COMPANION_KINDS
+      {
+         // A school's companion, from before the 2026-10-19 revamp: released, its pack returned
+         Send(who,@MsgSendUser,#message_rsc=cbook_retired,#parm1=Send(oComp,@GetName),
+              #parm2=Send(oComp,@GetName));
+         Send(oComp,@GiveAllTo,#who=who);
+         Send(self,@Forget,#who=who);
+
+         return;
+      }
+
+      if oComp <> $
+      {
+         // Its kind's kit as it is now (it changed with the revamp)
+         Send(oComp,@SetTier,#tier=Send(self,@TierOf,#points=Send(who,@GetCompanionBond)),
+              #force=TRUE);
+      }
+
       if oComp <> $ AND Send(oComp,@GetCompanionState) = COMP_ACTIVE
       {
          Send(who,@SetCompanionBondSince,#when=GetTime());
@@ -1244,7 +1247,7 @@ messages:
    }
 
    AdminGrant(who = $,kind = COMPANION_DUKE)
-   "Admin supported. A companion of this kind (1-4), whatever the rules."
+   "Admin supported. A companion of this kind (1-3), whatever the rules."
    {
       if who = $ OR NOT IsClass(who,&User) OR kind < 1 OR kind > COMPANION_KINDS
          OR Send(who,@GetCompanion) <> $
