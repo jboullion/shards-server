@@ -20,6 +20,14 @@ constants:
    include blakston.khd
    include protocol.khd
 
+   // Ours (2026-10-18 play test): within this of its master (sixty-fourths of a square), standing
+   // still, it strolls a quarter as often as other followers (MoveToMaster)
+   COMPANION_NEAR = 80
+   // A master moving faster than walking (user.kod USER_WALKING_SPEED) is running: so does it,
+   // as fast as them, up to this (squares per 10 seconds)
+   COMPANION_MASTER_WALKS = 25
+   COMPANION_RUN_MAX = 60
+
    // Human's (constants aren't inherited)
    HUMAN_TRANSLATION_LEGS_MASK = 0xff
    HUMAN_TRANSLATION_LEGS_MUL = 1
@@ -786,6 +794,71 @@ messages:
       Send(self,@CastAt,#sid=First(lSmall),#mana=Nth(lSmall,2),#target=target);
 
       return;
+   }
+
+   GetMoveSpeed()
+   "Running when its master runs, as fast as them (user.kod RecentMoveSpeed); else its own pace."
+   {
+      local iSpeed;
+
+      if poMaster <> $ AND IsClass(poMaster,&User)
+      {
+         iSpeed = Send(poMaster,@RecentMoveSpeed);
+         if iSpeed > COMPANION_MASTER_WALKS
+         {
+            return Bound(iSpeed,viSpeed,COMPANION_RUN_MAX);
+         }
+      }
+
+      return viSpeed;
+   }
+
+   MoveToMaster()
+   "As Monster's, but beside a master who stands still (within COMPANION_NEAR) it keeps still "
+   "more: it starts a stroll a quarter as often. Monster's steps toward a master it can never "
+   "reach (they block it), so it fidgeted all the time."
+   {
+      local drow, dcol;
+
+      if poMaster = $
+      {
+         propagate;
+      }
+
+      drow = ((Send(poMaster,@GetRow) * FINENESS) + Send(poMaster,@GetFineRow)) / 16;
+      dcol = ((Send(poMaster,@GetCol) * FINENESS) + Send(poMaster,@GetFineCol)) / 16;
+      drow = abs(drow - (((piRow * FINENESS) + piFine_row) / 16));
+      dcol = abs(dcol - (((piCol * FINENESS) + piFine_col) / 16));
+      if drow > COMPANION_NEAR OR dcol > COMPANION_NEAR
+         OR (IsClass(poMaster,&User) AND Send(poMaster,@RecentMoveSpeed) > 0)
+      {
+         propagate;
+      }
+
+      if piKeepWalkingSteps < 8
+      {
+         Send(self,@MoveTowards,#oTarget=poMaster,#face_target=TRUE);
+         piKeepWalkingSteps = piKeepWalkingSteps + 1;
+      }
+      // Monster's 5 in 100, a quarter as often
+      else if Random(1,400) <= 5
+      {
+         piKeepWalkingSteps = 0;
+      }
+
+      return;
+   }
+
+   GetPlayerNameColor(rgb = FALSE)
+   "Its name is white, as a player's (a monster's default is black, hard to read: the 2026-10-18 "
+   "play test)."
+   {
+      if rgb
+      {
+         return [255, 255, 255];
+      }
+
+      return NC_PLAYER;
    }
 
    GetObjectFlags(what = $)

@@ -302,6 +302,7 @@ enum {
    UC_TRAINING = 112,
    UC_APPRAISAL = 113,
    UC_SIGNETS = 114,
+   UC_SEASON = 115,
 };
 
 // Login error action constants

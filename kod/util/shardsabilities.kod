@@ -58,6 +58,8 @@ resources:
 
    abil_not_holding = "You must be carrying %s%s."
 
+   abil_uncast_harmful = "You can't shake off %s yourself."
+
    abil_start_too_late = "It's too late to choose where you start."
    abil_start_done = \
       "You skip the long road from Raza and set out from %s, with armor on your back, a shield "
@@ -89,12 +91,19 @@ messages:
 
    ObjectCommand(who = $,what = $,words = $)
    "UC_SHARDS_OBJECT from who's client: train <amount> (a spell or skill), appraise <price>, "
-   "appraise clear, vault, guild (an item)."
+   "appraise clear, vault, guild (an item), uncast (an enchantment on who)."
    {
       local sVerb;
 
       if who = $ OR NOT IsClass(who,&User) OR what = $ OR words = $
       {
+         return;
+      }
+
+      if StringEqual(First(words),"uncast")
+      {
+         Send(self,@Uncast,#who=who,#oSpell=what);
+
          return;
       }
 
@@ -520,6 +529,31 @@ messages:
 
       Send(who,@TeleportTo,#RID=iInn,#bAdminPort=FALSE);
       Send(who,@MsgSendUser,#message_rsc=abil_start_done,#parm1=rName);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// enchantments
+
+   Uncast(who = $,oSpell = $)
+   "Ours: who ends one of their own enchantments (a double click on it, or Cancel in its "
+   "description): any that isn't harmful, Phase too (which Purge and Purify can't touch). Curses "
+   "and poisons stay for those."
+   {
+      if who = $ OR oSpell = $ OR NOT IsClass(oSpell,&Spell)
+         OR NOT Send(who,@IsEnchanted,#what=oSpell)
+      {
+         return;
+      }
+
+      if Send(oSpell,@IsHarmful)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_uncast_harmful,#parm1=Send(oSpell,@GetName));
+
+         return;
+      }
+
+      Send(who,@RemoveEnchantment,#what=oSpell);
 
       return;
    }

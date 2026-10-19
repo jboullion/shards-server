@@ -504,6 +504,10 @@ properties:
 
    vrName = user_name_rsc
 
+   // Ours: the speed of our last move and when (GetTime), for a companion keeping up (RecentMoveSpeed)
+   piLastMoveSpeed = 0
+   piLastMoveTime = 0
+
    piHomeroom
 
    piLastSafeRoom = $
@@ -1002,6 +1006,8 @@ messages:
       Send(Send(SYS,@GetQuestBook),@PlayerLoggedOn,#who=self);
       // Ours: our companion comes back with us (util/companionbook.kod)
       Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
+      // Ours: the season, for our client's seasonal looks (System.SendSeason)
+      Send(SYS,@SendSeason,#who=self);
       // Ours: market listings sent back to our vault while we were away (util/playermarket.kod)
       if Send(SYS,@GetPlayerMarket) <> $
       {
@@ -4404,6 +4410,10 @@ messages:
       piMovementBucket -= iMoveLength;
       //Debug("Bucket after:",piMovementBucket);
 
+      // Ours: how fast we're going, for our companion (RecentMoveSpeed)
+      piLastMoveSpeed = speed;
+      piLastMoveTime = GetTime();
+
       //
       // 9. Process the move
       //
@@ -4413,6 +4423,18 @@ messages:
             #cause=CAUSE_USER_INPUT,#speed=speed);
 
       return;
+   }
+
+   RecentMoveSpeed()
+   "Ours: the speed we last moved at (USER_WALKING_SPEED walking, more running), if that was in "
+   "the last second or so; 0 when we're standing."
+   {
+      if GetTime() - piLastMoveTime <= 1
+      {
+         return piLastMoveSpeed;
+      }
+
+      return 0;
    }
 
    NotifyMonstersOfPresence()

@@ -227,8 +227,13 @@ properties:
    piPlayerMinionLimit = 4
    piMonsterMinionLimit = 4
 
-   // Minimum swings needed for a chance to improve a weaponcraft skill.
+   // Minimum swings needed for a chance to improve a weaponcraft skill. Ours: no longer used
+   // (skills practise instead: Skill.ImproveAbility, piSkillPracticeRate)
    piWeaponcraftImprovementMinimumSwings = 75
+
+   // Ours: how fast skills (weapons, strokes, parry, block, dodge...) improve with practice, in
+   // percent (Skill.GetPracticeChance). Spells keep piAdvancementRate.
+   piSkillPracticeRate = 100
    
    // Riija Sword drops on death? (Used to limit griefing)
    pbRiijaSwordDropOnDeath = FALSE
@@ -679,6 +684,17 @@ messages:
    GetSkillSoftcapPenalty()
    {
       return piSkillSoftcapPenalty;
+   }
+
+   GetSkillPracticeRate()
+   {
+      // A Settings object made before the property existed has it as $
+      if piSkillPracticeRate = $
+      {
+         return 100;
+      }
+
+      return piSkillPracticeRate;
    }
 
    GetSpellSoftcapPenalty()

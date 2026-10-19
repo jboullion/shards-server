@@ -1475,6 +1475,9 @@ messages:
 
       piYear = piYear + 1;
 
+      // Ours: the season changes with the year: our clients' seasonal looks
+      Send(self,@SendSeasonToAll);
+
       // Tell GameEventEngine object we have a new year.
       Send(EVENTENGINE_OBJECT,@NewGameYear);
 
@@ -4406,6 +4409,42 @@ messages:
       return piYear % 4;
    }
 
+   SendSeason(who = $)
+   "Ours: UC_SEASON to who's client: the season (WEATHER_SEASON_*), the year and the day of the "
+   "year, for its seasonal looks. At logon (User.UserLogon) and whenever the year changes."
+   {
+      local oSession;
+
+      if who = $
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_SEASON,1,Send(self,@GetSeason),2,piYear,2,piDay);
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendSeasonToAll()
+   "Ours: SendSeason to everyone logged on."
+   {
+      local i;
+
+      foreach i in plUsers_logged_on
+      {
+         Send(self,@SendSeason,#who=i);
+      }
+
+      return;
+   }
+
    CreateLightAndWeather()
    "Called by timer when System is first created, to add a delay."
    {
@@ -5223,6 +5262,9 @@ messages:
       oldYear = piYear;
       piYear = year;
       adjust = piYear - oldYear;
+
+      // Ours: the season may have changed
+      Send(self,@SendSeasonToAll);
 
       foreach i in plUsers
       {

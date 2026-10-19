@@ -54,15 +54,18 @@ properties:
 
 messages:
 
-   ImproveStroke(who=$,Use_weapon=$,target=$)
+   ImproveStroke(who=$,Use_weapon=$,target=$,miss=FALSE)
+   "Ours (practice, Skill.ImproveAbility): every swing practises both the stroke and brawling, "
+   "a miss at half (it was one or the other, half the time each)."
    {
-      if random(1,100) > 50 OR NOT send(who,@HasSkill,#num=SKID_BRAWLING)
+      local oBrawling;
+
+      send(self,@ImproveAbility,#who=who,#target=target,#miss=miss);
+
+      oBrawling = Send(SYS,@FindSkillByNum,#num=SKID_BRAWLING);
+      if oBrawling <> $
       {
-         send(self,@ImproveAbility,#who=who,#target=target);        
-      }
-      else
-      {
-         send(send(SYS,@FindSkillByNum,#num=SKID_BRAWLING),@ImproveAbility,#who=who,#target=target);
+         Send(oBrawling,@ImproveAbility,#who=who,#target=target,#miss=miss);
       }
 
      return;

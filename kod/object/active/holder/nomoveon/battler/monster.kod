@@ -2021,7 +2021,7 @@ messages:
                Send(poOwner,@SomethingMoved,#what=self,
                      #new_row=iNew_row,#new_col=iNew_col,
                      #fine_row=iNew_finerow,#fine_col=iNew_finecol,
-                     #speed=(0x80|viSpeed),#non_monsters_only=TRUE);
+                     #speed=(0x80|Send(self,@GetMoveSpeed)),#non_monsters_only=TRUE);
             }
          }
       }
@@ -2924,7 +2924,7 @@ messages:
                  #new_finerow=iFineRow,#new_finecol=iFineCol,
                  #face_target=face_target,#face_away=face_away);
 		
-            Send(poOwner,@SomethingMoved,#what=self,#speed=viSpeed,
+            Send(poOwner,@SomethingMoved,#what=self,#speed=Send(self,@GetMoveSpeed),
                  #new_row=iRow,#new_col=iCol,
                  #fine_row=iFineRow,#fine_col=iFineCol,
                  #non_monsters_only=TRUE);
@@ -5732,9 +5732,18 @@ messages:
       return iTime;
    }
 
+   GetMoveSpeed()
+   "Ours: how fast we move now, squares per 10 seconds (viSpeed; a companion keeps up with its "
+   "running master)."
+   {
+      return viSpeed;
+   }
+
    GetMoveTime()
    {
-      local iTime;
+      local iTime, iSpeed;
+
+      iSpeed = Send(self,@GetMoveSpeed);
 
       // Unit of viSpeed is: #gridsquares per 10 seconds (per 10000 ms)
       // viSpeed is pre-defined by monster
@@ -5753,10 +5762,10 @@ messages:
       // avoid division by zero, if objects teleport
       // objects with viSpeed = 0 don't need seamless movements in the client
       // so we just assume it is enough to teleport them once a second
-      if viSpeed > 0
+      if iSpeed > 0
       {
          // see formula above  
-         iTime = 10000 / (viSpeed * 4);
+         iTime = 10000 / (iSpeed * 4);
 
          // finally we reduce the timer a bit (right now it's exact at ms)
          // why? the client should get a new position before the last destination

@@ -93,30 +93,30 @@ messages:
 
    // The unsorted messages:
 
-   ImproveStroke(who=$,use_weapon=$,target=$)
+   ImproveStroke(who=$,use_weapon=$,target=$,miss=FALSE)
+   "Ours (practice, Skill.ImproveAbility): every swing practises both the stroke and the "
+   "weapon's proficiency (brawling when unarmed), a miss at half. Before 2026-10-18 only a hit "
+   "after 75 swings tried, and only one of the two (60% the proficiency)."
    {
-      local prof, target_level;
+      local oBrawling;
 
-      target_level = Send(target,@GetLevel);
-      prof=Send(use_weapon,@GetProfNumber);
+      // the stroke
+      Send(self,@ImproveAbility,#who=who,#target=target,#miss=miss);
 
-      if Random(1,100) > 60
-         OR NOT Send(who,@HasSkill,#num=prof)
+      // the weapon's proficiency
+      if use_weapon <> $ AND IsClass(use_weapon,&Weapon)
       {
-         if Send(who,@GetSkillAbility,#skill_num=viSkill_num) < 100
-         {
-            // checking for stroke advancement
-            Send(self,@ImproveAbility,#who=who,#target=target,
-                  #bonus=Send(who,@GetWeaponSwingBonus));
-         }
+         Send(use_weapon,@ImproveProficiency,#who=who,#target=target,#miss=miss);
+
+         return;
       }
-      else
+
+      if use_weapon = $
       {
-         if Send(use_weapon,@getprof,#who=who) < 100
+         oBrawling = Send(SYS,@FindSkillByNum,#num=SKID_BRAWLING);
+         if oBrawling <> $
          {
-            // checking for weapon proficiency advancement
-            Send(use_weapon,@ImproveProficiency,#who=who,#target=target,
-                  #bonus=Send(who,@GetWeaponSwingBonus));
+            Send(oBrawling,@ImproveAbility,#who=who,#target=target,#miss=miss);
          }
       }
 

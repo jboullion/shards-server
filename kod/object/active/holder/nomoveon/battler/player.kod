@@ -898,6 +898,10 @@ properties:
    // list of skills we know, in the form of a 3-part compound
    plSkills = $
 
+   // Ours (Skill.ImproveAbility): practice, [ skill number, half uses since it last improved ]
+   // for each skill with any
+   plSkillPractice = $
+
    // A list of the total percentage points the player has in the various
    //  spell and skill schools.
    plSchools = $
@@ -5714,8 +5718,8 @@ messages:
    {
       local oMonster;
 
+      // Ours (practice, Skill.ImproveAbility): every hit practises, with no 75-swing gate
       if stroke_obj <> $
-         AND Send(self,@GetWeaponSwingBonus) > 0
       {
          Send(stroke_obj,@ImproveStroke,#who=self,#target=what,
                #use_weapon=Send(self,@GetWeapon));
@@ -5732,6 +5736,18 @@ messages:
       
       Send(self,@DoHitMessageSound,#what=what,#damage=damage,
             #stroke_obj=stroke_obj,#use_weapon=use_weapon);
+
+      propagate;
+   }
+
+   AssessMiss(what = $, stroke_obj = $)
+   "Ours (practice, Skill.ImproveAbility): a miss practises too, at half."
+   {
+      if stroke_obj <> $
+      {
+         Send(stroke_obj,@ImproveStroke,#who=self,#target=what,
+               #use_weapon=Send(self,@GetWeapon),#miss=TRUE);
+      }
 
       propagate;
    }
@@ -8572,6 +8588,55 @@ messages:
    }
 
    ////  Skills Stuff
+
+   GetSkillPractice(num = $)
+   "Ours (Skill.ImproveAbility): half uses of this skill since it last improved."
+   {
+      local i;
+
+      foreach i in plSkillPractice
+      {
+         if First(i) = num
+         {
+            return Nth(i,2);
+         }
+      }
+
+      return 0;
+   }
+
+   SetSkillPractice(num = $,halves = 0)
+   "Ours (Skill.ImproveAbility): sets the practice count; 0 forgets it. Kept to 20000 (10000 "
+   "uses), long past where the chance reaches its cap, so the sums stay in a Kod integer."
+   {
+      local i;
+
+      halves = Bound(halves,0,20000);
+
+      foreach i in plSkillPractice
+      {
+         if First(i) = num
+         {
+            if halves <= 0
+            {
+               plSkillPractice = DelListElem(plSkillPractice,i);
+            }
+            else
+            {
+               SetNth(i,2,halves);
+            }
+
+            return;
+         }
+      }
+
+      if halves > 0
+      {
+         plSkillPractice = Cons([ num, halves ],plSkillPractice);
+      }
+
+      return;
+   }
 
    HasSkill(num = $)
    "Returns TRUE if a Skill is in a player's Skill list,"

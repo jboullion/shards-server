@@ -581,10 +581,16 @@ messages:
       return SKID_SLASH;
    }
 
-   ImproveProficiency(who=$,target=$,bonus=0)
+   ImproveProficiency(who=$,target=$,bonus=0,miss=FALSE)
    {
-      Send(Send(SYS,@findSkillbynum,#num=viProficiency_needed),@ImproveAbility,
-            #who=who,#target=target,#bonus=bonus);
+      local oSkill;
+
+      // Ours: a weapon that needs no proficiency practises none
+      oSkill = Send(SYS,@FindSkillByNum,#num=viProficiency_needed);
+      if oSkill <> $
+      {
+         Send(oSkill,@ImproveAbility,#who=who,#target=target,#bonus=bonus,#miss=miss);
+      }
 
       return;
    }

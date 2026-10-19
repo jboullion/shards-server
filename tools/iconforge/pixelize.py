@@ -151,14 +151,16 @@ def add_outline(idx: np.ndarray, pal: np.ndarray) -> np.ndarray:
 def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shrink: int, pal: np.ndarray,
              outline: bool = False, allowed=None, key=None, clean: bool = True) -> Bitmap:
     """The generated image as a new Bitmap the same in-game size and placement as `original`.
-    key: the background colour to remove; None reads it from the corners (models never paint exact #FF00FF)."""
+    key: the background colour to remove; None reads it from the corners (models never paint exact #FF00FF).
+    The size and hotspots scale with the shrink (they're in the bitmap's own pixels); the offsets don't:
+    they're in the pixels of what the bitmap hangs on (the body, or the head for a helm: weapon.py)."""
     k = new_shrink / orig_shrink
     W, H = max(1, round(original.w * k)), max(1, round(original.h * k))
     hs = [{"num": h["num"], "x": round(h["x"] * k), "y": round(h["y"] * k)} for h in original.hotspots]
     obox = opaque_box(original.rgba(pal))
     if obox is None:
         # an empty frame in the original (some worn views are blank): keep it empty
-        return Bitmap(W, H, round(original.xoff * k), round(original.yoff * k), hs, bytes([TRANSPARENT]) * (W * H))
+        return Bitmap(W, H, original.xoff, original.yoff, hs, bytes([TRANSPARENT]) * (W * H))
     bx0, by0 = round(obox[0] * k), round(obox[1] * k)
     bw, bh = max(1, round((obox[2] - obox[0]) * k)), max(1, round((obox[3] - obox[1]) * k))
 
@@ -188,4 +190,4 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     idx = to_palette(canvas, pal, allowed)
     if outline:
         idx = add_outline(idx, pal)
-    return Bitmap(W, H, round(original.xoff * k), round(original.yoff * k), hs, idx.tobytes())
+    return Bitmap(W, H, original.xoff, original.yoff, hs, idx.tobytes())
