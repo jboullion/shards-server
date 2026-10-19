@@ -10,8 +10,10 @@
 //
 // Each fights with its weapon and its school's spells (CompanionKinds.GetSpellBook), from
 // Monster's spell book (plSpellBook), in reach as well as from afar: the Duke's Qor acids, the
-// Princess's Faren fire or ice (whichever its target resists less). Touch spells it does its own
-// way (TouchStrike). The rebels' keeps Kraanan's blessings on its owner instead (BuffTimer).
+// Princess's Faren fire or ice (whichever its target resists less). Every few seconds it also
+// looks after its owner (SupportTimer, CompanionKinds.GetSupport): enchantments on them every
+// half hour, a holy or unholy edge on their weapon, heals; a dome or reflections of itself while
+// fighting; Jala's songs while calm (IsCalm), stopped the moment a fight starts (MarkFight).
 
 ////////////////////////////////////////////////////////////////////////////////
 Companion is Human
@@ -53,7 +55,8 @@ resources:
    companion_pack_too_many = "%s can't carry any more things."
    companion_not_yours = "%s takes orders only from %q."
    companion_owner_full = "You can't carry %s%s."
-   companion_buffs = "%s calls down Kraanan's favour on you."
+   companion_buffs = "%s calls down %s's favour on you."
+   companion_weapon = "%s lays %s's power on your %s."
 
 classvars:
 
@@ -91,12 +94,18 @@ properties:
    // Only its book may delete it (CompanionBook.Forget): anything else parks it
    pbDeleteOk = FALSE
 
-   // Its chance to cast in a fight (percent), and the buffs it keeps on its owner
-   // ([ [spell, mana], ... ], CompanionKinds.GetBuffs), their timer, and GetTime when next due
+   // Its chance to cast in a fight (percent); how it supports its owner ([ [spell, mana, mode],
+   // ... ], CompanionKinds.GetSupport) and the timer that does it
    piCastChance = 0
-   plBuffs = $
-   ptBuff = $
+   plSupport = $
+   ptSupport = $
+   // GetTime when its enchantments on its owner, its next heal and its next reflection are due;
+   // the weapon it last enchanted (or found it couldn't); GetTime of its last blow, or one at it
    piNextBuff = 0
+   piNextHeal = 0
+   piNextReflect = 0
+   poEnchanted = $
+   piLastFight = 0
    // GetTime before which it can't cast again (COMPANION_CAST_SECONDS)
    piNextCast = 0
 
@@ -383,6 +392,11 @@ messages:
    SetCompanionState(state = COMP_ACTIVE)
    {
       piCompState = state;
+      if state <> COMP_ACTIVE
+      {
+         Send(self,@StopSupport);
+      }
+
       Send(self,@ResetBehaviorFlags);
       if poOwner <> $
       {
@@ -400,6 +414,11 @@ messages:
    SetStance(stance = COMP_FOLLOW)
    {
       piStance = stance;
+      if stance = COMP_PASSIVE
+      {
+         Send(self,@StopSupport);
+      }
+
       Send(self,@ResetBehaviorFlags);
       if poOwner <> $
       {
@@ -447,10 +466,22 @@ messages:
          return;
       }
 
-      if ptBuff <> $
+      Send(self,@StopSupport);
+      if ptSupport <> $
       {
-         DeleteTimer(ptBuff);
-         ptBuff = $;
+         DeleteTimer(ptSupport);
+         ptSupport = $;
+      }
+
+      propagate;
+   }
+
+   NewOwner(what = $)
+   "Leaving a room, its songs, dome and reflections end there."
+   {
+      if poOwner <> $ AND what <> poOwner
+      {
+         Send(self,@StopSupport);
       }
 
       propagate;
@@ -551,26 +582,28 @@ messages:
          return FALSE;
       }
 
-      if piStance = COMP_FOLLOW
+      if piStance = COMP_FOLLOW OR defend
       {
+         Send(self,@MarkFight);
+
          return TRUE;
       }
 
-      return defend;
+      return FALSE;
    }
 
    ////////////////////////////////////////////////////////////// casting
 
    ApplyCaster(tier = 1,health = 50)
-   "Its spell book, buffs, chance to cast, spell power and mana for a bond tier and its owner's "
-   "base health (CompanionBook.Rescale): spells come as its owner grows. It keeps the share of "
-   "its mana it had."
+   "Its spell book, support, chance to cast, spell power and mana for a bond tier and its "
+   "owner's base health (CompanionBook.Rescale): spells come as its owner grows. It keeps the "
+   "share of its mana it had."
    {
       local oBook, lNumbers, iMax;
 
       oBook = Send(SYS,@GetCompanionBook);
       plSpellBook = Send(oBook,@GetSpellBook,#kind=piKind,#health=health);
-      plBuffs = Send(oBook,@GetBuffs,#kind=piKind,#health=health);
+      plSupport = Send(oBook,@GetSupport,#kind=piKind,#health=health);
       lNumbers = Send(oBook,@GetCasterNumbers,#kind=piKind,#tier=tier,#health=health);
       piCastChance = First(lNumbers);
       piSpellPower = Nth(lNumbers,2);
@@ -588,12 +621,18 @@ messages:
       piMana = Bound(piMana,0,iMax);
       Send(self,@NewMana);
 
-      if plBuffs <> $ AND ptBuff = $
+      if plSupport <> $ AND ptSupport = $
       {
-         ptBuff = CreateTimer(self,@BuffTimer,COMPANION_BUFF_CHECK_MS);
+         ptSupport = CreateTimer(self,@SupportTimer,COMPANION_SUPPORT_MS);
       }
 
       return;
+   }
+
+   HasSpell(num = 0)
+   "Reflection asks its master (Reflection.Constructor): it lends its reflections none."
+   {
+      return FALSE;
    }
 
    CastAt(sid = 0,mana = 0,target = $)
@@ -630,52 +669,9 @@ messages:
       return TRUE;
    }
 
-   TouchStrike(sid = 0,mana = 0,target = $)
-   "A touch spell (Acid Touch, Touch of Flame, Icy Fingers) on a target in reach. A player's "
-   "is an enchantment that works only unarmed (Human.GetWeapon), so ours is one blow of the "
-   "spell's kind, COMPANION_TOUCH_PCT of its melee damage, which the target's resistances "
-   "temper. Returns whether it struck."
-   {
-      local oSpell, oRoom, iDamage;
-
-      oRoom = poOwner;
-      if oRoom = $ OR target = $ OR piMana < mana OR GetTime() < piNextCast
-      {
-         return FALSE;
-      }
-
-      oSpell = Send(SYS,@FindSpellByNum,#num=sid);
-      if oSpell = $ OR NOT Send(oRoom,@ReqSpellCast,#who=self,#oSpell=oSpell,#lItems=[target])
-      {
-         return FALSE;
-      }
-
-      piMana = piMana - mana;
-      piNextCast = GetTime() + COMPANION_CAST_SECONDS;
-      Send(self,@NewMana);
-      Send(self,@MonsterOrient,#new_row=Send(target,@GetRow),#new_col=Send(target,@GetCol),
-           #new_finerow=Send(target,@GetFineRow),#new_finecol=Send(target,@GetFineCol),
-           #face_target=TRUE);
-      Send(self,@DoCast);
-
-      iDamage = Send(self,@GetDamage,#what=target,#stroke_obj=self) * COMPANION_TOUCH_PCT / 100;
-      iDamage = Send(target,@AssessDamage,#what=self,#damage=Bound(iDamage,1,$),#atype=0,
-                     #aspell=Send(oSpell,@GetAttackSpell),#precision=TRUE);
-      Send(self,@AssessHit,#what=target,#stroke_obj=self,#damage=iDamage);
-      if iDamage = $
-      {
-         Send(self,@KilledSomething,#what=target,#use_weapon=self);
-      }
-
-      Send(oRoom,@SomethingAttacked,#what=self,#victim=target,#use_weapon=self);
-
-      return TRUE;
-   }
-
-   PickSpell(target = $,in_reach = FALSE)
-   "[ spell, mana ] from its book for this target, or $: a touch spell only in reach (else the "
-   "first that isn't one), and a fire spell turned to its cold twin when the target resists "
-   "cold less."
+   PickSpell(target = $)
+   "[ spell, mana ] from its book for this target, or $: Fireball turns to Ice Shard when the "
+   "target resists cold less."
    {
       local i, oBook, iRandom, iSpell, iMana, iTwin;
 
@@ -690,21 +686,6 @@ messages:
             iMana = Nth(i,2);
 
             break;
-         }
-      }
-
-      if iSpell <> $ AND NOT in_reach AND Send(oBook,@IsTouchSpell,#sid=iSpell)
-      {
-         iSpell = $;
-         foreach i in plSpellBook
-         {
-            if NOT Send(oBook,@IsTouchSpell,#sid=First(i))
-            {
-               iSpell = First(i);
-               iMana = Nth(i,2);
-
-               break;
-            }
          }
       }
 
@@ -728,7 +709,7 @@ messages:
    "It casts at its target in reach as well as from afar (Monster's waits until the target is "
    "out of reach), at its own chance, and only at what it may attack."
    {
-      local iDistance, lPick;
+      local lPick;
 
       if plSpellBook = $ OR poTarget = $ OR poOwner = $
       {
@@ -740,8 +721,7 @@ messages:
          return FALSE;
       }
 
-      iDistance = Send(self,@SquaredFineDistanceTo3D,#what=poTarget);
-      if iDistance > piSpellRange * piSpellRange
+      if Send(self,@SquaredFineDistanceTo3D,#what=poTarget) > piSpellRange * piSpellRange
          OR NOT Send(poOwner,@LineOfSight,#obj1=self,#obj2=poTarget)
          OR NOT Send(poOwner,@ReqSomethingAttack,#what=self,#victim=poTarget,
                      #use_weapon=self)
@@ -750,16 +730,10 @@ messages:
          return FALSE;
       }
 
-      lPick = Send(self,@PickSpell,#target=poTarget,
-                   #in_reach=(iDistance <= piAttackRange * piAttackRange));
+      lPick = Send(self,@PickSpell,#target=poTarget);
       if lPick = $
       {
          return FALSE;
-      }
-
-      if Send(Send(SYS,@GetCompanionBook),@IsTouchSpell,#sid=First(lPick))
-      {
-         return Send(self,@TouchStrike,#sid=First(lPick),#mana=Nth(lPick,2),#target=poTarget);
       }
 
       return Send(self,@CastAt,#sid=First(lPick),#mana=Nth(lPick,2),#target=poTarget);
@@ -768,6 +742,7 @@ messages:
    TryAttack(what = $,stroke_obj = $)
    "It tries a spell before its weapon."
    {
+      Send(self,@MarkFight);
       if plSpellBook <> $
          AND NOT (piBehavior & AI_NOFIGHT)
          AND Send(self,@MonsterCanCastSpell)
@@ -779,47 +754,137 @@ messages:
       propagate;
    }
 
-   BuffTimer()
-   "Every COMPANION_BUFF_SECONDS it puts its buffs on its owner, beside it, those they lack. "
-   "Its buffs last as long, so they stay up; one purged stays gone till the next time."
+   ////////////////////////////////////////////////////////////// supporting its owner
+
+   MarkFight()
+   "It's fighting, or being fought: its songs stop at once (they'd soothe its foes too)."
    {
-      ptBuff = $;
-      if plBuffs = $
+      piLastFight = GetTime();
+      Send(self,@StopRadius,#mode=COMP_SUP_SONG);
+
+      return;
+   }
+
+   IsCalm()
+   {
+      return poTarget = $ AND GetTime() - piLastFight >= COMPANION_CALM_SECONDS;
+   }
+
+   SupportOf(mode = 0)
+   "Its support entries of a mode (COMP_SUP_*)."
+   {
+      local i, lFound;
+
+      lFound = $;
+      foreach i in plSupport
+      {
+         if Nth(i,3) = mode
+         {
+            lFound = Cons(i,lFound);
+         }
+      }
+
+      return lFound;
+   }
+
+   SupportTimer()
+   "Every COMPANION_SUPPORT_MS: a little mana back, then, with its owner beside it, what its "
+   "support does now: enchantments, their weapon and heals always; while fighting a dome and "
+   "reflections, while calm its songs."
+   {
+      ptSupport = $;
+      if plSupport = $
       {
          return;
       }
 
-      ptBuff = CreateTimer(self,@BuffTimer,COMPANION_BUFF_CHECK_MS);
-      if GetTime() < piNextBuff OR piCompState <> COMP_ACTIVE OR poOwner = $
-         OR poSworn = $ OR piStance = COMP_PASSIVE
+      ptSupport = CreateTimer(self,@SupportTimer,COMPANION_SUPPORT_MS);
+      if piMana < piMax_Mana
+      {
+         piMana = Bound(piMana + Bound(piMax_Mana * COMPANION_MANA_REGEN_PCT / 100,1,$),
+                        0,piMax_Mana);
+         Send(self,@NewMana);
+      }
+
+      if piCompState <> COMP_ACTIVE OR poOwner = $ OR poSworn = $
          OR Send(poSworn,@GetOwner) <> poOwner
-         OR NOT Send(poOwner,@LineOfSight,#obj1=self,#obj2=poSworn)
+      {
+         Send(self,@StopSupport);
+
+         return;
+      }
+
+      Send(self,@SupportOwner);
+      if piStance = COMP_PASSIVE
       {
          return;
       }
 
-      // As anyone's buffs on others (PersonalEnchantment.CanPayCosts)
-      if (Send(poOwner,@GetPermanentFlags) & ROOM_NO_COMBAT)
-         AND NOT Send(SETTINGS_OBJECT,@CanBuffOthersInSafeZones)
+      if Send(self,@IsCalm)
+      {
+         Send(self,@StopRadius,#mode=COMP_SUP_AURA);
+         Send(SYS,@DeletePlayerReflections,#who=self);
+         Send(self,@StartRadius,#mode=COMP_SUP_SONG);
+
+         return;
+      }
+
+      Send(self,@StartRadius,#mode=COMP_SUP_AURA);
+      Send(self,@Reflect);
+
+      return;
+   }
+
+   StopSupport()
+   "Its songs, its dome and its reflections end (it leaves, falls, waits or turns passive)."
+   {
+      Send(self,@StopRadius);
+      Send(SYS,@DeletePlayerReflections,#who=self);
+
+      return;
+   }
+
+   SupportOwner()
+   "With its owner in sight: its enchantments on them when due (COMPANION_BUFF_SECONDS), their "
+   "weapon, a heal. As anyone's buffs on others, none in a safe room unless the settings allow "
+   "it (PersonalEnchantment.CanPayCosts); a heal any time."
+   {
+      local bSafe;
+
+      if NOT Send(poOwner,@LineOfSight,#obj1=self,#obj2=poSworn)
       {
          return;
       }
 
-      piNextBuff = GetTime() + COMPANION_BUFF_SECONDS;
-      Send(self,@BuffOwner);
+      bSafe = (Send(poOwner,@GetPermanentFlags) & ROOM_NO_COMBAT)
+              AND NOT Send(SETTINGS_OBJECT,@CanBuffOthersInSafeZones);
+      if NOT bSafe
+      {
+         if GetTime() >= piNextBuff
+         {
+            piNextBuff = GetTime() + COMPANION_BUFF_SECONDS;
+            Send(self,@BuffOwner);
+            // The round looks at their weapon afresh
+            poEnchanted = $;
+         }
+
+         Send(self,@EdgeOwnerWeapon);
+      }
+
+      Send(self,@HealOwner);
 
       return;
    }
 
    BuffOwner()
-   "Each of its buffs its owner lacks, for COMPANION_BUFF_SECONDS, started as "
+   "Each of its enchantments its owner lacks, for COMPANION_BUFF_SECONDS, started as "
    "PersonalEnchantment.CastSpell starts one (so it shows, and purge takes it), while its mana "
    "lasts."
    {
-      local i, oSpell, bCast;
+      local i, oSpell, iFirst;
 
-      bCast = FALSE;
-      foreach i in plBuffs
+      iFirst = $;
+      foreach i in Send(self,@SupportOf,#mode=COMP_SUP_ENCHANT)
       {
          oSpell = Send(SYS,@FindSpellByNum,#num=First(i));
          if oSpell = $ OR piMana < Nth(i,2) OR Send(poSworn,@IsEnchanted,#what=oSpell)
@@ -828,7 +893,7 @@ messages:
          }
 
          piMana = piMana - Nth(i,2);
-         bCast = TRUE;
+         iFirst = First(i);
          Send(poSworn,@StartEnchantment,#what=oSpell,
               #state=Send(oSpell,@GetStateValue,#iSpellpower=piSpellPower,#who=self,
                           #target=poSworn),
@@ -837,12 +902,179 @@ messages:
               #who=self,#iSpellpower=piSpellPower);
       }
 
-      if bCast
+      if iFirst <> $
       {
          Send(self,@NewMana);
-         Send(self,@MonsterCastAnimation,#iSpellNum=First(First(plBuffs)));
-         Send(poSworn,@MsgSendUser,#message_rsc=companion_buffs,#parm1=prName);
+         Send(self,@MonsterCastAnimation,#iSpellNum=iFirst);
+         Send(poSworn,@MsgSendUser,#message_rsc=companion_buffs,#parm1=prName,
+              #parm2=Send(Send(SYS,@FindSpellByNum,#num=iFirst),@GetSchoolStr));
       }
+
+      return;
+   }
+
+   EdgeOwnerWeapon()
+   "Holy or Unholy Weapon on the weapon its owner wields, once for each weapon (the round "
+   "looks again). As holywp.kod and unholywp.kod enchant, but its own way, since those want "
+   "their caster to hold the weapon; and never over another attack spell or enchantment."
+   {
+      local lSup, oWeapon, oSpell, iType;
+
+      lSup = Send(self,@SupportOf,#mode=COMP_SUP_WEAPON);
+      if lSup = $
+      {
+         return;
+      }
+
+      lSup = First(lSup);
+      oWeapon = Send(poSworn,@GetWeapon);
+      if oWeapon = $ OR oWeapon = poEnchanted OR NOT IsClass(oWeapon,&Weapon)
+         OR piMana < Nth(lSup,2)
+      {
+         return;
+      }
+
+      oSpell = Send(SYS,@FindSpellByNum,#num=First(lSup));
+      if oSpell = $
+      {
+         return;
+      }
+
+      poEnchanted = oWeapon;
+      if Send(oWeapon,@GetAttackSpell) <> 0
+         OR Send(oWeapon,@GetAttributeData,#ItemAtt=WA_ENCHANTED) <> $
+         OR Send(oWeapon,@CheckTypeFlag,#flag=ATCK_WEAP_MAGIC) <> 0
+         OR NOT Send(oWeapon,@CanEnchant,#oSpell=oSpell)
+      {
+         return;
+      }
+
+      iType = ATCK_SPELL_HOLY;
+      if First(lSup) = SID_UNHOLY_WEAPON
+      {
+         iType = ATCK_SPELL_UNHOLY;
+      }
+
+      piMana = piMana - Nth(lSup,2);
+      Send(self,@NewMana);
+      Send(self,@MonsterCastAnimation,#iSpellNum=First(lSup));
+      Send(Send(SYS,@FindItemAttByNum,#num=WA_ATTACKSPELLTYPE),@AddToItem,#oItem=oWeapon,
+           #random_gen=FALSE,#state1=iType,
+           #timer_duration=Send(oSpell,@GetDuration,#iSpellPower=piSpellPower),
+           #state3=[self,oSpell,piSpellPower]);
+      Send(poSworn,@MsgSendUser,#message_rsc=companion_weapon,#parm1=prName,
+           #parm2=Send(oSpell,@GetSchoolStr),#parm3=Send(oWeapon,@GetName));
+
+      return;
+   }
+
+   HealOwner()
+   "Its heal on its owner below COMPANION_HEAL_OWNER_PCT, once in COMPANION_HEAL_SECONDS."
+   {
+      local lSup, iMax;
+
+      lSup = Send(self,@SupportOf,#mode=COMP_SUP_HEAL);
+      if lSup = $ OR GetTime() < piNextHeal
+      {
+         return;
+      }
+
+      lSup = First(lSup);
+      iMax = Send(poSworn,@GetMaxHealth);
+      if iMax <= 0 OR Send(poSworn,@GetHealth) * 100 / iMax >= COMPANION_HEAL_OWNER_PCT
+      {
+         return;
+      }
+
+      if Send(self,@CastAt,#sid=First(lSup),#mana=Nth(lSup,2),#target=poSworn)
+      {
+         piNextHeal = GetTime() + COMPANION_HEAL_SECONDS;
+      }
+
+      return;
+   }
+
+   IsPlaying(what = $)
+   "Whether a radius enchantment of its own (a song, its dome) is going."
+   {
+      local lState;
+
+      lState = Send(self,@GetRadiusEnchantmentState,#what=what);
+
+      return lState <> $ AND First(lState) = self;
+   }
+
+   StartRadius(mode = COMP_SUP_SONG)
+   "Its radius enchantments of a mode it isn't playing yet, by the spell's own CastSpell with "
+   "itself the caster (a monster can hold them: nomoveon.kod)."
+   {
+      local i, oSpell;
+
+      foreach i in Send(self,@SupportOf,#mode=mode)
+      {
+         oSpell = Send(SYS,@FindSpellByNum,#num=First(i));
+         if oSpell = $ OR piMana < Nth(i,2) OR Send(self,@IsPlaying,#what=oSpell)
+         {
+            continue;
+         }
+
+         piMana = piMana - Nth(i,2);
+         Send(self,@NewMana);
+         Send(self,@MonsterCastAnimation,#iSpellNum=First(i));
+         Send(oSpell,@CastSpell,#who=self,#iSpellPower=piSpellPower);
+      }
+
+      return;
+   }
+
+   StopRadius(mode = 0)
+   "Ends its own radius enchantments of a mode (COMP_SUP_SONG or COMP_SUP_AURA), or all (0)."
+   {
+      local i, oSpell;
+
+      foreach i in plSupport
+      {
+         if (mode = 0 AND (Nth(i,3) = COMP_SUP_SONG OR Nth(i,3) = COMP_SUP_AURA))
+            OR (mode <> 0 AND Nth(i,3) = mode)
+         {
+            oSpell = Send(SYS,@FindSpellByNum,#num=First(i));
+            if oSpell <> $ AND Send(self,@IsPlaying,#what=oSpell)
+            {
+               Send(self,@RemoveRadiusEnchantment,#what=oSpell,
+                    #state=Send(self,@GetRadiusEnchantmentState,#what=oSpell));
+            }
+         }
+      }
+
+      return;
+   }
+
+   Reflect()
+   "While fighting, a reflection of itself every COMPANION_REFLECT_SECONDS, up to the "
+   "reflections a player may keep (summrefl.kod)."
+   {
+      local lSup, oSpell;
+
+      lSup = Send(self,@SupportOf,#mode=COMP_SUP_REFLECT);
+      if lSup = $ OR GetTime() < piNextReflect
+      {
+         return;
+      }
+
+      lSup = First(lSup);
+      oSpell = Send(SYS,@FindSpellByNum,#num=First(lSup));
+      if oSpell = $ OR piMana < Nth(lSup,2)
+         OR Send(oSpell,@CountPlayerReflections,#who=self)
+            >= Send(SETTINGS_OBJECT,@GetPlayerReflectionLimit)
+      {
+         return;
+      }
+
+      piNextReflect = GetTime() + COMPANION_REFLECT_SECONDS;
+      piMana = piMana - Nth(lSup,2);
+      Send(self,@NewMana);
+      Send(self,@MonsterCastAnimation,#iSpellNum=First(lSup));
+      Send(oSpell,@CastSpell,#who=self,#iSpellPower=piSpellPower);
 
       return;
    }
@@ -976,6 +1208,11 @@ messages:
 
    AssessDamage(what = $,damage = $,atype = 0,aspell = 0,bonus = 0,scalefactor = 1000)
    {
+      if what <> $ AND what <> self
+      {
+         Send(self,@MarkFight);
+      }
+
       Post(Send(SYS,@GetCompanionBook),@HealthChanged,#comp=self);
 
       propagate;

@@ -882,7 +882,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 79103540;
+      return 93476101;
    }
 
    GetQuests()

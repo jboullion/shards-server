@@ -174,17 +174,27 @@
 
    // Base health needed to ask for one
    COMPANION_MIN_HEALTH = 50
-   // Its owner's base health at which its second and third spells come
+   // Its owner's base health at which its second and third rounds of spells come
    COMPANION_SPELL2_HEALTH = 70
    COMPANION_SPELL3_HEALTH = 90
 
-   // The rebel's buffs on its owner: cast every so often (seconds), lasting as long; it looks
-   // whether one is due every so often (ms)
+   // How it supports its owner (CompanionKinds.GetSupport, Companion.SupportTimer):
+   COMP_SUP_ENCHANT = 1   // an enchantment on them, every COMPANION_BUFF_SECONDS, lasting as long
+   COMP_SUP_WEAPON = 2    // Holy or Unholy Weapon on the weapon they wield
+   COMP_SUP_HEAL = 3      // healed below COMPANION_HEAL_OWNER_PCT, once in COMPANION_HEAL_SECONDS
+   COMP_SUP_AURA = 4      // a radius enchantment (Umbrella) about it while fighting
+   COMP_SUP_REFLECT = 5   // a reflection of itself every COMPANION_REFLECT_SECONDS while fighting
+   COMP_SUP_SONG = 6      // a Jala song while calm (COMPANION_CALM_SECONDS without a fight)
+
    COMPANION_BUFF_SECONDS = 1800
-   COMPANION_BUFF_CHECK_MS = 5000
-   // A touch spell (Acid Touch, Touch of Flame, Icy Fingers) hits for this share of its
-   // melee damage (percent)
-   COMPANION_TOUCH_PCT = 150
+   COMPANION_HEAL_OWNER_PCT = 75
+   COMPANION_HEAL_SECONDS = 10
+   COMPANION_REFLECT_SECONDS = 20
+   COMPANION_CALM_SECONDS = 10
+   // It looks after its owner this often (ms), and regains this share of its mana each time
+   // (percent): monsters regain none of their own
+   COMPANION_SUPPORT_MS = 2000
+   COMPANION_MANA_REGEN_PCT = 3
    // It casts at most once in this many seconds
    COMPANION_CAST_SECONDS = 2
 

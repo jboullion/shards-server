@@ -2,11 +2,12 @@
 // leader who gives them, and the numbers they grow by. CompanionBook (util/companionbook.kod)
 // inherits these tables, as QuestBook inherits QuestDefs.
 //
-// Since the 2026-10-19 revamp each fights with a weapon and a school's spells, which come as its
-// owner grows (COMPANION_SPELL2_HEALTH, COMPANION_SPELL3_HEALTH): the Duke's with an axe and
-// Qor's acids, the Princess's with a hammer and Faren's fire and ice, the rebels' with a scimitar
-// and Kraanan's blessings on its owner (Companion.BuffTimer). Its bond tier betters its kit.
-// The schools' own companions (kinds 4-7) are gone.
+// Since the 2026-10-19 revamp each fights with a weapon and a school's spells, and supports its
+// owner with another's (GetSupport, Companion.SupportTimer); both come as its owner grows
+// (COMPANION_SPELL2_HEALTH, COMPANION_SPELL3_HEALTH). The Duke's: an axe, Qor's acids, Riija's
+// shadows and reflections and Qor's unholy weapon. The Princess's: a hammer, Faren's fire or ice,
+// Shal'ille's heal, holy weapon and umbrella. The rebels': a scimitar, Kraanan's blessings and
+// Jala's songs. Its bond tier betters its kit. The schools' own companions (kinds 4-7) are gone.
 
 ////////////////////////////////////////////////////////////////////////////////
 CompanionKinds is UtilityFunctions
@@ -205,8 +206,35 @@ messages:
 
    GetSpellBook(kind = 0,health = 50)
    "Its attack spells for its owner's base health, as Monster.plSpellBook has them: [ spell, "
-   "mana, cumulative chance ]. A fire spell turns to its cold twin against a target that "
-   "resists cold less (GetColdTwin); a touch spell is cast only in reach (Companion.TouchStrike)."
+   "mana, cumulative chance ]. Fireball turns to Ice Shard against a target that resists cold "
+   "less (GetColdTwin)."
+   {
+      if kind = COMPANION_DUKE
+      {
+         if Send(self,@SpellsKnown,#health=health) = 1
+         {
+            return [ [SID_SPLASH_OF_ACID,6,100] ];
+         }
+
+         return [ [SID_SPLASH_OF_ACID,6,75], [SID_BLIND,6,100] ];
+      }
+
+      if kind = COMPANION_PRINCESS
+      {
+         if Send(self,@SpellsKnown,#health=health) = 1
+         {
+            return [ [SID_FIREBALL,6,100] ];
+         }
+
+         return [ [SID_FIREBALL,6,60], [SID_LIGHTNING_BOLT,8,100] ];
+      }
+
+      return $;
+   }
+
+   GetSupport(kind = 0,health = 50)
+   "How it supports its owner, for its owner's base health: [ spell, mana, COMP_SUP_* ] each "
+   "(Companion.SupportTimer)."
    {
       local iKnown;
 
@@ -215,68 +243,54 @@ messages:
       {
          if iKnown = 1
          {
-            return [ [SID_ACID_TOUCH,4,100] ];
+            return [ [SID_SHADOW_FORM,5,COMP_SUP_ENCHANT] ];
          }
 
          if iKnown = 2
          {
-            return [ [SID_ACID_TOUCH,4,50], [SID_SPLASH_OF_ACID,6,100] ];
+            return [ [SID_SHADOW_FORM,5,COMP_SUP_ENCHANT],
+                     [SID_UNHOLY_WEAPON,10,COMP_SUP_WEAPON] ];
          }
 
-         return [ [SID_ACID_TOUCH,4,40], [SID_SPLASH_OF_ACID,6,80], [SID_BLIND,6,100] ];
+         return [ [SID_SHADOW_FORM,5,COMP_SUP_ENCHANT], [SID_UNHOLY_WEAPON,10,COMP_SUP_WEAPON],
+                  [SID_REFLECTION,10,COMP_SUP_REFLECT] ];
       }
 
       if kind = COMPANION_PRINCESS
       {
          if iKnown = 1
          {
-            return [ [SID_TOUCH_OF_FLAME,4,100] ];
+            return [ [SID_MINOR_HEAL,4,COMP_SUP_HEAL] ];
          }
 
          if iKnown = 2
          {
-            return [ [SID_TOUCH_OF_FLAME,4,50], [SID_FIREBALL,6,100] ];
+            return [ [SID_MINOR_HEAL,4,COMP_SUP_HEAL], [SID_HOLY_WEAPON,10,COMP_SUP_WEAPON] ];
          }
 
-         return [ [SID_TOUCH_OF_FLAME,4,35], [SID_FIREBALL,6,70], [SID_LIGHTNING_BOLT,8,100] ];
+         return [ [SID_MINOR_HEAL,4,COMP_SUP_HEAL], [SID_HOLY_WEAPON,10,COMP_SUP_WEAPON],
+                  [SID_UMBRELLA,15,COMP_SUP_AURA] ];
       }
 
-      return $;
-   }
-
-   GetBuffs(kind = 0,health = 50)
-   "The spells it keeps on its owner (Companion.BuffTimer), for its owner's base health: "
-   "[ spell, mana ] each."
-   {
-      local iKnown;
-
-      if kind <> COMPANION_REBEL
-      {
-         return $;
-      }
-
-      iKnown = Send(self,@SpellsKnown,#health=health);
       if iKnown = 1
       {
-         return [ [SID_BLESS,6] ];
+         return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_INVIGORATE,5,COMP_SUP_SONG] ];
       }
 
       if iKnown = 2
       {
-         return [ [SID_BLESS,6], [SID_MAGIC_SHIELD,9] ];
+         return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_MAGIC_SHIELD,9,COMP_SUP_ENCHANT],
+                  [SID_INVIGORATE,5,COMP_SUP_SONG], [SID_RESTORATE,5,COMP_SUP_SONG] ];
       }
 
-      return [ [SID_BLESS,6], [SID_MAGIC_SHIELD,9], [SID_ARMOR_OF_GORT,10] ];
+      return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_MAGIC_SHIELD,9,COMP_SUP_ENCHANT],
+               [SID_ARMOR_OF_GORT,10,COMP_SUP_ENCHANT], [SID_INVIGORATE,5,COMP_SUP_SONG],
+               [SID_RESTORATE,5,COMP_SUP_SONG], [SID_REJUVENATE,5,COMP_SUP_SONG] ];
    }
 
    GetColdTwin(sid = 0)
    "The cold spell a fire spell turns into, or $."
    {
-      if sid = SID_TOUCH_OF_FLAME
-      {
-         return SID_ICY_FINGERS;
-      }
-
       if sid = SID_FIREBALL
       {
          return SID_ICESHARD;
@@ -285,15 +299,10 @@ messages:
       return $;
    }
 
-   IsTouchSpell(sid = 0)
-   {
-      return sid = SID_ACID_TOUCH OR sid = SID_TOUCH_OF_FLAME OR sid = SID_ICY_FINGERS;
-   }
-
    GetCasterNumbers(kind = 0,tier = 1,health = 50)
    "[ chance to cast in a fight (percent), spell power, maximum mana ]."
    {
-      return [ 30 + 2 * tier, Bound(health * 2 / 3 + 3 * tier,10,99), 40 + health / 2 ];
+      return [ 30 + 2 * tier, Bound(health * 2 / 3 + 3 * tier,10,99), 60 + health * 2 / 3 ];
    }
 
    GetNames(kind = 0,gender = GENDER_MALE)
