@@ -577,6 +577,10 @@ properties:
    piCompanionKillWindow = 0
    piCompanionKillPoints = 0
 
+   // Ours (util/arenabouts.kod): our mock bouts, [ wins, losses, streak, best streak ] for the
+   // Arena of Kraanan and the Arena of Death ($ until the first), apart from matches of players
+   plArenaRecord = $
+
    piLogoffPenaltyCount = 0
 
    piTimeNewsPosted = 0
@@ -1064,6 +1068,8 @@ messages:
       // Ours: friends see when we were last here, and our follows end (util/shardssocial.kod)
       piLastSeen = GetTime();
       Send(Send(SYS,@GetShardsSocial),@UserLeaving,#who=self);
+      // Ours: out of the line for a mock bout, and one we're in is lost (util/arenabouts.kod)
+      Send(Send(SYS,@GetArenaBouts),@UserLeaving,#who=self);
 
       Send(self,@CancelIfOffer);
       // Ours: our companion goes to limbo with us, before minions are released
@@ -4580,6 +4586,13 @@ messages:
          return;
       }
 
+      if StringEqual(sVerb,"arena")
+      {
+         Send(Send(SYS,@GetArenaBouts),@ArenaCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       if StringEqual(sVerb,"train")
       {
          Send(Send(SYS,@GetShardsAbilities),@SendTraining,#who=self);
@@ -4685,6 +4698,50 @@ messages:
    GetCompanionBond()
    {
       return piCompanionBond;
+   }
+
+   GetArenaRecord(arena = ARENA_KRAANAN)
+   "Ours (util/arenabouts.kod): [ wins, losses, streak, best streak ] in an arena's mock bouts."
+   {
+      if plArenaRecord = $ OR arena < 1 OR arena > Length(plArenaRecord)
+      {
+         return [ 0, 0, 0, 0 ];
+      }
+
+      return Nth(plArenaRecord,arena);
+   }
+
+   NoteArenaBout(arena = ARENA_KRAANAN,won = FALSE)
+   {
+      local lRec;
+
+      if plArenaRecord = $
+      {
+         plArenaRecord = [ [ 0, 0, 0, 0 ], [ 0, 0, 0, 0 ] ];
+      }
+
+      if arena < 1 OR arena > Length(plArenaRecord)
+      {
+         return;
+      }
+
+      lRec = Nth(plArenaRecord,arena);
+      if won
+      {
+         SetNth(lRec,1,First(lRec) + 1);
+         SetNth(lRec,3,Nth(lRec,3) + 1);
+         if Nth(lRec,3) > Nth(lRec,4)
+         {
+            SetNth(lRec,4,Nth(lRec,3));
+         }
+      }
+      else
+      {
+         SetNth(lRec,2,Nth(lRec,2) + 1);
+         SetNth(lRec,3,0);
+      }
+
+      return;
    }
 
    SetCompanionBond(points = 0)
@@ -10108,6 +10165,12 @@ messages:
    Killed(what = $)
    {
       Send(self,@CancelIfOffer);
+
+      // Ours: beaten in a mock bout isn't dying (util/arenabouts.kod BoutDeath, in Player.Killed)
+      if Send(Send(SYS,@GetArenaBouts),@InBout,#who=self)
+      {
+         propagate;
+      }
 
       if what = self
       {

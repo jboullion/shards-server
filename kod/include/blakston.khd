@@ -192,6 +192,19 @@
    // A caster casts at most once in this many seconds (heals and attacks alike)
    COMPANION_CAST_SECONDS = 2
 
+   // Ours (docs/adr/0019-arena-bouts.md): mock bouts against arena fighters (util/arenabouts.kod)
+   // The arenas: the Arena of Kraanan's melee and the Arena of Death's duel
+   ARENA_KRAANAN = 1
+   ARENA_DEATH = 2
+   // The kinds of fighter (battler/monster/human/arenafighter.kod): the Arena of Death's elites,
+   // then the Arena of Kraanan's
+   ARENA_FIGHTER_WARRIOR = 1
+   ARENA_FIGHTER_QOR = 2
+   ARENA_FIGHTER_FAREN = 3
+   ARENA_FIGHTER_RIIJA = 4
+   ARENA_FIGHTER_BRAWLER = 5
+   ARENA_FIGHTER_ADEPT = 6
+
    // Player name color sent as hex RGB value. Define constants
    // for ease of use as needed. Requires OF_PLAYER boolean flag
    // to be set to draw a name.

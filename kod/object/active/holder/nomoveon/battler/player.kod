@@ -9659,6 +9659,13 @@ messages:
       // If we have Apparitions attacking us, delete them.
       Send(self,@RemoveAllApparitions);
 
+      // Ours (util/arenabouts.kod): beaten in a mock bout is never a death, even in the Arena
+      // of Death. Before anything else here, so no arena or room rule can make it one.
+      if Send(Send(SYS,@GetArenaBouts),@BoutDeath,#who=self)
+      {
+         return;
+      }
+
       if poOwner <> $
          AND Send(poOwner,@GetRoomNum) = RID_UNDERWORLD
       {

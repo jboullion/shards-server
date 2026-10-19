@@ -748,6 +748,12 @@ resources:
    qd_246_name = "A Mage of Faren"
    qd_246_s1 = "Take a companion into your service"
    qd_246_t1 = "Priestess Tenuv'vyal"
+   qd_250_name = "Blood and Sand"
+   qd_250_s1 = "Fight a mock bout in the Arena of Kraanan"
+   qd_250_t1 = "Paddock"
+   qd_251_name = "A Dealer of Death"
+   qd_251_s1 = "Win a mock bout in the Arena of Death"
+   qd_251_t1 = "Johlan Tulca"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -763,7 +769,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 33331917;
+      return 123223456;
    }
 
    GetQuests()
@@ -1983,7 +1989,19 @@ messages:
            $, $, $, $,
            [ [ 14, $, 1, 0, &FarenPriestess, 0, qd_246_s1, $, $, qd_246_t1,
                1, $, $, $, 0 ] ],
-           5202, 0, $, 0, 1, $, $, 0, $, $, $ ]
+           5202, 0, $, 0, 1, $, $, 0, $, $, $ ],
+         // tos-blood-and-sand
+         [ 250, qd_250_name, &TosInnKeeper, 0, 0, 200, $,
+           $, $, $, $,
+           [ [ 18, $, 1, 0, &TosInnKeeper, 0, qd_250_s1, $, $, qd_250_t1,
+               0, $, &TosWatcher, $, 0 ] ],
+           200, 100, $, 0, 2, $, $, 0, $, $, $ ],
+         // tos-death-arena-duel
+         [ 251, qd_251_name, &DeathArenaWatcher, 0, 100, 200, $,
+           $, $, 86400, $,
+           [ [ 18, $, 1, 0, &DeathArenaWatcher, 0, qd_251_s1, $, $, qd_251_t1,
+               0, $, &DeathArenaWatcher, $, 1 ] ],
+           5101, 1500, $, 0, 3, $, $, 0, $, $, $ ]
          ]
       ];
    }

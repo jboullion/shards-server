@@ -1,0 +1,1392 @@
+// Ours (Meridian Shards, docs/adr/0019-arena-bouts.md): mock bouts in the arenas. One object,
+// SYS@GetArenaBouts, made on demand. A player in the Arena of Kraanan or the Arena of Death
+// joins (our client's Arena window: UC_SHARDS "arena join"); when the floor is free (no bout,
+// and the watcher has no fight of players going) the first in line is healed, put on the floor,
+// and given fighters (battler/monster/human/arenafighter.kod) scaled to their health:
+//
+//   ARENA_KRAANAN  a melee: the player and three fighters, everyone against everyone; any level
+//   ARENA_DEATH    a duel: one elite with about the player's health, at least 100
+//
+// After a countdown the fighters move. The player wins when every fighter is down, and loses when
+// beaten, when time runs out, or by leaving (fleeing the floor, logging off, "arena leave").
+// Losing is never a death, even in the Arena of Death: Player.Killed asks BoutDeath first, and
+// the player wakes in the stands with a tenth of their health. Winning gives back the health,
+// mana and vigor they came in with. Mock bouts give no XP, skills or spells (arenas give none,
+// and ArenaFighter.CanPlayerAdvanceOnMe), only the record and title kept on User
+// (plArenaRecord, apart from the watchers' champion lists) and the arena quest steps
+// (QuestBook.ArenaBoutDone).
+//
+// The room's attack and spell checks ask ReqBoutAttack and ReqBoutSpell first (room.kod,
+// watcher.kod); $ means no bout here, and the watcher's own rules go on. A watcher won't take
+// champions or challengers while a bout runs, and a bout waits while the watcher is busy.
+//
+// Our client's commands (UC_SHARDS, User.ShardsCommand -> ArenaCommand):
+//   arena status | join | leave | pvp <champion|challenge|accept|renege|traditional|
+//   lastman|guild|royale>
+// and it's told everything with UC_ARENA (SendStatus): to everyone in the arena whenever the
+// floor changes, and every second of a bout.
+
+////////////////////////////////////////////////////////////////////////////////
+ArenaBouts is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   // UC_ARENA's kinds of packet
+   ARENA_PKT_STATUS = 1
+
+   // A slot's state, and a player's in the status (1: waiting in line)
+   BOUT_IDLE = 0
+   BOUT_QUEUED = 1
+   BOUT_COUNTDOWN = 2
+   BOUT_FIGHTING = 3
+   // Its player beaten, waiting for EndBout (posted, as the blow that beat them is still
+   // being struck): no more attacks
+   BOUT_ENDING = 4
+
+   // How a bout ended
+   BOUT_END_WON = 1
+   BOUT_END_BEATEN = 2
+   BOUT_END_FLED = 3
+   BOUT_END_TIME = 4
+   BOUT_END_CANCELLED = 5
+
+   // Seconds: the countdown, the bouts, the rest between bouts; ms between ticks
+   BOUT_COUNTDOWN_SECONDS = 10
+   BOUT_DUEL_SECONDS = 180
+   BOUT_MELEE_SECONDS = 240
+   BOUT_REST_SECONDS = 15
+   BOUT_TICK_MS = 1000
+   // Seconds into a bout before leaving the floor counts, and ticks off it that do
+   BOUT_GRACE_SECONDS = 10
+   BOUT_OFF_FLOOR_TICKS = 3
+
+   // A loser keeps this share of their health (percent)
+   BOUT_LOSER_HEALTH_PCT = 10
+
+   // The Arena of Death's elites have at least this much health
+   BOUT_ELITE_MIN_HEALTH = 100
+   // The Arena of Kraanan's melees have adepts (mages) only for players with this much health
+   BOUT_ADEPT_MIN_HEALTH = 60
+
+   // The titles: total mock wins for each rank
+   BOUT_RANK_1 = 1
+   BOUT_RANK_2 = 5
+   BOUT_RANK_3 = 15
+   BOUT_RANK_4 = 30
+   BOUT_RANK_5 = 60
+
+resources:
+
+   bouts_not_here = "Mock bouts are fought in the Arena of Kraanan and the Arena of Death."
+   bouts_already = "You are already waiting for a mock bout, or fighting one."
+   bouts_in_match = "You are in a match of players already."
+   bouts_queued = "You wait for a mock bout.  %i ahead of you."
+   bouts_queued_first = "You wait for a mock bout.  You are next."
+   bouts_left_queue = "You leave the line for a mock bout."
+   bouts_none = "You aren't waiting for a mock bout."
+   bouts_forfeit = "You give up the bout."
+   bouts_running = "A mock bout is under way.  Wait until it's over."
+   bouts_no_watcher = "There's nobody here to run a match."
+   bouts_cant_cast = "Only those in the bout may cast spells on each other."
+   bouts_won_you = "You win the bout!  The crowd roars your name."
+   bouts_lost_you = "You are beaten, and come to in the stands, bruised but alive."
+   bouts_fled_you = "You leave the bout, and lose it."
+   bouts_time_you = "Time runs out, and the bout goes against you."
+   bouts_cancelled_you = "The bout is called off."
+
+   bouts_say_melee = "~B%s%s steps into the melee against %s, %s and %s!~B  Ten seconds!"
+   bouts_say_duel = "~B%s%s faces %s, %s!~B  Ten seconds!"
+   bouts_say_begin = "~BFight!~B"
+   bouts_say_won = "~B%s%s wins the bout!~B"
+   bouts_say_beaten = "%s%s is beaten, and carried from the floor."
+   bouts_say_fled = "%s%s has fled the bout."
+   bouts_say_time = "Time!  %s%s could not finish them."
+
+   bouts_title_0 = "Untested"
+   bouts_title_1 = "Blooded"
+   bouts_title_2 = "Brawler"
+   bouts_title_3 = "Gladiator"
+   bouts_title_4 = "Champion of the Sands"
+   bouts_title_5 = "Legend of the Arena"
+
+classvars:
+
+properties:
+
+   // For each arena (ARENA_KRAANAN, ARENA_DEATH): its state, its player, the fighters still
+   // standing, all its fighters as [ fighter, name, kind name, kind, max health ], those
+   // waiting, the player's [ health, mana, vigor ] on coming in, when its countdown or bout
+   // ends, when the next may begin, and the ticks its player has been off the floor
+   plState = $
+   plPlayer = $
+   plFighters = $
+   plOpponents = $
+   plQueue = $
+   plSaved = $
+   plDeadline = $
+   plNextStart = $
+   plOffFloor = $
+
+   ptTick = $
+
+messages:
+
+   Constructor()
+   {
+      plState = [ BOUT_IDLE, BOUT_IDLE ];
+      plPlayer = [ $, $ ];
+      plFighters = [ $, $ ];
+      plOpponents = [ $, $ ];
+      plQueue = [ $, $ ];
+      plSaved = [ $, $ ];
+      plDeadline = [ 0, 0 ];
+      plNextStart = [ 0, 0 ];
+      plOffFloor = [ 0, 0 ];
+
+      propagate;
+   }
+
+   ////////////////////////////////////////////////////////////// the arenas
+
+   ArenaOfRoom(where = $)
+   {
+      local iRid;
+
+      if where = $ OR NOT IsClass(where,&Room)
+      {
+         return 0;
+      }
+
+      iRid = Send(where,@GetRoomNum);
+      if iRid = RID_TOS_ARENA
+      {
+         return ARENA_KRAANAN;
+      }
+
+      if iRid = RID_TOS_DEATH_ARENA
+      {
+         return ARENA_DEATH;
+      }
+
+      return 0;
+   }
+
+   RoomOf(arena = ARENA_KRAANAN)
+   {
+      if arena = ARENA_DEATH
+      {
+         return Send(SYS,@FindRoomByNum,#num=RID_TOS_DEATH_ARENA);
+      }
+
+      return Send(SYS,@FindRoomByNum,#num=RID_TOS_ARENA);
+   }
+
+   WatcherOf(arena = ARENA_KRAANAN)
+   {
+      local oRoom;
+
+      oRoom = Send(self,@RoomOf,#arena=arena);
+      if oRoom = $
+      {
+         return $;
+      }
+
+      return Send(oRoom,@GetWatcher);
+   }
+
+   IsFloorTaken(where = $)
+   "Whether a bout holds this room's floor (the watcher won't start a match)."
+   {
+      local a;
+
+      a = Send(self,@ArenaOfRoom,#where=where);
+
+      return a <> 0 AND Nth(plState,a) <> BOUT_IDLE;
+   }
+
+   ////////////////////////////////////////////////////////////// who is in a bout
+
+   SlotOf(who = $)
+   "The arena whose bout this player or fighter is in, or 0."
+   {
+      local a;
+
+      if who = $
+      {
+         return 0;
+      }
+
+      a = 1;
+      while a <= 2
+      {
+         if Nth(plState,a) <> BOUT_IDLE
+            AND (Nth(plPlayer,a) = who OR FindListElem(Nth(plFighters,a),who))
+         {
+            return a;
+         }
+
+         a = a + 1;
+      }
+
+      return 0;
+   }
+
+   InBout(who = $)
+   {
+      return Send(self,@SlotOf,#who=who) <> 0;
+   }
+
+   InQueue(who = $)
+   {
+      return FindListElem(First(plQueue),who) OR FindListElem(Nth(plQueue,2),who);
+   }
+
+   IsMember(arena = 0,what = $)
+   "In this bout: its player, one of its fighters, or a minion of its player."
+   {
+      if arena = 0 OR what = $ OR Nth(plState,arena) = BOUT_IDLE
+      {
+         return FALSE;
+      }
+
+      if what = Nth(plPlayer,arena) OR FindListElem(Nth(plFighters,arena),what)
+      {
+         return TRUE;
+      }
+
+      return IsClass(what,&Monster) AND NOT IsClass(what,&ArenaFighter)
+             AND Send(what,@GetMaster) <> $
+             AND Send(what,@GetMaster) = Nth(plPlayer,arena);
+   }
+
+   IsBoutFoe(fighter = $,what = $)
+   "ArenaFighter's targeting: someone else in its bout, while it's being fought."
+   {
+      local a;
+
+      a = Send(self,@SlotOf,#who=fighter);
+      if a = 0 OR what = $ OR what = fighter OR Nth(plState,a) <> BOUT_FIGHTING
+      {
+         return FALSE;
+      }
+
+      if IsClass(what,&User) AND NOT Send(what,@IsLoggedOn)
+      {
+         return FALSE;
+      }
+
+      return Send(self,@IsMember,#arena=a,#what=what);
+   }
+
+   ////////////////////////////////////////////////////////////// the room's and watcher's checks
+
+   ReqBoutAttack(where = $,what = $,victim = $)
+   "Room.ReqSomethingAttack, first: $ with no bout here (the watcher's rules go on); else "
+   "whether this attack may happen."
+   {
+      local a, oMaster;
+
+      a = Send(self,@ArenaOfRoom,#where=where);
+      if a = 0 OR Nth(plState,a) = BOUT_IDLE
+      {
+         return $;
+      }
+
+      if NOT Send(self,@IsMember,#arena=a,#what=what)
+      {
+         // Outsiders can't touch the bout; anything else is the watcher's
+         if victim <> $ AND Send(self,@IsMember,#arena=a,#what=victim)
+         {
+            return FALSE;
+         }
+
+         return $;
+      }
+
+      if Nth(plState,a) <> BOUT_FIGHTING
+      {
+         return FALSE;
+      }
+
+      return victim = $ OR NOT IsClass(victim,&Battler)
+             OR Send(self,@IsMember,#arena=a,#what=victim);
+   }
+
+   ReqBoutSpell(where = $,who = $,oSpell = $,lItems = $)
+   "Watcher.ReqSpellCast, first: $ with no bout here, else whether this spell may be cast."
+   {
+      local a, i;
+
+      a = Send(self,@ArenaOfRoom,#where=where);
+      if a = 0 OR Nth(plState,a) = BOUT_IDLE
+      {
+         return $;
+      }
+
+      if NOT Send(self,@IsMember,#arena=a,#what=who)
+      {
+         foreach i in lItems
+         {
+            if Send(self,@IsMember,#arena=a,#what=i)
+            {
+               if IsClass(who,&User)
+               {
+                  Send(who,@MsgSendUser,#message_rsc=bouts_cant_cast);
+               }
+
+               return FALSE;
+            }
+         }
+
+         return $;
+      }
+
+      if Nth(plState,a) <> BOUT_FIGHTING
+         OR (oSpell <> $ AND Send(oSpell,@SpellBannedInArena))
+      {
+         return FALSE;
+      }
+
+      if Length(lItems) = 1 AND First(lItems) <> who
+         AND IsClass(First(lItems),&Battler)
+         AND NOT Send(self,@IsMember,#arena=a,#what=First(lItems))
+      {
+         if IsClass(who,&User)
+         {
+            Send(who,@MsgSendUser,#message_rsc=bouts_cant_cast);
+         }
+
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
+   BoutDeath(who = $)
+   "Player.Killed, first: a player beaten in a bout doesn't die. Returns whether it was one."
+   {
+      local a;
+
+      a = Send(self,@SlotOf,#who=who);
+      if a = 0 OR Nth(plPlayer,a) <> who
+      {
+         return FALSE;
+      }
+
+      if Nth(plState,a) <> BOUT_ENDING
+      {
+         SetNth(plState,a,BOUT_ENDING);
+         Post(self,@EndBout,#arena=a,#result=BOUT_END_BEATEN);
+      }
+
+      return TRUE;
+   }
+
+   ////////////////////////////////////////////////////////////// commands
+
+   ArenaCommand(who = $,words = $)
+   "The client's arena commands (UC_SHARDS)."
+   {
+      local sVerb;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      if Length(words) < 2
+      {
+         Send(self,@SendStatus,#who=who);
+
+         return;
+      }
+
+      sVerb = Nth(words,2);
+      if StringEqual(sVerb,"join")
+      {
+         Send(self,@Join,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"leave")
+      {
+         Send(self,@Leave,#who=who);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"pvp") AND Length(words) >= 3
+      {
+         Send(self,@PlayerMatch,#who=who,#word=Nth(words,3));
+
+         return;
+      }
+
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   Join(who = $)
+   {
+      local a, oWatcher, iAhead;
+
+      a = Send(self,@ArenaOfRoom,#where=Send(who,@GetOwner));
+      if a = 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_not_here);
+
+         return;
+      }
+
+      if Send(self,@InBout,#who=who) OR Send(self,@InQueue,#who=who)
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_already);
+         Send(self,@SendStatus,#who=who);
+
+         return;
+      }
+
+      oWatcher = Send(self,@WatcherOf,#arena=a);
+      if oWatcher = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_no_watcher);
+
+         return;
+      }
+
+      if Send(oWatcher,@IsCombatant,#who=who)
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_in_match);
+
+         return;
+      }
+
+      iAhead = Length(Nth(plQueue,a));
+      if Nth(plState,a) <> BOUT_IDLE
+      {
+         iAhead = iAhead + 1;
+      }
+
+      SetNth(plQueue,a,AppendListElem(who,Nth(plQueue,a)));
+      if iAhead = 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_queued_first);
+      }
+      else
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_queued,#parm1=iAhead);
+      }
+
+      Send(self,@TryStart,#arena=a);
+      Send(self,@BroadcastStatus,#arena=a);
+      Send(self,@KeepTicking);
+
+      return;
+   }
+
+   Leave(who = $)
+   "Out of the line, or out of the bout (a loss)."
+   {
+      local a;
+
+      a = Send(self,@SlotOf,#who=who);
+      if a <> 0 AND Nth(plPlayer,a) = who
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_forfeit);
+         Send(self,@EndBout,#arena=a,#result=BOUT_END_FLED);
+
+         return;
+      }
+
+      if Send(self,@DropFromQueues,#who=who)
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_left_queue);
+         Send(self,@BroadcastStatus,
+              #arena=Send(self,@ArenaOfRoom,#where=Send(who,@GetOwner)));
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=bouts_none);
+      Send(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   DropFromQueues(who = $)
+   "Takes them out of any line. Returns whether they were in one."
+   {
+      local a, bWas;
+
+      bWas = FALSE;
+      a = 1;
+      while a <= 2
+      {
+         if FindListElem(Nth(plQueue,a),who)
+         {
+            SetNth(plQueue,a,DelListElem(Nth(plQueue,a),who));
+            bWas = TRUE;
+         }
+
+         a = a + 1;
+      }
+
+      return bWas;
+   }
+
+   PlayerMatch(who = $,word = $)
+   "The watcher's own commands for matches of players, without saying them aloud."
+   {
+      local a, oWatcher;
+
+      a = Send(self,@ArenaOfRoom,#where=Send(who,@GetOwner));
+      oWatcher = Send(self,@WatcherOf,#arena=a);
+      if a = 0 OR oWatcher = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_not_here);
+
+         return;
+      }
+
+      if Nth(plState,a) <> BOUT_IDLE
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_running);
+
+         return;
+      }
+
+      if Send(self,@InQueue,#who=who)
+      {
+         Send(who,@MsgSendUser,#message_rsc=bouts_already);
+
+         return;
+      }
+
+      Send(oWatcher,@ArenaCommand,#who=who,#word=word);
+      Post(self,@SendStatus,#who=who);
+
+      return;
+   }
+
+   UserLeaving(who = $)
+   "User.UserLogoff: out of any line, and a bout they're in is lost."
+   {
+      local a;
+
+      a = Send(self,@SlotOf,#who=who);
+      if a <> 0 AND Nth(plPlayer,a) = who
+      {
+         Send(self,@EndBout,#arena=a,#result=BOUT_END_FLED);
+      }
+
+      if Send(self,@DropFromQueues,#who=who)
+      {
+         Send(self,@BroadcastStatus,#arena=ARENA_KRAANAN);
+         Send(self,@BroadcastStatus,#arena=ARENA_DEATH);
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// the bout
+
+   KeepTicking()
+   {
+      if ptTick = $
+      {
+         ptTick = CreateTimer(self,@Tick,BOUT_TICK_MS);
+      }
+
+      return;
+   }
+
+   Tick()
+   {
+      local a, bBusy;
+
+      ptTick = $;
+      bBusy = FALSE;
+      a = 1;
+      while a <= 2
+      {
+         Send(self,@TickArena,#arena=a);
+         if Nth(plState,a) <> BOUT_IDLE OR Nth(plQueue,a) <> $
+         {
+            bBusy = TRUE;
+         }
+
+         a = a + 1;
+      }
+
+      if bBusy
+      {
+         Send(self,@KeepTicking);
+      }
+
+      return;
+   }
+
+   TickArena(arena = ARENA_KRAANAN)
+   {
+      local iState, oRoom, i;
+
+      iState = Nth(plState,arena);
+      if iState = BOUT_ENDING
+      {
+         return;
+      }
+
+      if iState = BOUT_IDLE
+      {
+         if Nth(plQueue,arena) <> $
+         {
+            Send(self,@TryStart,#arena=arena);
+         }
+
+         return;
+      }
+
+      oRoom = Send(self,@RoomOf,#arena=arena);
+      if NOT Send(self,@PlayerHere,#arena=arena)
+      {
+         Send(self,@EndBout,#arena=arena,#result=BOUT_END_FLED);
+
+         return;
+      }
+
+      if iState = BOUT_COUNTDOWN
+      {
+         if GetTime() >= Nth(plDeadline,arena)
+         {
+            Send(self,@Commence,#arena=arena);
+         }
+
+         return;
+      }
+
+      // Fighting: fighters taken away count as fallen
+      foreach i in ListCopy(Nth(plFighters,arena))
+      {
+         if NOT IsObject(i) OR Send(i,@GetOwner) <> oRoom
+         {
+            SetNth(plFighters,arena,DelListElem(Nth(plFighters,arena),i));
+         }
+      }
+
+      if Nth(plFighters,arena) = $
+      {
+         Send(self,@EndBout,#arena=arena,#result=BOUT_END_WON);
+
+         return;
+      }
+
+      // Off the floor (an escape, a teleport) for long enough is fleeing
+      if GetTime() - (Nth(plDeadline,arena) - Send(self,@BoutSeconds,#arena=arena))
+            >= BOUT_GRACE_SECONDS
+         AND NOT Send(oRoom,@InPlay,#what=Nth(plPlayer,arena))
+      {
+         SetNth(plOffFloor,arena,Nth(plOffFloor,arena) + 1);
+         if Nth(plOffFloor,arena) >= BOUT_OFF_FLOOR_TICKS
+         {
+            Send(self,@EndBout,#arena=arena,#result=BOUT_END_FLED);
+
+            return;
+         }
+      }
+      else
+      {
+         SetNth(plOffFloor,arena,0);
+      }
+
+      if GetTime() >= Nth(plDeadline,arena)
+      {
+         Send(self,@EndBout,#arena=arena,#result=BOUT_END_TIME);
+
+         return;
+      }
+
+      foreach i in Nth(plFighters,arena)
+      {
+         if Send(i,@GetTarget) = $
+            OR NOT Send(self,@IsBoutFoe,#fighter=i,#what=Send(i,@GetTarget))
+         {
+            Send(self,@PickTarget,#arena=arena,#fighter=i);
+         }
+      }
+
+      Send(self,@BroadcastStatus,#arena=arena);
+
+      return;
+   }
+
+   PlayerHere(arena = ARENA_KRAANAN)
+   {
+      local who;
+
+      who = Nth(plPlayer,arena);
+
+      return who <> $ AND IsObject(who) AND Send(who,@IsLoggedOn)
+             AND Send(who,@GetOwner) = Send(self,@RoomOf,#arena=arena);
+   }
+
+   BoutSeconds(arena = ARENA_KRAANAN)
+   {
+      if arena = ARENA_DEATH
+      {
+         return BOUT_DUEL_SECONDS;
+      }
+
+      return BOUT_MELEE_SECONDS;
+   }
+
+   TryStart(arena = ARENA_KRAANAN)
+   "The next in line, when the floor is free."
+   {
+      local oRoom, oWatcher, who, i;
+
+      if Nth(plState,arena) <> BOUT_IDLE OR GetTime() < Nth(plNextStart,arena)
+      {
+         return;
+      }
+
+      oRoom = Send(self,@RoomOf,#arena=arena);
+      oWatcher = Send(self,@WatcherOf,#arena=arena);
+      if oRoom = $ OR oWatcher = $ OR Send(oWatcher,@IsBusy)
+      {
+         return;
+      }
+
+      who = $;
+      while who = $ AND Nth(plQueue,arena) <> $
+      {
+         i = First(Nth(plQueue,arena));
+         SetNth(plQueue,arena,Rest(Nth(plQueue,arena)));
+         if IsObject(i) AND Send(i,@IsLoggedOn) AND Send(i,@GetOwner) = oRoom
+            AND NOT Send(oWatcher,@IsCombatant,#who=i)
+            AND NOT Send(self,@InBout,#who=i)
+         {
+            who = i;
+         }
+      }
+
+      if who = $
+      {
+         Send(self,@BroadcastStatus,#arena=arena);
+
+         return;
+      }
+
+      Send(self,@Begin,#arena=arena,#who=who);
+
+      return;
+   }
+
+   Begin(arena = ARENA_KRAANAN,who = $)
+   "Heals them, makes their fighters and puts everyone in the cages for the countdown."
+   {
+      local oRoom, oWatcher, iH, lFighters, i, lOpp, oFirst;
+
+      oRoom = Send(self,@RoomOf,#arena=arena);
+      oWatcher = Send(self,@WatcherOf,#arena=arena);
+
+      SetNth(plSaved,arena,[ Send(who,@GetHealth), Send(who,@GetMana), Send(who,@GetVigor) ]);
+      Send(who,@GainHealthNormal,#amount=Send(who,@GetMaxHealth));
+      Send(who,@GainMana,#amount=Send(who,@GetMaxMana) - Send(who,@GetMana));
+      Send(who,@AddExertion,#amount=-2000000);
+
+      iH = Bound(Send(who,@GetMaxHealth),1,$);
+      lFighters = $;
+      if arena = ARENA_DEATH
+      {
+         i = Random(1,100);
+         if i <= 40
+         {
+            i = ARENA_FIGHTER_WARRIOR;
+         }
+         else if i <= 60
+         {
+            i = ARENA_FIGHTER_QOR;
+         }
+         else if i <= 80
+         {
+            i = ARENA_FIGHTER_FAREN;
+         }
+         else
+         {
+            i = ARENA_FIGHTER_RIIJA;
+         }
+
+         lFighters = [ Send(self,@MakeFighter,#kind=i,#health=iH,#elite=TRUE) ];
+      }
+      else
+      {
+         // A bolt is too much for the newest: adepts only for those with some health
+         foreach i in [ 1, 2, 3 ]
+         {
+            if iH < BOUT_ADEPT_MIN_HEALTH OR Random(1,100) <= 65
+            {
+               lFighters = Cons(Send(self,@MakeFighter,#kind=ARENA_FIGHTER_BRAWLER,
+                                     #health=iH,#elite=FALSE),lFighters);
+            }
+            else
+            {
+               lFighters = Cons(Send(self,@MakeFighter,#kind=ARENA_FIGHTER_ADEPT,
+                                     #health=iH,#elite=FALSE),lFighters);
+            }
+         }
+      }
+
+      lOpp = $;
+      foreach i in lFighters
+      {
+         lOpp = AppendListElem([ i, Send(i,@GetName), Send(i,@GetKindName), Send(i,@GetKind),
+                                 Send(i,@GetMaxHealth) ],lOpp);
+      }
+
+      SetNth(plState,arena,BOUT_COUNTDOWN);
+      SetNth(plPlayer,arena,who);
+      SetNth(plFighters,arena,lFighters);
+      SetNth(plOpponents,arena,lOpp);
+      SetNth(plDeadline,arena,GetTime() + BOUT_COUNTDOWN_SECONDS);
+      SetNth(plOffFloor,arena,0);
+
+      // Everyone stands on the open floor for the countdown, the fighters still: not in the
+      // watchers' cages and start boxes, or behind the Arena of Kraanan's maze, as monsters walk
+      // straight at their foes and can't find their way out of them
+      oFirst = First(lFighters);
+      if arena = ARENA_KRAANAN
+      {
+         Send(self,@PlaceAt,#what=who,#where=oRoom,#row=8,#col=8,#angle=ANGLE_SOUTH_EAST);
+         Send(self,@PlaceAt,#what=oFirst,#where=oRoom,#row=18,#col=8,#angle=ANGLE_NORTH_EAST);
+         Send(self,@PlaceAt,#what=Nth(lFighters,2),#where=oRoom,#row=8,#col=17,
+              #angle=ANGLE_SOUTH_WEST);
+         Send(self,@PlaceAt,#what=Nth(lFighters,3),#where=oRoom,#row=18,#col=17,
+              #angle=ANGLE_NORTH_WEST);
+         Send(oWatcher,@Say,#message_rsc=bouts_say_melee,
+              #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName),
+              #parm3=Send(oFirst,@GetName),#parm4=Send(Nth(lFighters,2),@GetName),
+              #parm5=Send(Nth(lFighters,3),@GetName));
+      }
+      else
+      {
+         Send(self,@PlaceAt,#what=who,#where=oRoom,#row=6,#col=8,#angle=ANGLE_SOUTH_EAST);
+         Send(self,@PlaceAt,#what=oFirst,#where=oRoom,#row=14,#col=15,#angle=ANGLE_NORTH_WEST);
+         Send(oWatcher,@Say,#message_rsc=bouts_say_duel,
+              #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName),
+              #parm3=Send(oFirst,@GetName),#parm4=Send(oFirst,@GetKindName));
+      }
+
+      Send(self,@BroadcastStatus,#arena=arena);
+      Send(self,@KeepTicking);
+
+      return;
+   }
+
+   PlaceAt(what = $,where = $,row = 1,col = 1,angle = ANGLE_EAST)
+   {
+      Send(SYS,@UtilGoNearSquare,#what=what,#where=where,#new_row=row,#new_col=col,
+           #new_angle=angle,#mob_override=TRUE);
+
+      return;
+   }
+
+   MakeFighter(kind = ARENA_FIGHTER_WARRIOR,health = 50,elite = FALSE)
+   "A fighter scaled to a player of this much health: an elite has at least 100, a melee "
+   "fighter four fifths of the player's (there are three of them, fighting each other too)."
+   {
+      local oFighter, iH, iFight, iMin, iMax, bMage;
+
+      oFighter = Create(&ArenaFighter,#kind=kind);
+      bMage = Send(oFighter,@IsMage);
+      if elite
+      {
+         iH = Bound(health,BOUT_ELITE_MIN_HEALTH,$);
+         // A monster of the player's level fights at 4 x level + 8 x 50 (Monster.GetOffense)
+         iFight = 4 * iH + 400;
+         iMin = iH * 50 / 1000;
+         iMax = iH * 110 / 1000;
+         if bMage
+         {
+            iMin = iH * 25 / 1000;
+            iMax = iH * 55 / 1000;
+         }
+
+         Send(oFighter,@ApplyFighter,#level=iH,#health=iH,#fight=iFight,
+              #min_damage=Bound(iMin,1,$),#max_damage=Bound(iMax,2,$),
+              #power=40 + iH / 4,#mana=60 + iH / 2,#difficulty=9,#cast_chance=50,
+              #cast_seconds=4);
+      }
+      else
+      {
+         iH = Bound(health * 80 / 100,10,$);
+         iFight = (4 * health + 400) * 75 / 100;
+         iMin = health * 40 / 1000;
+         iMax = health * 90 / 1000;
+         if bMage
+         {
+            iMin = health * 20 / 1000;
+            iMax = health * 45 / 1000;
+         }
+
+         Send(oFighter,@ApplyFighter,#level=health,#health=iH,#fight=iFight,
+              #min_damage=Bound(iMin,1,$),#max_damage=Bound(iMax,2,$),
+              #power=10 + health / 5,#mana=30 + health / 3,#difficulty=6,#cast_chance=25,
+              #cast_seconds=6);
+      }
+
+      Send(oFighter,@ResetBehaviorFlags);
+
+      return oFighter;
+   }
+
+   Commence(arena = ARENA_KRAANAN)
+   "The fighters go for their nearest foes."
+   {
+      local i;
+
+      SetNth(plState,arena,BOUT_FIGHTING);
+      SetNth(plDeadline,arena,GetTime() + Send(self,@BoutSeconds,#arena=arena));
+      Send(Send(self,@WatcherOf,#arena=arena),@Say,#message_rsc=bouts_say_begin);
+
+      foreach i in Nth(plFighters,arena)
+      {
+         Send(i,@Unfreeze);
+      }
+
+      foreach i in Nth(plFighters,arena)
+      {
+         Send(self,@PickTarget,#arena=arena,#fighter=i);
+      }
+
+      Send(self,@BroadcastStatus,#arena=arena);
+
+      return;
+   }
+
+   PickTarget(arena = ARENA_KRAANAN,fighter = $)
+   "Its nearest foe, though one others are already on counts as further off: the melee "
+   "spreads out rather than all on the player."
+   {
+      local lFoes, i, j, iScore, iBest, oBest;
+
+      lFoes = Cons(Nth(plPlayer,arena),Nth(plFighters,arena));
+      oBest = $;
+      iBest = $;
+      foreach i in lFoes
+      {
+         if i <> fighter AND Send(self,@IsBoutFoe,#fighter=fighter,#what=i)
+         {
+            iScore = Send(fighter,@SquaredFineDistanceTo,#what=i) / (FINENESS * FINENESS);
+            foreach j in Nth(plFighters,arena)
+            {
+               if j <> fighter AND Send(j,@GetTarget) = i
+               {
+                  iScore = iScore + 16;
+               }
+            }
+
+            if iBest = $ OR iScore < iBest
+            {
+               iBest = iScore;
+               oBest = i;
+            }
+         }
+      }
+
+      if oBest <> $
+      {
+         Send(fighter,@TargetSwitch,#what=oBest,#iHatred=100);
+         Send(fighter,@EnterStateChase,#target=oBest,#actnow=TRUE);
+      }
+
+      return;
+   }
+
+   FighterFell(fighter = $,killer = $)
+   "ArenaFighter.Killed."
+   {
+      local a;
+
+      a = Send(self,@SlotOf,#who=fighter);
+      if a = 0
+      {
+         return;
+      }
+
+      SetNth(plFighters,a,DelListElem(Nth(plFighters,a),fighter));
+      if Nth(plFighters,a) = $
+      {
+         // After the kill is done with
+         Post(self,@CheckWon,#arena=a);
+      }
+      else
+      {
+         Send(self,@BroadcastStatus,#arena=a);
+      }
+
+      return;
+   }
+
+   CheckWon(arena = ARENA_KRAANAN)
+   {
+      if Nth(plState,arena) = BOUT_FIGHTING AND Nth(plFighters,arena) = $
+      {
+         Send(self,@EndBout,#arena=arena,#result=BOUT_END_WON);
+      }
+
+      return;
+   }
+
+   FighterGone(fighter = $)
+   "ArenaFighter.Delete, by something else (a watcher clearing the arena, an admin): the "
+   "bout is called off."
+   {
+      local a;
+
+      a = Send(self,@SlotOf,#who=fighter);
+      if a = 0
+      {
+         return;
+      }
+
+      SetNth(plFighters,a,DelListElem(Nth(plFighters,a),fighter));
+      Post(self,@CallOff,#arena=a);
+
+      return;
+   }
+
+   CallOff(arena = ARENA_KRAANAN)
+   {
+      if Nth(plState,arena) <> BOUT_IDLE
+      {
+         Send(self,@EndBout,#arena=arena,#result=BOUT_END_CANCELLED);
+      }
+
+      return;
+   }
+
+   EndBout(arena = ARENA_KRAANAN,result = BOUT_END_BEATEN)
+   "Ends a bout: the fighters and their spells go, the player is put in the stands, and the "
+   "record, the quest steps and everyone watching are told."
+   {
+      local who, oRoom, oWatcher, lSaved, i, j, iAmount, bWon, rYou, rSay;
+
+      if Nth(plState,arena) = BOUT_IDLE
+      {
+         return;
+      }
+
+      who = Nth(plPlayer,arena);
+      oRoom = Send(self,@RoomOf,#arena=arena);
+      oWatcher = Send(self,@WatcherOf,#arena=arena);
+      lSaved = Nth(plSaved,arena);
+      bWon = (result = BOUT_END_WON);
+
+      // First, so nothing below can end it again
+      SetNth(plState,arena,BOUT_IDLE);
+      SetNth(plPlayer,arena,$);
+      SetNth(plSaved,arena,$);
+      SetNth(plNextStart,arena,GetTime() + BOUT_REST_SECONDS);
+
+      foreach i in Nth(plFighters,arena)
+      {
+         if IsObject(i)
+         {
+            Send(i,@EndOfBout);
+         }
+      }
+
+      SetNth(plFighters,arena,$);
+
+      // Walls, clouds and brambles the bout left (as Watcher.ClearCombatants)
+      if oRoom <> $
+      {
+         foreach i in Send(oRoom,@GetHolderActive)
+         {
+            j = First(i);
+            if IsClass(j,&ActiveWallElement)
+               OR IsClass(j,&PassiveWallOfFire)
+               OR IsClass(j,&PassiveWallOfLightning)
+               OR IsClass(j,&SporeCloud)
+               OR IsClass(j,&FogCloud)
+               OR IsClass(j,&Brambles)
+            {
+               Send(j,@Delete);
+            }
+         }
+
+         Send(oRoom,@ArenaEndFight);
+      }
+
+      if who <> $ AND IsObject(who)
+      {
+         Send(self,@RemoveHarm,#who=who);
+
+         // Their mana and vigor as they came in; their health too if they won (or the bout
+         // was called off), else a tenth of it
+         if lSaved <> $
+         {
+            Send(who,@GainMana,#amount=Nth(lSaved,2) - Send(who,@GetMana));
+            iAmount = -10000 * (Nth(lSaved,3) - Send(who,@GetVigor));
+            Send(who,@AddExertion,#amount=iAmount);
+         }
+
+         if bWon OR result = BOUT_END_CANCELLED
+         {
+            if lSaved <> $
+            {
+               Send(who,@SetHealth,#amount=Bound(First(lSaved),1,Send(who,@GetMaxHealth)));
+            }
+         }
+         else
+         {
+            Send(who,@SetHealth,
+                 #amount=Bound(Send(who,@GetMaxHealth) * BOUT_LOSER_HEALTH_PCT / 100,1,$));
+         }
+
+         Send(who,@NewHealth);
+
+         if Send(who,@IsLoggedOn) AND Send(who,@GetOwner) = oRoom
+         {
+            Send(oRoom,@Teleport,#what=who,#outofplay=TRUE);
+         }
+
+         rYou = bouts_lost_you;
+         rSay = bouts_say_beaten;
+         if bWon
+         {
+            rYou = bouts_won_you;
+            rSay = bouts_say_won;
+         }
+         else if result = BOUT_END_FLED
+         {
+            rYou = bouts_fled_you;
+            rSay = bouts_say_fled;
+         }
+         else if result = BOUT_END_TIME
+         {
+            rYou = bouts_time_you;
+            rSay = bouts_say_time;
+         }
+         else if result = BOUT_END_CANCELLED
+         {
+            rYou = bouts_cancelled_you;
+            rSay = $;
+         }
+
+         if Send(who,@IsLoggedOn)
+         {
+            Send(who,@MsgSendUser,#message_rsc=rYou);
+         }
+
+         if rSay <> $ AND oWatcher <> $
+         {
+            Send(oWatcher,@Say,#message_rsc=rSay,
+                 #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName));
+         }
+
+         if result <> BOUT_END_CANCELLED
+         {
+            Send(who,@NoteArenaBout,#arena=arena,#won=bWon);
+            Send(Send(SYS,@GetQuestBook),@ArenaBoutDone,#who=who,#arena_watcher=oWatcher,#won=bWon);
+         }
+
+         Send(self,@SendStatus,#who=who,#ended=result);
+      }
+
+      Send(self,@BroadcastStatus,#arena=arena,#except=who);
+      Send(self,@KeepTicking);
+
+      return;
+   }
+
+   RemoveHarm(who = $)
+   "The bout's curses and poisons go with it: one left running in the Arena of Death's stands "
+   "would be a real death."
+   {
+      local i, oSpell;
+
+      foreach i in Send(who,@GetEnchantmentList)
+      {
+         oSpell = Nth(i,2);
+         if oSpell <> $ AND IsClass(oSpell,&Spell) AND Send(oSpell,@IsHarmful)
+         {
+            Send(who,@RemoveEnchantment,#what=oSpell,#report=FALSE);
+         }
+      }
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// what our client is told
+
+   TitleOf(wins = 0)
+   {
+      if wins >= BOUT_RANK_5
+      {
+         return [ bouts_title_5, 5 ];
+      }
+
+      if wins >= BOUT_RANK_4
+      {
+         return [ bouts_title_4, 4 ];
+      }
+
+      if wins >= BOUT_RANK_3
+      {
+         return [ bouts_title_3, 3 ];
+      }
+
+      if wins >= BOUT_RANK_2
+      {
+         return [ bouts_title_2, 2 ];
+      }
+
+      if wins >= BOUT_RANK_1
+      {
+         return [ bouts_title_1, 1 ];
+      }
+
+      return [ bouts_title_0, 0 ];
+   }
+
+   BroadcastStatus(arena = 0,except = $)
+   "Everyone in that arena."
+   {
+      local oRoom, i, j;
+
+      if arena = 0
+      {
+         return;
+      }
+
+      oRoom = Send(self,@RoomOf,#arena=arena);
+      if oRoom = $
+      {
+         return;
+      }
+
+      foreach i in Send(oRoom,@GetHolderActive)
+      {
+         j = First(i);
+         if j <> except AND IsClass(j,&User) AND Send(j,@IsLoggedOn)
+         {
+            Send(self,@SendStatus,#who=j);
+         }
+      }
+
+      return;
+   }
+
+   SendStatus(who = $,ended = 0)
+   "UC_ARENA, kind 1: where we stand, the floor's bout, and our records "
+   "(docs/research/protocol.md)."
+   {
+      local oSession, a, iState, iPlace, iFloor, iFlags, oWatcher, i, lAlive, lRec, lTitle,
+            iWins, oFighter;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      a = Send(self,@ArenaOfRoom,#where=Send(who,@GetOwner));
+      iState = BOUT_IDLE;
+      iPlace = 0;
+      iFloor = BOUT_IDLE;
+      iFlags = 0;
+      if a <> 0
+      {
+         iFloor = Nth(plState,a);
+         if iFloor <> BOUT_IDLE AND Nth(plPlayer,a) = who
+         {
+            iState = iFloor;
+         }
+         else if FindListElem(Nth(plQueue,a),who)
+         {
+            iState = BOUT_QUEUED;
+            iPlace = FindListElem(Nth(plQueue,a),who);
+         }
+
+         oWatcher = Send(self,@WatcherOf,#arena=a);
+         if oWatcher <> $ AND Send(oWatcher,@IsBusy)
+         {
+            iFlags = iFlags | 1;
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_ARENA, 1,ARENA_PKT_STATUS,
+                1,a, 1,iState, 1,iPlace);
+      if a <> 0
+      {
+         AddPacket(1,Length(Nth(plQueue,a)));
+      }
+      else
+      {
+         AddPacket(1,0);
+      }
+
+      AddPacket(1,iFloor);
+      if a <> 0 AND iFloor <> BOUT_IDLE
+      {
+         AddPacket(2,Bound(Nth(plDeadline,a) - GetTime(),0,$), 1,iFlags,
+                   4,Nth(plPlayer,a), 1,Length(Nth(plOpponents,a)));
+         lAlive = Nth(plFighters,a);
+         foreach i in Nth(plOpponents,a)
+         {
+            oFighter = First(i);
+            if FindListElem(lAlive,oFighter) AND IsObject(oFighter)
+            {
+               AddPacket(4,oFighter);
+            }
+            else
+            {
+               AddPacket(4,0);
+            }
+
+            AddPacket(4,Nth(i,2), 4,Nth(i,3), 1,Nth(i,4));
+            if FindListElem(lAlive,oFighter) AND IsObject(oFighter)
+            {
+               AddPacket(2,Send(oFighter,@GetHealth));
+            }
+            else
+            {
+               AddPacket(2,0);
+            }
+
+            AddPacket(2,Nth(i,5));
+         }
+      }
+      else
+      {
+         AddPacket(2,0, 1,iFlags, 4,0, 1,0);
+      }
+
+      iWins = 0;
+      foreach i in [ ARENA_KRAANAN, ARENA_DEATH ]
+      {
+         lRec = Send(who,@GetArenaRecord,#arena=i);
+         iWins = iWins + First(lRec);
+         AddPacket(2,First(lRec), 2,Nth(lRec,2), 2,Nth(lRec,3), 2,Nth(lRec,4));
+      }
+
+      lTitle = Send(self,@TitleOf,#wins=iWins);
+      AddPacket(4,First(lTitle), 1,Nth(lTitle,2), 1,ended);
+      SendPacket(oSession);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

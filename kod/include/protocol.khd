@@ -249,6 +249,8 @@
    UC_SIGNETS = 114
    // Ours: the season, the year and the day of the year (System.SendSeason)
    UC_SEASON = 115
+   // Ours: mock bouts in the arenas (util/arenabouts.kod SendStatus, SendFloor)
+   UC_ARENA = 116
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

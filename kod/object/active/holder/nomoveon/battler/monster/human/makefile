@@ -5,7 +5,7 @@
 !include $(TOPDIR)\common.mak
 
 DEPEND = ..\human.bof
-BOFS  = lvstatue.bof troop.bof far'nohl.bof spirit.bof bandit.bof companion.bof
+BOFS  = lvstatue.bof troop.bof far'nohl.bof spirit.bof bandit.bof companion.bof arenafighter.bof
 
 
 !include $(KODDIR)\kod.mak

@@ -421,6 +421,8 @@ properties:
    poQuestBook = $
    // Ours: companions (util/companionbook.kod), made on demand
    poCompanionBook = $
+   // Ours: mock bouts in the arenas (util/arenabouts.kod), made on demand
+   poArenaBouts = $
    poCosmeticsBook = $
    // Ours: training, and the item abilities that were utility spells (util/shardsabilities.kod)
    poShardsAbilities = $
@@ -5374,6 +5376,17 @@ messages:
       }
 
       return poCompanionBook;
+   }
+
+   GetArenaBouts()
+   "Ours: mock bouts in the arenas (util/arenabouts.kod), made on demand."
+   {
+      if poArenaBouts = $
+      {
+         poArenaBouts = Create(&ArenaBouts);
+      }
+
+      return poArenaBouts;
    }
 
    GetCosmeticsBook()

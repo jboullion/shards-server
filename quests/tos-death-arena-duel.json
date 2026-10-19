@@ -1,0 +1,33 @@
+{
+  "id": 251,
+  "key": "tos-death-arena-duel",
+  "name": "A Dealer of Death",
+  "tier": "errand",
+  "giver": {
+    "class": "DeathArenaWatcher"
+  },
+  "band": {
+    "min": 100,
+    "max": 200
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "So you think you can fight. The crowd pays to see blood, and my fighters are the best in Meridian: gladiators in plate, battle mages of Qor, Faren and Riija who will hold you, web you and burn you. Win a duel against one of them and I'll pay you for the show. Press the crossed swords by your map to join. A mock bout will not kill you, even here: lose, and you're carried out of the cage.",
+    "progress": "Win a duel. Press the crossed swords by your map, and join a mock bout.",
+    "complete": "Ha! The crowd will talk about that one for a week. Here is your purse. Come back tomorrow, and bring more blood."
+  },
+  "steps": [
+    {
+      "kind": "arena",
+      "arena": "death",
+      "win": true,
+      "auto": false
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 1500
+  }
+}

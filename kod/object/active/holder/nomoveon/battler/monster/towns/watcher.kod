@@ -201,6 +201,8 @@ resources:
       "I'll have none of these shenanigans during an officially sanctioned "
       "tournament!"
    watcher_unwanted_give = "~k%s%s ignores your bribe.~n~k"
+   // Ours (util/arenabouts.kod)
+   watcher_bout_running = "A mock bout is under way.  Wait until it's over."
 
    #region Speech Command Classvars
    watcher_arena_help_command = "arena help"
@@ -1679,6 +1681,14 @@ messages:
    "Someone in the room said 'champion'.  Net effect, if there is no "
    "champion, then make the talker the new champion."
    {
+      // Ours: not while a mock bout holds the floor (util/arenabouts.kod)
+      if Send(Send(SYS,@GetArenaBouts),@IsFloorTaken,#where=poOwner)
+      {
+         Send(self,@SayToOne,#target=what,#message_rsc=watcher_bout_running);
+
+         return;
+      }
+
       if piCombat_style = STYLE_NO_FIGHT
       {
          Send(self,@Say,#message_rsc=vrMustChooseStyle);
@@ -1761,6 +1771,14 @@ messages:
    "the match, but in general, this will fail if there is no champion, and "
    "will succeed only if there is a challenger spot open."
    {
+      // Ours: not while a mock bout holds the floor (util/arenabouts.kod)
+      if Send(Send(SYS,@GetArenaBouts),@IsFloorTaken,#where=poOwner)
+      {
+         Send(self,@SayToOne,#target=what,#message_rsc=watcher_bout_running);
+
+         return;
+      }
+
       if piCombat_style = STYLE_NO_FIGHT
       {
          Send(self,@SaytoOne,#target=what,#message_rsc=vrMustChooseStyle);
@@ -1910,6 +1928,67 @@ messages:
    {
       // Don't delete it on random passthroughs.
       return FALSE;
+   }
+
+   IsBusy()
+   "Ours (util/arenabouts.kod): whether a match of players is set up, waiting or going; a "
+   "mock bout waits until it's over."
+   {
+      return plCombatants <> $ OR ptAccept <> $ OR ptCommence <> $ OR ptFight <> $
+             OR pbTournament;
+   }
+
+   ArenaCommand(who = $,word = $)
+   "Ours: our client's Arena window (ArenaBouts.PlayerMatch) gives a match command without "
+   "saying it aloud: it's heard as if said here."
+   {
+      local rWord;
+
+      if who = $ OR word = $ OR Send(who,@GetOwner) <> poOwner
+      {
+         return;
+      }
+
+      rWord = $;
+      if StringEqual(word,"champion")
+      {
+         rWord = watcher_champion_command;
+      }
+      else if StringEqual(word,"challenge")
+      {
+         rWord = watcher_challenge_command;
+      }
+      else if StringEqual(word,"accept")
+      {
+         rWord = watcher_accept_command;
+      }
+      else if StringEqual(word,"renege")
+      {
+         rWord = watcher_renege_command;
+      }
+      else if StringEqual(word,"traditional")
+      {
+         rWord = vrCmdOneOnOne;
+      }
+      else if StringEqual(word,"lastman")
+      {
+         rWord = vrCmdLastManStanding;
+      }
+      else if StringEqual(word,"guild")
+      {
+         rWord = vrCmdGuildVsGuild;
+      }
+      else if StringEqual(word,"royale")
+      {
+         rWord = vrCmdBattleRoyale;
+      }
+
+      if rWord <> $
+      {
+         Send(self,@SomeoneSaid,#what=who,#type=SAY_NORMAL,#string=rWord);
+      }
+
+      return;
    }
 
    IsCombatant(who=$)
@@ -2212,8 +2291,23 @@ messages:
 
    ReqSpellCast(who=$,oSpell=$,lItems=$)
    {
+      local bBout;
+
       // Spells cast by immortal DMs are not blocked by the watcher
       if IsClass(who,&DM) AND Send(who,@PlayerIsImmortal)
+      {
+         propagate;
+      }
+
+      // Ours (util/arenabouts.kod): a mock bout's own rules first; $ is none here
+      bBout = Send(Send(SYS,@GetArenaBouts),@ReqBoutSpell,#where=poOwner,#who=who,
+                   #oSpell=oSpell,#lItems=lItems);
+      if bBout = FALSE
+      {
+         return FALSE;
+      }
+
+      if bBout = TRUE
       {
          propagate;
       }

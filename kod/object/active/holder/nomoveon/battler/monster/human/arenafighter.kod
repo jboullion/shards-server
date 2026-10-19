@@ -1,0 +1,712 @@
+// Ours (Meridian Shards, docs/adr/0019-arena-bouts.md): a fighter in a mock bout. ArenaBouts
+// (util/arenabouts.kod) makes one or three for a player who joins a bout, scales them to that
+// player, frees them when the bout begins and deletes them when it ends. It looks like a player
+// (Human, wearing real items), fights only the others in its bout, nearest first, and leaves
+// no treasure: what it wears goes with it (Human.Delete).
+//
+// The Arena of Death's elites are warriors in heavy armour with fine (not magic) weapons or a
+// bow, and battle mages of Qor, Faren and Riija, who hold, web and blind; the Arena of Kraanan's
+// are brawlers and adepts, a tier below.
+
+////////////////////////////////////////////////////////////////////////////////
+ArenaFighter is Human
+
+constants:
+
+   include blakston.khd
+
+   // A battle mage likes to stand this far from its foe (fine units): less than other casters
+   ARENA_MAGE_RANGE = 192
+   // An archer, further off
+   ARENA_ARCHER_RANGE = 320
+   // Seconds between spells, and between spells that hold, web or blind
+   ARENA_CAST_SECONDS = 3
+   ARENA_CONTROL_SECONDS = 12
+
+resources:
+
+   arenafighter_name_rsc = "arena fighter"
+   arenafighter_desc_rsc = "%s, %s, fights in the arena for the crowd's pleasure."
+   arenafighter_dead_name_rsc = "fallen fighter"
+
+   arenafighter_kind_warrior = "a gladiator"
+   arenafighter_kind_qor = "a battle mage of Qor"
+   arenafighter_kind_faren = "a battle mage of Faren"
+   arenafighter_kind_riija = "a battle mage of Riija"
+   arenafighter_kind_brawler = "a brawler"
+   arenafighter_kind_adept = "an adept"
+
+   arenafighter_m1 = "Brakkus"
+   arenafighter_m2 = "Corvane"
+   arenafighter_m3 = "Draven"
+   arenafighter_m4 = "Garrok"
+   arenafighter_m5 = "Haldor"
+   arenafighter_m6 = "Kael"
+   arenafighter_m7 = "Malek"
+   arenafighter_m8 = "Orrin"
+   arenafighter_m9 = "Rask"
+   arenafighter_m10 = "Thane"
+   arenafighter_m11 = "Varro"
+   arenafighter_m12 = "Zekk"
+   arenafighter_f1 = "Ashka"
+   arenafighter_f2 = "Brenna"
+   arenafighter_f3 = "Cyra"
+   arenafighter_f4 = "Delia"
+   arenafighter_f5 = "Freya"
+   arenafighter_f6 = "Ilsa"
+   arenafighter_f7 = "Kessa"
+   arenafighter_f8 = "Mira"
+   arenafighter_f9 = "Nadja"
+   arenafighter_f10 = "Rhiane"
+   arenafighter_f11 = "Sorcha"
+   arenafighter_f12 = "Vala"
+
+classvars:
+
+   vrName = arenafighter_name_rsc
+   vrDesc = arenafighter_desc_rsc
+   vrDead_name = arenafighter_dead_name_rsc
+
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+
+   viTreasure_type = TID_NONE
+   viSpeed = SPEED_FASTER
+   viAttack_type = ATCK_WEAP_SLASH
+   viAttributes = 0
+   viDefault_behavior = AI_FIGHT_MONSTERS | AI_FIGHT_SWITCHALOT | AI_FIGHT_HYPERAGGRESSIVE
+   viVisionDistance = 30
+   viChanceFemale = 40
+   viCashMin = 0
+   viCashMax = 0
+
+properties:
+
+   piKind = ARENA_FIGHTER_WARRIOR
+   prName = $
+   // Still until its bout begins (Unfreeze)
+   pbFrozen = TRUE
+   // Killed in its bout, or deleted by it: anything else that deletes it ends the bout
+   pbFallen = FALSE
+   pbBoutOver = FALSE
+
+   // Its chance to cast when it attacks (percent), the seconds between its spells, and GetTime
+   // before which it can't cast again, or cast a spell that holds, webs or blinds
+   piCastChance = 0
+   piCastSeconds = ARENA_CAST_SECONDS
+   piNextCast = 0
+   piNextControl = 0
+
+messages:
+
+   Constructor(kind = ARENA_FIGHTER_WARRIOR)
+   {
+      piKind = kind;
+
+      propagate;
+   }
+
+   Constructed()
+   {
+      pbDontDispose = TRUE;
+      Send(self,@PickName);
+
+      propagate;
+   }
+
+   ////////////////////////////////////////////////////////////// looks and gear
+
+   PickName()
+   {
+      local lNames;
+
+      if viGender = GENDER_FEMALE
+      {
+         lNames = [ arenafighter_f1, arenafighter_f2, arenafighter_f3, arenafighter_f4,
+                    arenafighter_f5, arenafighter_f6, arenafighter_f7, arenafighter_f8,
+                    arenafighter_f9, arenafighter_f10, arenafighter_f11, arenafighter_f12 ];
+      }
+      else
+      {
+         lNames = [ arenafighter_m1, arenafighter_m2, arenafighter_m3, arenafighter_m4,
+                    arenafighter_m5, arenafighter_m6, arenafighter_m7, arenafighter_m8,
+                    arenafighter_m9, arenafighter_m10, arenafighter_m11, arenafighter_m12 ];
+      }
+
+      prName = Nth(lNames,Random(1,Length(lNames)));
+
+      return;
+   }
+
+   GetKind()
+   {
+      return piKind;
+   }
+
+   GetKindName()
+   {
+      if piKind = ARENA_FIGHTER_QOR
+      {
+         return arenafighter_kind_qor;
+      }
+
+      if piKind = ARENA_FIGHTER_FAREN
+      {
+         return arenafighter_kind_faren;
+      }
+
+      if piKind = ARENA_FIGHTER_RIIJA
+      {
+         return arenafighter_kind_riija;
+      }
+
+      if piKind = ARENA_FIGHTER_BRAWLER
+      {
+         return arenafighter_kind_brawler;
+      }
+
+      if piKind = ARENA_FIGHTER_ADEPT
+      {
+         return arenafighter_kind_adept;
+      }
+
+      return arenafighter_kind_warrior;
+   }
+
+   IsMage()
+   {
+      return piKind = ARENA_FIGHTER_QOR OR piKind = ARENA_FIGHTER_FAREN
+             OR piKind = ARENA_FIGHTER_RIIJA OR piKind = ARENA_FIGHTER_ADEPT;
+   }
+
+   SetShield()
+   "Its kit comes with its kind (SetEquipment)."
+   {
+      return;
+   }
+
+   SetEquipment()
+   "Its kind's kit. A mage's spell book is set first, as a disciple robe asks for it."
+   {
+      local i, oRobe, oShield;
+
+      if piKind = ARENA_FIGHTER_WARRIOR OR piKind = ARENA_FIGHTER_BRAWLER
+      {
+         Send(self,@SetWarriorKit);
+
+         return;
+      }
+
+      Send(self,@SetSpellBook);
+      if piKind = ARENA_FIGHTER_ADEPT
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&Robe));
+         if Random(1,100) <= 50
+         {
+            Send(self,@AddEquipmentObject,#what=Create(&Circlet));
+         }
+
+         return;
+      }
+
+      if piKind = ARENA_FIGHTER_QOR
+      {
+         oRobe = Create(&DiscipleRobe,#school=SS_QOR);
+         Send(self,@AddEquipmentObject,#what=oRobe);
+         Send(oRobe,@SetXLATTranslation,#translation=XLAT_TO_BLACK);
+         Send(self,@AddEquipmentObject,#what=Create(&ThornCirclet));
+         Send(self,@AddEquipmentObject,#what=Create(&OrcShield));
+
+         return;
+      }
+
+      if piKind = ARENA_FIGHTER_FAREN
+      {
+         oRobe = Create(&DiscipleRobe,#school=SS_FAREN);
+         Send(self,@AddEquipmentObject,#what=oRobe);
+         Send(oRobe,@SetXLATTranslation,#translation=XLAT_TO_RED);
+         Send(self,@AddEquipmentObject,#what=Create(&Circlet));
+         Send(self,@AddEquipmentObject,#what=Create(&JewelofFroz));
+
+         return;
+      }
+
+      // Riija: the herald's shield, the guild shield with Riija's sign
+      oRobe = Create(&DiscipleRobe,#school=SS_RIIJA);
+      Send(self,@AddEquipmentObject,#what=oRobe);
+      Send(oRobe,@SetXLATTranslation,#translation=XLAT_TO_PURPLE);
+      Send(self,@AddEquipmentObject,#what=Create(&Circlet));
+      oShield = Create(&GuildShield,#color1=XLAT_TO_PURPLE,#color2=XLAT_TO_PURPLE);
+      Send(oShield,@ChangeGuildInsignia,#insignia=INSIG_RIIJA);
+      Send(self,@AddEquipmentObject,#what=oShield);
+
+      return;
+   }
+
+   SetWarriorKit()
+   "A gladiator: heavy armour and a fine weapon or a bow (nothing magic). A brawler: lighter."
+   {
+      local iRoll, cArmour, cWeapon, bBow;
+
+      bBow = FALSE;
+      iRoll = Random(1,100);
+      if piKind = ARENA_FIGHTER_WARRIOR
+      {
+         cArmour = &ScaleArmor;
+         if iRoll <= 40
+         {
+            cArmour = &PlateArmor;
+         }
+         else if iRoll <= 60
+         {
+            cArmour = &NeruditeArmor;
+         }
+
+         iRoll = Random(1,100);
+         if iRoll <= 20
+         {
+            cWeapon = &Scimitar;
+         }
+         else if iRoll <= 40
+         {
+            cWeapon = &Axe;
+         }
+         else if iRoll <= 58
+         {
+            cWeapon = &Hammer;
+         }
+         else if iRoll <= 78
+         {
+            cWeapon = &NeruditeSword;
+         }
+         else if iRoll <= 90
+         {
+            cWeapon = &Longbow;
+            bBow = TRUE;
+         }
+         else
+         {
+            cWeapon = &BattleBow;
+            bBow = TRUE;
+         }
+      }
+      else
+      {
+         cArmour = &LeatherArmor;
+         if iRoll <= 40
+         {
+            cArmour = &ChainArmor;
+         }
+         else if iRoll <= 55
+         {
+            cArmour = &ScaleArmor;
+         }
+
+         iRoll = Random(1,100);
+         cWeapon = &ShortSword;
+         if iRoll <= 30
+         {
+            cWeapon = &LongSword;
+         }
+         else if iRoll <= 55
+         {
+            cWeapon = &Mace;
+         }
+         else if iRoll <= 70
+         {
+            cWeapon = &Scimitar;
+         }
+      }
+
+      Send(self,@AddEquipmentObject,#what=Create(cArmour));
+      Send(self,@AddEquipmentObject,#what=Create(cWeapon));
+      if bBow
+      {
+         poArrow = Create(&NeruditeArrow);
+      }
+      else if Random(1,100) <= 50
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&MetalShield));
+      }
+
+      if Random(1,100) <= 35
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&SimpleHelm));
+      }
+
+      piAttackRange = Send(self,@GetAttackRange);
+
+      return;
+   }
+
+   SetSpellBook()
+   "A mage's spells, as Monster.plSpellBook has them: [ spell, mana, cumulative chance ]."
+   {
+      if piKind = ARENA_FIGHTER_QOR
+      {
+         plSpellBook = [ [SID_HOLD,6,15], [SID_BLIND,6,30], [SID_VAMPIRIC_DRAIN,6,65],
+                         [SID_SPLASH_OF_ACID,8,100] ];
+      }
+      else if piKind = ARENA_FIGHTER_FAREN
+      {
+         plSpellBook = [ [SID_SPIDER_WEB,6,20], [SID_LIGHTNING_BOLT,6,55],
+                         [SID_FIREBALL,7,80], [SID_ICESHARD,7,100] ];
+      }
+      else if piKind = ARENA_FIGHTER_RIIJA
+      {
+         plSpellBook = [ [SID_HOLD,6,15], [SID_VERTIGO,6,35], [SID_DAZZLE,6,50],
+                         [SID_ILLUSIONARY_WOUNDS,7,100] ];
+      }
+      else
+      {
+         plSpellBook = [ [SID_LIGHTNING_BOLT,5,60], [SID_FIREBALL,6,100] ];
+      }
+
+      return;
+   }
+
+   ApplyFighter(level = 50,health = 50,fight = 200,min_damage = 3,max_damage = 6,
+                power = 50,mana = 60,difficulty = 6,cast_chance = 0,
+                cast_seconds = ARENA_CAST_SECONDS)
+   "Its strength, from the player it was made for (ArenaBouts.MakeFighter)."
+   {
+      viLevel = level;
+      viDifficulty = difficulty;
+      piOffense = fight;
+      piDefense = fight;
+      piMinDamage = min_damage;
+      piMaxDamage = max_damage;
+      piMax_hit_points = Bound(health,1,$);
+      piHit_points = piMax_hit_points * 100;
+      piSpellPower = Bound(power,1,99);
+      piCastChance = cast_chance;
+      piCastSeconds = cast_seconds;
+      piMax_Mana = mana;
+      piMana = mana;
+      Send(self,@NewMana);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// fighting
+
+   Unfreeze()
+   "Its bout begins."
+   {
+      pbFrozen = FALSE;
+      Send(self,@ResetBehaviorFlags);
+
+      return;
+   }
+
+   TweakBehavior()
+   {
+      if pbFrozen
+      {
+         piBehavior = AI_NOMOVE | AI_NOFIGHT;
+
+         return;
+      }
+
+      if Send(self,@IsMage) OR poArrow <> $
+      {
+         piBehavior |= AI_MOVE_OPTIMAL_RANGE;
+      }
+
+      propagate;
+   }
+
+   GetOptimalRange()
+   {
+      if Send(self,@IsMage)
+      {
+         return ARENA_MAGE_RANGE;
+      }
+
+      if poArrow <> $
+      {
+         return ARENA_ARCHER_RANGE;
+      }
+
+      propagate;
+   }
+
+   IsAlly(target = $,regroup = FALSE)
+   "Every fighter fights every other in its bout."
+   {
+      return FALSE;
+   }
+
+   SpecialHatredBehavior(what = $)
+   "Its bout's foes, the nearest most; nobody else at all."
+   {
+      if NOT Send(Send(SYS,@GetArenaBouts),@IsBoutFoe,#fighter=self,#what=what)
+      {
+         return -10000;
+      }
+
+      return 200 - 4 * (Send(self,@SquaredFineDistanceTo,#what=what) / (FINENESS * FINENESS));
+   }
+
+   TargetSwitch(what = $,iHatred = 0)
+   {
+      if NOT Send(Send(SYS,@GetArenaBouts),@IsBoutFoe,#fighter=self,#what=what)
+      {
+         return;
+      }
+
+      propagate;
+   }
+
+   CastAt(sid = 0,mana = 0,target = $)
+   "One of its spells on a target, as Companion casts: its mana, the spell's own checks and "
+   "the room's (the watcher's, and so the bout's). Returns whether it cast."
+   {
+      local oSpell, lTargets, bControl;
+
+      if poOwner = $ OR target = $ OR piMana < mana OR GetTime() < piNextCast
+      {
+         return FALSE;
+      }
+
+      bControl = (sid = SID_HOLD OR sid = SID_BLIND OR sid = SID_SPIDER_WEB
+                  OR sid = SID_VERTIGO OR sid = SID_DAZZLE);
+      if bControl AND GetTime() < piNextControl
+      {
+         return FALSE;
+      }
+
+      oSpell = Send(SYS,@FindSpellByNum,#num=sid);
+      if oSpell = $
+      {
+         return FALSE;
+      }
+
+      lTargets = Send(oSpell,@GetTargets,#who=self,#lTargets=[target]);
+      if NOT Send(oSpell,@CanPayMonsterCosts,#who=self,#lTargets=lTargets,
+                  #iSpellPower=piSpellPower)
+         OR NOT Send(poOwner,@ReqSpellCast,#who=self,#oSpell=oSpell,#lItems=lTargets)
+      {
+         return FALSE;
+      }
+
+      piMana = piMana - mana;
+      piNextCast = GetTime() + piCastSeconds;
+      if bControl
+      {
+         piNextControl = GetTime() + ARENA_CONTROL_SECONDS;
+      }
+
+      Send(self,@NewMana);
+      Send(self,@MonsterCastAnimation,#iSpellNum=sid);
+      Send(oSpell,@CastSpell,#who=self,#lTargets=lTargets,#iSpellPower=piSpellPower);
+
+      return TRUE;
+   }
+
+   MonsterCastSpell()
+   "It casts at its target in reach as well as from afar, at its own chance."
+   {
+      local i, iRandom, iSpell, iMana;
+
+      if plSpellBook = $ OR poTarget = $ OR poOwner = $ OR pbFrozen
+      {
+         return FALSE;
+      }
+
+      if Random(1,100) > piCastChance
+      {
+         return FALSE;
+      }
+
+      if Send(self,@SquaredFineDistanceTo3D,#what=poTarget) > piSpellRange * piSpellRange
+         OR NOT Send(poOwner,@LineOfSight,#obj1=self,#obj2=poTarget)
+         OR NOT Send(poOwner,@ReqSomethingAttack,#what=self,#victim=poTarget,
+                     #use_weapon=self)
+      {
+         return FALSE;
+      }
+
+      iRandom = Random(1,100);
+      iSpell = $;
+      foreach i in plSpellBook
+      {
+         if iRandom <= Nth(i,3)
+         {
+            iSpell = First(i);
+            iMana = Nth(i,2);
+
+            break;
+         }
+      }
+
+      if iSpell = $
+      {
+         return FALSE;
+      }
+
+      // A spell that holds, webs or blinds that can't be cast yet gives way to the last one
+      if NOT Send(self,@CastAt,#sid=iSpell,#mana=iMana,#target=poTarget)
+      {
+         i = Nth(plSpellBook,Length(plSpellBook));
+         if First(i) = iSpell
+         {
+            return FALSE;
+         }
+
+         return Send(self,@CastAt,#sid=First(i),#mana=Nth(i,2),#target=poTarget);
+      }
+
+      return TRUE;
+   }
+
+   TryAttack(what = $,stroke_obj = $)
+   "A mage tries a spell before its fists."
+   {
+      if plSpellBook <> $
+         AND NOT (piBehavior & AI_NOFIGHT)
+         AND Send(self,@MonsterCanCastSpell)
+         AND Send(self,@MonsterCastSpell)
+      {
+         return TRUE;
+      }
+
+      propagate;
+   }
+
+   HealHitPoint()
+   "No healing in a bout."
+   {
+      return;
+   }
+
+   GainMaxHealth(amount = 0)
+   "Its health comes from its player (ApplyFighter): what it wears changes nothing."
+   {
+      return 0;
+   }
+
+   CanPlayerAdvanceOnMe()
+   "Beating one teaches nothing: no skills or spells from mock bouts."
+   {
+      return FALSE;
+   }
+
+   CanMorphTo()
+   {
+      return FALSE;
+   }
+
+   DestroyDisposable()
+   {
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// what others see
+
+   GetName()
+   {
+      return prName;
+   }
+
+   GetTrueName()
+   {
+      return prName;
+   }
+
+   GetApparentName()
+   {
+      return prName;
+   }
+
+   IsNamedMob()
+   {
+      return TRUE;
+   }
+
+   ShowDesc()
+   {
+      AddPacket(4,arenafighter_desc_rsc, 4,prName, 4,Send(self,@GetKindName));
+
+      return;
+   }
+
+   GetPlayerNameColor(rgb = FALSE)
+   "Its name is white, as a player's."
+   {
+      if rgb
+      {
+         return [255, 255, 255];
+      }
+
+      return NC_PLAYER;
+   }
+
+   GetObjectFlags(what = $)
+   "Its name always shows."
+   {
+      return viObject_flags | piDrawEffectFlag | OF_DISPLAY_NAME;
+   }
+
+   ////////////////////////////////////////////////////////////// death
+
+   Killed(what = $)
+   "A body where it fell and its cry, then its bout hears of it. No treasure, reputation or "
+   "quest credit: arenas give none."
+   {
+      local oBody, oRoom;
+
+      oRoom = poOwner;
+      if oRoom = $
+      {
+         return;
+      }
+
+      pbFallen = TRUE;
+      if what <> $ AND IsClass(what,&Monster) AND Send(what,@GetMaster) <> $
+      {
+         what = Send(what,@GetMaster);
+      }
+
+      oBody = Send(self,@CreateDeadBody,#killer=what);
+      if oBody <> $
+      {
+         Send(oRoom,@NewHold,#what=oBody,#new_row=piRow,#new_col=piCol,
+              #fine_row=piFine_row,#fine_col=piFine_col,#new_angle=Send(self,@GetAngle));
+      }
+
+      if vrSound_death <> $
+      {
+         Send(oRoom,@SomethingWaveRoom,#what=oBody,#wave_rsc=vrSound_death,
+              #flags=SOUND_RANDOM_PITCH);
+      }
+
+      Send(Send(SYS,@GetArenaBouts),@FighterFell,#fighter=self,#killer=what);
+      Send(self,@Delete);
+
+      return;
+   }
+
+   EndOfBout()
+   "Its bout deletes it."
+   {
+      pbBoutOver = TRUE;
+      Send(self,@Delete);
+
+      return;
+   }
+
+   Delete()
+   {
+      if NOT pbFallen AND NOT pbBoutOver
+      {
+         // Something else took it away (a watcher clearing the arena, an admin)
+         pbBoutOver = TRUE;
+         Send(Send(SYS,@GetArenaBouts),@FighterGone,#fighter=self);
+      }
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,31 @@
+{
+  "id": 250,
+  "key": "tos-blood-and-sand",
+  "name": "Blood and Sand",
+  "tier": "story",
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 0,
+    "max": 200
+  },
+  "repeat": null,
+  "timeLimitMinutes": null,
+  "text": {
+    "offer": "Looking for a bit of sport? The Arena of Kraanan is just through the foyer off East Ende, and the crowd there loves a newcomer. Stand in the stands and press the crossed swords by your map: the Arena window lets you join a mock battle. You and three fighters, everyone against everyone. Nobody dies in a mock bout. Lose, and you wake in the stands with a sore head. Go and fight one, win or lose, and I'll stand you a drink. And when you're tougher, a hundred health or more, the Arena of Death in East Ende takes duels against real killers.",
+    "progress": "The Arena of Kraanan is through the foyer off East Ende. Press the crossed swords by your map there, and join a mock battle.",
+    "complete": "Back on your feet, I see! Win or lose, the crowd got its show. Here, on the house. Keep at it: the arena keeps a record of every bout you fight."
+  },
+  "steps": [
+    {
+      "kind": "arena",
+      "arena": "kraanan",
+      "auto": false
+    }
+  ],
+  "rewards": {
+    "xp": 200,
+    "shillings": 100
+  }
+}

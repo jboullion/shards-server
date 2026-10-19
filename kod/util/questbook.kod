@@ -126,6 +126,9 @@ constants:
    // attuning to a portal (the step's amount is the travel point: util/travelnet.kod)
    QK_LEARN = 16
    QK_ATTUNE = 17
+   // Ours: a mock bout in an arena (docs/adr/0019-arena-bouts.md; util/arenabouts.kod). The
+   // step's NPC is the arena's watcher; an amount of 1 counts only a bout won
+   QK_ARENA = 18
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -1708,6 +1711,12 @@ messages:
          return num >= Nth(step,QBS_AMOUNT);
       }
 
+      // arena: what is TRUE for a bout won
+      if Nth(step,QBS_KIND) = QK_ARENA
+      {
+         return Nth(step,QBS_AMOUNT) = 0 OR what;
+      }
+
       if Nth(step,QBS_KIND) = QK_STASH
       {
          // what is the list of items left; any one of the class will do
@@ -1743,6 +1752,14 @@ messages:
 
       // cast, buy: the spell or the item, when the step names one
       return Nth(step,QBS_CLASS) = $ OR IsClass(what,Nth(step,QBS_CLASS));
+   }
+
+   ArenaBoutDone(who = $,arena_watcher = $,won = FALSE)
+   "ArenaBouts: a mock bout ended, won or lost, in the arena whose watcher this is."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_ARENA,#what=won,#with=arena_watcher);
+
+      return;
    }
 
    SpellCast(who = $,cast = $)

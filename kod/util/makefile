@@ -11,6 +11,6 @@ BOFS = system.bof library.bof parlia.bof assgame.bof questengine.bof lore.bof \
        gameevent.bof gameeventengine.bof realtime.bof playermarket.bof dmfeed.bof \
        gamequestmaint.bof travelnet.bof shardssocial.bof \
        questdefs.bof questbook.bof companionkinds.bof companionbook.bof cosmeticsbook.bof \
-       shardsabilities.bof
+       shardsabilities.bof arenabouts.bof
 
 !include $(KODDIR)\kod.mak
