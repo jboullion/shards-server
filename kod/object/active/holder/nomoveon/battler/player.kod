@@ -15349,6 +15349,8 @@ messages:
       {
          piTimeAttackedPlayer = piTimeAttackedPlayer
                                  + (Send(self,@GetRemainingPhaseTime) / 1000);
+         // Ours: our client's countdown (UC_PVP_UNTIL) takes the longer lockout
+         Send(self,@SendPvPUntil);
       }
 
       return;
@@ -15405,6 +15407,8 @@ messages:
       {
          piTimeAttackedPlayer = piTimeAttackedPlayer
                                  - (Send(self,@GetRemainingPhaseTime) / 1000);
+         // Ours: and the shorter one when the phase ends early
+         Send(self,@SendPvPUntil);
       }
 
       // Possibly start phase time regen.

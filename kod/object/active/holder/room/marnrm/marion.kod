@@ -245,10 +245,6 @@ messages:
       plExits = Cons([ 50, 21, RID_MAR_HALL, 6, 20, ROTATE_NONE ],plExits);
       plExits = Cons([ 31, 43, RID_MAR_SMITHY, 11, 4, ROTATE_NONE ],plExits);
 
-      plExits = Cons([ 70, 13, ROOM_LOCKED_DOOR, marion_gate_warning ],plExits);
-      plExits = Cons([ 70, 14, ROOM_LOCKED_DOOR, marion_gate_warning ],plExits);
-      plExits = Cons([ 71, 13, ROOM_LOCKED_DOOR, marion_gate_warning ],plExits);
-      plExits = Cons([ 71, 14, ROOM_LOCKED_DOOR, marion_gate_warning ],plExits);
 
       plExits = Cons([ 80, 15, RID_MAR_CRYPT1, 11, 17, ROTATE_NONE ],plExits);
 

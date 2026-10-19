@@ -1012,6 +1012,11 @@ messages:
       Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
       // Ours: the season, for our client's seasonal looks (System.SendSeason)
       Send(SYS,@SendSeason,#who=self);
+      // Ours: a PvP lockout still running (logging off in one adds the phase time to it)
+      if Send(self,@IsInPvP)
+      {
+         Send(self,@SendPvPUntil);
+      }
       // Ours: market listings sent back to our vault while we were away (util/playermarket.kod)
       if Send(SYS,@GetPlayerMarket) <> $
       {
