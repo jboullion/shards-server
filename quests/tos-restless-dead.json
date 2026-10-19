@@ -1,0 +1,37 @@
+{
+  "id": 276,
+  "key": "tos-restless-dead",
+  "name": "The Restless Dead of Tos",
+  "tier": "main",
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 50,
+    "max": 85
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Paddock says, \"You hear that racket at night? That's the graveyard, right next door. Late at night the zombies climb out of their graves and moan till dawn, and it's driving my customers off. Go over there after dark and put ten of them back in the ground. Come back any night you like: they never stay down.\"",
+    "progress": "The Graveyard of Tos is just outside Familiars. The dead only rise late at night, so go after dark.",
+    "complete": "Quiet at last. Here, for your trouble, and have one on the house."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Zombie",
+      "count": 10,
+      "rooms": [
+        "RID_TOS_GRAVEYARD"
+      ],
+      "inRooms": true,
+      "objective": "Zombies put down in the graveyard"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "shillings": 100
+  }
+}

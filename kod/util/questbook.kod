@@ -137,6 +137,9 @@ constants:
    // Ours: bonding with one mana node (the step's amount is its NODE_ bit); a quest with one
    // isn't offered to a player who already has that node
    QK_NODE = 20
+   // Ours: claiming a flagpole for one's faction in the territory game (Flagpole.ClaimAttempt);
+   // any pole counts
+   QK_CLAIM = 21
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -1826,6 +1829,14 @@ messages:
    "ShardsAbilities.Convey: something sent to our vault."
    {
       Send(self,@ActionDone,#who=who,#kind=QK_CONVEY);
+
+      return;
+   }
+
+   FlagClaimed(who = $,rid = 0)
+   "Flagpole.ClaimAttempt: who claimed the flagpole in room rid for their faction (QK_CLAIM)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_CLAIM);
 
       return;
    }

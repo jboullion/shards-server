@@ -837,6 +837,48 @@ resources:
    qd_275_name = "The Collapsed Causeway"
    qd_275_s1 = "Bond with the node at the Collapsed Causeway"
    qd_275_t1 = "Meidei"
+   qd_276_name = "The Restless Dead of Tos"
+   qd_276_s1 = "Zombies put down in the graveyard"
+   qd_276_t1 = "Paddock"
+   qd_277_name = "Bones in the Graveyard"
+   qd_277_s1 = "Skeletons broken in the graveyard"
+   qd_277_t1 = "Paddock"
+   qd_278_name = "The Song of Jala"
+   qd_278_s1 = "Speak to Priestess Themala at the Temple of Jala"
+   qd_278_t1 = "Priestess Themala"
+   qd_279_name = "The Temple of Riija"
+   qd_279_s1 = "Speak to the Monk of Riija at his temple"
+   qd_279_t1 = "Monk of Riija"
+   qd_280_name = "The Duke's Priestess"
+   qd_280_s1 = "Find the Temple of Qor and speak to Priestess Zuxana"
+   qd_280_t1 = "Priestess Zuxana"
+   qd_281_name = "The Princess's Priestess"
+   qd_281_s1 = "Speak to Priestess Tenuv'vyal in the Badlands"
+   qd_281_t1 = "Priestess Tenuv'vyal"
+   qd_282_name = "Jonas's Priestess"
+   qd_282_s1 = "Speak to Priestess Qerti'nya at the Temple of Kraanan"
+   qd_282_t1 = "Priestess Qerti'nya"
+   qd_283_name = "Ground for the Duke"
+   qd_283_s1 = "Rebel soldiers slain"
+   qd_283_t1 = "Duke Akardius"
+   qd_283_s2 = "Soldiers of the Princess slain"
+   qd_283_t2 = "Duke Akardius"
+   qd_283_s3 = "Claim a flagpole for your faction"
+   qd_283_t3 = "Duke Akardius"
+   qd_284_name = "Ground for the Crown"
+   qd_284_s1 = "Soldiers of the Duke slain"
+   qd_284_t1 = "Princess Kateriina"
+   qd_284_s2 = "Rebel soldiers slain"
+   qd_284_t2 = "Princess Kateriina"
+   qd_284_s3 = "Claim a flagpole for your faction"
+   qd_284_t3 = "Princess Kateriina"
+   qd_285_name = "Ground for the Rebellion"
+   qd_285_s1 = "Soldiers of the Duke slain"
+   qd_285_t1 = "Jonas D'Accor"
+   qd_285_s2 = "Soldiers of the Princess slain"
+   qd_285_t2 = "Jonas D'Accor"
+   qd_285_s3 = "Claim a flagpole for your faction"
+   qd_285_t3 = "Jonas D'Accor"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -852,7 +894,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 83835554;
+      return 49223328;
    }
 
    GetQuests()
@@ -2238,7 +2280,79 @@ messages:
            $, $, $, $,
            [ [ 20, $, 1, 0, &BarloqueBartender, 0, qd_275_s1, $, $, qd_275_t1,
                1, $, $, $, 16384 ] ],
-           7651, 0, $, 450, 2, $, $, 0, $, $, $ ]
+           7651, 0, $, 450, 2, $, $, 0, $, $, $ ],
+         // tos-restless-dead
+         [ 276, qd_276_name, &TosInnKeeper, 0, 50, 85, $,
+           $, $, 86400, $,
+           [ [ 1, &Zombie, 10, 2, &TosInnKeeper, 0, qd_276_s1, [ 70 ], $, qd_276_t1,
+               0, $, $, $, 0 ] ],
+           1040, 100, $, 0, 1, $, $, 0, $, $, $ ],
+         // tos-bones-in-the-graveyard
+         [ 277, qd_277_name, &TosInnKeeper, 0, 50, 90, $,
+           $, $, 86400, $,
+           [ [ 1, &Skeleton, 5, 3, &TosInnKeeper, 0, qd_277_s1, [ 70 ], $, qd_277_t1,
+               0, $, $, $, 0 ] ],
+           1040, 100, $, 0, 1, $, $, 0, $, $, $ ],
+         // berg-song-of-jala
+         [ 278, qd_278_name, &BergMerchant, 0, 50, 150, $,
+           $, $, $, $,
+           [ [ 3, $, 1, 0, &JalaPriestess, 0, qd_278_s1, $, $, qd_278_t1,
+               0, $, $, $, 0 ] ],
+           780, 0, $, 0, 2, $, $, 0, $, $, $ ],
+         // kocatan-riija-temple
+         [ 279, qd_279_name, &KocatanLanguageMaster, 0, 90, 150, $,
+           $, $, $, $,
+           [ [ 3, $, 1, 0, &RiijaMonk, 0, qd_279_s1, $, $, qd_279_t1,
+               0, $, $, $, 0 ] ],
+           2484, 0, $, 0, 2, $, $, 0, $, $, $ ],
+         // duke-temple-of-qor
+         [ 280, qd_280_name, &DukeLiege, 0, 50, 150, $,
+           $, $, $, $,
+           [ [ 3, $, 1, 0, &QorPriestess, 0, qd_280_s1, $, $, qd_280_t1,
+               0, $, $, $, 0 ] ],
+           780, 0, $, 0, 1, 1, $, 0, $, $, $ ],
+         // princess-faren-priestess
+         [ 281, qd_281_name, &PrincessLiege, 0, 50, 150, $,
+           $, $, $, $,
+           [ [ 3, $, 1, 0, &FarenPriestess, 0, qd_281_s1, $, $, qd_281_t1,
+               0, $, $, $, 0 ] ],
+           780, 0, $, 0, 1, 2, $, 0, $, $, $ ],
+         // rebel-kraanan-priestess
+         [ 282, qd_282_name, &RebelLiege, 0, 50, 150, $,
+           $, $, $, $,
+           [ [ 3, $, 1, 0, &KraananPriestess, 0, qd_282_s1, $, $, qd_282_t1,
+               0, $, $, $, 0 ] ],
+           780, 0, $, 0, 1, 3, $, 0, $, $, $ ],
+         // duke-ground-for-the-duke
+         [ 283, qd_283_name, &DukeLiege, 0, 60, 150, [ 77 ],
+           $, $, 86400, $,
+           [ [ 1, &RebelTroop, 3, 0, &DukeLiege, 0, qd_283_s1, $, $, qd_283_t1,
+               1, $, $, $, 0 ],
+             [ 1, &PrincessTroop, 3, 0, &DukeLiege, 0, qd_283_s2, $, $, qd_283_t2,
+               1, $, $, $, 0 ],
+             [ 21, $, 1, 0, &DukeLiege, 0, qd_283_s3, $, $, qd_283_t3,
+               1, $, $, $, 0 ] ],
+           3721, 500, $, 300, 1, 1, $, 0, $, $, $ ],
+         // princess-ground-for-the-crown
+         [ 284, qd_284_name, &PrincessLiege, 0, 60, 150, [ 76 ],
+           $, $, 86400, $,
+           [ [ 1, &DukeTroop, 3, 0, &PrincessLiege, 0, qd_284_s1, $, $, qd_284_t1,
+               1, $, $, $, 0 ],
+             [ 1, &RebelTroop, 3, 0, &PrincessLiege, 0, qd_284_s2, $, $, qd_284_t2,
+               1, $, $, $, 0 ],
+             [ 21, $, 1, 0, &PrincessLiege, 0, qd_284_s3, $, $, qd_284_t3,
+               1, $, $, $, 0 ] ],
+           3721, 500, $, 300, 1, 2, $, 0, $, $, $ ],
+         // rebel-ground-for-the-rebellion
+         [ 285, qd_285_name, &RebelLiege, 0, 60, 150, [ 78 ],
+           $, $, 86400, $,
+           [ [ 1, &DukeTroop, 3, 0, &RebelLiege, 0, qd_285_s1, $, $, qd_285_t1,
+               1, $, $, $, 0 ],
+             [ 1, &PrincessTroop, 3, 0, &RebelLiege, 0, qd_285_s2, $, $, qd_285_t2,
+               1, $, $, $, 0 ],
+             [ 21, $, 1, 0, &RebelLiege, 0, qd_285_s3, $, $, qd_285_t3,
+               1, $, $, $, 0 ] ],
+           3721, 500, $, 300, 1, 3, $, 0, $, $, $ ]
          ]
       ];
    }

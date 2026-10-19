@@ -1,0 +1,57 @@
+{
+  "id": 283,
+  "key": "duke-ground-for-the-duke",
+  "name": "Ground for the Duke",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      77
+    ],
+    "faction": "duke"
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"Power is land, and land is taken. My rivals plant their flags across Meridian, and their soldiers stand guard at every pole. Kill three of the rebels' soldiers and three of the Princess's, then take a pole for me: carry my flag to one next to land I already hold, and keep it until it's mine. Do it again tomorrow, and every day after.\"",
+    "progress": "Rival soldiers guard their side's flagpoles. Kill three rebel soldiers and three of the Princess's soldiers, then claim a flagpole for the Duke.",
+    "complete": "Duke Akardius says, \"Another pole flies my colours. Take your pay, and come back tomorrow for more.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "RebelTroop",
+      "count": 3,
+      "auto": true,
+      "objective": "Rebel soldiers slain"
+    },
+    {
+      "kind": "kill",
+      "target": "PrincessTroop",
+      "count": 3,
+      "auto": true,
+      "objective": "Soldiers of the Princess slain",
+      "brief": "Good. Now three of the soldiers of the princess: they guard their own side's poles the same way."
+    },
+    {
+      "kind": "claim",
+      "objective": "Claim a flagpole for your faction",
+      "brief": "Now take ground. Carry your faction's flag (a new one appears in your liege's hall every hour), wear your soldier's shield, and use a flagpole next to land your side already holds. Stay with it until the claim is done, eight minutes, while its troops come for you. If you die, leave or drop the flag, the claim fails."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 500
+  }
+}

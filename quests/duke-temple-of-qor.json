@@ -1,0 +1,36 @@
+{
+  "id": 280,
+  "key": "duke-temple-of-qor",
+  "name": "The Duke's Priestess",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke"
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"Those who serve me find Qor's magic answers them more readily than it does anyone else. Her priestess, Zuxana, keeps a temple in the mountains. Its door is never in the same place for long: it opens under the shadow of the Sentinel, or out in the Cragged Mountains. Find it, and tell her I sent you.\"",
+    "progress": "Leave Tos, go through the Twisted Wood to the Cragged Mountains. The Temple of Qor's door opens either there or under the shadow of the Sentinel, and moves between them from time to time.",
+    "complete": "Priestess Zuxana says, \"The Duke's creature, are you? Good. Qor rewards ambition. Right-click me and choose Buy to see what darkness I can teach you.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "QorPriestess"
+      },
+      "objective": "Find the Temple of Qor and speak to Priestess Zuxana"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3
+  }
+}

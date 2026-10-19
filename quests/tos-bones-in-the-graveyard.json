@@ -1,0 +1,38 @@
+{
+  "id": 277,
+  "key": "tos-bones-in-the-graveyard",
+  "name": "Bones in the Graveyard",
+  "tier": "main",
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 50,
+    "max": 90
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Paddock says, \"The zombies are bad enough, but some nights the skeletons come out with them, and they're worse. Harder to kill and they don't smell any better. Break five of them in the graveyard some night, and I'll pay you for it.\"",
+    "progress": "The skeletons rise with the zombies in the Graveyard of Tos, late at night. There are fewer of them, so be patient.",
+    "complete": "Five fewer bags of bones rattling about. Good work."
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Skeleton",
+      "count": 5,
+      "exact": true,
+      "rooms": [
+        "RID_TOS_GRAVEYARD"
+      ],
+      "inRooms": true,
+      "objective": "Skeletons broken in the graveyard"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "shillings": 100
+  }
+}

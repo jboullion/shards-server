@@ -1,0 +1,57 @@
+{
+  "id": 284,
+  "key": "princess-ground-for-the-crown",
+  "name": "Ground for the Crown",
+  "tier": "main",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      76
+    ],
+    "faction": "princess"
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Princess Kateriina says, \"The Duke's men and the rebels plant their flags on land that is rightfully Ours, and set soldiers to guard them. Slay three of the Duke's soldiers and three of the rebels', then raise Our flag over a pole that borders Our lands, and hold it until it is Ours. We shall have need of thee every day.\"",
+    "progress": "Rival soldiers guard their side's flagpoles. Kill three of the Duke's soldiers and three rebel soldiers, then claim a flagpole for the Princess.",
+    "complete": "Princess Kateriina says, \"Our banner flies there once more. Thou hast done well. Return to Us tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DukeTroop",
+      "count": 3,
+      "auto": true,
+      "objective": "Soldiers of the Duke slain"
+    },
+    {
+      "kind": "kill",
+      "target": "RebelTroop",
+      "count": 3,
+      "auto": true,
+      "objective": "Rebel soldiers slain",
+      "brief": "Good. Now three of the rebel soldiers: they guard their own side's poles the same way."
+    },
+    {
+      "kind": "claim",
+      "objective": "Claim a flagpole for your faction",
+      "brief": "Now take ground. Carry your faction's flag (a new one appears in your liege's hall every hour), wear your soldier's shield, and use a flagpole next to land your side already holds. Stay with it until the claim is done, eight minutes, while its troops come for you. If you die, leave or drop the flag, the claim fails."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 500
+  }
+}

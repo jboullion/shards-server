@@ -1,0 +1,36 @@
+{
+  "id": 281,
+  "key": "princess-faren-priestess",
+  "name": "The Princess's Priestess",
+  "tier": "main",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "princess"
+  },
+  "text": {
+    "offer": "Princess Kateriina says, \"Faren's magic, the fire and storm of the elements, burns brightest in those who serve Our crown. Her priestess, Tenuv'vyal, keeps her fire out in the Badlands, past Kardde's Canyon. Seek her out, and say that thou comest in Our name.\"",
+    "progress": "Leave Barloque by the main gate, go through Kardde's Canyon into the Badlands, and look for Priestess Tenuv'vyal by her fire.",
+    "complete": "Priestess Tenuv'vyal says, \"The Princess sends me another? Then sit by my fire. Right-click me and choose Buy to learn what Faren will give you.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "FarenPriestess"
+      },
+      "objective": "Speak to Priestess Tenuv'vyal in the Badlands"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3
+  }
+}

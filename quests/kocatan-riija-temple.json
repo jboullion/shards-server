@@ -1,0 +1,30 @@
+{
+  "id": 279,
+  "key": "kocatan-riija-temple",
+  "name": "The Temple of Riija",
+  "tier": "story",
+  "giver": {
+    "class": "KocatanLanguageMaster"
+  },
+  "band": {
+    "min": 90,
+    "max": 150
+  },
+  "text": {
+    "offer": "Quetzal says, \"You study words? I study the old ones. Past the East Tower, on the path to the ruins, stands what is left of the temple of Riija, god of dreams and illusion. Go beyond the ruins, through the land of the noble avars, and you will find the temple itself. A monk of Riija still lives there and teaches his god's tricks to those who seek him.\"",
+    "progress": "From Ko'catan: the East Tower, outside the guard tower, the path to the ruins, the Ruins of the Riija Temple, the territory of the noble avars, then the Temple of Riija.",
+    "complete": "The Monk of Riija says, \"You found the way. Few do. What you see is not always what is there: that is Riija's first lesson. Right-click me and choose Buy for the rest.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RiijaMonk"
+      },
+      "objective": "Speak to the Monk of Riija at his temple"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3
+  }
+}

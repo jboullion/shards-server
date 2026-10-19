@@ -1,0 +1,30 @@
+{
+  "id": 278,
+  "key": "berg-song-of-jala",
+  "name": "The Song of Jala",
+  "tier": "story",
+  "giver": {
+    "class": "BergMerchant"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "text": {
+    "offer": "Luisane d'Ile says, \"There is a Temple of Jala here in Berg. Jala is the goddess of song, and her priestess, Themala, teaches her magic to anyone with an ear for it: songs that lift your friends and wear down your enemies. Go and hear her. You won't regret it.\"",
+    "progress": "The Temple of Jala is in Berg. Speak to Priestess Themala there.",
+    "complete": "Priestess Themala says, \"Luisane sent you? Then welcome. Jala's songs are for anyone who will listen. Right-click me and choose Buy to see what I can teach you.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "JalaPriestess"
+      },
+      "objective": "Speak to Priestess Themala at the Temple of Jala"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3
+  }
+}

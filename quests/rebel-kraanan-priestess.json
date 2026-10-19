@@ -1,0 +1,36 @@
+{
+  "id": 282,
+  "key": "rebel-kraanan-priestess",
+  "name": "Jonas's Priestess",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel"
+  },
+  "text": {
+    "offer": "Jonas says, \"We're fighters, so fight with every weapon you've got. Kraanan is the god of war, and his priestess, Qerti'nya, teaches battle magic in his temple up past the ancient place in the Cragged Mountains. Go and learn from her. Tell her Jonas sent you.\"",
+    "progress": "From Jasper: East Jasper, the Lake of Jala's Song, the Cragged Mountains, the ancient place, then the Temple of Kraanan.",
+    "complete": "Priestess Qerti'nya says, \"Jonas's fighters are always welcome here. Kraanan loves a warrior. Right-click me and choose Buy to see what he will teach you.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KraananPriestess"
+      },
+      "objective": "Speak to Priestess Qerti'nya at the Temple of Kraanan"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3
+  }
+}

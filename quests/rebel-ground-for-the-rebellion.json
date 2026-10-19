@@ -1,0 +1,57 @@
+{
+  "id": 285,
+  "key": "rebel-ground-for-the-rebellion",
+  "name": "Ground for the Rebellion",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      78
+    ],
+    "faction": "rebel"
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Jonas says, \"The Duke and the Princess carve up this land with their flags and guard them with soldiers. We take it back, one pole at a time. Kill three of the Duke's soldiers and three of the Princess's, then plant our flag at a pole beside land we already hold and keep it. Same again tomorrow.\"",
+    "progress": "Rival soldiers guard their side's flagpoles. Kill three of the Duke's soldiers and three of the Princess's soldiers, then claim a flagpole for the rebels.",
+    "complete": "Jonas says, \"One more pole for the people. Here's your share. See you tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DukeTroop",
+      "count": 3,
+      "auto": true,
+      "objective": "Soldiers of the Duke slain"
+    },
+    {
+      "kind": "kill",
+      "target": "PrincessTroop",
+      "count": 3,
+      "auto": true,
+      "objective": "Soldiers of the Princess slain",
+      "brief": "Good. Now three of the soldiers of the princess: they guard their own side's poles the same way."
+    },
+    {
+      "kind": "claim",
+      "objective": "Claim a flagpole for your faction",
+      "brief": "Now take ground. Carry your faction's flag (a new one appears in your liege's hall every hour), wear your soldier's shield, and use a flagpole next to land your side already holds. Stay with it until the claim is done, eight minutes, while its troops come for you. If you die, leave or drop the flag, the claim fails."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 500
+  }
+}

@@ -466,6 +466,10 @@ messages:
          Send(oClaimingFlag,@Delete);
       }
 
+      // Ours: a quest step to claim a flagpole (util/questbook.kod QK_CLAIM)
+      Send(Send(SYS,@GetQuestBook),@FlagClaimed,#who=poClaimer,
+           #rid=Send(poOwner,@GetRoomNum));
+
       poClaimer = $;
 
       // Slow down troop generation again.
