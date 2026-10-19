@@ -52,6 +52,16 @@ Needs Python 3.12+ with Pillow and numpy. Everything else is the standard librar
      `server/src/resource/graphics/shards` (or `ICONFORGE_DIR`) before every other source. Then
      run `npm run assets`.
 
+### Per-icon settings (`data/iconforge/overrides.json`)
+
+- `describe`: what the model draws instead of the class name.
+- `mode: "generate"`: draws a new icon from the description alone.
+- `output`: installs under another file name.
+- `from`: starts a new variant sprite from another sprite's frames (our restyle of it if there is one).
+  - Point the class's Kod at the new file first; `forge.py inventory` then lists it with that source.
+  - Example: `minotaurbers.bgf`, the minotaur berserker drawn from the restyled minotaur.
+  - Monsters work best with `--sheet-frames 8`: with three angles to a sheet, the model can drift off the grid.
+
 ## Providers
 
 | spec | what | keys / setup |

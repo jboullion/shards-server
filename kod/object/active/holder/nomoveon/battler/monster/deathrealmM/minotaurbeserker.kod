@@ -17,14 +17,14 @@ constants:
 resources:
    
    minotaurberserker_name_rsc = "minotaur berserker"
-   minotaurberserker_icon_rsc = minotaurb.bgf
+   minotaurberserker_icon_rsc = minotaurbers.bgf
    minotaurberserker_desc_rsc = \
       "Ugly as hell, covered in blood and body parts, this minotaur berserker "
       "is always ready for a fight. A close relative to the minotaur family, "
       "however, it has turned to darkness and is constantly craving fresh meat. "
       "Beware of their berserker speed!"
 
-   minotaurberserker_dead_icon_rsc = minotaurbX.bgf
+   minotaurberserker_dead_icon_rsc = minotaurbersX.bgf
    minotaurberserker_dead_name_rsc = "slain minotaur berserker"
 
    minotaurberserker_sound_hit = minotaurberserker_att.mp3

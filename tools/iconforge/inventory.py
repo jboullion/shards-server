@@ -114,6 +114,11 @@ def run() -> dict:
     for k, v in shards.items():  # icons that only exist as our own art (e.g. iiceshrd.bgf)
         served_idx.setdefault(k, v)
 
+    # A new sprite drawn from another one (a variant): overrides.json "from" names the sprite whose frames
+    # it starts from, our restyle of it if there is one, until the new file is installed and served
+    overrides = json.loads((DATA / "overrides.json").read_text(encoding="utf-8"))
+    derived = {n.lower(): o["from"].lower() for n, o in overrides.items() if isinstance(o, dict) and o.get("from")}
+
     previous = {}
     inv_path = DATA / "inventory.json"
     if inv_path.exists():
@@ -122,6 +127,8 @@ def run() -> dict:
     entries = []
     for name, classes in icons.items():
         src = served_idx.get(name)
+        if src is None and name in derived:
+            src = shards.get(derived[name]) or served_idx.get(derived[name])
         served = classic = None
         try:
             served = BGF.read(src) if src else None
@@ -133,6 +140,8 @@ def run() -> dict:
              "source": str(src) if src else None,
              "in_classic": name in classic_idx,
              "restyled": name in shards}
+        if name in derived:
+            e["from"] = derived[name]
         if served:
             e.update(shrink=served.shrink, bitmaps=len(served.bitmaps), groups=len(served.groups),
                      size=[max(b.w for b in served.bitmaps), max(b.h for b in served.bitmaps)])

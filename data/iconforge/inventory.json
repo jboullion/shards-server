@@ -1,11 +1,11 @@
 {
  "counts": {
   "original": 549,
-  "check": 79,
-  "fanart": 188,
+  "check": 80,
+  "fanart": 190,
   "missing": 1
  },
- "selected": 128,
+ "selected": 130,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -4732,6 +4732,7 @@
    "classes": [
     "CouncilLetter",
     "Letter",
+    "QuestParcel",
     "TaxLetter"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\scr04.bgf",
@@ -8231,7 +8232,8 @@
    "kind": "spell",
    "status": "original",
    "classes": [
-    "PortalOfLife"
+    "PortalOfLife",
+    "RestoreCompanion"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\irasdead.bgf",
    "in_classic": true,
@@ -11245,6 +11247,25 @@
    "selected": true
   },
   {
+   "name": "duskratx.bgf",
+   "kind": "monster",
+   "status": "check",
+   "classes": [
+    "DuskRat"
+   ],
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\duskratx.bgf",
+   "in_classic": false,
+   "restyled": true,
+   "shrink": 3,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    91,
+    41
+   ],
+   "selected": false
+  },
+  {
    "name": "earthdrag.bgf",
    "kind": "monster",
    "status": "fanart",
@@ -13079,12 +13100,11 @@
    "kind": "monster",
    "status": "fanart",
    "classes": [
-    "Minotaur",
-    "MinotaurBerserker"
+    "Minotaur"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\minotaurb.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 64,
    "groups": 8,
@@ -13095,16 +13115,55 @@
    "selected": true
   },
   {
+   "name": "minotaurbers.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "MinotaurBerserker"
+   ],
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\minotaurb.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "from": "minotaurb.bgf",
+   "shrink": 4,
+   "bitmaps": 64,
+   "groups": 8,
+   "size": [
+    340,
+    400
+   ],
+   "selected": true
+  },
+  {
+   "name": "minotaurbersx.bgf",
+   "kind": "monster",
+   "status": "fanart",
+   "classes": [
+    "MinotaurBerserker"
+   ],
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\minotaurbx.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "from": "minotaurbx.bgf",
+   "shrink": 4,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    344,
+    262
+   ],
+   "selected": true
+  },
+  {
    "name": "minotaurbx.bgf",
    "kind": "monster",
    "status": "fanart",
    "classes": [
-    "Minotaur",
-    "MinotaurBerserker"
+    "Minotaur"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\minotaurbX.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 4,
    "bitmaps": 8,
    "groups": 1,
@@ -13883,7 +13942,6 @@
    "kind": "monster",
    "status": "original",
    "classes": [
-    "DuskRat",
     "GiantRat"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ratX.bgf",
@@ -14960,6 +15018,7 @@
    "kind": "monster",
    "status": "original",
    "classes": [
+    "QuestGiver",
     "RazaBartender",
     "TosInnKeeper"
    ],
@@ -15736,7 +15795,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunny2.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 18,
    "bitmaps": 30,
    "groups": 5,
@@ -15755,7 +15814,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunny2X.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 17,
    "bitmaps": 8,
    "groups": 1,
@@ -15774,7 +15833,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygrey.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 14,
    "bitmaps": 30,
    "groups": 5,
@@ -15793,7 +15852,7 @@
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\bunnygreyx.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "shrink": 15,
    "bitmaps": 8,
    "groups": 1,

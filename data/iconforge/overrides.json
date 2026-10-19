@@ -1,5 +1,5 @@
 {
- "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it).",
+ "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it); 'from' starts a new sprite (a variant the kod points at, not yet served) from another sprite's frames, our restyle of it if there is one.",
  "icebolt.bgf": {
   "mode": "generate",
   "output": "iiceshrd.bgf",
@@ -123,6 +123,14 @@
  },
  "minotaurbx.bgf": {
   "describe": "a dead minotaur lying sprawled on the ground, a huge bull-headed brute with shaggy brown fur, curved pale horns, a ragged grey loincloth and leather wraps (keep its pose, colours and proportions)"
+ },
+ "minotaurbers.bgf": {
+  "from": "minotaurb.bgf",
+  "describe": "a minotaur berserker: the same huge bull-headed brute turned savage and dark, with matted charcoal-black fur, glowing blood-red eyes, chipped horns stained dark red, smears of dried blood on its arms, chest and mace, crude bone trophies tied at its belt and a torn, blackened loincloth (keep its pose, size and proportions)"
+ },
+ "minotaurbersx.bgf": {
+  "from": "minotaurbx.bgf",
+  "describe": "a dead minotaur berserker lying sprawled on the ground: a huge bull-headed brute with matted charcoal-black fur, chipped blood-stained horns, smears of dried blood, bone trophies at its belt and a torn, blackened loincloth (keep its pose, size and proportions)"
  },
  "bunny2.bgf": {
   "describe": "a wild brown rabbit: a small, lean bunny with soft tawny-brown fur, a cream belly, long upright ears, dark eyes and a white cotton tail, in natural rabbit colours (not purple or blue), with the same proportions"
