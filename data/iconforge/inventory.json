@@ -5,7 +5,7 @@
   "fanart": 188,
   "missing": 1
  },
- "selected": 126,
+ "selected": 128,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -13092,7 +13092,7 @@
     340,
     400
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "minotaurbx.bgf",
@@ -13112,7 +13112,7 @@
     344,
     262
    ],
-   "selected": false
+   "selected": true
   },
   {
    "name": "mollusk.bgf",

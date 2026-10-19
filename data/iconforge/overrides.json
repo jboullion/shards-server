@@ -118,6 +118,12 @@
  "cowx.bgf": {
   "describe": "a dead pygmy cow lying flat on its side, a small black-and-white spotted dairy cow with its legs stretched out sideways and one comic crossed-out X eye (keep its pose, colours and proportions)"
  },
+ "minotaurb.bgf": {
+  "describe": "a minotaur: a towering, heavily muscled bull-headed brute with shaggy brown fur, long curved pale horns, a ragged grey loincloth, leather wraps on its arms and legs and a spiked iron mace in one hand (keep its colours, gear, pose and proportions)"
+ },
+ "minotaurbx.bgf": {
+  "describe": "a dead minotaur lying sprawled on the ground, a huge bull-headed brute with shaggy brown fur, curved pale horns, a ragged grey loincloth and leather wraps (keep its pose, colours and proportions)"
+ },
  "bunny2.bgf": {
   "describe": "a wild brown rabbit: a small, lean bunny with soft tawny-brown fur, a cream belly, long upright ears, dark eyes and a white cotton tail, in natural rabbit colours (not purple or blue), with the same proportions"
  },

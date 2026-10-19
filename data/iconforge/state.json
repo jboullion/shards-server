@@ -1,5 +1,5 @@
 {
- "next_batch": 27,
+ "next_batch": 29,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2938,6 +2938,54 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\026\\duskratx\\v0.bgf"
+   }
+  },
+  "minotaurb.bgf": {
+   "status": "installed",
+   "attempts": 2,
+   "notes": [],
+   "history": [
+    {
+     "batch": "027",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "028",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "minotaurb.bgf",
+   "chosen": {
+    "batch": "028",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\028\\minotaurb\\v0.bgf"
+   }
+  },
+  "minotaurbx.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "027",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "minotaurbx.bgf",
+   "chosen": {
+    "batch": "027",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\027\\minotaurbx\\v0.bgf"
    }
   }
  }
