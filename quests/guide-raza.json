@@ -14,9 +14,9 @@
     "max": 30
   },
   "text": {
-    "offer": "Rodric d'Stane says, \"Ah, so you are the new soul to these lands. Perhaps you can help us. We are gravely in need of adventurers who can clear out the mausoleum on the north side of town. Please assist us by slaying the evil shadow mummy that has corrupted our dead!\"",
-    "progress": "The elder of Raza has requested you enter the Mausoleum on the north end of town and slay the shadow mummy that has brought a curse to the honored dead resting within. To that end, you can find weapons and armor at the blacksmith, and you can purchase spell reagents at the apothecary, both located on the west side of Raza. When you find them, type 'buy' to see what they have for sale. You can also sell items they're interested in by typing 'offer' while facing them.",
-    "complete": "Rodric d'Stane says, \"Thank you for your assistance. You have truly helped us in our time of need. I shall share with you some of the wisdom of my years. Perhaps my meager experience will help you face the dangers of Meridian proper. Go now, and find the city of Marion. Once you are there, I recommend you seek out Priestess Xiana at the Temple of Shal'ille. She can guide you further.\""
+    "offer": "Rodric d'Stane says, \"Something wakes our dead: an evil shadow mummy, deep in the mausoleum on the north side of town, behind a wooden gate. While you put the mummies back to rest, find it and slay it, and lift the curse from our honored dead!\"",
+    "progress": "The elder of Raza has requested you enter the Mausoleum on the north end of town and slay the shadow mummy that has brought a curse to the honored dead resting within. It waits behind the wooden gate at the far end: pull both levers beside it, one and then the other quickly, to open the gate. You can find weapons and armor at the blacksmith, and spell reagents at the apothecary: right-click them and choose Buy to see what they sell.",
+    "complete": "Rodric d'Stane says, \"Thank you for your assistance. You have truly helped us in our time of need. I shall share with you some of the wisdom of my years. But you are not ready for Meridian proper yet, and Raza still needs a strong arm. There is one more thing I would ask of you.\""
   },
   "steps": [
     {
@@ -31,7 +31,7 @@
   },
   "requires": {
     "quests": [
-      121
+      137
     ]
   }
 }

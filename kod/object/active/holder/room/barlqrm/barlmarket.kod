@@ -21,21 +21,24 @@ resources:
    BarloqueMarket_music = corloth.ogg
 
    Market_Appraise_sign_name = "Appraising items"
+   // Ours (docs/adr/0016-abilities.md): valuable things only, appraised from the inventory, and
+   // back to the vault after 30 days unsold (util/shardsabilities.kod, util/playermarket.kod)
    Market_Appraise_sign_desc = "You may only list items for sale that are appraised. "
-      "You have a spell called 'Appraise' cast it on a item and say how much you want to sell it for "
-      "to appraise it for you desired price. Then you will be able to list the item on the market. "
+      "Right-click a valuable item in your inventory and press its scales to set the price you want to "
+      "sell it for. Then offer it to Veydran Goldleaf to list it on the market. "
 
    Market_Items_sign_name    = "Selling items"
    Market_Items_sign_desc    = "Once your item is put on the market citizens will be able to "
       "purchase it from Veydran Goldleaf. Once the item is purchased you will be given a trade bond "
       "worth the cost of the item. Offer it to Veydran Goldleaf and he will give you the shillings."
       " If you want to remove a item from the market you are able to take any item you place on the "
-      "market for no cost."
-   
-   Market_Reagents_sign_name = "Selling reagents"
-   Market_Reagents_sign_desc = "Reagents can be sold by placing them in a reagent bag and then listing the reagent bag. "
-      "You will have to appraise the reagent bag for the total cost you want for everything in the bag. Other than that it "
-      "behaves the same as selling any other item. "
+      "market for no cost. Anything still unsold after 30 days is sent back to your vault, and must "
+      "be appraised and listed again."
+
+   Market_Reagents_sign_name = "What sells here"
+   Market_Reagents_sign_desc = "The market only deals in valuable things: magical items, and "
+      "anything worth 5,000 shillings or more. Reagents, food and plain gear are best sold to the "
+      "shopkeepers in town. "
 
 classvars:
 

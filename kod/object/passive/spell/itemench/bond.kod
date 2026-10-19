@@ -61,7 +61,6 @@ classvars:
    viCast_time = 500
    viChance_To_Increase = 66
 
-   vbFree_Castable = FALSE
 
    viMeditate_ratio = 60
 

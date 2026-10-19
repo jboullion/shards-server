@@ -3,6 +3,7 @@
   "key": "guide-road",
   "name": "The Road Through Meridian",
   "tier": "main",
+  "paused": true,
   "replaces": [
     "HP30_NEWBIE_CHAIN"
   ],
@@ -58,10 +59,12 @@
       }
     },
     {
-      "kind": "cast",
-      "spell": "Conveyance",
-      "objective": "Use your Conveyance spell",
-      "brief": "Rolan De'nair says, \"Always nice to see a new face. Say, have you used the spell Conveyance yet? For a small monetary fee, we run magical portals here that will take stackable items from almost anywhere. Try it now. Watch the magic at work!\" Rolan De'nair has asked you to use your Conveyance spell to practice depositing stackable items at a distance. Make sure you have a few shillings on you, then cast conveyance and target a stackable item in your inventory. Stackable items have numbers on their icons. They are often reagents, such as mushrooms or herbs, but they can also be treasure like emeralds or sapphires.",
+      "kind": "talk",
+      "turnin": {
+        "class": "JasperVaultman"
+      },
+      "objective": "Speak to Rolan De'nair",
+      "brief": "Rolan De'nair says, \"Always nice to see a new face. Your gear is safe with us, and the vaults of Barloque and Raza will hand it back to you just the same. Talk to me again before you go, and I'll point you on your way.\" Talk to Rolan De'nair (double-click him) once more.",
       "rewards": {
         "xp": 350
       }

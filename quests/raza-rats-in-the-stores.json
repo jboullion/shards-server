@@ -10,25 +10,33 @@
     "min": 20,
     "max": 30
   },
+  "requires": {
+    "quests": [
+      138
+    ],
+    "healthBelow": 30
+  },
+  "repeat": {
+    "cooldownHours": 0
+  },
   "text": {
-    "offer": "Welcome to the inn, traveller. You look like you can swing a blade, and I've a problem that needs one. Giant rats have been coming in from the outskirts and getting into my stores. Thin their numbers out there, a dozen or so, and I'll make it worth your while.",
-    "progress": "The rats are in the outskirts of Raza, just outside town.",
-    "complete": "That should keep them out of the flour for a while. Here, for your trouble - and come back, I may have more work."
+    "offer": "Giant rats keep coming in from the outskirts and getting into my stores. Thin them out there, eight or so, and I'll make it worth your while. They never stop coming, so come back for more work whenever you like, until you're hale enough for the road to Marion.",
+    "progress": "The rats are in the outskirts of Raza, just outside town. Centipedes come in along the Farol road nearby: Marcus pays for those too.",
+    "complete": "That should keep them out of the flour for a while. Here, for your trouble. There'll be more of them by tomorrow, mark my words."
   },
   "steps": [
     {
       "kind": "kill",
       "target": "GiantRat",
-      "count": 12,
+      "count": 8,
       "rooms": [
-        330,
-        331
+        330
       ],
       "objective": "Giant rats slain"
     }
   ],
   "rewards": {
-    "xpPoints": 0.75,
-    "shillings": 50
+    "xpPoints": 1.5,
+    "shillings": 30
   }
 }

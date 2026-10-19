@@ -177,6 +177,9 @@ properties:
    poSpell           = $
    piAppraisal_Price = 0
    poAppraiser       = $
+   // Ours: when it went on the citizen's market (GetTime), 0 off it: after 30 days unsold it goes
+   // back to its appraiser's vault (util/playermarket.kod ExpireListings)
+   piMarket_listed   = 0
 
 messages:
 
@@ -3005,6 +3008,19 @@ messages:
       poAppraiser       = $;
 
       return;
+   }
+
+   SetMarketListed(time = 0)
+   "Ours: when it went on the citizen's market, or 0 as it leaves (util/playermarket.kod)."
+   {
+      piMarket_listed = time;
+
+      return;
+   }
+
+   GetMarketListed()
+   {
+      return piMarket_listed;
    }
 
 end

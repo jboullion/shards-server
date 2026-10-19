@@ -7,18 +7,13 @@
     "class": "MarionInnkeeper"
   },
   "band": {
-    "min": 34,
+    "min": 30,
     "max": 44
   },
-  "requires": {
-    "quests": [
-      125
-    ]
-  },
   "text": {
-    "offer": "The herb gatherers won't go into the Valley of Ileria any more. Fungus beasts have spread all through it, and their spores make a body sick for days. Clear ten of them and the valley might be safe to walk again.",
-    "progress": "The Valley of Ileria is east of Marion.",
-    "complete": "The gatherers send their thanks - and a little coin, which I'm passing on to you."
+    "offer": "The herb gatherers won't go into the Valley of Ileria any more. Fungus beasts have spread all through it, and their spores make a body sick for days. Clear ten of them and the valley might be safe to walk again. It's on your way to the shore, if you're after the slimes as well.",
+    "progress": "The Valley of Ileria lies past the Deep Woods of Ileria, out of Marion's north-east corner.",
+    "complete": "The gatherers send their thanks - and a little coin, which I'm passing on to you. The beasts grow back like weeds: come back whenever you want more work."
   },
   "steps": [
     {
@@ -34,5 +29,8 @@
   "rewards": {
     "xpPoints": 0.5,
     "shillings": 100
+  },
+  "repeat": {
+    "cooldownHours": 0
   }
 }

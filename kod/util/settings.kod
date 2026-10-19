@@ -78,22 +78,6 @@ properties:
    // The training points we grant players each day to reward them for logging on.
    piLogonBonus = 120
 
-   // The maximum amount of unbound energy we can absorb
-   piUnboundMax = 5000
-
-   // The maximum percentage of XP we can absorb as unbound energy.
-   piUnboundAbsorption = 100
-
-   // The permillage of unbound energy that is lost every second. 50 means 5 percent.
-   piUnboundDecay = 20
-
-   // Delay between receiving unbound energy and decay setting in in ms.
-   piUnboundDelay = 180000
-
-   // Players can't absorb unbound energy from monsters while engaged in PvP or
-   // a short while thereafter. Default of 4 minutes.
-   piUnboundEnergyAttackDelaySec = 240
-
    // XP percent awarded, can be raised to give a bonus.
    piXPPercent = 115
    
@@ -421,26 +405,6 @@ messages:
       return piLogonBonus;
    }
 
-   GetUnboundMax()
-   {
-      return piUnboundMax;
-   }
-
-   GetUnboundAbsorption()
-   {
-      return piUnboundAbsorption;
-   }
-
-   GetUnboundDecay()
-   {
-      return piUnboundDecay;
-   }
-
-   GetUnboundDelay()
-   {
-      return piUnboundDelay;
-   }
-
    GetXPPercent()
    {
       return piXPPercent;
@@ -503,11 +467,6 @@ messages:
    CanRecastJalaWithNecklace()
    {
       return pbCanRecastJalaWithNecklace;
-   }
-
-   UnboundEnergyAttackDelaySec()
-   {
-      return piUnboundEnergyAttackDelaySec;
    }
 
    TeleportAttackDelaySec()

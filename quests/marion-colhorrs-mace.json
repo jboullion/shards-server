@@ -1,0 +1,40 @@
+{
+  "id": 139,
+  "key": "marion-colhorrs-mace",
+  "name": "A Mace from Colhorr",
+  "tier": "main",
+  "giver": {
+    "class": "MarionBartender"
+  },
+  "band": {
+    "min": 30,
+    "max": 40
+  },
+  "text": {
+    "offer": "Tova says, \"Before you go looking for trouble in Marion, get yourself something heavier to swing. Colhorr at the smithy, Ye Olde Slasher Salesman, sells a good mace for next to nothing. Tell him I sent you: he owes me for a few barrels, and he'll put some coin in your hand for it. Then buy yourself a mace.\"",
+    "progress": "Colhorr keeps the smithy in Marion, Ye Olde Slasher Salesman. Right-click him and choose Quests to talk to him, and Buy to see what he sells.",
+    "complete": "Colhorr says, \"A fine choice. Mind you keep it out of the bar - Tova's furniture has suffered enough.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "rewards": {
+        "shillings": 100
+      },
+      "turnin": {
+        "class": "MarionBlacksmith"
+      },
+      "objective": "Speak to Colhorr the blacksmith"
+    },
+    {
+      "kind": "buy",
+      "with": "MarionBlacksmith",
+      "item": "Mace",
+      "objective": "Buy a mace from Colhorr",
+      "brief": "Colhorr says, \"Tova sent you, did he? Then a mace it is. Right-click me and choose Buy, and tick the mace.\""
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}

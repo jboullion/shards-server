@@ -10,6 +10,7 @@ BOFS = system.bof library.bof parlia.bof assgame.bof questengine.bof lore.bof \
        warevent.bof statistics.bof settings.bof survivalmaint.bof \
        gameevent.bof gameeventengine.bof realtime.bof playermarket.bof dmfeed.bof \
        gamequestmaint.bof travelnet.bof shardssocial.bof \
-       questdefs.bof questbook.bof companionkinds.bof companionbook.bof cosmeticsbook.bof
+       questdefs.bof questbook.bof companionkinds.bof companionbook.bof cosmeticsbook.bof \
+       shardsabilities.bof
 
 !include $(KODDIR)\kod.mak

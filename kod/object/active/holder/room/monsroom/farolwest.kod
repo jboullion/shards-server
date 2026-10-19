@@ -60,7 +60,8 @@ messages:
 
    Constructed()
    {
-      plMonsters = [ [&GiantRat, 60], [&SpiderBaby, 20], [&Centipede, 20] ];
+      // Ours: mostly centipedes, for Raza's Farol Road quest (was 60 rats, 20 spiders, 20 centipedes)
+      plMonsters = [ [&GiantRat, 20], [&SpiderBaby, 15], [&Centipede, 65] ];
 
       plGenerators = [ [42, 28], [33, 40], [30, 46], [20, 37], [9, 28],
                        [13, 19], [27, 20], [29, 9] ];

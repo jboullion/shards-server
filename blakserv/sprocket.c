@@ -140,6 +140,9 @@ client_def_table_type usercommand_def_table[] =
 	// Ours (Meridian Shards): a command line, read by user.kod ShardsCommand (ParseString
 	// needs it as the temp string, as UC_MINIGAME_STATE's state)
 	{ UC_SHARDS,                { {0, TAG_TEMP_STRING}, {0, DONE_PARM} } },
+	// Ours: an object and a command line about it (user.kod ShardsObjectCommand), as Kod
+	// can't turn a number in UC_SHARDS's line back into an object
+	{ UC_SHARDS_OBJECT,         { {4, TAG_OBJECT}, {0, TAG_TEMP_STRING}, {0, DONE_PARM} } },
 };
 int num_usercommand_msgs = sizeof(usercommand_def_table)/sizeof(client_def_table_type);
 

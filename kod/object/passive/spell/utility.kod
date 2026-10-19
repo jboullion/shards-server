@@ -20,7 +20,6 @@ classvars:
 
    viMeditate_ratio = 0
 
-   vbFree_Castable = FALSE
 
 properties:
 

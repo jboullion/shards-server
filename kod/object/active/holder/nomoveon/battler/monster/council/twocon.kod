@@ -156,9 +156,8 @@ messages:
 
    SetForSale()
    {
-      plFor_sale = [$,$,
-                   [SID_CONVEYANCE],
-                   $ ];
+      // Ours: Conveyance is an item button now (docs/adr/0016-abilities.md): nothing to teach
+      plFor_sale = [$,$,$,$];
 
       return;
    }

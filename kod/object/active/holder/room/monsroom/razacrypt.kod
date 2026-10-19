@@ -18,7 +18,9 @@ constants:
    SECTOR_NODE1 = 4
    SECTOR_NODE2 = 5
 
-   SLAM_TIME = 2000
+   // Ours: the time to pull the second lever after the first, 5000 (from 2000) so that one
+   // player can open the gate alone
+   SLAM_TIME = 5000
    FIGHT_TIME = 10000
 
    MIN_FINAL_ROW = 27
@@ -122,14 +124,15 @@ resources:
    razacrypt_signname5 = "Using objects"
    razacrypt_sign5 = \
       "The two levers you see before you will open the wooden gate if both "
-      "are pulled at the same time.  Other objects in this world, mainly "
-      "levers, guild hall switches and light sources, can be interacted with "
-      "to produce some effect.\n\nTo pull the lever, right-click it and click "
-      "\"use\", or type use into the chatbox while standing close to it.\n\n"
-      "You may find you are not quick enough to pull both levers in time to "
-      "open the door.  If so, you can use the \"broadcast\" chat command to "
-      "find another player to help you, or continue killing monsters in the "
-      "rest of the mausoleum (there are only a few behind the gate)."
+      "are pulled.  Once you pull one, you have a few seconds to pull the "
+      "other before the gate slams shut, so pull one and hurry straight to "
+      "the next.  Other objects in this world, mainly levers, guild hall "
+      "switches and light sources, can be interacted with to produce some "
+      "effect.\n\nTo pull the lever, right-click it and click \"use\", or "
+      "type use into the chatbox while standing close to it.\n\n"
+      "If the gate closes before you reach the second lever, just try again: "
+      "the levers reset when it does.  A friend can make it easier, one of "
+      "you at each lever."
 
    razacrypt_door1_rsc = down2.ogg
 

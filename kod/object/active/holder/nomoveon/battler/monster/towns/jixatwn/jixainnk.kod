@@ -48,8 +48,7 @@ messages:
    {
       plFor_sale = [ 
          [
-            Create(&LoadoutScroll,#labelled=TRUE),
-            Create(&SetScroll,#labelled=TRUE),
+            // Ours: no loadout or set scrolls (docs/adr/0016-abilities.md)
             Create(&Pear,#number=3),
             Create(&WineGoblet)
          ],

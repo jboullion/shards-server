@@ -1,0 +1,44 @@
+{
+  "id": 134,
+  "key": "raza-tomas-wares",
+  "name": "Arms for the Road",
+  "tier": "main",
+  "giver": {
+    "class": "RazaInnKeeper"
+  },
+  "band": {
+    "min": 20,
+    "max": 30
+  },
+  "text": {
+    "offer": "Welcome to the Inn of Raza, traveller. You've washed up with little more than the clothes on your back, I see. Before anyone in this town can use you, you'll want something to stop a blow. Take this coin to Tomas, our blacksmith: he'll sell you a shield. Then come back and tell me how it sits on your arm.",
+    "progress": "Tomas keeps the smithy in Raza. People with something for you show a gold \"!\" or \"?\" over their heads: right-click Tomas and choose Quests to talk to him, and Buy to see what he sells. Then wear the shield, and come back to Marcus at the inn.",
+    "complete": "Now you look like someone who might come home again. Wear it whenever you leave the town walls."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "rewards": {
+        "shillings": 250
+      },
+      "turnin": {
+        "class": "RazaBlacksmith"
+      },
+      "objective": "Speak to Tomas the blacksmith"
+    },
+    {
+      "kind": "buy",
+      "with": "RazaBlacksmith",
+      "item": "MetalShield",
+      "auto": false,
+      "turnin": {
+        "class": "RazaInnKeeper"
+      },
+      "objective": "Buy a small round shield from Tomas",
+      "brief": "Tomas says, \"Marcus sent you? Then here's what I'd give any newcomer: a small round shield. Right-click me and choose Buy, tick the shield, and it's yours. Wear it, then let Marcus see it.\""
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1
+  }
+}

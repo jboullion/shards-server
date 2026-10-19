@@ -33,9 +33,7 @@ resources:
       "These vaults and bank work the same as their mainland counterparts, "
       "but any deposits made here will not be accessible from the mainland.  "
       "Deposits made to mainland vaults or banks will also be inaccessible "
-      "from Ko'catan.\n\nCasting Conveyance on items from Ko'catan or the "
-      "island will send them to these vaults.  Casting the spell from the "
-      "Orc Caves will send items to the mainland (Barloque and Jasper vaults)."
+      "from Ko'catan."
 
 classvars:
 

@@ -55,7 +55,7 @@ messages:
       plFor_sale = [
          [
             Create(&Xpscroll),
-            Create(&Ubscroll),
+            // Ours: no unbound energy scrolls, as there is no unbound energy (docs/adr/0016-abilities.md)
             Create(&Tpscroll),
             Create(&TpTranferScroll)
          ],

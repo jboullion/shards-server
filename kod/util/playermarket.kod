@@ -7,6 +7,11 @@
 // Meridian is a registered trademark.
 
 
+// Ours (docs/adr/0016-abilities.md): a listing lasts 30 days (Item.SetMarketListed, set as it
+// comes here). Then the item goes back to its appraiser's vault, its price cleared, to be
+// appraised and listed again (ExpireListings, each game hour: SYS NewGameHour); its appraiser is
+// told then, or at their next logon (TellReturns).
+
 ////////////////////////////////////////////////////////////////////////////////
 PlayerMarket is UtilityFunctions
 
@@ -14,13 +19,22 @@ constants:
 
    include blakston.khd
 
+   // 30 days, in GetTime's seconds
+   MARKET_LISTING_SECONDS = 2592000
+
 resources:
+
+   pm_listing_returned = \
+      "Your %s went unsold on the citizen's market for 30 days and has been sent back to your "
+      "vault. Appraise it and offer it to Veydran Goldleaf again to relist it."
 
 classvars:
 
 properties:
 
    plPassive = $
+   // Ours: [ appraiser, item name ] for listings returned while their appraiser was away
+   plReturned = $
 
 messages:
 
@@ -102,6 +116,8 @@ messages:
 
       plPassive = Cons(node,plPassive);
       Send(oThing,@NewOwner,#what=self);
+      // Ours: its 30 days start
+      Send(oThing,@SetMarketListed,#time=GetTime());
 
       return;
    }
@@ -142,10 +158,99 @@ messages:
             }
 
             plPassive = DelListElem(plPassive,i);
+            Send(what,@SetMarketListed,#time=0);
 
             break;
          }
       }
+
+      return;
+   }
+
+   ExpireListings()
+   "Ours, each game hour (SYS NewGameHour): listings 30 days old go back to their appraisers' "
+   "vaults. A listing from before there was a clock starts its 30 days now."
+   {
+      local i, iNow, iListed, lDue;
+
+      iNow = GetTime();
+      lDue = $;
+      foreach i in plPassive
+      {
+         iListed = Send(i,@GetMarketListed);
+         if iListed = 0
+         {
+            Send(i,@SetMarketListed,#time=iNow);
+         }
+         else if iNow - iListed >= MARKET_LISTING_SECONDS
+         {
+            lDue = Cons(i,lDue);
+         }
+      }
+
+      foreach i in lDue
+      {
+         Send(self,@ReturnToSeller,#what=i);
+      }
+
+      return;
+   }
+
+   ReturnToSeller(what = $)
+   "Ours: an unsold listing to its appraiser's vault, its price cleared. With nobody to return it "
+   "to, or a full vault, it stays on sale and is tried again later."
+   {
+      local oWho, oVault, rName;
+
+      oWho = Send(what,@GetAppraiser);
+      oVault = Send(SYS,@FindVaultByNum,#num=VID_BARLOQUE);
+      if oWho = $ OR NOT IsClass(oWho,&User) OR oVault = $
+         OR NOT Send(oVault,@CanDepositItems,#lItems=[what],#who=oWho)
+      {
+         Debug("MARKET LISTING NOT RETURNED",what,Send(what,@GetName),oWho);
+
+         return;
+      }
+
+      rName = Send(what,@GetName);
+      Debug("MARKET LISTING RETURNED",oWho,Send(oWho,@GetTrueName),what,rName,
+            "price",Send(what,@GetAppraisalPrice));
+      Send(what,@ClearAppraisal);
+      Send(Send(SYS,@FindItemAttByNum,#num=IA_APPRAISE),@RemoveFromItem,#oItem=what);
+      // Into the vault: its NewOwner takes it off our list (LeaveHold)
+      Send(oVault,@DepositItems,#lItems=[what],#who=oWho);
+
+      if Send(oWho,@IsLoggedOn)
+      {
+         Send(oWho,@MsgSendUser,#message_rsc=pm_listing_returned,#parm1=rName);
+      }
+      else
+      {
+         plReturned = Cons([oWho,rName],plReturned);
+      }
+
+      return;
+   }
+
+   TellReturns(who = $)
+   "Ours, at logon (User): listings returned while who was away."
+   {
+      local i, lLeft;
+
+      lLeft = $;
+      foreach i in plReturned
+      {
+         if First(i) = who
+         {
+            Send(who,@MsgSendUser,#message_rsc=pm_listing_returned,#parm1=Nth(i,2));
+         }
+         else
+         {
+            lLeft = Cons(i,lLeft);
+         }
+      }
+
+      plReturned = lLeft;
 
       return;
    }

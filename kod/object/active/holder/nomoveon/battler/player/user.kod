@@ -153,7 +153,6 @@ resources:
    user_stat_defense = "Defense"
    user_stat_armor = "Armor"
    user_stat_training = "Training Pts"
-   user_stat_unbound_energy = "Unbound Energy"
 
    user_resist_magic = "Magic Resist"
    user_resist_fire = "Fire Resist"
@@ -1003,6 +1002,11 @@ messages:
       Send(Send(SYS,@GetQuestBook),@PlayerLoggedOn,#who=self);
       // Ours: our companion comes back with us (util/companionbook.kod)
       Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
+      // Ours: market listings sent back to our vault while we were away (util/playermarket.kod)
+      if Send(SYS,@GetPlayerMarket) <> $
+      {
+         Send(Send(SYS,@GetPlayerMarket),@TellReturns,#who=self);
+      }
 
       return;
    }
@@ -2655,6 +2659,11 @@ messages:
          case UC_MINIGAME_RESET_PLAYERS:
             Send(Nth(client_msg,2),@ResetPlayers,#who=self);
             return;
+         case UC_SHARDS_OBJECT:
+            // Ours: a command about one object (util/shardsabilities.kod)
+            Send(self,@ShardsObjectCommand,#what=Nth(client_msg,2),
+                 #string=Nth(client_msg,3));
+            return;
          case UC_SHARDS:
             // Ours: a command from Meridian Shards' client (docs/adr/0015)
             Send(self,@ShardsCommand,#string=Nth(client_msg,2));
@@ -3171,8 +3180,6 @@ messages:
          piSave_Fine_Col = 54;
          piSave_Angle = 3072;
       }
-
-      Send(self,@WipeUnboundEnergy);
 
       return Send(SYS,@GetSuccessRsc);
    }
@@ -3706,9 +3713,9 @@ messages:
 
       if group = 2
       {
-         AddPacket(1,BP_STAT_GROUP, 1,group, 1,27);
+         // Ours: no Unbound Energy (gone) or Karma (always 0): docs/adr/0016-abilities.md
+         AddPacket(1,BP_STAT_GROUP, 1,group, 1,25);
 
-         Send(self,@SendStatUnboundEnergy);
          Send(self,@SendStatTraining);
          Send(self,@SendStatMight);
          Send(self,@SendStatIntellect);
@@ -3716,7 +3723,6 @@ messages:
          Send(self,@SendStatAgility);
          Send(self,@SendStatMysticism);
          Send(self,@SendStatAim);
-         Send(self,@SendStatKarma);
          Send(self,@SendStatBulk);
          Send(self,@SendStatCapacity);
          Send(self,@SendStatOffense);
@@ -4477,6 +4483,11 @@ messages:
    //   ambient       the crowd our client should show in this room
    //   quest ...     quests: accept, turn in, abandon, the log (util/questbook.kod)
    //   companion ... our companion: ask, stances, dismiss, come, looks (util/companionbook.kod)
+   //   tailor, barber ... their menus (util/cosmeticsbook.kod)
+   //   train list    the abilities we can train, and their costs (util/shardsabilities.kod)
+   //   start <city>  a new character skips the tutorial (ShardsAbilities.StartCity)
+   // UC_SHARDS_OBJECT carries an object with its line (ShardsObjectCommand): train, appraise,
+   // vault and guild.
 
    ShardsCommand(string = $)
    {
@@ -4547,7 +4558,47 @@ messages:
          return;
       }
 
+      if StringEqual(sVerb,"train")
+      {
+         Send(Send(SYS,@GetShardsAbilities),@SendTraining,#who=self);
+
+         return;
+      }
+
+      // A new character skipping the tutorial: start <city> (the creator's choice)
+      if StringEqual(sVerb,"start")
+      {
+         Send(Send(SYS,@GetShardsAbilities),@StartCity,#who=self,#words=lWords);
+
+         return;
+      }
+
       Debug("Unknown UC_SHARDS command from",self);
+
+      return;
+   }
+
+   ShardsObjectCommand(what = $,string = $)
+   "Ours: UC_SHARDS_OBJECT, a command line about one object: an item we carry to appraise or "
+   "send to our vault or guild chest, a spell or skill to train (util/shardsabilities.kod)."
+   {
+      local lWords;
+
+      if what = $ OR string = $
+      {
+         return;
+      }
+
+      plShardsWords = $;
+      ParseString(string," ",@ShardsCommandWord);
+      lWords = plShardsWords;
+      plShardsWords = $;
+      if lWords = $
+      {
+         return;
+      }
+
+      Send(Send(SYS,@GetShardsAbilities),@ObjectCommand,#who=self,#what=what,#words=lWords);
 
       return;
    }
@@ -4760,6 +4811,9 @@ messages:
             }
          }
       }
+
+      // A quest step to attune here (util/questbook.kod QK_ATTUNE)
+      Send(Send(SYS,@GetQuestBook),@CheckStateSteps,#who=self);
 
       return;
    }
@@ -7205,7 +7259,7 @@ messages:
 
    UserCast(oSpell=$,lTargets=$)
    {
-      local i, bFound, iSpell, iSpellNum, iSpellPower, lFinalTargets, iCost;
+      local i, bFound, iSpell, iSpellNum, iSpellPower, lFinalTargets;
 
       // Check for valid spell first. This is mainly an issue during
       // system saves where a user might cast something with the wrong
@@ -7283,39 +7337,20 @@ messages:
          return;
       }
 
-      iCost = Send(oSpell,@GetMeditateRatio);
-
-      // Check if it's a free cast.
-      pbFree_cast = (iCost <= Send(self,@GetUnboundEnergy)
-                     AND iCost > 0
-                     AND send(oSpell,@IsFreeCastable));
-
-      // Get the spell power
+      // Get the spell power (ours: no free casts, as unbound energy is gone: docs/adr/0016)
       iSpellPower = Send(oSpell,@GetSpellPower,#who=self);
-
-      // Free casts get a bonus.
-      if pbFree_cast
-      {
-         iSpellPower = Bound(iSpellPower + 20,SPELLPOWER_MINIMUM,SPELLPOWER_MAXIMUM);
-      }
 
       // First make sure user has enough magic points, reagents, etc.
       if NOT Send(oSpell,@CanPayCosts,#who=self,#lTargets=lFinalTargets,
-                  #iSpellpower=iSpellpower,#bFreeCast=pbFree_cast)
+                  #iSpellpower=iSpellpower)
       {
          // Player failed some sort of internal check
          return;
       }
 
       if Send(oSpell,@PayCosts,#who=self,#iSpellPower=iSpellPower,
-               #lTargets=lFinalTargets,#bFreeCast=pbFree_cast)
+               #lTargets=lFinalTargets)
       {
-         // If we had a free cast, deduct points from our unbound energy.
-         if pbFree_cast
-         {
-            Send(self,@AddUnboundEnergy,#iAmount=-iCost);
-         }
-
          // Alright, cast that spell already.
          Send(oSpell,@BeginCastingTrance,#who=self,#lTargets=lFinalTargets,
                #iSpellPower=iSpellPower);
@@ -9574,14 +9609,8 @@ messages:
    }
 
    DrawKarma()
+   "Ours: Karma is no longer in the Stats group (it's always 0): nothing to draw."
    {
-      if pbLogged_on
-      {
-         AddPacket(1,BP_STAT,1,2);
-         Send(self,@SendStatKarma);
-         SendPacket(poSession);
-      }
-
       return;
    }
 
@@ -9976,30 +10005,6 @@ messages:
          Send(self,@SendStatXP);
          SendPacket(poSession);
       }
-
-      return;
-   }
-
-   DrawUnboundEnergy()
-   {
-      if pbLogged_on
-      {
-         AddPacket(1,BP_STAT,1,2);
-         Send(self,@SendStatUnboundEnergy);
-         SendPacket(poSession);
-      }
-
-      return;
-   }
-
-   SendStatUnboundEnergy()
-   {
-      local iPoints;
-
-      iPoints = Send(self,@GetUnboundEnergy);
-
-      AddPacket(1,27, 4,user_stat_unbound_energy, 1,STAT_VALUE, 1,STAT_INTEGER,
-                4,iPoints, 4,0, 4,Send(SETTINGS_OBJECT,@GetUnboundMax), 4,iPoints);
 
       return;
    }

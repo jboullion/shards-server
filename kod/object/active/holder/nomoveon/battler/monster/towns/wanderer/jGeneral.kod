@@ -126,8 +126,7 @@ messages:
             SID_RESIST_POISON,
             SID_GLOW_WEAPON,
             SID_FREE_ACTION,
-            SID_SHATTERLOCK,
-			   SID_VAULT_LOADOUT
+            SID_SHATTERLOCK
          ],
       $];
 
@@ -149,8 +148,7 @@ messages:
             SID_HASTE,
             SID_RESIST_POISON,
             SID_GLOW_WEAPON,
-            SID_FREE_ACTION,
-			   SID_VAULT_LOADOUT
+            SID_FREE_ACTION
          ],
       $];
 

@@ -23,6 +23,9 @@ constants:
    // One minute
    DEATH_RIFT_INTERVAL = 1000 * 60
 
+   // Ours: how long a new character has to skip the tutorial for a starting city (CanChooseStart)
+   CHOOSE_START_SECONDS = 3600
+
    KARMA_TUNE_A_INVERSE = 20
    KARMA_TUNE_B_INVERSE = 5
 
@@ -233,8 +236,8 @@ resources:
    player_training_inform = "You now have ~B%i~B training points!"
    player_reached_maxtraining = \
       "You now have ~B%i~B training points and can not gain any more!  "
-      "Cast the Meditate spell and say the name of a spell or skill out loud "
-      "to use your points to train it."
+      "Press Train beside your training points on the Stats page to spend "
+      "them on a spell or skill."
    player_gained_training = "You have gained ~B%i~B training points!"
    player_spent_training = "You have spent ~B%i~B training points!"
    player_logon_bonus = \
@@ -242,16 +245,6 @@ resources:
       "Come back tomorrow for more!"
    player_experience_gained = "You have gained ~B~s%i~v~B XP."
    player_experience_lost = "You have lost ~B~r%i~B~v XP!"
-
-   player_unbound_energy_wiped = "The volatile energy surrounding you "
-      "dissipates in the violently twisting aether."
-   player_unbound_energy_gained = "You gather ~B~t%i~v~B unbound energy "
-      "from your fallen enemy. You have ~B~t%i~v~B unbound energy."
-   player_unbound_energy_lost = "You channel ~B~t%i~v~B unbound energy "
-      "to shape your spell. You have ~B~t%i~v~B unbound energy left."
-   player_unbound_energy_wasted = "Your mind is too preoccupied with your "
-      "recent encounter to make any use of the subtle energies dispersing "
-      "before your eyes."
 
    player_health_gain_maxed = "Your health cannot increase any further."
 
@@ -868,11 +861,13 @@ properties:
    // This keeps track of training points that players accumulate when 
    // killing mobs.
    piTraining_points = 0
-   piInform = TRUE
 
-   // This keeps track of unbound energy, which isused for free spell casts.
-   piUnbound_energy = 0
-   pbFree_cast = FALSE
+   // Ours: when the character was made (PlayerNewCharInfo; 0 for older ones), and whether it has
+   // used its one chance to skip the tutorial for a starting city (util/shardsabilities.kod)
+   piCreatedAt = 0
+   pbStartChosen = FALSE
+
+   piInform = TRUE
 
    // This keeps track of when we've last received our daily training points.
    piReward_timestamp = 0
@@ -987,7 +982,6 @@ properties:
    ptHealth = $
    ptAdvancement = $
    ptRest = $
-   ptUnboundEnergy = $
 
    // Poison info
    ptPoison = $
@@ -1177,12 +1171,6 @@ messages:
       foreach i in Send(SYS,@GetGuilds)
       {
          Send(i,@RemoveFromFormerMemberList,#who=self);
-      }
-
-      if ptUnboundEnergy <> $
-      {
-         DeleteTimer(ptUnboundEnergy);
-         ptUnboundEnergy = $;
       }
 
       if ptHealth <> $
@@ -2363,8 +2351,13 @@ messages:
       SendList(plPassive, 0, @UserLogon);
       SendList(plActive, 0, @UserLogon);
 
-      // Restart Unbound Energy, Health and Mana timers
-      Send(self,@NewUnboundEnergy);
+      // Ours: looks the character creator no longer offers
+      Send(self,@TidyLook);
+
+      // Ours: scrolls of what's gone from the game (docs/adr/0016-abilities.md)
+      Send(self,@DropRetiredItems);
+
+      // Restart Health and Mana timers
       Send(self,@NewHealth);
       Send(self,@NewMana);
 
@@ -2513,12 +2506,7 @@ messages:
          Send(self,@FactionServiceTimer,#renew=FALSE);
       }
 
-      // Stop unbound energy, health and mana timers.
-      if ptUnboundEnergy <> $
-      {
-         DeleteTimer(ptUnboundEnergy);
-         ptUnboundEnergy = $;
-      }
+      // Stop health and mana timers.
 
       if ptHealth <> $
       {
@@ -2755,6 +2743,10 @@ messages:
 
       Send(self,@AddDefaultSpells);
       Send(self,@AddDefaultSkills);
+
+      // Ours: a new character may choose once to skip the tutorial (CanChooseStart)
+      piCreatedAt = GetTime();
+      pbStartChosen = FALSE;
 
       lSpells = Nth(charinfo,5);
       lSkills = Nth(charinfo,6);
@@ -2994,18 +2986,38 @@ messages:
       return;
    }
 
+   DropRetiredItems()
+   "Ours, at logon (docs/adr/0016-abilities.md): scrolls of what left the game crumble: set, "
+   "loadout and vault loadout scrolls (their spells are retired: SYS GetRetiredSpells) and "
+   "unbound energy scrolls. Their classes stay, as copies may wait in vaults and shops."
+   {
+      local i, lGone;
+
+      lGone = $;
+      foreach i in plPassive
+      {
+         if IsClass(i,&SetScroll) OR IsClass(i,&LoadoutScroll)
+            OR IsClass(i,&VaultLoadoutScroll) OR IsClass(i,&UBScroll)
+         {
+            lGone = Cons(i,lGone);
+         }
+      }
+
+      foreach i in lGone
+      {
+         Send(i,@Delete);
+      }
+
+      return;
+   }
+
    AddDefaultSpells()
    "Add the spells a player is given when creating a character"
    {
       Send(self,@AddSpell,#num=SID_BLINK,#initial=TRUE);
-      Send(self,@AddSpell,#num=SID_CONVEYANCE,#initial=TRUE);
-      Send(self,@AddSpell,#num=SID_TRANSFERENCE,#initial=TRUE);
       Send(self,@AddSpell,#num=SID_PHASE,#initial=TRUE);
-      Send(self,@AddSpell,#num=SID_MEDITATE,#initial=TRUE,#iability=1);
-      Send(self,@AddSpell,#num=SID_VAULT_LOADOUT,#initial=TRUE);
-      Send(self,@AddSpell,#num=SID_LOADOUT,#initial=TRUE);
-      Send(self,@AddSpell,#num=SID_SET,#initial=TRUE);
-      Send(self,@AddSpell,#num=SID_APPRAISE,#initial=TRUE);
+      // Ours: Conveyance, Transference, Meditate, Vault Loadout, Loadout, Set and Appraise are
+      // retired (SYS GetRetiredSpells): our client's Train window and item buttons do their work
 
       return;
    }
@@ -3265,6 +3277,22 @@ messages:
       return piGender;
    }
 
+   CanChooseStart()
+   "Ours: whether this character may still skip the tutorial for a starting city: made within the "
+   "hour (CHOOSE_START_SECONDS), not chosen yet, and still at its first health."
+   {
+      return piCreatedAt > 0 AND NOT pbStartChosen
+         AND GetTime() - piCreatedAt < CHOOSE_START_SECONDS
+         AND piBase_max_health <= 20;
+   }
+
+   SetStartChosen()
+   {
+      pbStartChosen = TRUE;
+
+      return;
+   }
+
    GetMaxHealth()
    {
       return piMax_health;
@@ -3309,11 +3337,8 @@ messages:
    }
 
    UnboundEnergyTimer()
+   "Ours: a timer a save may still hold from when there was unbound energy (docs/adr/0016)."
    {
-      ptUnboundEnergy = $;
-
-      Send(self,@LoseUnboundEnergy);
-
       return;
    }
 
@@ -7044,22 +7069,6 @@ messages:
       return;
    }
 
-   LoseUnboundEnergy()
-   {
-      local iReduction;
-
-      if NOT Send(self,@IsInCannotInteractMode)
-      {
-         iReduction = Bound(piUnbound_energy * Send(SETTINGS_OBJECT,@GetUnboundDecay)
-                           / 1000,1,$);
-         piUnbound_energy -= iReduction;
-      }
-
-      Send(self,@NewUnboundEnergy);
-
-      return;
-   }
-
    LoseHealth(amount = $, decay = FALSE, precision = FALSE)
    "decay = TRUE if you lose a HP over time because you are boosted over max "
    "by some sort of vamp effect. If this is true, you shouldn't break a trance."
@@ -7153,45 +7162,6 @@ messages:
       Send(self,@NewHealth);
 
       return (piHealth - iOldhealth);
-   }
-
-   NewUnboundEnergy(bDelay = FALSE)
-   {
-      if piUnbound_energy < 0
-      {
-         piUnbound_energy = 0;
-      }
-
-      if ptUnboundEnergy = $
-      {
-         if piUnbound_energy > 0
-         {
-            if bDelay
-            {
-               ptUnboundEnergy = CreateTimer(self,@UnboundEnergyTimer,
-                                       Send(SETTINGS_OBJECT,@GetUnboundDelay));
-            }
-            else
-            {
-               ptUnboundEnergy = CreateTimer(self,@UnboundEnergyTimer,1000);
-            }
-         }
-      }
-      else if piUnbound_energy = 0
-      {
-         DeleteTimer(ptUnboundEnergy);
-         ptUnboundEnergy = $;
-      }
-      else if bDelay
-      {
-         DeleteTimer(ptUnboundEnergy);
-         ptUnboundEnergy = CreateTimer(self,@UnboundEnergyTimer,
-                                 Send(SETTINGS_OBJECT,@GetUnboundDelay));
-      }
-
-      Send(self,@DrawUnboundEnergy);
-
-      return;
    }
 
    NewHealth()
@@ -8852,6 +8822,8 @@ messages:
       {
          Send(self,@AddToSchools,#school=Send(oSkill,@GetSchool),
                #change=iBoundAbility);
+         // Ours: a quest step to learn it (util/questbook.kod QK_LEARN)
+         Send(Send(SYS,@GetQuestBook),@SkillLearned,#who=self,#oSkill=oSkill);
       }
 
       return True;
@@ -9128,7 +9100,7 @@ messages:
    "stamina, all the way down to half for those with high staminas."
    {
       local i, iMaxHealth, dodgeskill, oSkill, monster_level, iXP, oWeapon,
-            iItemBonus, iUnbound, iDist, iDifference, iBonusXP, iBonusTP;
+            iItemBonus, iBonusXP, iBonusTP;
 
       iXP = 0;
       iItemBonus = 0;
@@ -9283,52 +9255,6 @@ messages:
          // AddXP checks for HP gain and redraws the XP bar.
          // NOTE: iMaxHealth could be wrong after this point.
          Send(self,@AddXP,#iAmount=iXP);
-
-         // Also grant unbound energy for your own kills.
-         // Unbound energy allows free spell casts.
-         if IsClass(what,&Monster) AND killing_blow
-         {
-            // Let's figure the amount, mostly based on monster level.
-            iUnbound = monster_level * Send(SETTINGS_OBJECT,@GetUnboundAbsorption)
-               * (Random(30,80) + (Send(self,@GetMysticism) * 2 / 5)) / 10000;
-
-            // Scale with distance to victim.
-            iDist = Bound(Send(self,@SquaredFineDistanceTo3D,#what=what),1,$);
-            // 36864 is 3 range in fine units, cf. SquaredFineDistanceTo3D.
-            iUnbound = Bound(iUnbound * 36864 / iDist,$,iUnbound);
-
-            // Scale with player level.
-            iDifference = piMax_health - monster_level;
-            if iDifference > 10
-            {
-               iUnbound = Bound(iUnbound * 100 / (iDifference * iDifference),$,iUnbound);
-            }
-
-            // Not awarding any unbound energy to players who have recently been involved
-            // in PvP.
-            if Send(self,@GetLastPlayerAttackTime)
-               + Send(SETTINGS_OBJECT,@UnboundEnergyAttackDelaySec)
-               > GetTime()
-            {
-               if iUnbound > 0
-               {
-                  Send(self,@MsgSendUser,#message_rsc=player_unbound_energy_wasted);
-               }
-            }
-            else
-            {
-            
-               // Grant only one fourth of the energy if the mob didn't attack the player.
-               if ((piFlags & PFLAG_TOOK_DAMAGE) OR (piFlags & PFLAG_DODGED))
-               {
-                  Send(self,@AddUnboundEnergy,#iAmount=iUnbound);
-               }
-               else
-               {
-                  Send(self,@AddUnboundEnergy,#iAmount=iUnbound / 4);
-               }
-            }
-         }
 
          // Here, we work out if the player deserves a training point.
          // They qualify if they got at least one gain point from the monster,
@@ -9545,54 +9471,6 @@ messages:
       return;
    }
 
-   AddUnboundEnergy(iAmount=0,report=TRUE)
-   {
-      // Add to total. Check reasonable limits first. You can't lose
-      // more points than you have and you can't get more points than
-      // you need to reach the cap.
-      iAmount = Bound(iAmount,-piUnbound_energy,Send(SETTINGS_OBJECT,@GetUnboundMax) - piUnbound_energy);
-      piUnbound_energy += iAmount;
-
-      if (pbLogged_on AND report)
-      {
-         if iAmount > 0
-         {
-            Send(self,@MsgSendUser,#message_rsc=player_unbound_energy_gained,
-                  #parm1=iAmount,#parm2=piUnbound_energy);
-         }
-         else if iAmount < 0
-         {
-            Send(self,@MsgSendUser,#message_rsc=player_unbound_energy_lost,
-                  #parm1=-iAmount,#parm2=piUnbound_energy);
-         }
-      }
-
-      // Only delay decay if we gain points.
-      if iAmount > 0
-      {
-         Send(self,@NewUnboundEnergy,#bDelay=TRUE);
-      }
-      else
-      {
-         Send(self,@NewUnboundEnergy,#bDelay=FALSE);
-      }
-
-      return;
-   }
-
-   WipeUnboundEnergy(report=TRUE)
-   {
-      if (pbLogged_on AND report AND piUnbound_energy > 0)
-      {
-         Send(self,@MsgSendUser,#message_rsc=player_unbound_energy_wiped);
-      }
-
-      // Remove all unbound energy, for example after a teleport.
-      send(self,@AddUnboundEnergy,#iAmount=-piUnbound_energy,#report=FALSE);
-
-      return;
-   }
-
    GetXPRemainingForNextLevel()
    {
       // Use raw base max health here, can go higher than 150.
@@ -9624,17 +9502,6 @@ messages:
    GetTrainingPoints()
    {
       return piTraining_points;
-   }
-
-   GetUnboundEnergy()
-   {
-      return piUnbound_energy;
-   }
-
-   // Returns true if the last spell cast was a free cast.
-   GetFreeCast()
-   {
-      return pbFree_cast;
    }
 
    AddTrainingPoints(points=0,report=TRUE,bCap=TRUE)
@@ -11191,6 +11058,34 @@ messages:
       prToupee = hair;
       prBeard = beard;
       Send(self,@SetHairTranslation,#translation=colour);
+
+      return;
+   }
+
+   TidyLook()
+   "Ours, at logon: a hairstyle or hair colour the creator stopped offering (SYS "
+   "GetRetiredHairIcons, OfferedHairColour), or facial hair it doesn't offer this gender "
+   "(GetAllowedBeardIcons), gives way: the gender's first style, the colour that replaced it, "
+   "no facial hair. Anything else (a DM's look) is left be."
+   {
+      local iColour, iOffered;
+
+      if FindListElem(Send(SYS,@GetRetiredHairIcons),prToupee) <> 0
+         AND FindListElem(Send(SYS,@GetAllowedHairIcons,#iGender=piGender),prToupee) = 0
+      {
+         prToupee = First(Send(SYS,@GetAllowedHairIcons,#iGender=piGender));
+      }
+      if prBeard <> $
+         AND FindListElem(Send(SYS,@GetAllowedBeardIcons,#iGender=piGender),prBeard) = 0
+      {
+         prBeard = $;
+      }
+      iColour = Send(self,@GetHairColor);
+      iOffered = Send(SYS,@OfferedHairColour,#colour=iColour);
+      if iOffered <> iColour
+      {
+         Send(self,@SetHairTranslation,#translation=iOffered);
+      }
 
       return;
    }
@@ -15701,19 +15596,6 @@ messages:
       return poWonDR;
    }
     
-   SomethingAttacked(what = $,victim = $,use_weapon = $)
-   {
-      if what <> victim
-      AND IsClass(what,&Player)
-      AND IsClass(victim,&Player)
-      {
-         Send(what,@WipeUnboundEnergy);
-         Send(victim,@WipeUnboundEnergy);
-      }
-
-      propagate;
-   }
-
    IsOfflineOrCannotInteract()
    {
       return (NOT pbLogged_on)

@@ -49,7 +49,8 @@ GREEN = (0, 177, 64)
 SHEET = 1024
 SKIN = 2  # XLAT DBLUETOSKIN2, a mid skin tone
 BLACK = 0
-RAMP = list(range(0xD0, 0xE0))  # the grey hair ramp, light to dark
+OVER_FIGURE = 127  # a hotspot marking facial hair, which the browser draws over the body
+RAMP =list(range(0xD0, 0xE0))  # the grey hair ramp, light to dark
 PREVIEW_COLOURS = [0x2D, 0x2F, 0x2C, 0x11]  # brown, blond, black, blue
 
 KINDS = {
@@ -221,6 +222,10 @@ def build(kind: str, name: str, describe: str, ref: str | None, force: bool) -> 
         xoff = int(round((x0 - ox - v["ox"]) / res - (hx - v["ox"]) / res))
         yoff = int(round((y0 - oy - v["oy"]) / res - (hy - v["oy"]) / res))
         bitmaps.append(Bitmap(crop.shape[1], crop.shape[0], xoff, yoff, [], crop.tobytes()))
+    if kind == "beard":
+        # meridian-browser sprites.ts HS_OVER_FIGURE: drawn over the body, whose collar would hide it
+        for b in bitmaps:
+            b.hotspots.append({"num": OVER_FIGURE, "x": 0, "y": 0})
     part = BGF(name=name, shrink=14, groups=spec["groups"], bitmaps=bitmaps)
     out = d / f"{name}.bgf"
     part.write(out)

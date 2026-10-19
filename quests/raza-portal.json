@@ -1,0 +1,33 @@
+{
+  "id": 135,
+  "key": "raza-portal",
+  "name": "A Way Home",
+  "tier": "main",
+  "giver": {
+    "class": "RazaInnKeeper"
+  },
+  "band": {
+    "min": 20,
+    "max": 30
+  },
+  "requires": {
+    "quests": [
+      138
+    ]
+  },
+  "text": {
+    "offer": "Before you head out to the rats, a word of advice. There is an old portal at the edge of town, shimmering away to itself. Walk into it, and it will know you: wherever you find another like it, you can step back here. Every traveller should have a way home.",
+    "complete": "There, now Raza is never more than a step away. Mind you come back and spend your coin here."
+  },
+  "steps": [
+    {
+      "kind": "attune",
+      "point": 3,
+      "objective": "Attune to Raza's portal",
+      "brief": "Find the portal at the edge of Raza (a gold \"!\" marks portals you haven't touched) and walk into it to attune yourself to it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}

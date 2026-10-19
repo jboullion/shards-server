@@ -20,9 +20,10 @@ resources:
 
    UBScroll_name_rsc = "unbound energy scroll"
    UBScroll_icon_rsc = scr06.bgf
-   UBScroll_desc_rsc = "This is a unbound energy scroll. Using it will grant you 1000 unbound energy. "   
+   UBScroll_desc_rsc = "This scroll once held unbound energy, which the world knows no more."
 
-   UBScroll_warning = "~r~BWarning using this scroll will consume it and grant the player 1000 unbound energy. "
+   // Ours: unbound energy is gone (docs/adr/0016-abilities.md); a scroll still about crumbles
+   UBScroll_crumbles = "The scroll's magic is long spent, and it crumbles to dust."
 
 classvars:
 
@@ -39,38 +40,15 @@ classvars:
 properties:
 
    pbIn_use = FALSE
-   pbWarned = FALSE
-
-   piEnergy = 1000
    
 messages:
    
    ReqNewApply(what = $,use_item = $)
    {
-
-      if pbWarned = FALSE
-      {
-         Send(what,@MsgSendUser,#message_rsc=UBScroll_warning);
-
-         pbWarned = TRUE;
-
-         return FALSE;
-      }
-      else
-      {
-         return TRUE;
-      }
+      Send(what,@MsgSendUser,#message_rsc=UBScroll_crumbles);
+      Send(self,@Delete);
 
       return FALSE;
-   }
-
-   NewApplied(what = $)
-   {
-      Send(what,@AddUnboundEnergy,#iAmount=piEnergy);
-
-      send(self,@delete);
-
-      return;
    }
 
    CanBeStoredInVault()

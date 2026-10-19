@@ -59,12 +59,16 @@ constants:
    QB_NEEDS = 20
    QB_SPECIAL = 21
    QB_EXCLUDES = 22
+   // Ours: offered only while base health is under this ($: no cap; Raza's repeatable hunts)
+   QB_HEALTH_BELOW = 23
 
    // What a quest needs of a player besides (QB_NEEDS bits)
    QBQ_INTRIGUING = 1
    QBQ_GUILD_MASTER = 2
    QBQ_GUILD_SHIELD = 4
    QBQ_NO_GUILD = 8
+   // Ours: not offered for now (a quest file's "paused"); one going can still be finished
+   QBQ_PAUSED = 16
 
    // A step's fields
    QBS_KIND = 1
@@ -115,6 +119,13 @@ constants:
    QK_NODES = 13
    // Ours: having a companion (docs/adr/0010-followers.md; util/companionbook.kod)
    QK_COMPANION = 14
+   // Ours: sending something to our vault from the inventory (util/shardsabilities.kod Convey),
+   // which was the Conveyance spell
+   QK_CONVEY = 15
+   // Ours: learning a skill (one of the step's classes; knowing them all already counts), and
+   // attuning to a portal (the step's amount is the travel point: util/travelnet.kod)
+   QK_LEARN = 16
+   QK_ATTUNE = 17
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -161,6 +172,9 @@ constants:
    QUEST_SOON_HEALTH = 10
 
 resources:
+
+   // Ours: a signet ring's owner who stands in no room (UC_SIGNETS)
+   quest_signet_nowhere = ""
 
    quest_accepted = "You take on the quest ~B%s~n."
    quest_progress = "%s: %i/%i"
@@ -425,7 +439,7 @@ messages:
    "QO_OFFER if this quest is offered to who now, QO_SOON if only their health keeps them from "
    "it (and not by much), else QO_NONE."
    {
-      local i, lDone, iHealth, iKarma, iMin, iFaction;
+      local i, lDone, iHealth, iKarma, iMin, iFaction, lStep;
 
       if Send(self,@LogEntry,#who=who,#id=First(qrow)) <> $
       {
@@ -482,7 +496,20 @@ messages:
          return QO_NONE;
       }
 
+      // Ours: a quest that starts by attuning to a portal isn't offered once we are
+      lStep = Send(self,@GetStep,#qrow=qrow,#num=1);
+      if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_ATTUNE
+         AND Send(Send(SYS,@GetTravelNetwork),@IsAttuned,#who=who,#id=Nth(lStep,QBS_AMOUNT))
+      {
+         return QO_NONE;
+      }
+
       iHealth = Send(who,@GetBaseMaxHealth);
+      if Nth(qrow,QB_HEALTH_BELOW) <> $ AND iHealth >= Nth(qrow,QB_HEALTH_BELOW)
+      {
+         return QO_NONE;
+      }
+
       iMin = Nth(qrow,QB_BAND_MIN);
       if iHealth < iMin
       {
@@ -506,6 +533,11 @@ messages:
       if needs = $ OR needs = 0
       {
          return TRUE;
+      }
+
+      if needs & QBQ_PAUSED
+      {
+         return FALSE;
       }
 
       if (needs & QBQ_INTRIGUING) AND NOT Send(who,@PlayerIsIntriguing)
@@ -1505,6 +1537,67 @@ messages:
       Send(self,@CheckDeadlines,#who=who);
       Send(self,@CheckStateSteps,#who=who);
       Send(self,@SendLog,#who=who);
+      Send(self,@SendSignets,#who=who);
+
+      return;
+   }
+
+   SignetMoved(from = $,to = $)
+   "Ours: a signet ring left a holder or reached one (SignetRing.NewOwner, Delete, posted): a "
+   "player on either side gets their list of rings to return again."
+   {
+      if from <> $ AND IsClass(from,&User)
+      {
+         Send(self,@SendSignets,#who=from);
+      }
+
+      if to <> $ AND to <> from AND IsClass(to,&User)
+      {
+         Send(self,@SendSignets,#who=to);
+      }
+
+      return;
+   }
+
+   SendSignets(who = $)
+   "Ours: UC_SIGNETS, the signet rings who carries, for our client's quest log (bronze, docs/adr/"
+   "0009-quests.md): each ring, its owner's name, and the room they stand in (name, number; "
+   "nothing and 0 for none). Returning a ring is the library's errand (Monster, SignetDelivered)."
+   {
+      local oSession, i, lRings, oMob, oRoom;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lRings = $;
+      foreach i in Send(who,@GetHolderPassive)
+      {
+         if IsClass(i,&SignetRing) AND Send(i,@GetRingOwner) <> $
+         {
+            lRings = Cons(i,lRings);
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_SIGNETS, 1,Length(lRings));
+      foreach i in lRings
+      {
+         oMob = Send(i,@GetRingOwner);
+         oRoom = Send(oMob,@GetOwner);
+         if oRoom <> $ AND IsClass(oRoom,&Room)
+         {
+            AddPacket(4,i, 4,Send(oMob,@GetName), 4,Send(oRoom,@GetName),
+                      4,Send(oRoom,@GetRoomNum));
+         }
+         else
+         {
+            AddPacket(4,i, 4,Send(oMob,@GetName), 4,quest_signet_nowhere, 4,0);
+         }
+      }
+
+      SendPacket(oSession);
 
       return;
    }
@@ -1634,7 +1727,8 @@ messages:
          return FALSE;
       }
 
-      if Nth(step,QBS_KIND) = QK_EQUIP
+      // equip: any of the items; learn: any of the skills
+      if Nth(step,QBS_KIND) = QK_EQUIP OR Nth(step,QBS_KIND) = QK_LEARN
       {
          foreach i in Nth(step,QBS_CLASSES)
          {
@@ -1657,6 +1751,49 @@ messages:
       Send(self,@ActionDone,#who=who,#kind=QK_CAST,#what=cast);
 
       return;
+   }
+
+   ItemsConveyed(who = $)
+   "ShardsAbilities.Convey: something sent to our vault."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_CONVEY);
+
+      return;
+   }
+
+   SkillLearned(who = $,oSkill = $)
+   "Player.AddSkill: who learned a skill (QK_LEARN)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_LEARN,#what=oSkill);
+
+      return;
+   }
+
+   KnowsSkills(who = $,classes = $)
+   "Whether who knows a skill of each of these classes (a learn step that has nothing left to learn)."
+   {
+      local i, j, bFound;
+
+      foreach i in classes
+      {
+         bFound = FALSE;
+         foreach j in Send(who,@GetSkillList)
+         {
+            if IsClass(Send(SYS,@FindSkillByNum,#num=Send(who,@DecodeSkillNum,#compound=j)),i)
+            {
+               bFound = TRUE;
+
+               break;
+            }
+         }
+
+         if NOT bFound
+         {
+            return FALSE;
+         }
+      }
+
+      return TRUE;
    }
 
    MoneyDeposited(who = $,with = $,amount = 0)
@@ -1693,8 +1830,9 @@ messages:
 
    CheckStateSteps(who = $)
    "Steps that are a state, not a deed: a base health reached, a hometown chosen, every mana "
-   "node bonded, a companion. Checked at logon, when a step starts, on a health gain, a "
-   "hometown, a node, a companion sworn."
+   "node bonded, a companion, every skill a learn step names known, a portal attuned. Checked at "
+   "logon, when a step starts, on a health gain, a hometown, a node, a companion sworn, an "
+   "attunement."
    {
       local i, lQuest, lStep, iKind, bDone;
 
@@ -1728,6 +1866,15 @@ messages:
                if iKind = QK_COMPANION
                {
                   bDone = Send(who,@GetCompanion) <> $;
+               }
+               if iKind = QK_LEARN
+               {
+                  bDone = Send(self,@KnowsSkills,#who=who,#classes=Nth(lStep,QBS_CLASSES));
+               }
+               if iKind = QK_ATTUNE
+               {
+                  bDone = Send(Send(SYS,@GetTravelNetwork),@IsAttuned,#who=who,
+                               #id=Nth(lStep,QBS_AMOUNT));
                }
 
                if bDone

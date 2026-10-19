@@ -1,0 +1,35 @@
+{
+  "id": 136,
+  "key": "raza-road-to-marion",
+  "name": "The Road to Marion",
+  "tier": "main",
+  "giver": {
+    "class": "RazaInnKeeper"
+  },
+  "band": {
+    "min": 30,
+    "max": 40
+  },
+  "requires": {
+    "quests": [
+      138
+    ]
+  },
+  "text": {
+    "offer": "Look at you: you're no newcomer any more. There's more of the world than our little town, and you've outgrown my rats. Take the road to Marion, on the mainland, and find Tova behind the bar there. He's an old friend, loud as a bull, and he knows everyone who might need a capable hand. Tell him Marcus sent you.",
+    "progress": "Marion lies along the road from Raza. Tova tends the bar in Marion.",
+    "complete": "Tova says, \"Ha! Marcus sent you? Then the first drink's on me! Marion's a fine town with plenty of trouble. Morrigan at the inn always needs a hand, and Ran er'Hoth, our elder, is worried about the crypts under the town. Go and see them.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "MarionBartender"
+      },
+      "objective": "Speak to Tova in Marion"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75
+  }
+}

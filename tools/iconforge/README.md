@@ -84,6 +84,7 @@ python tools/iconforge/hair.py beard pbdc --describe "a pointed goatee with a th
 
 - `headrender.ts` renders the head and face with meridian-browser's own compositor, so placement matches the game.
 - One request redraws a sheet of every view in neutral grey. The part is matted (grey, not green, not the skin under it, clear of the eyes and nose), snapped to the hair ramp (`D0`–`DF`) plus black, and written as a shrink-14 BGF placed from the head's hotspot: 13 for hair (6 views), 12 for facial hair (5 views, no back).
+- Facial hair frames also carry a hotspot numbered 127. meridian-browser (`sprites.ts` `HS_OVER_FIGURE`) then draws the beard over the body, under a helm. Without it, the collar covers the beard, because the head hangs under the body. Keep it when editing a beard by hand.
 - Outputs go to `build/iconforge/hair/<name>/` (`raw.png` is cached, `preview.png` shows the part on both heads in four hair colours). Install by copying the BGF to `resource/graphics/shards/` and listing it in `kod/util/system.kod` (`GetAllowedHairIcons`, `GetAllowedBeardIcons`).
 - `data/iconforge/hair.json` lists every style made so far, with its reference and description.
 

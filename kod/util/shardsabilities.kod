@@ -1,0 +1,735 @@
+// Ours (Meridian Shards, docs/adr/0016-abilities.md in meridian-browser): what were utility
+// spells, done from our client's windows instead.
+//
+//   Train         spends training points on a spell or skill we know, 1% at a time, at the
+//                 ability's own price (its GetMeditateRatio: 10 x its level). Was Meditate's
+//                 spoken trance (meditate.kod SomethingSaidDuringTrance).
+//   Appraise      sets the price an item of ours sells for in the citizen's market, or clears
+//                 it. Was the Appraise spell (appraise.kod). Valuable things only: magical,
+//                 or worth APPRAISE_MIN_VALUE (IsAppraisable; Veydran checks it too). The
+//                 client asks (appraise ask, UC_APPRAISAL back) before showing its button.
+//   Vault         sends a stack we carry (or a bag's stacks) to our vault, for a fee of a
+//                 shilling a unit of bulk. Was Conveyance (conveyance.kod).
+//   Guild         sends a stack we carry (or a bag's stacks) to our guild hall's chest. Was
+//                 Transference (transference.kod).
+//
+// The client names the object with UC_SHARDS_OBJECT (user.kod ShardsObjectCommand): train
+// <amount>, appraise <price>, appraise clear, appraise ask, vault, guild. It asks for the list of
+// what it can train, and the prices, with the UC_SHARDS line "train list" (UC_TRAINING back).
+// Vault and guild work, but our client shows no buttons for them for now (fast travel makes
+// them less needed).
+
+////////////////////////////////////////////////////////////////////////////////
+ShardsAbilities is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   // Appraise: as the spell allowed
+   APPRAISE_MAX = 130000000
+   // ...but only on valuable things: magical, or worth this much (Item.GetInitValue)
+   APPRAISE_MIN_VALUE = 5000
+   // Skipping the tutorial: the purse a new character sets out with (StartCity)
+   START_SHILLINGS = 1000
+   // ...and the portals it's attuned to, which the tutorial's road would have passed
+   // (util/travelnet.kod GetPoints: Raza, Marion)
+   START_PORTAL_RAZA = 3
+   START_PORTAL_MARION = 2
+
+resources:
+
+   abil_train_unknown = "You don't know that."
+   abil_train_cant = "%s can't be trained."
+   abil_train_maxed = "You've mastered %s as far as anyone can."
+   abil_train_poor = "Improving %s costs %i training points a percent, and you have %i."
+   abil_train_done = \
+      "You reflect on the art of %s and come to a deeper understanding of its "
+      "intricacies. It rose by ~B%i~B percent, for %i training points."
+
+   abil_appraise_not_valuable = \
+      "Only valuable things go on the citizen's market: magical items, and anything worth "
+      "5,000 shillings or more."
+   abil_appraise_price = "The price must be between 1 and 130,000,000 shillings."
+   abil_appraise_done = "~g~BYou appraise the %s for %i shillings."
+   abil_appraise_none = "The %s isn't appraised."
+   abil_appraise_cleared = "You remove the appraisal from the %s."
+
+   abil_not_holding = "You must be carrying %s%s."
+
+   abil_start_too_late = "It's too late to choose where you start."
+   abil_start_done = \
+      "You skip the long road from Raza and set out from %s, with armor on your back, a shield "
+      "on your arm and a purse of coin. It's your home now: you're one of its citizens. The "
+      "portals of Raza and Marion know you too, for when you'd travel."
+   abil_start_marion = "Marion"
+   abil_start_jasper = "Jasper"
+   abil_start_cornoth = "Cor Noth"
+   abil_start_barloque = "Barloque"
+   abil_start_tos = "Tos"
+   abil_vault_cant = "You can't send %s%s to your vault."
+   abil_vault_poor = "You don't have the shillings to send %s%s to your vault."
+   abil_vault_full = "Your vault doesn't have the room."
+   abil_vault_done = "A small portal whips into existence, pulling %s%s to your vault."
+
+   abil_guild_cant = "You can't send %s%s to your guild hall's chest."
+   abil_guild_pvp = "You can't do that while you're sworn to peace."
+   abil_guild_none = "You must be in a guild to do that."
+   abil_guild_rank = "You aren't high enough in your guild to reach its chest."
+   abil_guild_no_hall = "Your guild doesn't own a hall. Perhaps you should complain to your guild master."
+   abil_guild_full = "Your guild hall's chest can't hold any more."
+   abil_guild_done = "Delivered %s%s to your guild hall's chest."
+
+classvars:
+
+properties:
+
+messages:
+
+   ObjectCommand(who = $,what = $,words = $)
+   "UC_SHARDS_OBJECT from who's client: train <amount> (a spell or skill), appraise <price>, "
+   "appraise clear, vault, guild (an item)."
+   {
+      local sVerb;
+
+      if who = $ OR NOT IsClass(who,&User) OR what = $ OR words = $
+      {
+         return;
+      }
+
+      sVerb = First(words);
+      if StringEqual(sVerb,"train")
+      {
+         if Length(words) >= 2
+         {
+            Send(self,@Train,#who=who,#ability=what,#amount=StringToNumber(Nth(words,2)));
+         }
+
+         return;
+      }
+
+      if StringEqual(sVerb,"appraise")
+      {
+         if Length(words) >= 2 AND StringEqual(Nth(words,2),"clear")
+         {
+            Send(self,@ClearAppraisal,#who=who,#oItem=what);
+
+            return;
+         }
+
+         // Our client asks before showing its Appraise button (UC_APPRAISAL back)
+         if Length(words) >= 2 AND StringEqual(Nth(words,2),"ask")
+         {
+            Send(self,@SendAppraisal,#who=who,#oItem=what);
+
+            return;
+         }
+
+         if Length(words) >= 2
+         {
+            Send(self,@AppraiseItem,#who=who,#oItem=what,#iPrice=StringToNumber(Nth(words,2)));
+         }
+
+         return;
+      }
+
+      if StringEqual(sVerb,"vault")
+      {
+         Send(self,@Convey,#who=who,#oItem=what);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"guild")
+      {
+         Send(self,@Transfer,#who=who,#oItem=what);
+
+         return;
+      }
+
+      Debug("Unknown UC_SHARDS_OBJECT command from",who);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// train
+
+   TrainCost(who = $,ability = $)
+   "What 1% of a spell or skill who knows costs in training points, or 0 if it can't be trained "
+   "(or who doesn't know it)."
+   {
+      if ability = $
+      {
+         return 0;
+      }
+
+      if IsClass(ability,&Spell)
+      {
+         if NOT Send(who,@HasSpell,#num=Send(ability,@GetSpellNum))
+         {
+            return 0;
+         }
+
+         return Send(ability,@GetMeditateRatio);
+      }
+
+      if IsClass(ability,&Skill)
+      {
+         if NOT Send(who,@HasSkill,#num=Send(ability,@GetSkillNum))
+         {
+            return 0;
+         }
+
+         return Send(ability,@GetMeditateRatio);
+      }
+
+      return 0;
+   }
+
+   SendTraining(who = $)
+   "UC_TRAINING: each spell and skill who knows that can be trained, and what 1% of it costs."
+   {
+      local oSession, i, oAbility, iCost, lRows;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lRows = $;
+      foreach i in Send(who,@GetSpellList)
+      {
+         oAbility = Send(SYS,@FindSpellByNum,#num=Send(who,@DecodeSpellNum,#compound=i));
+         iCost = Send(self,@TrainCost,#who=who,#ability=oAbility);
+         if iCost > 0
+         {
+            lRows = Cons([oAbility,iCost],lRows);
+         }
+      }
+
+      foreach i in Send(who,@GetSkillList)
+      {
+         oAbility = Send(SYS,@FindSkillByNum,#num=Send(who,@DecodeSkillNum,#compound=i));
+         iCost = Send(self,@TrainCost,#who=who,#ability=oAbility);
+         if iCost > 0
+         {
+            lRows = Cons([oAbility,iCost],lRows);
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_TRAINING, 2,Length(lRows));
+      foreach i in lRows
+      {
+         AddPacket(4,First(i), 4,Nth(i,2));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   Train(who = $,ability = $,amount = 0)
+   "Raises a spell or skill who knows by up to amount percent (not past 99), at its price a "
+   "percent, as far as who's training points go."
+   {
+      local iCost, iPercent, iPoints, iGain, sName;
+
+      if ability = $ OR NOT (IsClass(ability,&Spell) OR IsClass(ability,&Skill))
+      {
+         return;
+      }
+
+      sName = Send(ability,@GetName);
+      if (IsClass(ability,&Spell) AND NOT Send(who,@HasSpell,#num=Send(ability,@GetSpellNum)))
+         OR (IsClass(ability,&Skill) AND NOT Send(who,@HasSkill,#num=Send(ability,@GetSkillNum)))
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_train_unknown);
+
+         return;
+      }
+
+      iCost = Send(self,@TrainCost,#who=who,#ability=ability);
+      if iCost <= 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_train_cant,#parm1=sName);
+
+         return;
+      }
+
+      iPercent = Send(ability,@GetAbility,#who=who);
+      if iPercent >= 99
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_train_maxed,#parm1=sName);
+
+         return;
+      }
+
+      iPoints = Send(who,@GetTrainingPoints);
+      iGain = Bound(amount,1,99 - iPercent);
+      if iGain * iCost > iPoints
+      {
+         iGain = iPoints / iCost;
+      }
+
+      if iGain <= 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_train_poor,#parm1=sName,#parm2=iCost,
+              #parm3=iPoints);
+
+         return;
+      }
+
+      if IsClass(ability,&Spell)
+      {
+         Send(who,@ChangeSpellAbility,#spell_num=Send(ability,@GetSpellNum),#amount=iGain,
+              #report=FALSE);
+      }
+      else
+      {
+         Send(who,@ChangeSkillAbility,#Skill_num=Send(ability,@GetSkillNum),#amount=iGain,
+              #report=FALSE);
+      }
+
+      Send(who,@AddTrainingPoints,#points=(-iGain * iCost),#report=FALSE);
+      Send(who,@MsgSendUser,#message_rsc=abil_train_done,#parm1=sName,#parm2=iGain,
+           #parm3=iGain * iCost);
+      Send(self,@SendTraining,#who=who);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// appraise
+
+   Carries(who = $,oItem = $)
+   "Whether who carries oItem, or a bag that holds it; says so if not."
+   {
+      if Send(who,@IsHolding,#what=oItem)
+         OR Send(who,@IsHolding,#what=Send(oItem,@GetOwner))
+      {
+         return TRUE;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=abil_not_holding,#parm1=Send(oItem,@GetDef),
+           #parm2=Send(oItem,@GetName));
+
+      return FALSE;
+   }
+
+   IsMagical(oItem = $)
+   "Ours: a gem, an enchantment or indestructible scroll, or an item with a magical property (an "
+   "item attribute besides its appraisal)."
+   {
+      local i;
+
+      if IsClass(oItem,&Gem) OR IsClass(oItem,&EnchantmentScroll)
+         OR IsClass(oItem,&IndestructibleScroll)
+      {
+         return TRUE;
+      }
+
+      foreach i in Send(oItem,@GetAttributes)
+      {
+         if Send(oItem,@GetNumFromCompound,#compound=First(i)) <> IA_APPRAISE
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   IsAppraisable(oItem = $)
+   "Whether oItem may be appraised and listed on the citizen's market: appraise.kod's rules (not "
+   "money, a stack, a bond or a spell item, but enchantment and indestructible scrolls), and "
+   "ours: something valuable, magical or worth APPRAISE_MIN_VALUE."
+   {
+      if oItem = $ OR NOT IsClass(oItem,&PassiveItem)
+         OR IsClass(oItem,&NumberItem)
+         OR (IsClass(oItem,&SpellItem) AND NOT IsClass(oItem,&EnchantmentScroll)
+             AND NOT IsClass(oItem,&IndestructibleScroll))
+         OR IsClass(oItem,&TradeBond)
+      {
+         return FALSE;
+      }
+
+      return Send(self,@IsMagical,#oItem=oItem)
+         OR Send(oItem,@GetInitValue) >= APPRAISE_MIN_VALUE;
+   }
+
+   SendAppraisal(who = $,oItem = $)
+   "UC_APPRAISAL: whether an item who carries can be appraised, and its price now (0 for none), "
+   "for our client's Appraise button. Nothing for an item who doesn't carry."
+   {
+      local oSession, iPrice;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $ OR oItem = $ OR NOT IsClass(oItem,&Item)
+         OR NOT (Send(who,@IsHolding,#what=oItem)
+                 OR Send(who,@IsHolding,#what=Send(oItem,@GetOwner)))
+      {
+         return;
+      }
+
+      iPrice = 0;
+      if Send(oItem,@HasAttribute,#ItemAtt=IA_APPRAISE)
+      {
+         iPrice = Send(oItem,@GetAppraisalPrice);
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_APPRAISAL, 4,oItem,
+                1,Send(self,@IsAppraisable,#oItem=oItem), 4,iPrice);
+      SendPacket(oSession);
+
+      return;
+   }
+
+   AppraiseItem(who = $,oItem = $,iPrice = 0)
+   "appraise.kod's rules, on valuable things only (IsAppraisable), priced 1 to APPRAISE_MAX."
+   {
+      local oAtt;
+
+      if oItem = $ OR NOT IsClass(oItem,&PassiveItem)
+      {
+         return;
+      }
+
+      if NOT Send(self,@Carries,#who=who,#oItem=oItem)
+      {
+         return;
+      }
+
+      if NOT Send(self,@IsAppraisable,#oItem=oItem)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_appraise_not_valuable);
+
+         return;
+      }
+
+      if iPrice = $ OR iPrice < 1 OR iPrice > APPRAISE_MAX
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_appraise_price);
+
+         return;
+      }
+
+      // A new price for an appraised item replaces the old
+      if NOT Send(oItem,@HasAttribute,#ItemAtt=IA_APPRAISE)
+      {
+         oAtt = Send(SYS,@FindItemAttByNum,#num=IA_APPRAISE);
+         Send(oAtt,@AddToItem,#oItem=oItem);
+      }
+
+      Send(oItem,@SetAppraisalPrice,#Price=iPrice,#Appraiser=who);
+      Send(who,@MsgSendUser,#message_rsc=abil_appraise_done,#parm1=Send(oItem,@GetName),
+           #parm2=iPrice);
+      Send(self,@SendAppraisal,#who=who,#oItem=oItem);
+
+      return;
+   }
+
+   ClearAppraisal(who = $,oItem = $)
+   {
+      if oItem = $ OR NOT IsClass(oItem,&PassiveItem)
+      {
+         return;
+      }
+
+      if NOT Send(self,@Carries,#who=who,#oItem=oItem)
+      {
+         return;
+      }
+
+      if NOT Send(oItem,@HasAttribute,#ItemAtt=IA_APPRAISE)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_appraise_none,#parm1=Send(oItem,@GetName));
+
+         return;
+      }
+
+      Send(oItem,@ClearAppraisal);
+      Send(Send(SYS,@FindItemAttByNum,#num=IA_APPRAISE),@RemoveFromItem,#oItem=oItem);
+      Send(who,@MsgSendUser,#message_rsc=abil_appraise_cleared,#parm1=Send(oItem,@GetName));
+      Send(self,@SendAppraisal,#who=who,#oItem=oItem);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// skipping the tutorial
+
+   StartCity(who = $,words = $)
+   "Ours: start <city>, our character creator's Skip tutorial, once, from a new character "
+   "(Player.CanChooseStart): that city's citizen, at its inn, with 30 base health, leather "
+   "armor, a small round shield and 1000 shillings in all, attuned to Raza's and Marion's "
+   "portals."
+   {
+      local sCity, iInn, rName, oItem, lGear, oMoney, iCash;
+
+      if who = $ OR NOT IsClass(who,&User) OR words = $ OR Length(words) < 2
+      {
+         return;
+      }
+
+      sCity = Nth(words,2);
+      iInn = $;
+      if StringEqual(sCity,"marion") { iInn = RID_MAR_INN; rName = abil_start_marion; }
+      if StringEqual(sCity,"jasper") { iInn = RID_JAS_INN; rName = abil_start_jasper; }
+      if StringEqual(sCity,"cornoth") { iInn = RID_COR_INN; rName = abil_start_cornoth; }
+      if StringEqual(sCity,"barloque") { iInn = RID_BAR_INN; rName = abil_start_barloque; }
+      if StringEqual(sCity,"tos") { iInn = RID_TOS_INN; rName = abil_start_tos; }
+      if iInn = $
+      {
+         return;
+      }
+
+      if NOT Send(who,@CanChooseStart)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_start_too_late);
+
+         return;
+      }
+
+      Send(who,@SetStartChosen);
+      Send(who,@SetHomeroom,#RID=iInn);
+
+      // 30 base health, with the experience that goes with it, and whole
+      Send(who,@GainBaseMaxHealth,#amount=30 - Send(who,@GetBaseMaxHealth));
+      Send(who,@ResetXPToLevel);
+      Send(who,@SetHealth,#amount=Send(who,@GetMaxHealth));
+
+      lGear = [ Create(&LeatherArmor), Create(&MetalShield) ];
+      foreach oItem in lGear
+      {
+         Send(who,@NewHold,#what=oItem);
+         Send(who,@TryUseItem,#what=oItem);
+      }
+      // A purse of START_SHILLINGS in all (a new character has some already)
+      oMoney = Send(who,@GetMoneyObject,#type=&Shillings);
+      iCash = 0;
+      if oMoney <> $
+      {
+         iCash = Send(oMoney,@GetNumber);
+      }
+      if iCash < START_SHILLINGS
+      {
+         Send(who,@NewHold,#what=Create(&Shillings,#number=START_SHILLINGS - iCash));
+      }
+      Send(who,@AttunePortal,#id=START_PORTAL_RAZA);
+      Send(who,@AttunePortal,#id=START_PORTAL_MARION);
+
+      Send(who,@TeleportTo,#RID=iInn,#bAdminPort=FALSE);
+      Send(who,@MsgSendUser,#message_rsc=abil_start_done,#parm1=rName);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// vault and guild
+
+   Stackable(who = $,oItem = $,cant = $)
+   "Whether oItem is a stack that may go to a vault (not money), carried by who; says cant if "
+   "it may not."
+   {
+      if NOT IsClass(oItem,&NumberItem) OR IsClass(oItem,&Money)
+         OR NOT Send(oItem,@CanBeStoredInVault)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cant,#parm1=Send(oItem,@GetDef),
+              #parm2=Send(oItem,@GetName));
+
+         return FALSE;
+      }
+
+      return Send(self,@Carries,#who=who,#oItem=oItem);
+   }
+
+   Convey(who = $,oItem = $)
+   "Conveyance: a stack (or each stack in a bag) to our vault, for a shilling a unit of bulk."
+   {
+      local i, bAny;
+
+      if oItem = $ OR NOT IsClass(oItem,&PassiveItem)
+      {
+         return;
+      }
+
+      bAny = FALSE;
+      if IsClass(oItem,&Bag)
+      {
+         if NOT Send(self,@Carries,#who=who,#oItem=oItem)
+         {
+            return;
+         }
+
+         foreach i in Send(oItem,@GetBagContents)
+         {
+            if Send(self,@ConveyOne,#who=who,#oItem=i)
+            {
+               bAny = TRUE;
+            }
+         }
+      }
+      else
+      {
+         bAny = Send(self,@ConveyOne,#who=who,#oItem=oItem);
+      }
+
+      // The guide quest's "send something to your vault" (QuestBook QK_CONVEY)
+      if bAny
+      {
+         Send(Send(SYS,@GetQuestBook),@ItemsConveyed,#who=who);
+      }
+
+      return;
+   }
+
+   ConveyOne(who = $,oItem = $)
+   "conveyance.kod CastSpell, for one stack. Returns whether it went."
+   {
+      local oVault, iFee, oMoney, iCash, lItems;
+
+      if NOT Send(self,@Stackable,#who=who,#oItem=oItem,#cant=abil_vault_cant)
+      {
+         return FALSE;
+      }
+
+      oVault = Send(SYS,@FindVaultByNum,#num=VID_BARLOQUE);
+      iFee = Send(oItem,@GetBulk);
+      if oVault = $ OR iFee = $ OR iFee = 0 OR NOT Send(who,@ReqLeaveHold,#what=oItem)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_vault_cant,#parm1=Send(oItem,@GetDef),
+              #parm2=Send(oItem,@GetName));
+
+         return FALSE;
+      }
+
+      oMoney = Send(who,@GetMoneyObject,#type=&Shillings);
+      iCash = 0;
+      if oMoney <> $
+      {
+         iCash = Send(oMoney,@GetValue);
+      }
+
+      if iCash < iFee
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_vault_poor,#parm1=Send(oItem,@GetDef),
+              #parm2=Send(oItem,@GetName));
+
+         return FALSE;
+      }
+
+      lItems = [oItem];
+      if NOT Send(oVault,@CanDepositItems,#lItems=lItems,#who=who)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_vault_full);
+
+         return FALSE;
+      }
+
+      Send(oVault,@DepositItems,#lItems=lItems,#who=who);
+      Send(who,@MsgSendUser,#message_rsc=abil_vault_done,#parm1=Send(oItem,@GetDef),
+           #parm2=Send(oItem,@GetName));
+      Send(oItem,@SubtractNumber,#number=Send(oItem,@GetNumber));
+      Send(oMoney,@SubtractNumber,#number=iFee);
+
+      return TRUE;
+   }
+
+   Transfer(who = $,oItem = $)
+   "Transference: a stack (or each stack in a bag) to our guild hall's chest."
+   {
+      local i, oGuild, oHall;
+
+      if oItem = $ OR NOT IsClass(oItem,&PassiveItem)
+      {
+         return;
+      }
+
+      // transference.kod CanPayCosts
+      if Send(who,@CheckPlayerFlag,#flag=PFLAG_PERMA_NO_PVP)
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_guild_pvp);
+
+         return;
+      }
+
+      oGuild = Send(who,@GetGuild);
+      if oGuild = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_guild_none);
+
+         return;
+      }
+
+      if Send(oGuild,@GetRank,#who=who) = RANK_APPRENTICE
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_guild_rank);
+
+         return;
+      }
+
+      oHall = Send(oGuild,@GetGuildHall);
+      if oHall = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=abil_guild_no_hall);
+
+         return;
+      }
+
+      if IsClass(oItem,&Bag)
+      {
+         if NOT Send(self,@Carries,#who=who,#oItem=oItem)
+         {
+            return;
+         }
+
+         foreach i in Send(oItem,@GetBagContents)
+         {
+            Send(self,@TransferOne,#who=who,#oItem=i,#hall=oHall);
+         }
+
+         return;
+      }
+
+      Send(self,@TransferOne,#who=who,#oItem=oItem,#hall=oHall);
+
+      return;
+   }
+
+   TransferOne(who = $,oItem = $,hall = $)
+   "transference.kod CastSpell, for one stack: into the hall's first storage box."
+   {
+      local i, oBox;
+
+      if NOT Send(self,@Stackable,#who=who,#oItem=oItem,#cant=abil_guild_cant)
+      {
+         return FALSE;
+      }
+
+      foreach i in Send(hall,@GetHolderActive)
+      {
+         oBox = First(i);
+         if oBox <> $ AND IsClass(oBox,&StorageBox)
+         {
+            if NOT Send(oBox,@ReqNewHold,#what=oItem,#who=who,#IsConveyance=TRUE)
+            {
+               Send(who,@MsgSendUser,#message_rsc=abil_guild_full);
+
+               return FALSE;
+            }
+
+            Send(oBox,@NewHold,#what=oItem);
+            Send(who,@MsgSendUser,#message_rsc=abil_guild_done,#parm1=Send(oItem,@GetDef),
+                 #parm2=Send(oItem,@GetName));
+
+            return TRUE;
+         }
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=abil_guild_cant,#parm1=Send(oItem,@GetDef),
+           #parm2=Send(oItem,@GetName));
+
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

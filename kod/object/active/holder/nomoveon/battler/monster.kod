@@ -266,6 +266,7 @@ resources:
    user_pickup_past_limit2 = "You can't carry more than 130 mil of a item."
 
    pm_not_appraised = "I can not list items on the market that have not yet been appraised!"
+   pm_not_valuable = "The market only deals in valuable things: magical items, and anything worth 5,000 shillings or more."
    pm_sold_item = "~g~BYou sold a %s on the citizen's market for %i, you have been given a trades bond for the value."
    To_much_value = "Sorry but I can only offer you 130 million shillings at a time, please hand over less trade bonds at a time. "
    
@@ -3133,6 +3134,14 @@ messages:
                   if NOT Send(i,@HasAttribute,#ItemAtt=IA_APPRAISE)
                   {
                      Send(self,@SayToOne,#target=what,#message_rsc=pm_not_appraised);
+
+                     return FALSE;
+                  }
+
+                  // Ours: valuable things only (docs/adr/0016-abilities.md), whenever appraised
+                  if NOT Send(Send(SYS,@GetShardsAbilities),@IsAppraisable,#oItem=i)
+                  {
+                     Send(self,@SayToOne,#target=what,#message_rsc=pm_not_valuable);
 
                      return FALSE;
                   }
@@ -6282,6 +6291,55 @@ messages:
       return 200;
    }
 
+   HasForSale(who = $)
+   "Ours: whether GetForSale would list anything for who, without saying so (it says "
+   "vrNothing_for_sale when not), for GetObjectFlags' OF_BUYABLE. A vault keeper always has "
+   "a Withdraw window. Without a viewer, a spell or skill counts whoever learns it."
+   {
+      local i;
+
+      if Send(self,@MobIsVaultman)
+      {
+         return TRUE;
+      }
+
+      if plFor_sale = $
+      {
+         return FALSE;
+      }
+
+      if First(plFor_sale) <> $
+         OR (Length(plFor_sale) = 4 AND Nth(plFor_sale,4) <> $)
+      {
+         return TRUE;
+      }
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return Nth(plFor_sale,2) <> $ OR Nth(plFor_sale,3) <> $;
+      }
+
+      foreach i in Nth(plFor_sale,3)
+      {
+         if Send(self,@CanAddSpell,#who=who,#num=i)
+            AND (Send(who,@GetSpellAbility,#spell_num=i) = 0)
+         {
+            return TRUE;
+         }
+      }
+
+      foreach i in Nth(plFor_sale,2)
+      {
+         if Send(self,@CanAddSkill,#who=who,#num=i)
+            AND (Send(who,@GetSkillAbility,#skill_num=i) = 0)
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
    GetForSale(who = $)
    "Returns the list of objects the mob has for sale "
    "(items, skills, spells, conditionals)"
@@ -6789,7 +6847,9 @@ messages:
          iFlags = iFlags & ~OF_ATTACKABLE;
       }
 
-      if Send(self,@MobIsSeller)
+      // Ours: only with something this viewer could buy, so the client's Buy button and double
+      // click don't offer an empty list (an innkeeper sells only on Chaos Night)
+      if Send(self,@MobIsSeller) AND Send(self,@HasForSale,#who=what)
       {
          iFlags = iFlags | OF_BUYABLE;
       }

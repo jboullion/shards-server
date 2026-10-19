@@ -10,16 +10,21 @@
     "min": 20,
     "max": 30
   },
+  "requires": {
+    "quests": [
+      137
+    ]
+  },
   "text": {
-    "offer": "You've arrived at a troubled time. The dead in our mausoleum, on the north side of town, no longer rest. Mummies walk its halls, and the townsfolk are afraid to tend the graves. Put eight of them back to rest, and then we'll talk about what's stirring them.",
-    "progress": "The mausoleum is on the north side of Raza.",
-    "complete": "Eight fewer of them. But something is waking them, and I fear I know what. Come, listen."
+    "offer": "Rodric d'Stane says, \"The dead in our mausoleum, on the north side of town, no longer rest. Mummies walk its halls, and the townsfolk are afraid to tend the graves. Put ten of them back to rest while you hunt the thing that wakes them: I will tell you of it too.\"",
+    "progress": "The mausoleum is on the north side of Raza. Its signs explain how to jump, open doors and pull levers.",
+    "complete": "Rodric d'Stane says, \"Ten fewer of them. The townsfolk will tend the graves again, thanks to you.\""
   },
   "steps": [
     {
       "kind": "kill",
       "target": "Mummy",
-      "count": 8,
+      "count": 10,
       "rooms": [
         306
       ],
@@ -27,7 +32,7 @@
     }
   ],
   "rewards": {
-    "xpPoints": 0.75,
+    "xpPoints": 1.5,
     "shillings": 50
   }
 }

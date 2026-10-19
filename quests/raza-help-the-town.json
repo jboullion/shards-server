@@ -1,0 +1,36 @@
+{
+  "id": 138,
+  "key": "raza-help-the-town",
+  "name": "A Strong Arm for Raza",
+  "tier": "main",
+  "giver": {
+    "class": "RazaElder"
+  },
+  "band": {
+    "min": 20,
+    "max": 30
+  },
+  "requires": {
+    "quests": [
+      10,
+      121
+    ]
+  },
+  "text": {
+    "offer": "Rodric d'Stane says, \"With the shadow mummy gone, our dead can rest. But the living have troubles too, and Marcus hears them all over his counter. Go back to the inn and ask him what needs doing. Help Raza until you are hale enough for the road, and then the world beyond our walls is yours.\"",
+    "progress": "Marcus keeps the Inn of Raza, where you first arrived.",
+    "complete": "Marcus says, \"Back from the mausoleum in one piece! The whole town's talking. Now, if you're looking for honest work, I've more than enough.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RazaInnKeeper"
+      },
+      "objective": "Speak to Marcus at the inn"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5
+  }
+}

@@ -98,9 +98,6 @@ player_wanted_now = de \
 player_haunted_on = de "%s%ss gewaltsamer Tod ruft einen Racheengel hervor."
 player_haunted_off = de "Der Racheengel ist zufrieden."
 player_training_inform = de "Du hast nun ~B%i~B Trainingspunkte!"
-player_reached_maxtraining = de \
-   "~BDu hast ~B%i~B Trainingspunkte erreicht und kannst nicht mehr dazu "
-   "bekommen! Meditiere jetzt, um sie zu benutzen!"
 player_gained_training = de "Du hast ~B%i~B Trainingspunkte dazu bekommen!"
 player_spent_training = de "Du hast ~B%i~B Trainingspunkte benutzt!"
 player_logon_bonus = de \
@@ -108,15 +105,6 @@ player_logon_bonus = de \
    "Komm morgen wieder, um mehr davon zu bekommen!"
 player_experience_gained = de "Du hast ~B~s%i~v~B XP erhalten."
 player_experience_lost = de "Du hast ~B~r%i~B~v XP verloren!"
-player_unbound_energy_wiped = de "Die instabile Energie, die dich umgibt, verflüchtigt "
-      "sich in den Weiten des wirbelnden Äthers."
-player_unbound_energy_gained = de "Du absorbierst ~B~t%i~v~B ungebundene Energie "
-      "von Deinem gefallenen Gegner. You have ~B~t%i~v~B unbound energy."
-player_unbound_energy_lost = de "Du kanalisierst ~B~t%i~v~B ungebundene Energie "
-      "um deinen Zauberspruch zu formen. You have ~B~t%i~v~B unbound energy left."
-player_unbound_energy_wasted = de "Deine Gedanken sind zu sehr mit den jüngsten "
-      "Ereignissen beschäftigt, als dass du irgendeinen Nutzen aus der sich vor "
-      "deinen Augen verflüchtigenden Energie ziehen könntest."
 player_health_gain_maxed = de \
    "Deine Lebensenergie kann sich nicht weiter erhöhen."
 player_cant_hit_optout = de \
@@ -620,10 +608,6 @@ player_wanted_now = pt "Agora você é procurado pelo assassinato de %s%s."
 player_haunted_on = pt "%s%s's morte violenta evoca um espírito."
 player_haunted_off = pt "O espírito está satisfeito."
 player_training_inform = pt "Agora você tem ~B%i~B pontos de treinamento!"
-player_reached_maxtraining = pt \
-   "Agora você tem ~B%i~B pontos de treinamento e não pode mais ganhar! "
-   "Lance o feitiço Meditar e diga o nome de um feitiço ou habilidade em voz alta "
-   "para usá-los para treinar."
 player_gained_training = pt "Você ganhou ~B%i~B pontos de treinamento!"
 player_spent_training = pt "Você gastou ~B%i~B pontos de treinamento!"
 player_logon_bonus = pt \
@@ -631,10 +615,6 @@ player_logon_bonus = pt \
    "Volte amanhã para mais!"
 player_experience_gained = pt "Você ganhou ~B~s%i~v~B XP."
 player_experience_lost = pt "Você perdeu ~B~r%i~B~v XP!"
-player_unbound_energy_wiped = pt "A energia volátil ao seu redor se dissipa no éter violentamente retorcido."
-player_unbound_energy_gained = pt "Você coleta ~B~t%i~v~B energia desvinculada de seu inimigo caído. Você tem ~B~t%i~v~B energia desvinculada."
-player_unbound_energy_lost = pt "Você canaliza ~B~t%i~v~B energia desvinculada para moldar seu feitiço. Você tem ~B~t%i~v~B energia desvinculada restante."
-player_unbound_energy_wasted = pt "Sua mente está muito ocupada com seu encontro recente para fazer qualquer uso das energias sutis se dispersando diante de seus olhos."
 player_health_gain_maxed = pt "Sua saúde não pode aumentar mais."
 player_cant_hit_optout = pt \
    "Você optou por não participar do combate jogador versus jogador."

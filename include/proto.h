@@ -296,6 +296,12 @@ enum {
    UC_QUEST_PROGRESS = 108,
    UC_COMPANION = 109,
    UC_COSMETICS = 110,
+   // An object and a command line about it (user.kod ShardsObjectCommand); the abilities we
+   // can train (util/shardsabilities.kod)
+   UC_SHARDS_OBJECT = 111,
+   UC_TRAINING = 112,
+   UC_APPRAISAL = 113,
+   UC_SIGNETS = 114,
 };
 
 // Login error action constants

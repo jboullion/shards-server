@@ -257,6 +257,12 @@ messages:
       return TRUE;
    }
 
+   HasForSale(who = $)
+   "Ours: Buy here is the guild hall window or why not (GetForSale), so always offer it."
+   {
+      return TRUE;
+   }
+
    GetForSale(who=$)
    "This is hacky--user.kod:UserBuy() aborts if it gets $ returned from here, "
    "so we can use it as a hook."

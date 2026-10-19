@@ -239,6 +239,14 @@
    UC_COMPANION = 109
    // Ours: a tailor's or barber's menu (util/cosmeticsbook.kod)
    UC_COSMETICS = 110
+   // Ours (util/shardsabilities.kod): a command about one object (an item to appraise or
+   // send, an ability to train), and the abilities we can train and what 1% of each costs
+   UC_SHARDS_OBJECT = 111
+   UC_TRAINING = 112
+   // Ours: whether an item of ours can be appraised, and its price (ShardsAbilities.SendAppraisal)
+   UC_APPRAISAL = 113
+   // Ours: the signet rings we carry, for the quest log (util/questbook.kod SendSignets)
+   UC_SIGNETS = 114
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

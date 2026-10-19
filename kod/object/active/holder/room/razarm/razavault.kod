@@ -36,13 +36,7 @@ resources:
       "as well as certain items that are too precious or dangerous to store in a "
       "vault.  Additionally, items that are deposited in Jasper, Barloque or Raza "
       "may be accessed from all three location, while items deposited in Ko'catan "
-      "are inaccessible from any other location.\n\n"
-      "Finally, you may use the spell 'conveyance' to directly send any item or "
-      "stack of items to the regional vault at the same fee as a regular deposit.  "
-      "To do so, simply cast the spell, then click on the item or stack of items "
-      "that you wish to send to the vault.  This feature is incredibly convenient "
-      "for adventurers who would otherwise be forced to head to town, weighed "
-      "down by the massive amounts of loot they have collected on their journeys."
+      "are inaccessible from any other location."
 
 classvars:
 

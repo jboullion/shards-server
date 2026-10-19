@@ -1,0 +1,35 @@
+{
+  "id": 149,
+  "key": "marion-temple-of-shalille",
+  "name": "The Temple of Shal'ille",
+  "tier": "main",
+  "giver": {
+    "class": "MarionHealer"
+  },
+  "band": {
+    "min": 30,
+    "max": 40
+  },
+  "requires": {
+    "quests": [
+      148
+    ]
+  },
+  "text": {
+    "offer": "Lady Aftyn says, \"My healing comes from Shal'ille, the goddess of light and life. Her temple stands in the Deep Woods of Ileria, just outside town, and Priestess Xiana keeps it. Every traveller should know the way there: go and pay her your respects.\"",
+    "progress": "Leave Marion by its north-east corner into the Deep Woods of Ileria. The Temple of Shal'ille is in the woods.",
+    "complete": "Priestess Xiana says, \"Welcome, child. Lady Aftyn sent you? Then you are welcome in Shal'ille's house, whenever you have need of it.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "ShalillePriestess"
+      },
+      "objective": "Speak to Priestess Xiana in the Temple of Shal'ille"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}

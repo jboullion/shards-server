@@ -11,15 +11,15 @@
     "max": 40
   },
   "text": {
-    "offer": "My fish come up from the shore of the Great Ocean, and lately the fishermen come back with nothing but slime on their boots - and worse. Slimes, crawling up out of the water. Kill a dozen of them and the fishermen might go back out.",
-    "progress": "The shore of the Great Ocean lies past the Valley of Ileria.",
-    "complete": "Fish on the table again, thanks to you. Take this."
+    "offer": "My fish come up from the shore of the Great Ocean, and lately the fishermen come back with nothing but slime on their boots - and worse. Slimes, crawling up out of the water. Kill ten of them and the fishermen might go back out. Take the north-east way out of town, through the Deep Woods of Ileria and the Valley of Ileria, and you will come to the shore. Fungus beasts plague the valley on the way: if you can, help the herb gatherers there too.",
+    "progress": "Leave Marion by its north-east corner, into the Deep Woods of Ileria, then go through the Valley of Ileria to the Great Ocean.",
+    "complete": "Fish on the table again, thanks to you. Take this - and come back whenever you like: the ocean never runs out of slime."
   },
   "steps": [
     {
       "kind": "kill",
       "target": "Slime",
-      "count": 12,
+      "count": 10,
       "rooms": [
         552
       ],
@@ -29,5 +29,8 @@
   "rewards": {
     "xpPoints": 0.5,
     "shillings": 100
+  },
+  "repeat": {
+    "cooldownHours": 0
   }
 }

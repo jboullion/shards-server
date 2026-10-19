@@ -422,6 +422,8 @@ properties:
    // Ours: companions (util/companionbook.kod), made on demand
    poCompanionBook = $
    poCosmeticsBook = $
+   // Ours: training, and the item abilities that were utility spells (util/shardsabilities.kod)
+   poShardsAbilities = $
    poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
@@ -681,6 +683,9 @@ messages:
       lSavedSenate = ListCopy(Send(poTokenGame,@GetSenate));
 
       Send(self,@CreateUserTable);
+
+      // Ours: the utility spells our client does as abilities now, taken back (docs/adr/0016)
+      Send(self,@RetireUtilitySpells);
 
       Send(self,@RecreateNecromancerBalance);
       Send(self,@RecreateClearQuests);
@@ -1452,6 +1457,12 @@ messages:
       // Change the color of rainbow ferns.
       Send(&RainbowFern,@ChangeColor,#iHour=piHour);
 
+      // Ours: market listings 30 days old go back to their sellers (util/playermarket.kod)
+      if poPlayerMarket <> $
+      {
+         Send(poPlayerMarket,@ExpireListings);
+      }
+
       return;
    }
 
@@ -2140,24 +2151,27 @@ messages:
    }
 
    GetAllowedHairIcons(iGender = GENDER_MALE)
-   "Shards: every hairstyle is offered to both genders (each sits right on both heads)."
+   "The original game's hairstyles for each gender. Shards' own styles (charinfo_hair_s*_icon, "
+   "and ptce) are left out until they're redrawn to suit both heads; to offer them again, add "
+   "them to both lists before charinfo_hair_bald_icon."
    {
-      return [charinfo_hair_cd_icon, charinfo_hair_ac_icon, charinfo_hair_ba_icon,
-          charinfo_hair_ad_icon, charinfo_hair_bb_icon, charinfo_hair_bc_icon,
-          charinfo_hair_ca_icon, charinfo_hair_db_icon, charinfo_hair_bd_icon,
-          charinfo_hair_cb_icon, charinfo_hair_dc_icon, charinfo_hair_dr_icon,
-          charinfo_hair_xa_icon, charinfo_hair_xb_icon, charinfo_hair_ce_icon,
-          charinfo_hair_sa_icon, charinfo_hair_sb_icon, charinfo_hair_sc_icon,
-          charinfo_hair_sd_icon, charinfo_hair_se_icon, charinfo_hair_sf_icon,
-          charinfo_hair_sg_icon, charinfo_hair_sh_icon, charinfo_hair_si_icon,
-          charinfo_hair_sj_icon, charinfo_hair_sk_icon, charinfo_hair_sl_icon,
+      if iGender = GENDER_MALE
+      {
+         return [charinfo_hair_cd_icon, charinfo_hair_ac_icon,
+             charinfo_hair_ba_icon, charinfo_hair_ad_icon, charinfo_hair_bb_icon,
+             charinfo_hair_bald_icon, charinfo_hair_xa_icon];
+      }
+      return [charinfo_hair_cd_icon, charinfo_hair_bc_icon, charinfo_hair_ca_icon,
+          charinfo_hair_db_icon, charinfo_hair_bd_icon, charinfo_hair_cb_icon,
+          charinfo_hair_dc_icon, charinfo_hair_dr_icon, charinfo_hair_xb_icon,
           charinfo_hair_bald_icon];
    }
 
    GetHairTranslations()
    "The hair colours the character creator offers, and the only ones it accepts "
    "(player.kod PlayerNewCharInfo). 0 leaves the hair its own grey. Shards added the "
-   "last eight: two browns, three golds and three dyed colours."
+   "last six: two browns, a dark gold, and three dyed colours (the green a dark one: the "
+   "light green was too loud)."
    {
       return [0, PT_GRAY_TO_ORANGE, PT_GRAY_TO_RED,
           PT_GRAY_TO_SKIN1, PT_GRAY_TO_SKIN2, PT_GRAY_TO_SKIN3,
@@ -2165,8 +2179,35 @@ messages:
           PT_GRAY_TO_KORANGE, PT_GRAY_TO_KRED, PT_GRAY_TO_KGRAY,
           PT_GRAY_TO_BLACK, PT_GRAY_TO_BLOND,
           PT_HAIR_OLDHAIR1, PT_HAIR_OLDHAIR2,
-          PT_GRAY_TO_LGOLD, PT_GRAY_TO_GOLD, PT_GRAY_TO_KGOLD,
-          PT_GRAY_TO_BBLUE, PT_GRAY_TO_PURPLE, PT_GRAY_TO_LGREEN];
+          PT_GRAY_TO_KGOLD,
+          PT_GRAY_TO_BBLUE, PT_GRAY_TO_PURPLE, PT_GRAY_TO_DGREEN];
+   }
+
+   OfferedHairColour(colour = 0)
+   "<colour>, or what replaced it if the creator stopped offering it (the light golds went, "
+   "the light green became a dark one)."
+   {
+      if colour = PT_GRAY_TO_LGOLD OR colour = PT_GRAY_TO_GOLD
+      {
+         return PT_GRAY_TO_KGOLD;
+      }
+      if colour = PT_GRAY_TO_LGREEN
+      {
+         return PT_GRAY_TO_DGREEN;
+      }
+
+      return colour;
+   }
+
+   GetRetiredHairIcons()
+   "Shards' hairstyles that the creator offered for a while and doesn't now (GetAllowedHairIcons): "
+   "players who chose one get their gender's first style at logon (Player.TidyLook)."
+   {
+      return [charinfo_hair_ce_icon,
+          charinfo_hair_sa_icon, charinfo_hair_sb_icon, charinfo_hair_sc_icon,
+          charinfo_hair_sd_icon, charinfo_hair_se_icon, charinfo_hair_sf_icon,
+          charinfo_hair_sg_icon, charinfo_hair_sh_icon, charinfo_hair_si_icon,
+          charinfo_hair_sj_icon, charinfo_hair_sk_icon, charinfo_hair_sl_icon];
    }
 
    GetAllowedEyeIcons(iGender = GENDER_MALE)
@@ -2201,7 +2242,8 @@ messages:
    }
 
    GetAllowedBeardIcons(iGender = GENDER_MALE)
-   "Shards: the facial hair the character creator offers (none is always allowed)."
+   "Shards: the facial hair the character creator offers (none is always allowed): men only "
+   "for now."
    {
       if iGender = GENDER_MALE
       {
@@ -3678,15 +3720,9 @@ messages:
       
       Send(self,@CreateOneSpellIfNew,#num=SID_DEATH_RIFT,#class=&DeathRift);
 
-      Send(self,@CreateOneSpellIfNew,#num=SID_MEDITATE,#class=&Meditate);
-      Send(self,@CreateOneSpellIfNew,#num=SID_SET,#class=&Set);
-      Send(self,@CreateOneSpellIfNew,#num=SID_LOADOUT,#class=&Loadout);
-      Send(self,@CreateOneSpellIfNew,#num=SID_CONVEYANCE,#class=&Conveyance);
-	   Send(self,@CreateOneSpellIfNew,#num=SID_TRANSFERENCE,#class=&Transference);
+      // Ours: Meditate, Set, Loadout, Conveyance, Transference, Appraise and Vault Loadout are
+      // made no more (RetireUtilitySpells; docs/adr/0016-abilities.md)
       Send(self,@CreateOneSpellIfNew,#num=SID_PHASE,#class=&Phase);
-      Send(self,@CreateOneSpellIfNew,#num=SID_APPRAISE,#class=&Appraise);
-	  
-      Send(self,@CreateOneSpellIfNew,#num=SID_VAULT_LOADOUT,#class=&VaultLoadout);
 
       // Trance may be searched for frequently, leave at end of list
       Send(self,@CreateOneSpellIfNew,#num=SID_TRANCE,#class=&Trance);
@@ -4036,6 +4072,43 @@ messages:
    {
       return Send(self,@GetXPForLevel,#iHP=iLevel + 1)
          - Send(self,@GetXPForLevel,#iHP=iLevel);
+   }
+
+   GetRetiredSpells()
+   "Ours (docs/adr/0016-abilities.md): the utility spells taken out of the game. Meditate's work "
+   "is the Train window's, Appraise, Conveyance and Transference are buttons on an item's "
+   "description (util/shardsabilities.kod), and Set, Loadout and Vault Loadout went."
+   {
+      return [SID_MEDITATE, SID_SET, SID_LOADOUT, SID_CONVEYANCE, SID_TRANSFERENCE,
+              SID_APPRAISE, SID_VAULT_LOADOUT];
+   }
+
+   RetireUtilitySpells()
+   "Admin supported\n"
+   "Ours: takes the retired spells (GetRetiredSpells) from every player, then deletes them. Run by "
+   "RecreateAll (reload system). Their classes stay until a save holds none of them: blakserv "
+   "won't load an object whose class is gone."
+   {
+      local i, j, oSpell;
+
+      foreach j in Send(self,@GetRetiredSpells)
+      {
+         oSpell = Send(self,@FindSpellByNum,#num=j);
+         if oSpell <> $
+         {
+            foreach i in plUsers
+            {
+               if Send(i,@HasSpell,#num=j)
+               {
+                  Send(i,@RemoveSpell,#num=j);
+               }
+            }
+
+            Send(oSpell,@Delete);
+         }
+      }
+
+      return;
    }
 
    RecreateAllSpells(figure_totals = TRUE)
@@ -5272,6 +5345,17 @@ messages:
       return poCosmeticsBook;
    }
 
+   GetShardsAbilities()
+   "Ours: training and the item abilities (util/shardsabilities.kod), made on demand."
+   {
+      if poShardsAbilities = $
+      {
+         poShardsAbilities = Create(&ShardsAbilities);
+      }
+
+      return poShardsAbilities;
+   }
+
    GetGameQuestMaintenance()
    "Created on demand, as GetDMFeed is: a savegame that predates the class "
    "has no object until a recreate pass, and until then every "
@@ -6035,9 +6119,7 @@ messages:
       plItemTemplates = cons(create(&SporeBurstScroll),plItemTemplates);
       plItemTemplates = cons(create(&TruceScroll),plItemTemplates);
       plItemTemplates = cons(create(&WindScroll),plItemTemplates);
-      plItemTemplates = cons(create(&SetScroll),plItemTemplates);
-      plItemTemplates = cons(create(&LoadoutScroll),plItemTemplates);
-      plItemTemplates = cons(create(&VaultLoadoutScroll),plItemTemplates);
+      // Ours: no set or loadout scrolls (docs/adr/0016-abilities.md)
       plItemTemplates = cons(create(&MirthScroll),plItemTemplates);
       plItemTemplates = cons(create(&MelancholyScroll),plItemTemplates);
 
@@ -6345,7 +6427,6 @@ messages:
       plItemTemplates = cons(create(&VaultContract),plItemTemplates);
       plItemTemplates = cons(create(&VaultResign),plItemTemplates);
       plItemTemplates = cons(create(&XPScroll),plItemTemplates);
-      plItemTemplates = cons(create(&UBScroll),plItemTemplates);
       plItemTemplates = cons(create(&TPScroll),plItemTemplates);
       plItemTemplates = cons(create(&tradebond),plItemTemplates);
       plItemTemplates = cons(create(&TpTranferScroll),plItemTemplates);

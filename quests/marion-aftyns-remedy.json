@@ -1,0 +1,40 @@
+{
+  "id": 148,
+  "key": "marion-aftyns-remedy",
+  "name": "Lady Aftyn's Remedy",
+  "tier": "main",
+  "giver": {
+    "class": "MarionElder"
+  },
+  "band": {
+    "min": 30,
+    "max": 40
+  },
+  "text": {
+    "offer": "Ran er'Hoth says, \"If you mean to go into that crypt, or anywhere past our walls, carry a cure for poison. The things out there bite, and their bites fester. Lady Aftyn keeps her sanctuary here in Marion and sells the potions. Tell her I sent you: the town keeps a purse with her for newcomers. Buy one from her.\"",
+    "progress": "Lady Aftyn's Sanctuary is in Marion. Right-click her and choose Quests to talk to her, and Buy to see what she sells.",
+    "complete": "Lady Aftyn says, \"Drink it as soon as you feel the poison in your veins, not after. And come back to me whenever you need healing.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "rewards": {
+        "shillings": 100
+      },
+      "turnin": {
+        "class": "MarionHealer"
+      },
+      "objective": "Speak to Lady Aftyn the healer"
+    },
+    {
+      "kind": "buy",
+      "with": "MarionHealer",
+      "item": "CurePoisonPotion",
+      "objective": "Buy a cure poison potion from Lady Aftyn",
+      "brief": "Lady Aftyn says, \"Ran er'Hoth sent you for a cure? Wise of him. Right-click me, choose Buy, and tick the cure poison potion.\""
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}

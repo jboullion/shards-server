@@ -114,7 +114,7 @@ messages:
       return [
          [ 1, travel_name_tos, NET_MAIN, RID_TOS, 29, 5, 29, 6, ANGLE_EAST ],
          [ 2, travel_name_marion, NET_MAIN, RID_MARION, 5, 4, 6, 5, ANGLE_SOUTH_EAST ],
-         [ 3, travel_name_raza, NET_MAIN, RID_RAZA, 4, 54, 21, 7, ANGLE_EAST ],
+         [ 3, travel_name_raza, NET_MAIN, RID_RAZA, 23, 8, 23, 9, ANGLE_EAST ],
          [ 4, travel_name_jasper, NET_MAIN, RID_JASPER, 60, 42, 60, 41, ANGLE_NORTH_WEST ],
          [ 5, travel_name_barloque, NET_MAIN, RID_BAR_NORTH, 4, 13, 4, 14, ANGLE_EAST ],
          [ 6, travel_name_cornoth, NET_MAIN, RID_CORNOTH, 41, 59, 41, 60, ANGLE_NORTH ],

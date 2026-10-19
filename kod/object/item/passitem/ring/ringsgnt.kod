@@ -84,6 +84,9 @@ messages:
          ptLazyTimer = $;
       }
 
+      // Ours: the player who had it no longer has it to return (QuestBook UC_SIGNETS)
+      Post(Send(SYS,@GetQuestBook),@SignetMoved,#from=poOwner);
+
       propagate;
    }
 
@@ -133,6 +136,10 @@ messages:
          DeleteTimer(ptLazyTimer);
          ptLazyTimer = $;
       }
+
+      // Ours: a player who picks it up has it to return; one who lets it go doesn't (QuestBook
+      // UC_SIGNETS, once it has moved)
+      Post(Send(SYS,@GetQuestBook),@SignetMoved,#from=poOwner,#to=what);
 
       if what = $
       {

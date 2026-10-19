@@ -1,0 +1,35 @@
+{
+  "id": 137,
+  "key": "raza-find-the-elder",
+  "name": "The Elder of Raza",
+  "tier": "main",
+  "giver": {
+    "class": "RazaInnKeeper"
+  },
+  "band": {
+    "min": 20,
+    "max": 30
+  },
+  "requires": {
+    "quests": [
+      134
+    ]
+  },
+  "text": {
+    "offer": "Good, you're armed. Now, Rodric d'Stane, our elder, has been asking for anyone with a strong arm. Something is wrong in the mausoleum, and the town is frightened. You'll find him in his hut in the southeast corner of town. Go and hear him out.",
+    "progress": "Rodric d'Stane lives in a hut in the southeast corner of Raza. Look for the gold \"?\" over his head.",
+    "complete": "Rodric d'Stane says, \"Marcus sent you? Good. Raza has need of you, newcomer. Sit, and I'll tell you what has befallen our dead.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RazaElder"
+      },
+      "objective": "Speak to Rodric d'Stane, the elder"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5
+  }
+}

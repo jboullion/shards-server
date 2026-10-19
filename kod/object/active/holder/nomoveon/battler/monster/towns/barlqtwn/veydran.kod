@@ -68,6 +68,23 @@ messages:
       propagate;
    }
 
+   GetForSale(who = $)
+   "Ours: the market as it is now, as items leave it after 30 days unsold (util/playermarket.kod "
+   "ExpireListings); Buy checks what is chosen against this too."
+   {
+      plFor_Sale = [ Send(Send(SYS,@GetPlayerMarket),@GetPlayerMarketItems), $, $ ];
+
+      propagate;
+   }
+
+   HasForSale(who = $)
+   "Ours: the market as it is now, for OF_BUYABLE (Monster HasForSale)."
+   {
+      plFor_Sale = [ Send(Send(SYS,@GetPlayerMarket),@GetPlayerMarketItems), $, $ ];
+
+      propagate;
+   }
+
    UserEntered(who=$)
    {
       if NOT Send(who,@GetFaction) = FACTION_NEUTRAL
