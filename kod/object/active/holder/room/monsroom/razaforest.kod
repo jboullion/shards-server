@@ -52,19 +52,22 @@ properties:
    // Longer dispose time.
    piDispose_delay = 240000
 
-   piGen_time = 20000
+   // Ours: faster and fuller (from 20000, 3-7 and 15) so Raza's rat hunt (raza-rats-in-the-stores)
+   // doesn't wait on spawns
+   piGen_time = 14000
    piGen_percent = 100
 
-   piInit_count_min = 3
-   piInit_count_max = 7
+   piInit_count_min = 5
+   piInit_count_max = 8
 
-   piMonster_count_max = 15
+   piMonster_count_max = 18
 
 messages:
 
    Constructed()
    {
-      plMonsters = [ [&GiantRat, 60], [&SpiderBaby, 40] ];
+      // Ours: more rats (from 60/40)
+      plMonsters = [ [&GiantRat, 75], [&SpiderBaby, 25] ];
 
       propagate;
    }

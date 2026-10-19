@@ -1,0 +1,40 @@
+{
+  "id": 252,
+  "key": "cornoth-rooks-lesson",
+  "name": "A Lesson from Rook",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothSergeant"
+  },
+  "band": {
+    "min": 40,
+    "max": 50
+  },
+  "text": {
+    "offer": "Rook says, \"Hut! You swing that weapon like it owes you money. Nobody's born knowing how to fight: you learn it, from someone who already does. That's me. Right-click me and choose Buy: you'll see the skills I can teach you, from dodging a blow to a proper sword grip. Pick one you can afford and I'll drill it into you.\"",
+    "progress": "Rook says, \"Right-click me and choose Buy. The skills are on my list beside the steel. Dodge or a proficiency with the weapon you carry is a good start.\"",
+    "complete": "Rook says, \"There. A skill starts out weak and grows every time you use it, so get out there and use it. And here's something to help it along: training points. I'll show you what to do with those next.\""
+  },
+  "steps": [
+    {
+      "kind": "learn",
+      "skills": [
+        "Dodge",
+        "Punch",
+        "Slash",
+        "Brawling",
+        "AxeProficiency",
+        "HammerProficiency",
+        "MaceProficiency",
+        "SwordProficiency",
+        "Parry"
+      ],
+      "objective": "Learn a skill from Rook",
+      "brief": "Rook teaches fighting skills to anyone who can pay. Right-click him and choose Buy to see them beside his weapons and armour. Trainers all over Meridian teach skills and spells this way."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25,
+    "trainingPoints": 400
+  }
+}

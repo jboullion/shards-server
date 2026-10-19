@@ -1,0 +1,32 @@
+{
+  "id": 256,
+  "key": "cornoth-hall-of-genealogy",
+  "name": "The Hall of Genealogy",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 50
+  },
+  "text": {
+    "offer": "D'Franco says, \"Sooner or later every traveller asks me where they ought to settle. I tell them all the same thing: go to the Hall of Genealogy and read the histories of the great towns. Tos, Barloque, Jasper, Marion, Raza and Cor Noth: each has its own people, its own story and its own advantage for those who call it home. The townsfolk treat their own a little better.\"",
+    "complete": "Thousands of books in that hall, and only a handful that matter to a traveller. Read them when you have the time, and choose your hometown well."
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_COR_GEN_HALL"
+      ],
+      "auto": true,
+      "objective": "Visit the Hall of Genealogy",
+      "brief": "The Hall of Genealogy is in Cor Noth. Inside, read the histories of the great towns; each one ends with the advantage its citizens get. When you are sure, the hall tells you what to say to make one your hometown."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25,
+    "shillings": 50
+  }
+}

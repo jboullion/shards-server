@@ -16,9 +16,9 @@
     ]
   },
   "text": {
-    "offer": "Lady Aftyn says, \"My healing comes from Shal'ille, the goddess of light and life. Her temple stands in the Deep Woods of Ileria, just outside town, and Priestess Xiana keeps it. Every traveller should know the way there: go and pay her your respects.\"",
-    "progress": "Leave Marion by its north-east corner into the Deep Woods of Ileria. The Temple of Shal'ille is in the woods.",
-    "complete": "Priestess Xiana says, \"Welcome, child. Lady Aftyn sent you? Then you are welcome in Shal'ille's house, whenever you have need of it.\""
+    "offer": "Lady Aftyn says, \"My healing comes from Shal'ille, the goddess of light and life. Her temple stands in the Deep Woods of Ileria, just outside town, and Priestess Xiana keeps it. Every traveller should know the way there. Go and pay her your respects, and ask her to teach you Minor Healing: it is Shal'ille's gift to everyone, and no one should walk the roads without it.\"",
+    "progress": "Leave Marion by its north-east corner into the Deep Woods of Ileria. The Temple of Shal'ille is in the woods. Right-click Priestess Xiana and choose Buy to learn Minor Healing.",
+    "complete": "Priestess Xiana says, \"Shal'ille's light goes with you now. Cast Minor Healing on yourself, or on a friend, whenever the road has been hard on you. You are welcome in her house whenever you have need of it.\""
   },
   "steps": [
     {
@@ -27,6 +27,14 @@
         "class": "ShalillePriestess"
       },
       "objective": "Speak to Priestess Xiana in the Temple of Shal'ille"
+    },
+    {
+      "kind": "learn",
+      "spells": [
+        "MinorHeal"
+      ],
+      "objective": "Learn Minor Healing from Priestess Xiana",
+      "brief": "Priestess Xiana says, \"Welcome, child. Lady Aftyn sent you? Then you are welcome in Shal'ille's house. Let me give you her gift: Minor Healing. Anyone may learn it, whatever path they follow, and it takes nothing from the other spells you can learn. Right-click me and choose Buy, and it is yours.\""
     }
   ],
   "rewards": {

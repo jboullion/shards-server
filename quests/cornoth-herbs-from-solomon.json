@@ -1,0 +1,29 @@
+{
+  "id": 257,
+  "key": "cornoth-herbs-from-solomon",
+  "name": "Herbs from Solomon",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 50
+  },
+  "text": {
+    "offer": "D'Franco says, \"If you mean to learn magic, and everyone does sooner or later, you'll need reagents: mushrooms, elderberries, fairy wings and the like. Many spells use some up every time you cast them. Solomon sells them at his shop here in Cor Noth, Solomon's Edibles. Go and buy something from him, so you know where to find him when you need them.\"",
+    "complete": "Solomon's a good sort. Keep a few reagents in your pack and you won't be caught short in the field."
+  },
+  "steps": [
+    {
+      "kind": "buy",
+      "with": "CornothGrocer",
+      "objective": "Buy herbs from Solomon",
+      "brief": "Solomon's Edibles is in Cor Noth. Right-click Solomon and choose Buy to see his herbs and reagents, then buy something from him."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25,
+    "shillings": 50
+  }
+}

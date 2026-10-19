@@ -302,6 +302,8 @@ messages:
       }
 
       Send(who,@AddTrainingPoints,#points=(-iGain * iCost),#report=FALSE);
+      // A quest step to spend them (util/questbook.kod QK_TRAIN)
+      Send(Send(SYS,@GetQuestBook),@AbilityTrained,#who=who,#ability=ability);
       Send(who,@MsgSendUser,#message_rsc=abil_train_done,#parm1=sName,#parm2=iGain,
            #parm3=iGain * iCost);
       Send(self,@SendTraining,#who=who);

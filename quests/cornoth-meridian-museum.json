@@ -1,0 +1,46 @@
+{
+  "id": 255,
+  "key": "cornoth-meridian-museum",
+  "name": "The Meridian Museum",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothInnkeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 50
+  },
+  "text": {
+    "offer": "D'Franco says, \"New in Cor Noth? Then don't spend all your time in my inn, much as I'd like your coin. This is a university town, and the best thing in it is the Meridian Museum. The whole history of the land is in there. Five old portals stand along its west wall, and each one still leads back to a town as it used to be, long ago. Go and see it, and step through one of them. You'll understand this land better for it.\"",
+    "complete": "Strange, seeing a town as it was before anyone you know was born. Step back through the portal to return to the museum whenever you're done looking around."
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_COR_MUSEUM"
+      ],
+      "auto": true,
+      "objective": "Visit the Meridian Museum",
+      "brief": "The Meridian Museum is in Cor Noth. Its displays tell the history of Meridian."
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_CORNOTH",
+        "RID_OLD_COR_UNIV",
+        "RID_OLD_JASPER",
+        "RID_OLD_MARION",
+        "RID_OLD_BAR_NORTH",
+        "RID_OLD_BAR_SOUTH"
+      ],
+      "auto": true,
+      "objective": "Step through one of the museum's old portals",
+      "brief": "Five old portals stand along the museum's west wall. Each leads to one of Meridian's towns as it was long ago. Walk into one to see it, and walk back through its portal when you are done."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3,
+    "shillings": 50
+  }
+}

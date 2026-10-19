@@ -8411,6 +8411,8 @@ messages:
       {
           Send(self,@AddToSchools,#school=Send(oSpell,@GetSchool),
                #change=iBoundAbility);
+          // Ours: a quest step to learn it (util/questbook.kod QK_LEARN)
+          Send(Send(SYS,@GetQuestBook),@SkillLearned,#who=self,#oSkill=oSpell);
       }
 
       if poOwner <> $
@@ -12544,6 +12546,17 @@ messages:
          return PLAYER_LEARN_ERROR;
       }
 
+      // Ours: a free spell (Minor Heal) is for anyone: no points, schools or karma asked
+      if IsClass(obj,&Spell) AND Send(obj,@IsFreeToLearn)
+      {
+         if Send(self,@HasSpell,#num=spell_num)
+         {
+            return PLAYER_LEARN_ALREADY;
+         }
+
+         return PLAYER_LEARN_SUCCESS;
+      }
+
       // Phase two:  get the hard data.
       level = Send(obj,@GetLevel);
       school = Send(obj,@GetSchool);
@@ -12703,6 +12716,7 @@ messages:
 
          if NOT IsClass(nobj,&Blink)  // DON'T COUNT BLINK!
             AND NOT IsClass(nobj,&UtilitySpell) // Don't count utility spells
+            AND NOT Send(nobj,@IsFreeToLearn) // Ours: nor free ones (Minor Heal)
          {
             switch (nSchool)
             {
@@ -12939,6 +12953,7 @@ messages:
 
          if NOT IsClass(oSpellObj,&Blink)  // DON'T COUNT BLINK!
             AND NOT IsClass(oSpellObj,&UtilitySpell) // Don't count utility spells
+            AND NOT Send(oSpellObj,@IsFreeToLearn) // Ours: nor free ones (Minor Heal)
             AND iSchool <> SS_DM_COMMAND
             AND except <> iSchool
          {

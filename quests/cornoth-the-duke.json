@@ -1,0 +1,54 @@
+{
+  "id": 260,
+  "key": "cornoth-the-duke",
+  "name": "The Duke of Tos",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothSergeant"
+  },
+  "band": {
+    "min": 48,
+    "max": 60
+  },
+  "requires": {
+    "quests": [
+      254
+    ]
+  },
+  "text": {
+    "offer": "Rook says, \"Duke Akardius runs a merchant empire out of Blackstone Keep in Tos, and his faction is about power at any cost. His people cast Qor, Riija and Kraanan magic stronger than anyone, recover their health and mana faster, and tire less. Even a murderer can still do business, so long as they work for him. The risk? The crown and the rebels count you as an enemy, Tos is full of thieves, and the road there crosses the Badlands, where trolls and groundworms will eat a careless traveller. Go and hear him out, touch the portal in Tos, and come back alive.\"",
+    "progress": "Rook says, \"Tos lies south-east of Cor Noth, through the Border of the Badlands. Run through the Badlands: don't stop to fight. The Duke is in Blackstone Keep, at the north end of the city.\"",
+    "complete": "Rook says, \"You came back. Good. The Duke pays well and asks a lot. Now you've heard all three. Think hard before you swear yourself to any of them, if you ever do.\""
+  },
+  "steps": [
+    {
+      "kind": "attune",
+      "point": 1,
+      "objective": "Attune to the portal in Tos",
+      "brief": "Tos is the oldest city in Meridian. Head south-east through the Border of the Badlands, running quickly past the trolls and groundworms, and you will find the Main Gate of Tos to the east. Touch the city's travel portal when you arrive."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      },
+      "objective": "Hear out Duke Akardius in Tos",
+      "brief": "Duke Akardius keeps court in Blackstone Keep, at the north end of Tos. Find him and talk to him."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "CorNothSergeant"
+      },
+      "objective": "Report back to Rook",
+      "brief": "Duke Akardius says, \"So Rook sends me his strays now. Very well. Power goes to those who take it, and I reward those who take it in my name. Come back when you're tired of being poor.\" Step into the portal in Tos to return to Cor Noth, and tell Rook what you made of him."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 150
+  }
+}

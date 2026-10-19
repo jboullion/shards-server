@@ -15,7 +15,7 @@
   },
   "text": {
     "offer": "Ran er'Hoth says, \"Now listen here, adventurer! The crypt right behind my hut has gone from a nuisance to an outright danger. Would you please go in there and see if you can figure out what is causing the dead to rise? My cousin Rodric d'Stane says you are highly recommended for the job of mummy slaying!\"",
-    "complete": "The sheer evil all around you is clear warning that this place is extremely dangerous!!"
+    "complete": "Ran er'Hoth says, \"Living statues? Our own ancestors, standing guard down there? Eight of them broken, and you walked out on your own feet. Whatever they guard below, we will face it when you are stronger.\""
   },
   "steps": [
     {
@@ -25,16 +25,18 @@
       ],
       "auto": true,
       "objective": "Investigate the Marion Crypt",
-      "brief": "Ran er'Hoth has requested you investigate the Crypt in the southwest corner of Marion on the behalf of the town's citizens. The people of Raza are descended from Marion folk, so you should recognize the layout of their burial site. However, these mummies are much stronger than the ones you fought before. What could possibly be the source of the mummies' restlessness?"
+      "brief": "Ran er'Hoth has asked you to look into the crypt in the south-west corner of Marion for the town's sake. The people of Raza are descended from Marion folk, so you should know the layout of their burial site. But these mummies are much stronger than the ones you fought before. What could be keeping the dead from their rest?"
     },
     {
-      "kind": "visit",
+      "kind": "kill",
+      "target": "LivingStatue",
+      "count": 8,
       "rooms": [
-        "RID_MAR_CRYPT3A"
+        "RID_MAR_CRYPT2"
       ],
-      "auto": true,
-      "objective": "Clear the Statues in Marion Crypt",
-      "brief": "The moment you step into the second level of the Marion Crypt, you are certain something is very wrong here. Do the citizens of Marion know what their ancestors built down here? The second level of the Marion Crypt seems dominated by very old and very strong living statues imbued with the spirits of Marionite ancestors. Were they animated long ago to guard the tombs, or to keep some deeper evil locked away? In either case, the undead situation is growing worse. You must train and improve your skills until you can clear all the statues and handle the skeletons as well."
+      "inRooms": true,
+      "objective": "Living statues destroyed",
+      "brief": "The moment you step onto the second level of the Marion crypt, you know something is very wrong here. Old and very strong living statues stand guard among the tombs, filled with the spirits of Marion's ancestors. Were they woken long ago to guard the dead, or to keep some deeper evil locked away? Either way, they are the danger now. Break eight of them on this level, then go back to Ran er'Hoth. Leave whatever lies deeper for another day: you are not ready for it yet."
     }
   ],
   "rewards": {

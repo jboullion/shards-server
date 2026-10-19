@@ -17,7 +17,7 @@
   },
   "text": {
     "offer": "Sergeant Rook keeps the peace in Cor Noth, and he knows more of what moves on the roads than anyone. Take him my report of what you've seen here and in Raza. He'll have work for someone like you.",
-    "complete": "Ran er'Hoth's report, is it? I'd heard rumours. Seems they're more than rumours. Glad you came."
+    "complete": "Ran er'Hoth's report, is it? I'd heard rumours. Seems they're more than rumours. Glad you came. He's sent coin with it, too: put it toward a lesson from me, and we'll make a fighter of you yet."
   },
   "steps": [
     {
@@ -30,6 +30,6 @@
   ],
   "rewards": {
     "xpPoints": 0.4,
-    "shillings": 100
+    "shillings": 500
   }
 }

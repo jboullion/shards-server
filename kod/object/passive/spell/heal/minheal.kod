@@ -24,7 +24,8 @@ resources:
       "or another person.  Is particularly potent on those protected by "
       "guardian angels.  Shal'ille gives a small reward toward the karma "
       "of the mage who heals another good soul.  Requires nothing but a "
-      "compassionate soul."
+      "compassionate soul.  Shal'ille's gift to all: anyone may learn it, "
+      "and it doesn't count against the other spells you can learn."
    heal_spell_intro = \
       "Shal'ille Lv. 1: Bestows the healing touch of Shal'ille, restoring "
       "points of health."
@@ -69,6 +70,12 @@ messages:
    GetPotionClass()
    {
       return &MinorHealPotion;
+   }
+
+   IsFreeToLearn()
+   "Ours: Shal'ille's gift to all (Spell.IsFreeToLearn)."
+   {
+      return TRUE;
    }
 
 end

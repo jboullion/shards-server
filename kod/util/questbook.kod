@@ -122,13 +122,15 @@ constants:
    // Ours: sending something to our vault from the inventory (util/shardsabilities.kod Convey),
    // which was the Conveyance spell
    QK_CONVEY = 15
-   // Ours: learning a skill (one of the step's classes; knowing them all already counts), and
+   // Ours: learning a skill or spell (one of the step's classes; knowing them all already counts), and
    // attuning to a portal (the step's amount is the travel point: util/travelnet.kod)
    QK_LEARN = 16
    QK_ATTUNE = 17
    // Ours: a mock bout in an arena (docs/adr/0019-arena-bouts.md; util/arenabouts.kod). The
    // step's NPC is the arena's watcher; an amount of 1 counts only a bout won
    QK_ARENA = 18
+   // Ours: spending training points on a spell or skill (util/shardsabilities.kod Train)
+   QK_TRAIN = 19
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -1778,8 +1780,16 @@ messages:
       return;
    }
 
+   AbilityTrained(who = $,ability = $)
+   "ShardsAbilities.Train: who spent training points on a spell or skill (QK_TRAIN)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_TRAIN,#what=ability);
+
+      return;
+   }
+
    SkillLearned(who = $,oSkill = $)
-   "Player.AddSkill: who learned a skill (QK_LEARN)."
+   "Player.AddSkill and AddSpell: who learned a skill or a spell (QK_LEARN)."
    {
       Send(self,@ActionDone,#who=who,#kind=QK_LEARN,#what=oSkill);
 
@@ -1787,7 +1797,8 @@ messages:
    }
 
    KnowsSkills(who = $,classes = $)
-   "Whether who knows a skill of each of these classes (a learn step that has nothing left to learn)."
+   "Whether who knows a skill or spell of each of these classes (a learn step that has nothing "
+   "left to learn)."
    {
       local i, j, bFound;
 
@@ -1801,6 +1812,20 @@ messages:
                bFound = TRUE;
 
                break;
+            }
+         }
+
+         // Ours: a learn step's spells (Minor Heal at the Temple of Shal'ille)
+         if NOT bFound
+         {
+            foreach j in Send(who,@GetSpellList)
+            {
+               if IsClass(Send(SYS,@FindSpellByNum,#num=Send(who,@DecodeSpellNum,#compound=j)),i)
+               {
+                  bFound = TRUE;
+
+                  break;
+               }
             }
          }
 

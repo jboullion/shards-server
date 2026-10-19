@@ -281,6 +281,13 @@ messages:
       return pbEnabled;
    }
 
+   IsFreeToLearn()
+   "Ours: whether anyone may learn it, without it counting toward their learn points "
+   "(Player.PlayerCanLearn, GetTotalLearnPoints): Minor Heal."
+   {
+      return FALSE;
+   }
+
    GetSchoolStr(iSchool=-1)
    {
       local rSchool;

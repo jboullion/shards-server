@@ -20,9 +20,10 @@ constants:
    SECTOR_EXIT1 = 6
    SECTOR_EXIT2 = 7
 
-   // Ours: the time to pull the second lever after the first, 5000 (from 2000) so that one
-   // player can open the gate alone, as in Raza's crypt (razacrypt.kod)
-   SLAM_TIME = 5000
+   // Ours: the time to pull the second lever after the first, 6000 (from 2000) so that one
+   // player can open the gate alone, as in Raza's crypt (razacrypt.kod, 5000: its levers are
+   // closer together)
+   SLAM_TIME = 6000
    FIGHT_TIME = 10000
 
    MIN_GEN_ROW = 29

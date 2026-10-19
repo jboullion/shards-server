@@ -1,0 +1,33 @@
+{
+  "id": 254,
+  "key": "cornoth-portal",
+  "name": "Cor Noth's Portal",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothSergeant"
+  },
+  "band": {
+    "min": 40,
+    "max": 50
+  },
+  "requires": {
+    "quests": [
+      252
+    ]
+  },
+  "text": {
+    "offer": "Rook says, \"Meridian's a big place, and walking it gets old. Every major town has a travel portal. Walk into one and it knows you; walk into any other you've touched, and you can step straight back to it. There's one here in Cor Noth. Go and touch it. You'll thank me the first time you're a long way from home and hurting.\"",
+    "complete": "Rook says, \"Now Cor Noth is one step away, wherever you've got another portal. Touch one in every town you reach. You'll need them for what I've got planned for you next.\""
+  },
+  "steps": [
+    {
+      "kind": "attune",
+      "point": 6,
+      "objective": "Attune to Cor Noth's portal",
+      "brief": "Find the travel portal in Cor Noth (a gold \"!\" marks portals you haven't touched), and walk into it to attune yourself to it. Once you have touched two portals, walk into either one to travel to the other."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}
