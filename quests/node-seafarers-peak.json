@@ -1,0 +1,32 @@
+{
+  "id": 267,
+  "key": "node-seafarers-peak",
+  "name": "Seafarer's Peak",
+  "tier": "story",
+  "giver": {
+    "class": "JasperInnKeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 70
+  },
+  "text": {
+    "offer": "Widow Qesino says, \"My husband was a sailor, and he swore by a place he called Seafarer's Peak. It's a hill above the sea, out past the Forest of Farol, and the old sailors climbed it to feel the mana there before a voyage. There's a node on the top. Go and see it for him, would you?\"",
+    "progress": "From Jasper: West Jasper, into the Forest of Farol past Faronath, out of its western edge into the Druid Hills, then the Hills, and up to Seafarer's Peak.",
+    "complete": "He'd have liked that. Thank you, traveller."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_A5",
+      "rooms": [
+        "RID_A5"
+      ],
+      "objective": "Bond with the node on Seafarer's Peak"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3,
+    "trainingPoints": 200
+  }
+}

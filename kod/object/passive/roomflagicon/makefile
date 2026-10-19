@@ -5,6 +5,6 @@
 !include $(TOPDIR)\common.mak
 
 DEPEND = ..\roomflagicon.bof
-BOFS = rmcombat.bof rmnocombat.bof rmgcombat.bof
+BOFS = rmcombat.bof rmnocombat.bof rmgcombat.bof feylock.bof
 
 !include $(KODDIR)\kod.mak

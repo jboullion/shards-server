@@ -1,0 +1,33 @@
+{
+  "id": 263,
+  "key": "node-the-underworld",
+  "name": "The Skull's Five Fires",
+  "tier": "story",
+  "start": "death",
+  "giver": {
+    "class": "ShalillePriestess"
+  },
+  "band": {
+    "min": 0,
+    "max": 150
+  },
+  "text": {
+    "offer": "Priestess Xiana's voice reaches you through the cold: \"Do not despair, child. Even here there is power. Five braziers stand around this place, and a skull watches over them. Light all five at once and a mana node will show itself by the skull. But mind: each brazier you touch wakes or puts out the fires beside it.\"",
+    "progress": "In the Underworld, light all five braziers at once. Each one you use changes the braziers next to it, so work out the order. The node appears by the skull when all five burn.",
+    "complete": "Cold power seeps into you from the node of the dead. Even death has given you something."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_CORPSENODE",
+      "rooms": [
+        "RID_UNDERWORLD"
+      ],
+      "objective": "Light the five fires and bond with the Underworld's node"
+    }
+  ],
+  "rewards": {
+    "xp": 500,
+    "trainingPoints": 200
+  }
+}

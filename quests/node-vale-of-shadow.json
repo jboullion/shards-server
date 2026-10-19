@@ -1,0 +1,39 @@
+{
+  "id": 262,
+  "key": "node-vale-of-shadow",
+  "name": "Shadow over the Vale",
+  "tier": "story",
+  "giver": {
+    "class": "QorPriestess"
+  },
+  "band": {
+    "min": 40,
+    "max": 90
+  },
+  "text": {
+    "offer": "Priestess Zuxana says, \"There is a forest beyond Marion's Green Acres Plantation, the Vale of Sorrows, where the dirhai fight the simpering elhai for every tree. When the dark holds all of it, the dirhai share their mana node with any who serve it. You can tip that war alone. Cast Qor's Detect Good in each part of the forest and her shadow will hold it for a day. Darken every part, and drink from their node.\"",
+    "progress": "Cast Detect Good in each of the Vale of Sorrows' eight parts to lock them evil, then bond with the node in the Vale. From Marion: through the Green Acres Plantation and North Quilicia Wood to the Fey's Crossing.",
+    "complete": "The dirhai shriek with delight as the node's power floods into you. The vale belongs to Qor, for today at least."
+  },
+  "steps": [
+    {
+      "kind": "cast",
+      "spell": "DetectGood",
+      "objective": "Cast Detect Good",
+      "brief": "Detect Good is a Qor spell of the first circle. Priestess Zuxana teaches it, if you don't know it yet. Cast it anywhere to begin."
+    },
+    {
+      "kind": "node",
+      "node": "NODE_FAERIE",
+      "rooms": [
+        "RID_C2"
+      ],
+      "objective": "Lock the vale evil and bond with the dirhai's node",
+      "brief": "The Vale of Sorrows is eight parts of one forest: the Fey's Crossing, the Vale itself and the woods around them. The node shows itself only while every part leans the same way. Cast Detect Good in each part and it will hold evil for a day, and gather only evil fey. Lock all eight and the node rises in the Vale. A lock shows as an icon by your map; someone casting Detect Evil there breaks it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "trainingPoints": 300
+  }
+}

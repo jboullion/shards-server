@@ -1,0 +1,33 @@
+{
+  "id": 268,
+  "key": "node-caves-of-ice",
+  "name": "The Dreaded Caves of Ice",
+  "tier": "story",
+  "giver": {
+    "class": "JasperBlacksmith"
+  },
+  "band": {
+    "min": 50,
+    "max": 100
+  },
+  "text": {
+    "offer": "Quintor says, \"The yeti I send my pupils after live in the Dreaded Caves of Ice, out past the Forest of Farol. There's more in there than yeti. A mana node sits in the caves, but the beast that rules the place won't let anyone near it while it lives. Kill the yeti, then claim the node.\"",
+    "progress": "From Jasper: West Jasper, through the Forest of Farol to its western edge, then the Druid Hills, and into the Dreaded Caves of Ice. The node won't answer you while the yeti lives.",
+    "complete": "Cold, isn't it? But you're the stronger for it."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_ICECAVE1",
+      "rooms": [
+        "RID_ICE_CAVE1"
+      ],
+      "objective": "Kill the yeti and bond with the node in the Caves of Ice",
+      "brief": "The node in the Dreaded Caves of Ice can't be touched while the yeti lives. Slay it first."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "trainingPoints": 250
+  }
+}

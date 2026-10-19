@@ -788,6 +788,55 @@ resources:
    qd_260_t2 = "Duke Akardius"
    qd_260_s3 = "Report back to Rook"
    qd_260_t3 = "Rook"
+   qd_261_name = "Light in the Vale"
+   qd_261_s1 = "Cast Detect Evil"
+   qd_261_t1 = "Priestess Xiana"
+   qd_261_s2 = "Lock the vale good and bond with the elhai's node"
+   qd_261_t2 = "Priestess Xiana"
+   qd_262_name = "Shadow over the Vale"
+   qd_262_s1 = "Cast Detect Good"
+   qd_262_t1 = "Priestess Zuxana"
+   qd_262_s2 = "Lock the vale evil and bond with the dirhai's node"
+   qd_262_t2 = "Priestess Zuxana"
+   qd_263_name = "The Skull's Five Fires"
+   qd_263_s1 = "Light the five fires and bond with the Underworld's node"
+   qd_263_t1 = "Priestess Xiana"
+   qd_264_name = "The Avars' Node"
+   qd_264_s1 = "Bond with the node in the Avar Village"
+   qd_264_t1 = "Oxal ix'Tokak"
+   qd_265_name = "The Martyrs' Node"
+   qd_265_s1 = "Bond with the node at Martyr's Battleground"
+   qd_265_t1 = "Priestess Qerti'nya"
+   qd_266_name = "Something in the Icky Cave"
+   qd_266_s1 = "Bond with the node in the icky cave"
+   qd_266_t1 = "Paddock"
+   qd_267_name = "Seafarer's Peak"
+   qd_267_s1 = "Bond with the node on Seafarer's Peak"
+   qd_267_t1 = "Widow Qesino"
+   qd_268_name = "The Dreaded Caves of Ice"
+   qd_268_s1 = "Kill the yeti and bond with the node in the Caves of Ice"
+   qd_268_t1 = "Quintor"
+   qd_269_name = "Fire in the Badlands"
+   qd_269_s1 = "Bond with the node in the Badlands"
+   qd_269_t1 = "Pritchett"
+   qd_270_name = "The Maze of the Mimic"
+   qd_270_s1 = "Bond with the node in the Maze of the Mimic"
+   qd_270_t1 = "Tendrath"
+   qd_271_name = "Under the Sentinel"
+   qd_271_s1 = "Bond with the node under the Sentinel"
+   qd_271_t1 = "Solomon"
+   qd_272_name = "The Ancient Place"
+   qd_272_s1 = "Bond with the node in the ancient place"
+   qd_272_t1 = "Pietro"
+   qd_273_name = "Upstairs in Castle Victoria"
+   qd_273_s1 = "Bond with the node upstairs in Castle Victoria"
+   qd_273_t1 = "Frisconar"
+   qd_274_name = "The Heart of Zjiria"
+   qd_274_s1 = "Bond with the Heart of Zjiria in Ukgoth"
+   qd_274_t1 = "Fehr'loi Qan"
+   qd_275_name = "The Collapsed Causeway"
+   qd_275_s1 = "Bond with the node at the Collapsed Causeway"
+   qd_275_t1 = "Meidei"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -803,7 +852,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 10703578;
+      return 83835554;
    }
 
    GetQuests()
@@ -2093,7 +2142,103 @@ messages:
                0, $, $, $, 0 ],
              [ 3, $, 1, 0, &CorNothSergeant, 0, qd_260_s3, $, $, qd_260_t3,
                0, $, $, $, 0 ] ],
-           1201, 150, $, 0, 1, $, $, 0, $, $, $ ]
+           1201, 150, $, 0, 1, $, $, 0, $, $, $ ],
+         // node-vale-of-light
+         [ 261, qd_261_name, &ShalillePriestess, 0, 40, 90, $,
+           $, $, $, $,
+           [ [ 6, &DetectEvil, 1, 0, &ShalillePriestess, 0, qd_261_s1, $, $, qd_261_t1,
+               1, $, $, $, 0 ],
+             [ 20, $, 1, 0, &ShalillePriestess, 0, qd_261_s2, $, $, qd_261_t2,
+               1, $, $, $, 512 ] ],
+           841, 0, $, 300, 2, $, $, 0, $, $, $ ]
+         ],
+         [
+         // node-vale-of-shadow
+         [ 262, qd_262_name, &QorPriestess, 0, 40, 90, $,
+           $, $, $, $,
+           [ [ 6, &DetectGood, 1, 0, &QorPriestess, 0, qd_262_s1, $, $, qd_262_t1,
+               1, $, $, $, 0 ],
+             [ 20, $, 1, 0, &QorPriestess, 0, qd_262_s2, $, $, qd_262_t2,
+               1, $, $, $, 512 ] ],
+           841, 0, $, 300, 2, $, $, 0, $, $, $ ],
+         // node-the-underworld
+         [ 263, qd_263_name, &ShalillePriestess, 0, 0, 150, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &ShalillePriestess, 0, qd_263_s1, $, $, qd_263_t1,
+               1, $, $, $, 128 ] ],
+           500, 0, $, 200, 2, $, $, 32, $, $, $ ],
+         // node-avar-village
+         [ 264, qd_264_name, &KocatanBartender, 0, 95, 150, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &KocatanBartender, 0, qd_264_s1, $, $, qd_264_t1,
+               1, $, $, $, 4096 ] ],
+           6912, 0, $, 500, 2, $, $, 0, $, $, $ ],
+         // node-martyrs-battleground
+         [ 265, qd_265_name, &KraananPriestess, 0, 90, 150, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &KraananPriestess, 0, qd_265_s1, $, $, qd_265_t1,
+               1, $, $, $, 2048 ] ],
+           4969, 0, $, 400, 2, $, $, 0, $, $, $ ],
+         // node-icky-cave
+         [ 266, qd_266_name, &TosInnKeeper, 0, 60, 100, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &TosInnKeeper, 0, qd_266_s1, $, $, qd_266_t1,
+               1, $, $, $, 16 ] ],
+           1488, 0, $, 250, 2, $, $, 0, $, $, $ ],
+         // node-seafarers-peak
+         [ 267, qd_267_name, &JasperInnKeeper, 0, 40, 70, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &JasperInnKeeper, 0, qd_267_s1, $, $, qd_267_t1,
+               1, $, $, $, 32 ] ],
+           504, 0, $, 200, 2, $, $, 0, $, $, $ ],
+         // node-caves-of-ice
+         [ 268, qd_268_name, &JasperBlacksmith, 0, 50, 100, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &JasperBlacksmith, 0, qd_268_s1, $, $, qd_268_t1,
+               1, $, $, $, 64 ] ],
+           1040, 0, $, 250, 2, $, $, 0, $, $, $ ],
+         // node-the-badlands
+         [ 269, qd_269_name, &BarloqueInnkeeper, 0, 50, 100, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &BarloqueInnkeeper, 0, qd_269_s1, $, $, qd_269_t1,
+               1, $, $, $, 8 ] ],
+           1040, 0, $, 250, 2, $, $, 0, $, $, $ ],
+         // node-maze-of-the-mimic
+         [ 270, qd_270_name, &HunterGhost, 0, 110, 150, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &HunterGhost, 0, qd_270_s1, $, $, qd_270_t1,
+               1, $, $, $, 8192 ] ],
+           9241, 0, $, 500, 2, $, $, 0, $, $, $ ],
+         // node-the-sentinel
+         [ 271, qd_271_name, &CornothGrocer, 0, 60, 110, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &CornothGrocer, 0, qd_271_s1, $, $, qd_271_t1,
+               1, $, $, $, 1 ] ],
+           1861, 0, $, 300, 2, $, $, 0, $, $, $ ],
+         // node-the-ancient-place
+         [ 272, qd_272_name, &JasperBartender, 0, 80, 130, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &JasperBartender, 0, qd_272_s1, $, $, qd_272_t1,
+               1, $, $, $, 2 ] ],
+           3281, 0, $, 300, 2, $, $, 0, $, $, $ ],
+         // node-castle-victoria
+         [ 273, qd_273_name, &TosApothecary, 0, 95, 150, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &TosApothecary, 0, qd_273_s1, $, $, qd_273_t1,
+               1, $, $, $, 4 ] ],
+           6912, 0, $, 450, 2, $, $, 0, $, $, $ ],
+         // node-heart-of-zjiria
+         [ 274, qd_274_name, &TosBlacksmith, 0, 80, 130, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &TosBlacksmith, 0, qd_274_s1, $, $, qd_274_t1,
+               1, $, $, $, 256 ] ],
+           3937, 0, $, 350, 2, $, $, 0, $, $, $ ],
+         // node-collapsed-causeway
+         [ 275, qd_275_name, &BarloqueBartender, 0, 100, 150, $,
+           $, $, $, $,
+           [ [ 20, $, 1, 0, &BarloqueBartender, 0, qd_275_s1, $, $, qd_275_t1,
+               1, $, $, $, 16384 ] ],
+           7651, 0, $, 450, 2, $, $, 0, $, $, $ ]
          ]
       ];
    }

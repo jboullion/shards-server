@@ -65,11 +65,10 @@ messages:
                        [23, 16], [20, 38], [25, 21], [27, 38]
                      ];
 
-      // Create the node now.
+      // Create the node now.  Ours: it shows only while the whole vale leans one way
+      // (KarmaChanged), which a detect spell's lock makes something a few players can do
+      // (FeyForest.CastLock)
       Create(&FeyNode,#node_num=NODE_FAERIE,#karma=0,#iRoomNum=piRoom_num);
-	  
-	  // Show the node now
-	  Send(self,@AppearNode);
 
       propagate;
    }
@@ -85,8 +84,6 @@ messages:
    KarmaChanged(karma = $)
    {
       local i, oRoom;
-
-      return;
 
       if karma > KVERY_GOOD AND karma < KVERY_EVIL
       {
@@ -139,7 +136,9 @@ messages:
          return;
       }
 
-      if TRUE OR Send(self,@GetKarma) = KVERY_GOOD
+      // Ours: the gate is back (the whole vale very good or very evil), but anyone may meld
+      // with the node either way (FeyNode's karma check stays off)
+      if Send(self,@GetKarma) = KVERY_GOOD
       {
          Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#what=self,#string=c2_elhai_win);
          oNode = Send(SYS,@FindNodeByNum,#num=NODE_FAERIE);
@@ -147,13 +146,13 @@ messages:
               #fine_row=0,#fine_col=0);
       }
 
-//      if Send(self,@GetKarma) = KVERY_EVIL
-//      {
-//         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#what=self,#string=c2_dirhai_win);
-//         oNode = Send(SYS,@FindNodeByNum,#num=NODE_FAERIE);
-//         Send(oNode,@NodeAppear,#where=self,#karma=2,#row=23,#col=30,
-//              #fine_row=0,#fine_col=0);
-//      }
+      if Send(self,@GetKarma) = KVERY_EVIL
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#what=self,#string=c2_dirhai_win);
+         oNode = Send(SYS,@FindNodeByNum,#num=NODE_FAERIE);
+         Send(oNode,@NodeAppear,#where=self,#karma=2,#row=23,#col=30,
+              #fine_row=0,#fine_col=0);
+      }
       
       if ptFeyNode = $
       {

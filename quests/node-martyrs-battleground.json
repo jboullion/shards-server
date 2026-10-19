@@ -1,0 +1,33 @@
+{
+  "id": 265,
+  "key": "node-martyrs-battleground",
+  "name": "The Martyrs' Node",
+  "tier": "story",
+  "giver": {
+    "class": "KraananPriestess"
+  },
+  "band": {
+    "min": 90,
+    "max": 150
+  },
+  "text": {
+    "offer": "Priestess Qerti'nya says, \"Kraanan's warriors remember a canyon where the martyrs fell: Martyr's Battleground. Their blood soaked the ground, and the mana it left still gathers there in a node. Stone trolls guard it now. Go, fight your way to it, and bond with it in Kraanan's name.\"",
+    "progress": "From the Twisted Wood's western border, pass the icky cave into the Forests of Meridian, then into the Berdonne Canyons and on to Martyr's Battleground. Beware the stone trolls.",
+    "complete": "The martyrs' strength flows into you. Kraanan smiles on the bold."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_Q",
+      "rooms": [
+        "RID_CANYON2"
+      ],
+      "objective": "Bond with the node at Martyr's Battleground",
+      "brief": "Martyr's Battleground lies past the Berdonne Canyons. The old way in is from Ukgoth's stone ring: five tokens laid in the ring and Martyr's Battleground cast there open a portal straight to it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "trainingPoints": 400
+  }
+}

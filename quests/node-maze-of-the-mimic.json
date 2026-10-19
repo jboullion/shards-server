@@ -1,0 +1,32 @@
+{
+  "id": 270,
+  "key": "node-maze-of-the-mimic",
+  "name": "The Maze of the Mimic",
+  "tier": "story",
+  "giver": {
+    "class": "HunterGhost"
+  },
+  "band": {
+    "min": 110,
+    "max": 150
+  },
+  "text": {
+    "offer": "Tendrath says, \"Below Brax, past the graveyard and the decaying city, there is a maze. Something lives in it that wears the shape of whatever you expect to see. In the heart of that maze is a node of mana. I never reached it. Perhaps you will.\"",
+    "progress": "From the Cragged Mountains: the Winding Caverns, the Ancient Graveyard of Brax, the Decaying City of Brax, and into the Maze of the Mimic.",
+    "complete": "You found it. Then my searching was not for nothing."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_BRAX",
+      "rooms": [
+        "RID_NECROAREA6"
+      ],
+      "objective": "Bond with the node in the Maze of the Mimic"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "trainingPoints": 500
+  }
+}

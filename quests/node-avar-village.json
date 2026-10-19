@@ -1,0 +1,33 @@
+{
+  "id": 264,
+  "key": "node-avar-village",
+  "name": "The Avars' Node",
+  "tier": "story",
+  "giver": {
+    "class": "KocatanBartender"
+  },
+  "band": {
+    "min": 95,
+    "max": 150
+  },
+  "text": {
+    "offer": "Oxal ix'Tokak says, \"Drink? No? Then hear a story. Deep in the jungle, past the old Riija temple, the avars keep a village, and in it a node of mana. Their gods guard it. Bring them enough offerings, or spill enough avar blood, and the gods show the node, for a while. Which way you do it is between you and your conscience.\"",
+    "progress": "From Ko'catan: the East Tower, the path to the ruins of the Riija temple, deep into the jungle past the trading post, to the Avar Village. Leave valuable offerings at their offering place, or slay avars, until their node appears.",
+    "complete": "The avars' gods let you go. Mana hums in you from the jungle's node."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_AVAR",
+      "rooms": [
+        "RID_KE4"
+      ],
+      "objective": "Bond with the node in the Avar Village",
+      "brief": "The node shows itself in the Avar Village once its gods have been swayed far enough, by offerings of value left at the village's offering place, or by avar lives. It doesn't stay long."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "trainingPoints": 500
+  }
+}

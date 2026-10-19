@@ -1,0 +1,32 @@
+{
+  "id": 274,
+  "key": "node-heart-of-zjiria",
+  "name": "The Heart of Zjiria",
+  "tier": "story",
+  "giver": {
+    "class": "TosBlacksmith"
+  },
+  "band": {
+    "min": 80,
+    "max": 130
+  },
+  "text": {
+    "offer": "Fehr'loi Qan says, \"Trolls. Big ones. Ukgoth's full of them, and they worship a lump of mana in the middle of it they call the Heart of Zjiria. I've sold a lot of good steel to folk going to see it. Some of them even came back to buy more.\"",
+    "progress": "From Tos: out the main gate, through the Twisted Wood to the Cragged Mountains, then into Ukgoth, Holy Land of Trolls. The Heart of Zjiria is the node at its centre.",
+    "complete": "Came back, did you? Good. Steel needs sharpening after trolls."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_I9",
+      "rooms": [
+        "RID_I9"
+      ],
+      "objective": "Bond with the Heart of Zjiria in Ukgoth"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "trainingPoints": 350
+  }
+}

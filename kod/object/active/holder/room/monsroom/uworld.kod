@@ -622,6 +622,13 @@ messages:
          }
       }
 
+      // Ours: the quests that start on a death (util/questbook.kod PlayerDied), once they're here
+      oDeadPlayer = Send(what,@GetDearlyDeparted);
+      if oDeadPlayer <> $
+      {
+         Post(Send(SYS,@GetQuestBook),@PlayerDied,#who=oDeadPlayer);
+      }
+
       return;
    }
 

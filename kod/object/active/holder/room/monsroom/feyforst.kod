@@ -20,11 +20,24 @@ constants:
    // What we adjust the Karma in the room by to get the light modifier.
    LIGHT_KARMA_ADJUST = -70
 
+   // Ours: how long a detect spell locks a room good or evil (CastLock): a Meridian day
+   FEY_LOCK_TIME = 7200000
+
 resources:
 
    feyforest_music_neutral = neutfor.ogg
    feyforest_music_evil = badfor.ogg
    feyforest_music_good = goodfor.ogg
+
+   feyforest_locked_good = \
+      "~B%s's Detect Evil floods this part of the vale with Shal'ille's light.  "
+      "Only good fey will gather here for the next day."
+   feyforest_locked_evil = \
+      "~B%s's Detect Good drowns this part of the vale in Qor's shadow.  "
+      "Only evil fey will gather here for the next day."
+   feyforest_lock_renewed = "~BThe lock on this part of the vale holds for another day."
+   feyforest_lock_broken = "~B%s's spell breaks the lock on this part of the vale."
+   feyforest_lock_faded = "~BThe lock on this part of the vale fades."
 
 classvars:
 
@@ -51,6 +64,12 @@ properties:
    piRoom_Karma = 50
    ptFaerie = $
 
+   // Ours: the lock a detect spell sets (CastLock): $, or the FeyLock room enchantment that
+   // holds the room good or evil, and the two FeyLock objects this room uses
+   poLock = $
+   poLockGood = $
+   poLockEvil = $
+
    pbSnowGroundTexture = TRUE
 
 messages:
@@ -65,7 +84,9 @@ messages:
 
    FaerieTimer()
    {
+      // Ours: a locked room doesn't drift back toward its equilibrium
       if NOT pbUser_in_room
+         AND poLock = $
       {
          if piRoom_Karma < viEquilibrium
          {
@@ -96,7 +117,147 @@ messages:
          ptFaerie = $;
       }
 
+      poLock = $;
+      if poLockGood <> $
+      {
+         Send(poLockGood,@Delete);
+         poLockGood = $;
+      }
+
+      if poLockEvil <> $
+      {
+         Send(poLockEvil,@Delete);
+         poLockEvil = $;
+      }
+
       propagate;
+   }
+
+   ////////////////////////////////////////////////////////////////// Ours: locks
+
+   SpellCast(who = $,oSpell = $,lItems = $,bItemCast = FALSE)
+   "Shal'ille's Detect Evil locks the room good, Qor's Detect Good evil (CastLock); a potion "
+   "doesn't."
+   {
+      if NOT bItemCast AND oSpell <> $
+      {
+         if Send(oSpell,@GetSpellNum) = SID_DETECT_EVIL
+         {
+            Send(self,@CastLock,#who=who,#karma=KVERY_GOOD);
+         }
+         else if Send(oSpell,@GetSpellNum) = SID_DETECT_GOOD
+         {
+            Send(self,@CastLock,#who=who,#karma=KVERY_EVIL);
+         }
+      }
+
+      propagate;
+   }
+
+   CastLock(who = $,karma = KVERY_GOOD)
+   "Someone cast a detect spell here: the same lock again holds another day, the opposing one "
+   "only breaks it, and an unlocked room locks."
+   {
+      if poLock <> $ AND Send(poLock,@GetLockKarma) = karma
+      {
+         // Take it off quietly (FeyLockEnded leaves an unknown lock alone), then put it back
+         poLock = $;
+         Send(self,@RemoveEnchantment,#what=Send(self,@LockIcon,#karma=karma),#report=FALSE);
+         Send(self,@LockRoom,#karma=karma);
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=feyforest_lock_renewed,#what=self);
+
+         return;
+      }
+
+      if poLock <> $
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=feyforest_lock_broken,#what=self,
+              #parm1=Send(who,@GetName));
+         // Its ending (FeyLockEnded) lets the room go back to its fairies
+         Send(self,@RemoveEnchantment,#what=poLock,#report=FALSE);
+
+         return;
+      }
+
+      Send(self,@LockRoom,#karma=karma);
+      if karma = KVERY_GOOD
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=feyforest_locked_good,#what=self,
+              #parm1=Send(who,@GetName));
+      }
+      else
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=feyforest_locked_evil,#what=self,
+              #parm1=Send(who,@GetName));
+      }
+
+      return;
+   }
+
+   LockIcon(karma = KVERY_GOOD)
+   "This room's FeyLock for good or evil, made the first time it's needed."
+   {
+      if karma = KVERY_GOOD
+      {
+         if poLockGood = $
+         {
+            poLockGood = Create(&FeyLockGood);
+         }
+
+         return poLockGood;
+      }
+
+      if poLockEvil = $
+      {
+         poLockEvil = Create(&FeyLockEvil);
+      }
+
+      return poLockEvil;
+   }
+
+   LockRoom(karma = KVERY_GOOD)
+   "Holds the room very good or very evil for a day: its karma, its spawns and its look."
+   {
+      poLock = Send(self,@LockIcon,#karma=karma);
+      Send(self,@RoomStartEnchantment,#what=poLock,#time=FEY_LOCK_TIME,#state=$);
+
+      if karma = KVERY_GOOD
+      {
+         piRoom_Karma = 100;
+      }
+      else
+      {
+         piRoom_Karma = 0;
+      }
+
+      Send(self,@SetRoomKarma,#karma=karma);
+
+      return;
+   }
+
+   FeyLockEnded(what = $,report = TRUE)
+   "FeyLock.EndSpell: the lock's time ran out (report), or it was broken. The room goes back to "
+   "counting its fairies."
+   {
+      if poLock = $ OR what <> poLock
+      {
+         return;
+      }
+
+      poLock = $;
+      if report
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=feyforest_lock_faded,#what=self);
+      }
+
+      Send(self,@FigureRoomKarma,#bForceChange=TRUE);
+
+      return;
+   }
+
+   IsLocked()
+   {
+      return poLock <> $;
    }
 
    SomethingKilled(victim = $)
@@ -140,6 +301,13 @@ messages:
 
       iRoll = Random(1,100);
       iRoll += (Bound((piRoom_Karma - viEquilibrium)/5,-10,10));
+
+      // Ours: a locked room only gathers its own kind
+      if poLock <> $ AND NOT goodguy AND NOT darkguy
+      {
+         goodguy = (Send(poLock,@GetLockKarma) = KVERY_GOOD);
+         darkguy = NOT goodguy;
+      }
 
       if (iRoll >= piRoom_Karma AND NOT darkguy) OR goodguy
       {
@@ -189,6 +357,17 @@ messages:
    FigureRoomKarma(bForceChange=FALSE)
    {
       local i, gCount, eCount, oldKarma, iIndex, oObj;
+
+      // Ours: a locked room holds its karma whatever its fairies (LockRoom)
+      if poLock <> $
+      {
+         if bForceChange
+         {
+            Send(self,@SetRoomKarma,#karma=Send(self,@GetKarma));
+         }
+
+         return;
+      }
 
       gCount = 0;
       eCount = 0;
@@ -383,6 +562,12 @@ messages:
    AdjustRoomKarma(value = 50)
    {
       local i, iGood, iBad;
+
+      // Ours: a DM's setting breaks any lock
+      if poLock <> $
+      {
+         Send(self,@RemoveEnchantment,#what=poLock,#report=FALSE);
+      }
 
       piRoom_karma = value;
 

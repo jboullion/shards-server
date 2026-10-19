@@ -1,0 +1,32 @@
+{
+  "id": 266,
+  "key": "node-icky-cave",
+  "name": "Something in the Icky Cave",
+  "tier": "story",
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 60,
+    "max": 100
+  },
+  "text": {
+    "offer": "Paddock says, \"You want to know a secret? Every drunk mage in this bar has told me the same one. Just outside the city, past the western border of the Twisted Wood, there's a cave. Deep, dark, spooky, and icky. And somewhere inside it, a mana node. Nobody comes back from it smelling nice, but they all come back stronger.\"",
+    "progress": "Leave Tos by the main gate, go to the western border of the Twisted Wood, and find the Deep, Dark, Spooky, Icky Cave. The node is somewhere inside.",
+    "complete": "That's the smell, all right. And the look of someone with a bit more magic in them."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_ORCCAVES",
+      "rooms": [
+        "RID_CAVE2"
+      ],
+      "objective": "Bond with the node in the icky cave"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "trainingPoints": 250
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": 275,
+  "key": "node-collapsed-causeway",
+  "name": "The Collapsed Causeway",
+  "tier": "story",
+  "giver": {
+    "class": "BarloqueBartender"
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "text": {
+    "offer": "Meidei says, \"Past Kardde's Canyon and the Waylay Oasis, the desert begins. There was a causeway across it once, before it fell. The caravans that still go that way say a mana node hums under the broken stones. The desert's no place for the weak, mind.\"",
+    "progress": "From the Bhrama & Falcon: South Barloque, out the main gate, through Kardde's Canyon to the Waylay Oasis, then on to the Collapsed Causeway.",
+    "complete": "Sand in your boots and magic in your blood. Sit down, the first one's on me."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_DESERT",
+      "rooms": [
+        "RID_DESERTBRIDGE"
+      ],
+      "objective": "Bond with the node at the Collapsed Causeway"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "trainingPoints": 450
+  }
+}

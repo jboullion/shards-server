@@ -1,0 +1,32 @@
+{
+  "id": 271,
+  "key": "node-the-sentinel",
+  "name": "Under the Sentinel",
+  "tier": "story",
+  "giver": {
+    "class": "CornothGrocer"
+  },
+  "band": {
+    "min": 60,
+    "max": 110
+  },
+  "text": {
+    "offer": "Solomon says, \"You buy reagents from me, so you must be a mage. Then you ought to know about the Sentinel. Out past the King's Way and up into the Cragged Mountains, beyond an ancient place nobody remembers building, there stands a great stone Sentinel. In its shadow is a mana node.\"",
+    "progress": "From Cor Noth: the outskirts, the King's Way, the Cragged Mountains, the ancient place, then Under the shadow of the Sentinel.",
+    "complete": "Good, good. Now you'll need more reagents than ever. You know where to find me."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_H9",
+      "rooms": [
+        "RID_H9"
+      ],
+      "objective": "Bond with the node under the Sentinel"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "trainingPoints": 300
+  }
+}

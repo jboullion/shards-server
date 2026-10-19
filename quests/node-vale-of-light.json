@@ -1,0 +1,39 @@
+{
+  "id": 261,
+  "key": "node-vale-of-light",
+  "name": "Light in the Vale",
+  "tier": "story",
+  "giver": {
+    "class": "ShalillePriestess"
+  },
+  "band": {
+    "min": 40,
+    "max": 90
+  },
+  "text": {
+    "offer": "Priestess Xiana says, \"Not far from this temple, beyond the Fey's Crossing, lies the Vale of Sorrows. Its fey are at war: the elhai of the light and the dirhai of the dark. When the light wins the whole forest, the elhai open their mana node to all. You need not raise an army to help them. Cast Shal'ille's Detect Evil in each part of the forest and her light will hold it for a day. Hold every part, and the node is yours to bond with.\"",
+    "progress": "Cast Detect Evil in each of the Vale of Sorrows' eight parts to lock them good, then bond with the node in the Vale. From the temple: the Deep Woods of Ileria, Quilicia Wood, Lower Elhadrim, Elhadrim, the Fey's Crossing, then the Vale of Sorrows.",
+    "complete": "The elhai sing as the node's power flows into you. Shal'ille's light has won the vale, for today at least."
+  },
+  "steps": [
+    {
+      "kind": "cast",
+      "spell": "DetectEvil",
+      "objective": "Cast Detect Evil",
+      "brief": "Detect Evil is a Shal'ille spell of the first circle. Priestess Xiana teaches it, if you don't know it yet. Cast it anywhere to begin."
+    },
+    {
+      "kind": "node",
+      "node": "NODE_FAERIE",
+      "rooms": [
+        "RID_C2"
+      ],
+      "objective": "Lock the vale good and bond with the elhai's node",
+      "brief": "The Vale of Sorrows is eight parts of one forest: the Fey's Crossing, the Vale itself and the woods around them. The node shows itself only while every part leans the same way. Cast Detect Evil in each part and it will hold good for a day, and gather only good fey. Lock all eight and the node rises in the Vale. A lock shows as an icon by your map; someone casting Detect Good there breaks it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "trainingPoints": 300
+  }
+}

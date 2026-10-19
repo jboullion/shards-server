@@ -69,6 +69,9 @@ constants:
    QBQ_NO_GUILD = 8
    // Ours: not offered for now (a quest file's "paused"); one going can still be finished
    QBQ_PAUSED = 16
+   // Ours: never offered by an NPC; it starts by itself on a death (a quest file's "start":
+   // "death", PlayerDied)
+   QBQ_ON_DEATH = 32
 
    // A step's fields
    QBS_KIND = 1
@@ -131,6 +134,9 @@ constants:
    QK_ARENA = 18
    // Ours: spending training points on a spell or skill (util/shardsabilities.kod Train)
    QK_TRAIN = 19
+   // Ours: bonding with one mana node (the step's amount is its NODE_ bit); a quest with one
+   // isn't offered to a player who already has that node
+   QK_NODE = 20
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -182,6 +188,9 @@ resources:
    quest_signet_nowhere = ""
 
    quest_accepted = "You take on the quest ~B%s~n."
+   // Ours: a quest that starts on a death (PlayerDied)
+   quest_death_start = "In the cold of the Underworld, something new stirs in your mind.  "
+      "Look in your quest log."
    quest_progress = "%s: %i/%i"
    quest_step_done = "%s: done.  Return to %s."
    quest_next = "~B%s~n: %s."
@@ -440,9 +449,10 @@ messages:
       return FALSE;
    }
 
-   CanOffer(who = $,qrow = $)
+   CanOffer(who = $,qrow = $,death = FALSE)
    "QO_OFFER if this quest is offered to who now, QO_SOON if only their health keeps them from "
-   "it (and not by much), else QO_NONE."
+   "it (and not by much), else QO_NONE. death: asked by PlayerDied, for the quests that start on "
+   "a death."
    {
       local i, lDone, iHealth, iKarma, iMin, iFaction, lStep;
 
@@ -496,7 +506,7 @@ messages:
          }
       }
 
-      if NOT Send(self,@MeetsNeeds,#who=who,#needs=Nth(qrow,QB_NEEDS))
+      if NOT Send(self,@MeetsNeeds,#who=who,#needs=Nth(qrow,QB_NEEDS),#death=death)
       {
          return QO_NONE;
       }
@@ -507,6 +517,16 @@ messages:
          AND Send(Send(SYS,@GetTravelNetwork),@IsAttuned,#who=who,#id=Nth(lStep,QBS_AMOUNT))
       {
          return QO_NONE;
+      }
+
+      // Ours: nor one to find a mana node we've already bonded with
+      foreach lStep in Nth(qrow,QB_STEPS)
+      {
+         if Nth(lStep,QBS_KIND) = QK_NODE
+            AND (Send(who,@GetNodeList) & Nth(lStep,QBS_AMOUNT)) <> 0
+         {
+            return QO_NONE;
+         }
       }
 
       iHealth = Send(who,@GetBaseMaxHealth);
@@ -529,18 +549,23 @@ messages:
       return QO_OFFER;
    }
 
-   MeetsNeeds(who = $,needs = 0)
+   MeetsNeeds(who = $,needs = 0,death = FALSE)
    "Whether who has what QB_NEEDS asks: of interest to the court, a guild master, a guild shield, "
-   "no guild."
+   "no guild. A quest that starts on a death is only for PlayerDied (death)."
    {
       local oGuild;
 
       if needs = $ OR needs = 0
       {
-         return TRUE;
+         return NOT death;
       }
 
       if needs & QBQ_PAUSED
+      {
+         return FALSE;
+      }
+
+      if ((needs & QBQ_ON_DEATH) <> 0) <> death
       {
          return FALSE;
       }
@@ -1105,8 +1130,33 @@ messages:
       return;
    }
 
+   PlayerDied(who = $)
+   "Ours: Underworld.NewDeath: who died for real (not in an arena). Starts the quests that start "
+   "on a death (QBQ_ON_DEATH) that who may take, while there's room in their log."
+   {
+      local i;
+
+      if NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      foreach i in plQuests
+      {
+         if Nth(i,QB_NEEDS) <> $ AND (Nth(i,QB_NEEDS) & QBQ_ON_DEATH)
+            AND Send(self,@CanOffer,#who=who,#qrow=i,#death=TRUE) = QO_OFFER
+            AND Send(self,@ActiveCount,#who=who) < QUEST_MAX_ACTIVE
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_death_start);
+            Send(self,@StartQuest,#who=who,#qrow=i);
+         }
+      }
+
+      return;
+   }
+
    StartQuest(who = $,qrow = $)
-   "Puts a quest in who's log at its first step, with no checks (Accept, AdminGrant)."
+   "Puts a quest in who's log at its first step, with no checks (Accept, AdminGrant, PlayerDied)."
    {
       local iDeadline, lEntry;
 
@@ -1900,6 +1950,10 @@ messages:
                if iKind = QK_HOMETOWN
                {
                   bDone = NOT Send(who,@CanChangeHomeroom);
+               }
+               if iKind = QK_NODE
+               {
+                  bDone = (Send(who,@GetNodeList) & Nth(lStep,QBS_AMOUNT)) <> 0;
                }
                if iKind = QK_NODES
                {

@@ -1,0 +1,32 @@
+{
+  "id": 269,
+  "key": "node-the-badlands",
+  "name": "Fire in the Badlands",
+  "tier": "story",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 50,
+    "max": 100
+  },
+  "text": {
+    "offer": "Pritchett says, \"Out past the main gate, through Kardde's Canyon, the land turns to the Badlands. A priestess of Faren keeps a fire out there, if you can believe it, and not far from her is a mana node. It's a hard walk, but every mage in my inn has made it at least once.\"",
+    "progress": "From the Brownestone Inn: South Barloque, out the main gate, through Kardde's Canyon, and into the Badlands. The node is near Faren's priestess.",
+    "complete": "Back in one piece, and with the Badlands' magic in you. Have a drink."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_BADLANDS",
+      "rooms": [
+        "RID_BADLAND1"
+      ],
+      "objective": "Bond with the node in the Badlands"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "trainingPoints": 250
+  }
+}

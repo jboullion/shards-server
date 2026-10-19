@@ -1,0 +1,32 @@
+{
+  "id": 272,
+  "key": "node-the-ancient-place",
+  "name": "The Ancient Place",
+  "tier": "story",
+  "giver": {
+    "class": "JasperBartender"
+  },
+  "band": {
+    "min": 80,
+    "max": 130
+  },
+  "text": {
+    "offer": "Pietro says, \"Past the Lake of Jala's Song, in the Cragged Mountains, there's a place older than any town. Nobody knows who built it. The way down to Brax starts there, and so does a mana node, if you can keep your head while the sky throws lightning at you.\"",
+    "progress": "From Jasper: East Jasper, the Lake of Jala's Song, the Cragged Mountains, and then An ancient place, its origin forgotten.",
+    "complete": "Hair standing on end? That'll be the node. Or the lightning."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_G9",
+      "rooms": [
+        "RID_G9"
+      ],
+      "objective": "Bond with the node in the ancient place"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "trainingPoints": 300
+  }
+}

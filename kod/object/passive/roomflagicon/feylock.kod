@@ -1,0 +1,74 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours: a Vale of Sorrows room locked good or evil by a detect spell (FeyForest.CastLock). The
+// room holds it as a room enchantment for the lock's time, so players see its icon, and its
+// ending (the timer, or the opposing spell) unlocks the room.
+FeyLock is RoomFlagIcon
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   feylock_name_rsc = "locked vale"
+   feylock_desc_rsc = "This part of the Vale of Sorrows has been locked."
+
+classvars:
+
+   vrName = feylock_name_rsc
+   vrDesc = feylock_desc_rsc
+
+   // The karma the room is held at (FeyForest)
+   viLockKarma = KNEUTRAL
+
+properties:
+
+messages:
+
+   GetLockKarma()
+   {
+      return viLockKarma;
+   }
+
+   StartEnchantmentNewOccupant(who = $,state = $)
+   {
+      return;
+   }
+
+   EndRoomEnchantment(who = $,state = $)
+   {
+      return;
+   }
+
+   EndSpell(where = $,who = $,state = $,report = TRUE)
+   "The room's enchantment ended: its timer ran out, or the room took it off."
+   {
+      if where <> $ AND IsClass(where,&FeyForest)
+      {
+         Send(where,@FeyLockEnded,#what=self,#report=report);
+      }
+
+      return;
+   }
+
+   // Not a spell: dispelling a school or illusions passes it by
+   GetSchool()
+   {
+      return 0;
+   }
+
+   IsIllusion()
+   {
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

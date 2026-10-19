@@ -1,0 +1,39 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours: a Vale of Sorrows room locked good, by Shal'ille's Detect Evil (FeyForest.CastLock)
+FeyLockGood is FeyLock
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   feylockgood_name_rsc = "locked good (Shal'ille)"
+   feylockgood_icon_rsc = ishabane.bgf
+   feylockgood_desc_rsc = \
+      "Shal'ille's light holds this part of the Vale of Sorrows.  Only good fey "
+      "gather here until the lock fades, a day from when it was cast, or "
+      "until someone casts Qor's Detect Good here to break it."
+
+classvars:
+
+   vrName = feylockgood_name_rsc
+   vrIcon = feylockgood_icon_rsc
+   vrDesc = feylockgood_desc_rsc
+
+   viLockKarma = KVERY_GOOD
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

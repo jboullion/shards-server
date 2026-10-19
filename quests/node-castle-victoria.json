@@ -1,0 +1,32 @@
+{
+  "id": 273,
+  "key": "node-castle-victoria",
+  "name": "Upstairs in Castle Victoria",
+  "tier": "story",
+  "giver": {
+    "class": "TosApothecary"
+  },
+  "band": {
+    "min": 95,
+    "max": 150
+  },
+  "text": {
+    "offer": "Frisconar says, \"I buy herbs from the ones brave enough to go past Ukgoth, to Castle Victoria. The dead walk there now. But those who climb the stairs come back talking about a mana node in the upper halls. If you're brave, or foolish, go and see.\"",
+    "progress": "From Tos: out the main gate, through the Twisted Wood to the Cragged Mountains, across Ukgoth, Holy Land of Trolls, to Castle Victoria. The node is upstairs.",
+    "complete": "Still breathing? Then you're braver than most who come through my door."
+  },
+  "steps": [
+    {
+      "kind": "node",
+      "node": "NODE_VICTORIA",
+      "rooms": [
+        "RID_CASTLE1B"
+      ],
+      "objective": "Bond with the node upstairs in Castle Victoria"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "trainingPoints": 450
+  }
+}

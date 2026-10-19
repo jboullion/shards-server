@@ -1,0 +1,39 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours: a Vale of Sorrows room locked evil, by Qor's Detect Good (FeyForest.CastLock)
+FeyLockEvil is FeyLock
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   feylockevil_name_rsc = "locked evil (Qor)"
+   feylockevil_icon_rsc = iqorbane.bgf
+   feylockevil_desc_rsc = \
+      "Qor's shadow holds this part of the Vale of Sorrows.  Only evil fey "
+      "gather here until the lock fades, a day from when it was cast, or "
+      "until someone casts Shal'ille's Detect Evil here to break it."
+
+classvars:
+
+   vrName = feylockevil_name_rsc
+   vrIcon = feylockevil_icon_rsc
+   vrDesc = feylockevil_desc_rsc
+
+   viLockKarma = KVERY_EVIL
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////
