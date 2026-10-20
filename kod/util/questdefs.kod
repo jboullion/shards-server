@@ -469,7 +469,7 @@ resources:
    qd_126_t1 = "Morrigan"
    qd_127_name = "The Spiders of Farol"
    qd_127_s1 = "Spiders slain"
-   qd_127_t1 = "Ran er'Hoth"
+   qd_127_t1 = "Morrigan"
    qd_128_name = "Word to Cor Noth"
    qd_128_s1 = "Take a report for Sergeant Rook to Rook"
    qd_128_p1 = "a report for Sergeant Rook"
@@ -882,7 +882,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 1567588;
+      return 85227005;
    }
 
    GetQuests()
@@ -1586,19 +1586,19 @@ messages:
                0, $, $, $, 0 ] ],
            481, 100, $, 0, 1, $, $, 0, $, $, $ ],
          // marion-spiders-of-farol
-         [ 127, qd_127_name, &MarionElder, 0, 36, 46, [ 12 ],
+         [ 127, qd_127_name, &MarionInnkeeper, 0, 35, 46, $,
            $, $, $, $,
-           [ [ 1, &Spider, 10, 1, &MarionElder, 0, qd_127_s1, $, $, qd_127_t1,
+           [ [ 1, &Spider, 10, 1, &MarionInnkeeper, 0, qd_127_s1, $, $, qd_127_t1,
                0, $, $, $, 0 ] ],
-           685, 100, $, 0, 1, $, $, 0, $, $, $ ]
+           648, 100, $, 0, 1, $, $, 0, $, $, $ ]
          ],
          [
          // marion-word-to-cor-noth
-         [ 128, qd_128_name, &MarionElder, 0, 38, 48, [ 127 ],
+         [ 128, qd_128_name, &MarionElder, 0, 40, 55, $,
            $, $, $, $,
            [ [ 4, $, 1, 0, &CorNothSergeant, 0, qd_128_s1, $, qd_128_p1, qd_128_t1,
                0, $, $, $, 0 ] ],
-           608, 500, $, 0, 1, $, $, 0, $, $, $ ],
+           672, 500, $, 0, 1, $, $, 0, $, $, $ ],
          // cornoth-merchant-way
          [ 129, qd_129_name, &CorNothSergeant, 0, 40, 50, $,
            $, $, $, $,

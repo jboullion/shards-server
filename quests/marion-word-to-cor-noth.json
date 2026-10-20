@@ -7,13 +7,8 @@
     "class": "MarionElder"
   },
   "band": {
-    "min": 38,
-    "max": 48
-  },
-  "requires": {
-    "quests": [
-      127
-    ]
+    "min": 40,
+    "max": 55
   },
   "text": {
     "offer": "Sergeant Rook keeps the peace in Cor Noth, and he knows more of what moves on the roads than anyone. Take him my report of what you've seen here and in Raza. He'll have work for someone like you.",
