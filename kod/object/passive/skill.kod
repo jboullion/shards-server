@@ -15,14 +15,17 @@ constants:
    include blakston.khd
 
    // Ours: practice (ImproveAbility). Chances are in hundredths of a percent.
+   // Halved on 2026-10-20 (it was 800, 20 and 5000): halving the chance, the ramp and the cap
+   // together makes every gain take exactly twice the uses; halving the chance alone wouldn't,
+   // as the ramp does most of the work.
    // The chance at a skill's start: GetInitialChance (pace and Intellect) times this
-   // (an average weapon's 30 makes about 8%, with Intellect a little more)
-   PRACTICE_PACE_NUM = 800
+   // (an average weapon's 30 makes about 4%, with Intellect a little more)
+   PRACTICE_PACE_NUM = 400
    PRACTICE_PACE_DEN = 30
-   // Each use without a gain adds 1/PRACTICE_RAMP of the starting chance: 20 doubles it
-   PRACTICE_RAMP = 20
+   // Each use without a gain adds 1/PRACTICE_RAMP of the starting chance: 40 doubles it
+   PRACTICE_RAMP = 40
    // The most a single use can have
-   PRACTICE_MAX_CHANCE = 5000
+   PRACTICE_MAX_CHANCE = 2500
    // The foe's level against 10 + half our ability, as thousandths, kept within these
    PRACTICE_FOE_MIN = 250
    PRACTICE_FOE_MAX = 1500
