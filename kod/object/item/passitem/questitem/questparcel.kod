@@ -24,8 +24,10 @@ classvars:
    viIndefinite = ARTICLE_NONE
 
    viValue_average = 0
-   viWeight = 1
-   viBulk = 1
+   // Weightless, so it always fits in the pack, overburdened or not (Holder.CanHoldWeightAndBulk
+   // passes nothing at all): one left at your feet could decay and leave the quest stuck
+   viWeight = 0
+   viBulk = 0
 
 properties:
 
