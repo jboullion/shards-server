@@ -10,8 +10,14 @@
     "min": 30,
     "max": 40
   },
+  "requires": {
+    "healthBelow": 40
+  },
+  "repeat": {
+    "cooldownHours": 0
+  },
   "text": {
-    "offer": "The crypt behind my hut was a quiet place, once. Now spectral mummies drift through its first chamber and the villagers won't go near. Clear a dozen of them out of there, so we can see what lies deeper.",
+    "offer": "The crypt behind my hut was a quiet place, once. Now spectral mummies drift through its first chamber and the villagers won't go near. Clear a dozen of them out of there, so we can see what lies deeper. Come back whenever you like: they keep drifting back in, and I will pay every time, until you are too strong to bother with them.",
     "progress": "The crypt's entrance is behind Ran er'Hoth's hut in Marion.",
     "complete": "Good. The way into the deeper crypt is open now - and I've a mind to send you down it."
   },

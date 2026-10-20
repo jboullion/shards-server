@@ -882,7 +882,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 93476101;
+      return 1567588;
    }
 
    GetQuests()
@@ -940,13 +940,13 @@ messages:
                1, [ 5000, 0, 0, $, $, $ ], $, $, 0 ] ],
            0, 0, $, 0, 1, $, $, 16, $, $, $ ],
          // guide-marion-crypt
-         [ 12, qd_12_name, &MarionElder, 0, 35, 70, [ 124 ],
-           $, $, $, $,
+         [ 12, qd_12_name, &MarionElder, 0, 40, 70, $,
+           $, $, 0, $,
            [ [ 5, $, 1, 0, &MarionElder, 0, qd_12_s1, [ 2601 ], $, qd_12_t1,
                1, $, $, $, 0 ],
              [ 1, &LivingStatue, 8, 2, &MarionElder, 0, qd_12_s2, [ 2601 ], $, qd_12_t2,
                0, $, $, $, 0 ] ],
-           2000, 0, $, 0, 1, $, $, 0, $, $, $ ],
+           2000, 0, $, 0, 1, $, $, 0, $, $, 60 ],
          // guide-castle-victoria
          [ 13, qd_13_name, &TosInnKeeper, 0, 40, 100, $,
            $, $, $, $,
@@ -1569,10 +1569,10 @@ messages:
            662, 30, $, 0, 1, $, $, 0, $, $, 30 ],
          // marion-first-chamber
          [ 124, qd_124_name, &MarionElder, 0, 30, 40, $,
-           $, $, $, $,
+           $, $, 0, $,
            [ [ 1, &SpectralMummy, 12, 0, &MarionElder, 0, qd_124_s1, $, $, qd_124_t1,
                0, $, $, $, 0 ] ],
-           481, 100, $, 0, 1, $, $, 0, $, $, $ ],
+           481, 100, $, 0, 1, $, $, 0, $, $, 40 ],
          // marion-slime-on-the-shore
          [ 125, qd_125_name, &MarionInnkeeper, 0, 30, 40, $,
            $, $, 0, $,

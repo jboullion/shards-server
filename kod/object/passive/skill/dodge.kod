@@ -38,6 +38,8 @@ classvars:
    viSchool = SKS_FENCING
    viSkill_Level = 2
    viChance_to_Increase = 20
+   // Ours: dodge keeps the full practice pace (skill.kod viPractice_slowness)
+   viPractice_slowness = 1
    viMeditate_ratio = 20
 
    viSkillExertion = 0

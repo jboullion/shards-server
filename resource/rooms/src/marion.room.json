@@ -1182,9 +1182,9 @@
     {"start":20,"end":540,"front":{"sector":77,"normal":9606,"above":0,"below":0,"xOffset":32,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":512},"back":null},
     {"start":542,"end":474,"front":{"sector":5,"normal":0,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":{"sector":77,"normal":0,"above":0,"below":11034,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0}},
     {"start":543,"end":220,"front":{"sector":31,"normal":9675,"above":0,"below":0,"xOffset":64,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":514},"back":{"sector":31,"normal":9675,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":515}},
-    {"start":228,"end":544,"front":{"sector":24,"normal":0,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":4},"back":{"sector":31,"normal":0,"above":0,"below":0,"xOffset":16,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":4}},
+    {"start":544,"end":228,"front":{"sector":31,"normal":0,"above":0,"below":11005,"xOffset":16,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":{"sector":24,"normal":0,"above":0,"below":11005,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0}},
     {"start":544,"end":545,"front":{"sector":79,"normal":9675,"above":0,"below":0,"xOffset":64,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":514},"back":{"sector":79,"normal":9675,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":515}},
-    {"start":544,"end":227,"front":{"sector":24,"normal":0,"above":0,"below":0,"xOffset":16,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":4},"back":{"sector":31,"normal":0,"above":0,"below":0,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":4}}
+    {"start":227,"end":544,"front":{"sector":31,"normal":0,"above":0,"below":11005,"xOffset":0,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":0},"back":{"sector":24,"normal":0,"above":0,"below":11005,"xOffset":16,"yOffset":0,"serverId":0,"animateSpeed":0,"flags":4}}
   ],
   "sectors": [
     {"serverId":0,"floorTexture":11043,"ceilingTexture":0,"floorHeight":98,"ceilingHeight":484,"xOffset":0,"yOffset":0,"light":192,"flags":0,"animateSpeed":0,"floorSlope":null,"ceilingSlope":null},

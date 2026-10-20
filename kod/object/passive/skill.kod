@@ -15,17 +15,18 @@ constants:
    include blakston.khd
 
    // Ours: practice (ImproveAbility). Chances are in hundredths of a percent.
-   // Halved on 2026-10-20 (it was 800, 20 and 5000): halving the chance, the ramp and the cap
-   // together makes every gain take exactly twice the uses; halving the chance alone wouldn't,
-   // as the ramp does most of the work.
+   // These are the full pace; a skill's viPractice_slowness divides the chance and the cap and
+   // multiplies the ramp (2 since 2026-10-20 for all but block and dodge: every gain takes
+   // exactly twice the uses, where halving the chance alone wouldn't, as the ramp does much of
+   // the work).
    // The chance at a skill's start: GetInitialChance (pace and Intellect) times this
-   // (an average weapon's 30 makes about 4%, with Intellect a little more)
-   PRACTICE_PACE_NUM = 400
+   // (an average weapon's 30 makes about 8%, with Intellect a little more)
+   PRACTICE_PACE_NUM = 800
    PRACTICE_PACE_DEN = 30
-   // Each use without a gain adds 1/PRACTICE_RAMP of the starting chance: 40 doubles it
-   PRACTICE_RAMP = 40
+   // Each use without a gain adds 1/PRACTICE_RAMP of the starting chance: 20 doubles it
+   PRACTICE_RAMP = 20
    // The most a single use can have
-   PRACTICE_MAX_CHANCE = 2500
+   PRACTICE_MAX_CHANCE = 5000
    // The foe's level against 10 + half our ability, as thousandths, kept within these
    PRACTICE_FOE_MIN = 250
    PRACTICE_FOE_MAX = 1500
@@ -82,6 +83,9 @@ classvars:
    // Initial chance to increase, modified by Intellect. Ours: the skill's pace in practice
    // (ImproveAbility): 30 is an average weapon's
    viChance_to_Increase = 25
+   // Ours: how many times slower than the full practice pace this skill improves (ImproveAbility,
+   // GetPracticeChance): 2 for most since 2026-10-20; block and dodge keep 1
+   viPractice_slowness = 2
    // This is NOT the same as the chance to increase. This determines how many training points a player needs to spend per improvement.
    // So it's not x improvements in 100 attempts, but 1 improvement per X points.
    viMeditate_ratio = 100
@@ -428,7 +432,8 @@ messages:
 
    ImproveAbility(who=$,target=$,bonus=0,miss=FALSE)
    "Ours (practice): every use is one roll to improve by 1%, at the skill's starting chance "
-   "(GetPracticeChance) plus 1/PRACTICE_RAMP of it for every use since the skill last "
+   "(GetPracticeChance) plus 1/(PRACTICE_RAMP x viPractice_slowness) of it for every use since "
+   "the skill last "
    "improved (the player keeps the count: Player.GetSkillPractice), so a long run without a "
    "gain is ever more likely to end, and two gains in a row can happen. A miss (a swing that "
    "didn't hit) rolls at half the chance and counts as half a use. It replaced the 75-swing "
@@ -479,7 +484,7 @@ messages:
 
       // Practice: counted in half uses (a miss is one)
       iPractice = Send(who,@GetSkillPractice,#num=viSkill_num);
-      iChance = iChance + (iChance * iPractice) / (2 * PRACTICE_RAMP);
+      iChance = iChance + (iChance * iPractice) / (2 * PRACTICE_RAMP * viPractice_slowness);
 
       // Rooms that help or hinder learning (ROOM_HARD_LEARN, a botting spot's third)
       if oOwner <> $
@@ -494,7 +499,7 @@ messages:
          return FALSE;
       }
 
-      iChance = Bound(iChance,1,PRACTICE_MAX_CHANCE);
+      iChance = Bound(iChance,1,PRACTICE_MAX_CHANCE / viPractice_slowness);
       if miss
       {
          iChance = iChance / 2;
@@ -537,7 +542,7 @@ messages:
          return 0;
       }
 
-      iChance = (iInitial * PRACTICE_PACE_NUM) / PRACTICE_PACE_DEN;
+      iChance = (iInitial * PRACTICE_PACE_NUM) / (PRACTICE_PACE_DEN * viPractice_slowness);
 
       // Slower the more we know
       iChance = (iChance * (110 - ability) * (110 - ability)) / 12100;
