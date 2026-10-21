@@ -1,5 +1,5 @@
 {
- "next_batch": 30,
+ "next_batch": 34,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -3036,6 +3036,86 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\029\\minotaurbersx\\v0.bgf"
+   }
+  },
+  "plainring.bgf": {
+   "status": "installed",
+   "attempts": 4,
+   "notes": [],
+   "history": [
+    {
+     "batch": "030",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "031",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "032",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "033",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "plainring.bgf",
+   "chosen": {
+    "batch": "033",
+    "spec": "openai",
+    "variant": 2,
+    "bgf": "build\\iconforge\\batches\\033\\plainring\\v2.bgf"
+   }
+  },
+  "plainamulet.bgf": {
+   "status": "installed",
+   "attempts": 4,
+   "notes": [],
+   "history": [
+    {
+     "batch": "030",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "031",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "032",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "033",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "plainamulet.bgf",
+   "chosen": {
+    "batch": "033",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\033\\plainamulet\\v0.bgf"
    }
   }
  }

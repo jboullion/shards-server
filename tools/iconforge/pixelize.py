@@ -134,6 +134,43 @@ def to_palette(rgba: np.ndarray, pal: np.ndarray, allowed=None) -> np.ndarray:
     return out
 
 
+RAMP = list(range(0xD0, 0xE0))  # the grey ramp the GRAY_TO_* palette translations recolour (xlat.c)
+
+
+def to_palette_greys(rgba: np.ndarray, pal: np.ndarray) -> np.ndarray:
+    """to_palette, with the item's neutral part (its largest patch of light, unsaturated pixels: a plain
+    stone) in the grey ramp, so the item's palette translation colours it, and every other pixel kept
+    out of the ramp, so nothing else changes colour."""
+    out = to_palette(rgba, pal, allowed=[i for i in range(256) if i not in RAMP])
+    rgb = rgba[..., :3].astype(np.float32)
+    mx, mn = rgb.max(-1), rgb.min(-1)
+    sat = (mx - mn) / np.maximum(mx, 1)
+    lum = rgb @ np.array([0.299, 0.587, 0.114], np.float32)
+    grey = (rgba[..., 3] >= ALPHA_CUT) & (sat < 0.2) & (lum > 60)
+    # the largest piece only: pale glints on metal stay out of the ramp
+    seen, best = np.zeros_like(grey), []
+    H, W = grey.shape
+    for y0, x0 in zip(*np.nonzero(grey)):
+        if seen[y0, x0]:
+            continue
+        stack, piece = [(y0, x0)], []
+        seen[y0, x0] = True
+        while stack:
+            y, x = stack.pop()
+            piece.append((y, x))
+            for yy, xx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+                if 0 <= yy < H and 0 <= xx < W and grey[yy, xx] and not seen[yy, xx]:
+                    seen[yy, xx] = True
+                    stack.append((yy, xx))
+        if len(piece) > len(best):
+            best = piece
+    if best:
+        ys, xs = np.array(best).T
+        greys = np.array([pal[i][0] for i in RAMP], np.float32)
+        out[ys, xs] = np.array(RAMP, np.uint8)[np.abs(lum[ys, xs][:, None] - greys[None, :]).argmin(-1)]
+    return out
+
+
 def add_outline(idx: np.ndarray, pal: np.ndarray) -> np.ndarray:
     """Darkest palette colour on every transparent pixel that touches the silhouette (4-neighbour)."""
     solid = idx != TRANSPARENT
@@ -149,11 +186,15 @@ def add_outline(idx: np.ndarray, pal: np.ndarray) -> np.ndarray:
 
 
 def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shrink: int, pal: np.ndarray,
-             outline: bool = False, allowed=None, key=None, clean: bool = True) -> Bitmap:
+             outline: bool = False, allowed=None, key=None, clean: bool = True, fit_object: bool = False,
+             greys: bool = False) -> Bitmap:
     """The generated image as a new Bitmap the same in-game size and placement as `original`.
     key: the background colour to remove; None reads it from the corners (models never paint exact #FF00FF).
     The size and hotspots scale with the shrink (they're in the bitmap's own pixels); the offsets don't:
-    they're in the pixels of what the bitmap hangs on (the body, or the head for a helm: weapon.py)."""
+    they're in the pixels of what the bitmap hangs on (the body, or the head for a helm: weapon.py).
+    fit_object: the frame takes the new object's own shape, its longest side as long as the original frame's
+    (a new icon need not fill an old one's box: the inventory stretches the whole frame into its square).
+    greys: the neutral part goes in the grey ramp for the item's palette translation (to_palette_greys)."""
     k = new_shrink / orig_shrink
     W, H = max(1, round(original.w * k)), max(1, round(original.h * k))
     hs = [{"num": h["num"], "x": round(h["x"] * k), "y": round(h["y"] * k)} for h in original.hotspots]
@@ -171,6 +212,10 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     if gbox is None:
         raise ValueError("the generated image has no object after matting")
     obj = cut.crop(gbox)
+    if fit_object:
+        side = max(W, H)
+        W, H = (side, max(1, round(side * obj.height / obj.width))) if obj.width >= obj.height else                (max(1, round(side * obj.width / obj.height)), side)
+        bx0, by0, bw, bh = 0, 0, W, H
     s = min(bw / obj.width, bh / obj.height)
     tw, th = max(1, round(obj.width * s)), max(1, round(obj.height * s))
     # premultiply so the background never bleeds into edge colours, area-average down, unpremultiply
@@ -187,7 +232,7 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
     canvas[y0:y0 + th, x0:x0 + tw] = small[:H - y0, :W - x0]
     if clean:
         canvas = clean_edges(canvas, key)
-    idx = to_palette(canvas, pal, allowed)
+    idx = to_palette_greys(canvas, pal) if greys else to_palette(canvas, pal, allowed)
     if outline:
         idx = add_outline(idx, pal)
     return Bitmap(W, H, original.xoff, original.yoff, hs, idx.tobytes())

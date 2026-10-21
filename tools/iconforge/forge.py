@@ -78,6 +78,9 @@ QWEN_PROMPT = ("Repaint the item in the first image as a small hand-painted pixe
                "or smooth 3D shading. Do not copy the subjects of the second image. Output only the one item.")
 REF_PROMPT = ("The last image is a sheet of original item sprites from the game: match their style exactly, "
               "not their subjects.")
+# overrides.json mode "generate" on an item: a new icon from its description, the current art not sent
+ITEM_GENERATE = ("Draw a new game inventory icon of %s. The image is a sheet of original item sprites from the game: "
+                 "match their style exactly, but draw this item's own subject.")
 
 
 # ------------------------------------------------------------------------------------- state
@@ -148,15 +151,18 @@ def style_refs(pal) -> list:
     return imgs
 
 
-def prompt_for(notes: list, provider: str = "openai", item: str = "") -> str:
+def prompt_for(notes: list, provider: str = "openai", item: str = "", describe: str | None = None) -> str:
     """The request text: the full instruction prompt, or for the local img2img model (comfy) the
-    short tag prompt from style.md's comfy-block."""
+    short tag prompt from style.md's comfy-block. With `describe`, a new icon drawn from it (mode generate)."""
     if provider == "comfy":
         block = re.search(r"<!-- comfy-block -->(.*?)<!-- /comfy-block -->", STYLE.read_text(encoding="utf-8"), re.S)
         text = " ".join(block.group(1).split()).replace("{item}", item)
         return text + (", " + ", ".join(n.rstrip(".") for n in notes) if notes else "")
     style, _ = style_text()
-    parts = [QWEN_PROMPT] if provider == "qwen" else [BASE_PROMPT, REF_PROMPT]
+    if describe:
+        parts = [ITEM_GENERATE % describe.rstrip(".")]
+    else:
+        parts = [QWEN_PROMPT] if provider == "qwen" else [BASE_PROMPT, REF_PROMPT]
     if notes:
         parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
     parts.append(style)
@@ -487,12 +493,15 @@ def cmd_batch(a):
             continue
         frames = unique_frames(b)
         notes = icon_state(state, n)["notes"]
-        texts = {s: prompt_for(notes, providers.split(s)[0], item_words(inv[n]["classes"])) for s in specs}
+        # mode generate: one new drawing from the description, pixelized into every frame (inventory and
+        # ground show the same object); the current art is not sent, only the style references
+        fresh = ovr.get(n, {}).get("mode") == "generate" and ovr.get(n, {}).get("describe")
+        texts = {s: prompt_for(notes, providers.split(s)[0], item_words(inv[n]["classes"]), fresh or None) for s in specs}
         sources[n] = (b, frames, texts)
         inv_fi = inv_fi_of[n] = frames[b.bitmaps.index(inv_mod.inventory_bitmap(b))]
         for fi in sorted(set(frames.values())):
-            if a.frames == "inventory" and fi != inv_fi:
-                continue  # pixelized straight from the original below
+            if (a.frames == "inventory" or fresh) and fi != inv_fi:
+                continue  # pixelized straight from the original (or the one new drawing) below
             src = on_canvas(b.bitmaps[fi].rgba(pal))
             for s in specs:
                 for v in range(a.variants):
@@ -504,7 +513,7 @@ def cmd_batch(a):
                         o = {**QWEN_DEFAULTS, **o}
                     if prov in ("comfy", "qwen"):
                         o = {**o, "seed": int(digest(n, fi, v)[:8], 16)}
-                    jobs.append((n, fi, s, v, [src] + refs, texts[s], o))
+                    jobs.append((n, fi, s, v, list(refs) if fresh else [src] + refs, texts[s], o))
 
     packs = {}
     for k in range(0, len(singles), max(1, a.pack_singles)):
@@ -608,11 +617,16 @@ def cmd_batch(a):
                     new = {}
                     for fi in sorted(set(frames.values())):
                         gen = results.get((n, fi, s, v))
+                        if gen is None and ovr.get(n, {}).get("mode") == "generate":
+                            gen = results.get((n, inv_fi_of[n], s, v))  # the one new drawing, every frame
                         if gen is None and a.frames == "inventory":
                             gen = on_canvas(b.bitmaps[fi].rgba(pal))
                         if gen is None:
                             raise KeyError("frame %d failed" % fi)
-                        new[fi] = pixelize(gen, b.bitmaps[fi], b.shrink, a.shrink, pal, outline=a.outline)
+                        o_n = ovr.get(n, {})
+                        new[fi] = pixelize(gen, b.bitmaps[fi], b.shrink, a.shrink, pal, outline=a.outline,
+                                           fit_object=o_n.get("mode") == "generate",
+                                           greys=o_n.get("recolour") == "greys")
                 except (KeyError, ValueError) as e:
                     print("!! %s %s v%d: %s" % (n, s, v, e))
                     continue

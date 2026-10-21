@@ -1,11 +1,11 @@
 {
  "counts": {
-  "original": 549,
-  "check": 80,
-  "fanart": 190,
+  "original": 544,
+  "check": 81,
+  "fanart": 191,
   "missing": 1
  },
- "selected": 130,
+ "selected": 132,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -3555,6 +3555,46 @@
    "selected": true
   },
   {
+   "name": "plainamulet.bgf",
+   "kind": "item",
+   "status": "check",
+   "classes": [
+    "PlainAmulet"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\amulet.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "from": "amulet.bgf",
+   "shrink": 3,
+   "bitmaps": 2,
+   "groups": 2,
+   "size": [
+    64,
+    64
+   ],
+   "selected": true
+  },
+  {
+   "name": "plainring.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "PlainRing"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ring1.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "from": "ring1.bgf",
+   "shrink": 15,
+   "bitmaps": 2,
+   "groups": 2,
+   "size": [
+    128,
+    128
+   ],
+   "selected": true
+  },
+  {
    "name": "plateamr.bgf",
    "kind": "item",
    "status": "original",
@@ -4348,8 +4388,7 @@
    "kind": "item",
    "status": "original",
    "classes": [
-    "ResistRing",
-    "RingofLethargy"
+    "ResistRing"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ring3.bgf",
    "in_classic": true,
@@ -5755,9 +5794,9 @@
     "ForgetWand",
     "GemRemove",
     "HoldWand",
-    "IdentifyWand",
     "LightningWand",
     "MarkOfDishonorWand",
+    "RevealWand",
     "SeduceWand",
     "ShatterWand",
     "SlitherWand",
@@ -6139,25 +6178,6 @@
     421
    ],
    "selected": true
-  },
-  {
-   "name": "iartific.bgf",
-   "kind": "spell",
-   "status": "original",
-   "classes": [
-    "Artifice"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iartific.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 1,
-   "bitmaps": 2,
-   "groups": 2,
-   "size": [
-    64,
-    64
-   ],
-   "selected": false
   },
   {
    "name": "iblfire.bgf",
@@ -6643,25 +6663,6 @@
     "CurePoison"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\icurpoi.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 1,
-   "bitmaps": 2,
-   "groups": 2,
-   "size": [
-    64,
-    64
-   ],
-   "selected": false
-  },
-  {
-   "name": "icurswpn.bgf",
-   "kind": "spell",
-   "status": "original",
-   "classes": [
-    "CurseWeapon"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\icurswpn.bgf",
    "in_classic": true,
    "restyled": false,
    "shrink": 1,
@@ -7615,25 +7616,6 @@
    "selected": false
   },
   {
-   "name": "iidentif.bgf",
-   "kind": "spell",
-   "status": "original",
-   "classes": [
-    "Identify"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iidentif.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 1,
-   "bitmaps": 2,
-   "groups": 2,
-   "size": [
-    64,
-    64
-   ],
-   "selected": false
-  },
-  {
    "name": "iillufrm.bgf",
    "kind": "spell",
    "status": "original",
@@ -8305,25 +8287,6 @@
    "selected": false
   },
   {
-   "name": "iremcurs.bgf",
-   "kind": "spell",
-   "status": "original",
-   "classes": [
-    "RemoveCurse"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\iremcurs.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 1,
-   "bitmaps": 2,
-   "groups": 2,
-   "size": [
-    64,
-    64
-   ],
-   "selected": false
-  },
-  {
    "name": "iresacid.bgf",
    "kind": "spell",
    "status": "original",
@@ -8713,25 +8676,6 @@
     "ShockingFury"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ishkfury.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 1,
-   "bitmaps": 2,
-   "groups": 2,
-   "size": [
-    64,
-    64
-   ],
-   "selected": false
-  },
-  {
-   "name": "ishroud.bgf",
-   "kind": "spell",
-   "status": "original",
-   "classes": [
-    "Shroud"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ishroud.bgf",
    "in_classic": true,
    "restyled": false,
    "shrink": 1,
@@ -13121,9 +13065,9 @@
    "classes": [
     "MinotaurBerserker"
    ],
-   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\minotaurb.bgf",
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\minotaurbers.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "from": "minotaurb.bgf",
    "shrink": 4,
    "bitmaps": 64,
@@ -13141,9 +13085,9 @@
    "classes": [
     "MinotaurBerserker"
    ],
-   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\minotaurbx.bgf",
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\minotaurbersx.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "from": "minotaurbx.bgf",
    "shrink": 4,
    "bitmaps": 8,

@@ -1,5 +1,5 @@
 {
- "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it); 'from' starts a new sprite (a variant the kod points at, not yet served) from another sprite's frames, our restyle of it if there is one.",
+ "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it); 'from' starts a new sprite (a variant the kod points at, not yet served) from another sprite's frames, our restyle of it if there is one. 'recolour': 'greys' puts the item's neutral part (its largest light grey patch, e.g. a plain stone) in the grey ramp, so the item's palette translation colours it, and keeps every other pixel out of it.",
  "icebolt.bgf": {
   "mode": "generate",
   "output": "iiceshrd.bgf",
@@ -147,5 +147,16 @@
  "ratx.bgf": {
   "output": "duskratx.bgf",
   "describe": "a dead dusk rat lying on its side: a sleek, sinister giant rat with dark slate-purple fur, a sickly pale belly and its fangs bared, with the same pose and proportions"
+ },
+ "plainring.bgf": {
+  "from": "ring1.bgf",
+  "mode": "generate",
+  "describe": "a simple solid band ring of polished silver-grey metal, one smooth unbroken band with no stone, no jewel and no setting, seen at a slight angle so the band's thickness shows, plain and unremarkable, no engraving and no glow"
+ },
+ "plainamulet.bgf": {
+  "from": "amulet.bgf",
+  "mode": "generate",
+  "recolour": "greys",
+  "describe": "a large round pendant amulet of polished gold metal with a smooth, plain, neutral pale-grey stone at its centre (the stone grey and uncoloured, like a moonstone in shadow), the pendant filling most of the picture, its thin gold chain running behind the pendant with only a short loop showing above it, plain and unremarkable, no runes, no gems around the rim and no glow"
  }
 }
