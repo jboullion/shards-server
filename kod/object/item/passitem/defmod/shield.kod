@@ -70,7 +70,8 @@ messages:
    {
       local iBonus;
 
-      iBonus = piDefense_bonus;
+      // Ours (the magic item revamp, phase 3): Warding on a shield adds block (GetAttributeBlock)
+      iBonus = piDefense_bonus + Send(self,@GetAttributeBlock);
 
       if (who <> $)
       {
@@ -103,7 +104,8 @@ messages:
       // If shield gives a damage reduction, and if the user has block, give them a skill check
       //  with the defense bonus as a positive modifier.
       if (send(who,@GetSkillAbility,#skill_num=SKID_BLOCK) > 0)
-         AND Send(oBlock,@SuccessChance,#who=who,#modifier=piDefense_bonus)
+         AND Send(oBlock,@SuccessChance,#who=who,
+                  #modifier=piDefense_bonus + Send(self,@GetAttributeBlock))
       {
          // We succeeded!  Propagate up and reduce damage.
          propagate;

@@ -105,6 +105,13 @@ messages:
       return wiz_icon_male_rsc;
    }
 
+   GetFocusSchool()
+   "Ours (the magic item revamp): Focus magic on a wizard's hat is for its own school, on top "
+   "of its +10 (itematt/armoratt/aafocus.kod)."
+   {
+      return piSchool;
+   }
+
    GetBaseSpellModifier(oSpell=$)
    {
       if Send(oSpell,@GetSchool) = piSchool

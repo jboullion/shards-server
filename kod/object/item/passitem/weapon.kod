@@ -503,7 +503,8 @@ messages:
    }
 
    GetMagicTierAttribute()
-   "The weapon attribute whose tier the weapon takes, or $ if none has one."
+   "The weapon attribute whose tier the weapon takes, or $ if none has one (Item's, but only "
+   "weapon attributes: their tier is a hit and damage bonus)."
    {
       local i, oWeapAtt, iTier, iBest, oBest;
 
@@ -525,28 +526,6 @@ messages:
       }
 
       return oBest;
-   }
-
-   GetMagicTier(bRevealedOnly=FALSE)
-   "The weapon's tier (MAGIC_TIER_*), or MAGIC_TIER_NONE. With bRevealedOnly, only "
-   "if the attribute that sets it has been revealed."
-   {
-      local oWeapAtt, lData;
-
-      oWeapAtt = Send(self,@GetMagicTierAttribute);
-      if oWeapAtt = $
-      {
-         return MAGIC_TIER_NONE;
-      }
-
-      lData = Send(self,@GetAttributeData,#ItemAtt=Send(oWeapAtt,@GetItemAttNumber));
-      if bRevealedOnly
-         AND NOT Send(self,@GetIDStatusFromCompound,#compound=First(lData))
-      {
-         return MAGIC_TIER_NONE;
-      }
-
-      return Send(oWeapAtt,@GetTier,#lData=lData);
    }
 
    GetMagicTierHitBonus()
@@ -573,29 +552,6 @@ messages:
       }
 
       return Send(oWeapAtt,@DecipherDamageFromPower,#iPower=Send(self,@GetMagicTier));
-   }
-
-   GetMagicTierShown()
-   "Item.GetMagicShowFlags: the tier, once revealed."
-   {
-      return Send(self,@GetMagicTier,#bRevealedOnly=TRUE);
-   }
-
-   AddMagicTierNamePart()
-   "Item.BuildMagicName: the revealed tier's word, if any. Returns whether one was added."
-   {
-      local oWeapAtt, iTier;
-
-      iTier = Send(self,@GetMagicTier,#bRevealedOnly=TRUE);
-      if iTier = MAGIC_TIER_NONE
-      {
-         return FALSE;
-      }
-
-      oWeapAtt = Send(self,@GetMagicTierAttribute);
-      AddPacket(4,Send(oWeapAtt,@GetTierNamePart,#iPower=iTier));
-
-      return TRUE;
    }
 
    GetRange(weapon_used = $)

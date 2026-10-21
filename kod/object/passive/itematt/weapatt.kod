@@ -27,7 +27,7 @@ WeaponAttribute is ItemAttribute
 //
 //   Ours (the magic item revamp): every permanent weapon attribute carries a
 //   tier in its power digit, slight to enormous (MAGIC_TIER_*), rolled from
-//   the difficulty of whatever dropped it (RollTier). The weapon takes the
+//   the difficulty of whatever dropped it (ItemAttribute.RollTier). The weapon takes the
 //   best tier's hit and damage bonus once (Weapon.GetMagicTier), on top of
 //   whatever the attribute itself does. Attributes put on by spells (they
 //   have a timer) carry no tier.
@@ -50,17 +50,7 @@ resources:
    weapatt_potent = "a potent"
    weapatt_enormous = "an enormous"
 
-   // In a revealed weapon's full name
-   weapatt_name_slight = "slight %s"
-   weapatt_name_moderate = "moderate %s"
-   weapatt_name_potent = "potent %s"
-   weapatt_name_enormous = "enormous %s"
-
-   // In the stats block
-   weapatt_tier_slight = "Slight"
-   weapatt_tier_moderate = "Moderate"
-   weapatt_tier_potent = "Potent"
-   weapatt_tier_enormous = "Enormous"
+   // In the stats block (the tier's word: ItemAttribute.GetTierWord)
    weapatt_tier_info = "%s magic: +%i to hit, +%i damage\n"
 
 classvars:
@@ -68,6 +58,9 @@ classvars:
    // If TRUE, add the weaponatt power to description.
    vbPowerDesc = FALSE
    viDamage_bonus = 0
+
+   // Ours: a found weapon attribute has a tier (ItemAttribute.GetTier)
+   vbTiered = TRUE
 
 properties:
 
@@ -104,65 +97,6 @@ messages:
       return Send(self,@RollTier,#diff_seed=diff_seed);
    }
 
-   RollTier(diff_seed=1)
-   "A tier for a weapon found at this treasure difficulty (1-10). Odds in percent, "
-   "slight / moderate / potent / enormous:\n"
-   "   1-3: 70 / 30 /  0 /  0\n"
-   "   4-6: 40 / 40 / 18 /  2\n"
-   "   7-8: 15 / 40 / 35 / 10\n"
-   "  9-10:  5 / 30 / 45 / 20"
-   {
-      local iRoll, lOdds, iTier, iOdds;
-
-      diff_seed = Bound(diff_seed,1,10);
-
-      if diff_seed <= 3
-      {
-         lOdds = [70, 30, 0, 0];
-      }
-      else if diff_seed <= 6
-      {
-         lOdds = [40, 40, 18, 2];
-      }
-      else if diff_seed <= 8
-      {
-         lOdds = [15, 40, 35, 10];
-      }
-      else
-      {
-         lOdds = [5, 30, 45, 20];
-      }
-
-      iRoll = Random(1,100);
-      iTier = MAGIC_TIER_SLIGHT;
-      foreach iOdds in lOdds
-      {
-         iRoll = iRoll - iOdds;
-         if iRoll <= 0
-         {
-            return iTier;
-         }
-
-         iTier = iTier + 1;
-      }
-
-      return MAGIC_TIER_SLIGHT;
-   }
-
-   GetTier(lData=$)
-   "This attribute's tier on a weapon (its node, lData), or MAGIC_TIER_NONE if it has "
-   "none: it was put on by a spell and will wear off."
-   {
-      if lData = $
-         OR Send(self,@HasTimer,#lData=lData)
-      {
-         return MAGIC_TIER_NONE;
-      }
-
-      return Bound(Send(self,@TranslatePowerFromCompound,#iCompound=First(lData)),
-                   MAGIC_TIER_SLIGHT,MAGIC_TIER_ENORMOUS);
-   }
-
    DecipherDamageFromPower(iPower=0)
    "A tier's damage bonus."
    {
@@ -197,24 +131,6 @@ messages:
       if iPower = MAGIC_TIER_POTENT { return weapatt_potent; }
 
       return weapatt_enormous;
-   }
-
-   GetTierNamePart(iPower=0)
-   {
-      if iPower <= MAGIC_TIER_SLIGHT { return weapatt_name_slight; }
-      if iPower = MAGIC_TIER_MODERATE { return weapatt_name_moderate; }
-      if iPower = MAGIC_TIER_POTENT { return weapatt_name_potent; }
-
-      return weapatt_name_enormous;
-   }
-
-   GetTierWord(iPower=0)
-   {
-      if iPower <= MAGIC_TIER_SLIGHT { return weapatt_tier_slight; }
-      if iPower = MAGIC_TIER_MODERATE { return weapatt_tier_moderate; }
-      if iPower = MAGIC_TIER_POTENT { return weapatt_tier_potent; }
-
-      return weapatt_tier_enormous;
    }
 
    //// Effect Functions

@@ -13,9 +13,15 @@ Robe is RobeBase
 
 constants:
 
+   include blakston.khd
+
 resources:
 
 classvars:
+
+   // Ours (the magic item revamp): plain robes give +5 to every school, not RobeBase's +10;
+   // a found one may add Focus for one school (itematt/armoratt/aafocus.kod)
+   viSpell_modifier = 5
 
 properties:
 

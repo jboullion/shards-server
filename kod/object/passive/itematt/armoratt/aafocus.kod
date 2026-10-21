@@ -1,0 +1,181 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+ArmorAttFocus is ArmorAttribute
+
+////////////////////////////////////////////////////////////////////////////////
+//  Ours (the magic item revamp, phase 3): Focus. Spell power for one school's
+//  spells while worn (Item.GetSpellModifier): Shal'ille, Qor, Kraanan, Faren,
+//  Riija or Jala.
+//
+//  Form is:
+//
+//      [ AA_FOCUS, $, SS_* ]
+////////////////////////////////////////////////////////////////////////////////
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   aafocus_desc = "\n\nHolding it, your thoughts settle and sharpen."
+   aafocus_name_shalille = "%s of Shal'ille"
+   aafocus_name_qor = "%s of Qor"
+   aafocus_name_kraanan = "%s of Kraanan"
+   aafocus_name_faren = "%s of Faren"
+   aafocus_name_riija = "%s of Riija"
+   aafocus_name_jala = "%s of Jala"
+   aafocus_info = "%s magic: +%i spell power for %s spells\n"
+   aafocus_word_shalille = "Shal'ille"
+   aafocus_word_qor = "Qor"
+   aafocus_word_kraanan = "Kraanan"
+   aafocus_word_faren = "Faren"
+   aafocus_word_riija = "Riija"
+   aafocus_word_jala = "Jala"
+   aafocus_dm = "focus"
+
+classvars:
+
+   viItem_Att_Num = AA_FOCUS
+   vrDesc = aafocus_desc
+   vrInfoDesc = aafocus_info
+   vrDM_trigger = aafocus_dm
+   viMagicColour = MAGIC_COLOUR_VIOLET
+   viDifficulty = 6
+
+   viValue_slight = 3
+   viValue_moderate = 5
+   viValue_potent = 8
+   viValue_enormous = 12
+
+properties:
+
+messages:
+
+   SetItemsToAttribute()
+   {
+      plItems_to_Attribute = [ [ &Robe, 20 ],
+                               [ &Circlet, 15 ],
+                               [ &PlainRing, 15 ],
+                               [ &PlainAmulet, 15 ],
+                               [ &Wizardhat, 10 ],
+                               [ &DiscipleRobe, 10 ]
+                             ];
+
+      return;
+   }
+
+   AddSelfToRandomItem(oItem=$,who=$,diff_seed=1)
+   "An item with a school of its own (disciple robes: Item.GetFocusSchool) is focused on that "
+   "one, on top of its usual bonus; anything else on a random school."
+   {
+      local iSchool;
+
+      if oItem = $
+         OR NOT Send(self,@ReqAddToItem,#oItem=oItem)
+      {
+         return FALSE;
+      }
+
+      iSchool = Send(oItem,@GetFocusSchool);
+      if iSchool = $
+      {
+         iSchool = Send(self,@RandomChoice);
+      }
+
+      Send(self,@AddToItem,#oItem=oItem,#state1=iSchool,#diff_seed=diff_seed);
+
+      return TRUE;
+   }
+
+   RandomChoice()
+   {
+      return Random(SS_SHALILLE,SS_JALA);
+   }
+
+   ItemGetSpellModifier(oSpell=$,oCaster=$,oItem=$,lData=$)
+   {
+      if oSpell = $
+      {
+         return 0;
+      }
+
+      if Send(oSpell,@GetSchool) <> Send(self,@GetChoice,#lData=lData)
+      {
+         return 0;
+      }
+
+      return Send(self,@GetValue,#lData=lData);
+   }
+
+   GetSchoolPart(iSchool=0,bName=FALSE)
+   "The school's word for the stats line, or (bName) the name part."
+   {
+      if iSchool = SS_SHALILLE
+      {
+         if bName { return aafocus_name_shalille; }
+
+         return aafocus_word_shalille;
+      }
+
+      if iSchool = SS_QOR
+      {
+         if bName { return aafocus_name_qor; }
+
+         return aafocus_word_qor;
+      }
+
+      if iSchool = SS_KRAANAN
+      {
+         if bName { return aafocus_name_kraanan; }
+
+         return aafocus_word_kraanan;
+      }
+
+      if iSchool = SS_FAREN
+      {
+         if bName { return aafocus_name_faren; }
+
+         return aafocus_word_faren;
+      }
+
+      if iSchool = SS_RIIJA
+      {
+         if bName { return aafocus_name_riija; }
+
+         return aafocus_word_riija;
+      }
+
+      if bName { return aafocus_name_jala; }
+
+      return aafocus_word_jala;
+   }
+
+   AppendOwnInfo(oItem=$,lData=$)
+   {
+      AddPacket(4,vrInfoDesc,
+                4,Send(self,@GetTierWord,#iPower=Send(self,@GetTier,#lData=lData)),
+                4,Send(self,@GetValue,#lData=lData),
+                4,Send(self,@GetSchoolPart,#iSchool=Send(self,@GetChoice,#lData=lData)));
+
+      return;
+   }
+
+   AddNamePart(oItem=$,lData=$)
+   {
+      AddPacket(4,Send(self,@GetSchoolPart,#iSchool=Send(self,@GetChoice,#lData=lData),
+                       #bName=TRUE));
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

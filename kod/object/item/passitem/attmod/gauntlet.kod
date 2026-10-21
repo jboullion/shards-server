@@ -303,7 +303,8 @@ messages:
 
    ModifyDefensePower(defense_power=$)
    {
-      return defense_power + piDefense_bonus;
+      // Ours (the magic item revamp, phase 3): with our attributes' (Warding)
+      return defense_power + piDefense_bonus + Send(self,@GetAttributeDefense);
    }
 
    ModifyDefenseDamage(who = $,what = $,damage = $)

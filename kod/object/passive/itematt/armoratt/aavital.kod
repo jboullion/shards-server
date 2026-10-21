@@ -1,0 +1,110 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+ArmorAttVitality is ArmorAttribute
+
+////////////////////////////////////////////////////////////////////////////////
+//  Ours (the magic item revamp, phase 3): Vitality. Maximum health while worn:
+//  added when it's put on and taken back when it comes off (ItemWorn,
+//  ItemRemoved), as a circlet does its trade of health for mana.
+//
+//  Form is:
+//
+//      [ AA_VITALITY ]
+////////////////////////////////////////////////////////////////////////////////
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   aavital_desc = "\n\nIt is warm to the touch, and a steady pulse seems to run through it."
+   aavital_name = "%s of vitality"
+   aavital_info = "%s magic: +%i maximum health\n"
+   aavital_dm = "vitality"
+
+classvars:
+
+   viItem_Att_Num = AA_VITALITY
+   vrDesc = aavital_desc
+   vrName = aavital_name
+   vrInfoDesc = aavital_info
+   vrDM_trigger = aavital_dm
+   viMagicColour = MAGIC_COLOUR_CRIMSON
+   viDifficulty = 7
+
+   viValue_slight = 3
+   viValue_moderate = 5
+   viValue_potent = 8
+   viValue_enormous = 12
+
+properties:
+
+messages:
+
+   SetItemsToAttribute()
+   {
+      plItems_to_Attribute = [ [ &LeatherArmor, 14 ],
+                               [ &SimpleHelm, 8 ],
+                               [ &ChainArmor, 12 ],
+                               [ &Helm, 8 ],
+                               [ &PlainRing, 12 ],
+                               [ &PlainAmulet, 12 ],
+                               [ &ScaleArmor, 8 ],
+                               [ &PlateArmor, 6 ]
+                             ];
+
+      return;
+   }
+
+   ItemWorn(oItem=$,lData=$,oPlayer=$)
+   {
+      if oPlayer <> $ AND IsClass(oPlayer,&Player)
+      {
+         Send(oPlayer,@GainMaxHealth,#amount=Send(self,@GetValue,#lData=lData));
+      }
+
+      return;
+   }
+
+   ItemRemoved(oItem=$,lData=$,oPlayer=$)
+   {
+      if oPlayer <> $ AND IsClass(oPlayer,&Player)
+      {
+         Send(oPlayer,@GainMaxHealth,#amount=-Send(self,@GetValue,#lData=lData));
+      }
+
+      return;
+   }
+
+   AddEffects(oItem=$,lData=$)
+   "Put on something already worn (a DM's doing): it counts at once, as if put on."
+   {
+      if oItem <> $ AND Send(oItem,@IsInUse)
+      {
+         Send(self,@ItemWorn,#oItem=oItem,#lData=lData,#oPlayer=Send(oItem,@GetOwner));
+      }
+
+      return;
+   }
+
+   RemoveEffects(oItem=$,lData=$)
+   {
+      if oItem <> $ AND lData <> $ AND Send(oItem,@IsInUse)
+      {
+         Send(self,@ItemRemoved,#oItem=oItem,#lData=lData,#oPlayer=Send(oItem,@GetOwner));
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

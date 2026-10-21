@@ -43,6 +43,45 @@ properties:
 
 messages:
 
+   // Worn, it counts with the wearer's armor, so its attributes' defense (Warding) counts
+   // (Player.GetDefense asks every defense modifier)
+
+   NewUsed(what = $)
+   {
+      if what <> $ AND IsClass(what,&Player)
+      {
+         Send(what,@AddDefenseModifier,#what=self);
+      }
+
+      propagate;
+   }
+
+   NewUnused(what = $)
+   {
+      if what <> $ AND IsClass(what,&Player)
+      {
+         Send(what,@RemoveDefenseModifier,#what=self);
+      }
+
+      propagate;
+   }
+
+   ModifyDefensePower(who = $,what = $,defense_power = 0)
+   {
+      return defense_power + Send(self,@GetAttributeDefense);
+   }
+
+   ModifyDefenseDamage(who = $,what = $,damage = $,atype = 0,aspell = 0)
+   {
+      return damage;
+   }
+
+   DefendingHit(who = $,what = $)
+   "Jewellery doesn't wear."
+   {
+      return;
+   }
+
    ReqUseSomething(what = $)
    "Ring won't have two of a kind on; a plain ring's magic is its own, so two may be."
    {

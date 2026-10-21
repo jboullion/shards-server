@@ -1,0 +1,162 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+ArmorAttResistance is ArmorAttribute
+
+////////////////////////////////////////////////////////////////////////////////
+//  Ours (the magic item revamp, phase 3): Resistance. A percentage of
+//  resistance to one element while worn (Item.GetCurrentResistances): fire,
+//  cold, shock or acid.
+//
+//  Form is:
+//
+//      [ AA_RESISTANCE, $, ATCK_SPELL_* ]
+////////////////////////////////////////////////////////////////////////////////
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   aaresist_desc = "\n\nA faint chill clings to it, as if the elements keep their distance."
+   aaresist_name_fire = "%s of fire resistance"
+   aaresist_name_cold = "%s of frost resistance"
+   aaresist_name_shock = "%s of storm resistance"
+   aaresist_name_acid = "%s of acid resistance"
+   aaresist_info = "%s magic: +%i%% resistance to %s\n"
+   aaresist_word_fire = "fire"
+   aaresist_word_cold = "cold"
+   aaresist_word_shock = "shock"
+   aaresist_word_acid = "acid"
+   aaresist_dm = "resistance"
+
+classvars:
+
+   viItem_Att_Num = AA_RESISTANCE
+   vrDesc = aaresist_desc
+   vrInfoDesc = aaresist_info
+   vrDM_trigger = aaresist_dm
+   viDifficulty = 5
+
+   viValue_slight = 5
+   viValue_moderate = 10
+   viValue_potent = 15
+   viValue_enormous = 20
+
+properties:
+
+messages:
+
+   SetItemsToAttribute()
+   {
+      plItems_to_Attribute = [ [ &LeatherArmor, 14 ],
+                               [ &MetalShield, 10 ],
+                               [ &SimpleHelm, 8 ],
+                               [ &ChainArmor, 10 ],
+                               [ &GoldShield, 8 ],
+                               [ &Helm, 8 ],
+                               [ &PlainRing, 10 ],
+                               [ &PlainAmulet, 10 ],
+                               [ &ScaleArmor, 6 ],
+                               [ &Knightshield, 5 ],
+                               [ &PlateArmor, 5 ]
+                             ];
+
+      return;
+   }
+
+   RandomChoice()
+   {
+      switch (Random(1,4))
+      {
+      case 1: return ATCK_SPELL_FIRE;
+      case 2: return ATCK_SPELL_COLD;
+      case 3: return ATCK_SPELL_SHOCK;
+      }
+
+      return ATCK_SPELL_ACID;
+   }
+
+   ItemModifyResistance(oItem=$,lData=$,resistance_list=$)
+   {
+      local iValue, iElement;
+
+      iValue = Send(self,@GetValue,#lData=lData);
+      iElement = Send(self,@GetChoice,#lData=lData);
+      if iValue = 0 OR iElement = $
+      {
+         return resistance_list;
+      }
+
+      // Spell damage types are kept negative in resistance lists
+      return Send(SYS,@AddResistance,#what=-iElement,#value=iValue,
+                  #resistance_list=resistance_list);
+   }
+
+   GetElementWord(iElement=0)
+   {
+      if iElement = ATCK_SPELL_FIRE { return aaresist_word_fire; }
+      if iElement = ATCK_SPELL_COLD { return aaresist_word_cold; }
+      if iElement = ATCK_SPELL_SHOCK { return aaresist_word_shock; }
+
+      return aaresist_word_acid;
+   }
+
+   AppendOwnInfo(oItem=$,lData=$)
+   {
+      AddPacket(4,vrInfoDesc,
+                4,Send(self,@GetTierWord,#iPower=Send(self,@GetTier,#lData=lData)),
+                4,Send(self,@GetValue,#lData=lData),
+                4,Send(self,@GetElementWord,#iElement=Send(self,@GetChoice,#lData=lData)));
+
+      return;
+   }
+
+   AddNamePart(oItem=$,lData=$)
+   {
+      local iElement;
+
+      iElement = Send(self,@GetChoice,#lData=lData);
+      if iElement = ATCK_SPELL_FIRE
+      {
+         AddPacket(4,aaresist_name_fire);
+      }
+      else if iElement = ATCK_SPELL_COLD
+      {
+         AddPacket(4,aaresist_name_cold);
+      }
+      else if iElement = ATCK_SPELL_SHOCK
+      {
+         AddPacket(4,aaresist_name_shock);
+      }
+      else
+      {
+         AddPacket(4,aaresist_name_acid);
+      }
+
+      return;
+   }
+
+   GetMagicColour(lData=$)
+   "The element's colour, as an elemental weapon's."
+   {
+      local iElement;
+
+      iElement = Send(self,@GetChoice,#lData=lData);
+      if iElement = ATCK_SPELL_FIRE { return MAGIC_COLOUR_ORANGE; }
+      if iElement = ATCK_SPELL_COLD { return MAGIC_COLOUR_TEAL; }
+      if iElement = ATCK_SPELL_SHOCK { return MAGIC_COLOUR_YELLOW; }
+
+      return MAGIC_COLOUR_GREEN;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

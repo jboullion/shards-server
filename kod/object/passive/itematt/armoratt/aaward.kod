@@ -1,0 +1,128 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+ArmorAttWarding is ArmorAttribute
+
+////////////////////////////////////////////////////////////////////////////////
+//  Ours (the magic item revamp, phase 3): Warding. Defense power while worn
+//  (DefenseModifier, gauntlets, plain jewellery: Item.GetAttributeDefense); on
+//  a shield, block instead, as a shield's own defense is (Shield.GetBlockAbility).
+//
+//  Form is:
+//
+//      [ AA_WARDING ]
+////////////////////////////////////////////////////////////////////////////////
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   aaward_desc = "\n\nFaint wards are worked into it, and blows seem to glance away."
+   aaward_name = "%s of warding"
+   aaward_info = "%s magic: +%i defense\n"
+   aaward_info_shield = "%s magic: +%i block\n"
+   aaward_dm = "warding"
+
+classvars:
+
+   viItem_Att_Num = AA_WARDING
+   vrDesc = aaward_desc
+   vrName = aaward_name
+   vrInfoDesc = aaward_info
+   vrDM_trigger = aaward_dm
+   viMagicColour = MAGIC_COLOUR_SILVER
+   viDifficulty = 4
+
+   viValue_slight = 15
+   viValue_moderate = 30
+   viValue_potent = 50
+   viValue_enormous = 75
+
+properties:
+
+messages:
+
+   SetItemsToAttribute()
+   "Weakest first: the stronger the finder, the further down the list it starts "
+   "(ItemAttribute.GenerateItemWithAttribute)."
+   {
+      plItems_to_Attribute = [ [ &LeatherArmor, 14 ],
+                               [ &MetalShield, 10 ],
+                               [ &SimpleHelm, 10 ],
+                               [ &Gauntlet, 10 ],
+                               [ &ChainArmor, 10 ],
+                               [ &GoldShield, 8 ],
+                               [ &Helm, 6 ],
+                               [ &PlainRing, 8 ],
+                               [ &PlainAmulet, 8 ],
+                               [ &ScaleArmor, 6 ],
+                               [ &Knightshield, 5 ],
+                               [ &PlateArmor, 5 ]
+                             ];
+
+      return;
+   }
+
+   ItemGetDefense(oItem=$,lData=$)
+   {
+      if IsClass(oItem,&Shield)
+      {
+         return 0;
+      }
+
+      return Send(self,@GetValue,#lData=lData);
+   }
+
+   ItemGetBlock(oItem=$,lData=$)
+   "On a shield, block rather than defense: 5 / 10 / 15 / 20."
+   {
+      if NOT IsClass(oItem,&Shield)
+      {
+         return 0;
+      }
+
+      return Send(self,@GetShieldValue,#lData=lData);
+   }
+
+   GetShieldValue(lData=$)
+   {
+      local iTier;
+
+      iTier = Send(self,@GetTier,#lData=lData);
+      if iTier = MAGIC_TIER_NONE
+      {
+         return 0;
+      }
+
+      if iTier <= MAGIC_TIER_SLIGHT { return 5; }
+      if iTier = MAGIC_TIER_MODERATE { return 10; }
+      if iTier = MAGIC_TIER_POTENT { return 15; }
+
+      return 20;
+   }
+
+   AppendOwnInfo(oItem=$,lData=$)
+   {
+      if IsClass(oItem,&Shield)
+      {
+         AddPacket(4,aaward_info_shield,
+                   4,Send(self,@GetTierWord,#iPower=Send(self,@GetTier,#lData=lData)),
+                   4,Send(self,@GetShieldValue,#lData=lData));
+
+         return;
+      }
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

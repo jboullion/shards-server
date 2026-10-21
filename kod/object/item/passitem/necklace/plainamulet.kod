@@ -39,5 +39,87 @@ properties:
 
 messages:
 
+   // Worn, it counts with the wearer's armor, so its attributes' defense (Warding) counts
+   // (Player.GetDefense asks every defense modifier)
+
+   NewUsed(what = $)
+   {
+      if what <> $ AND IsClass(what,&Player)
+      {
+         Send(what,@AddDefenseModifier,#what=self);
+      }
+
+      propagate;
+   }
+
+   NewUnused(what = $)
+   {
+      if what <> $ AND IsClass(what,&Player)
+      {
+         Send(what,@RemoveDefenseModifier,#what=self);
+      }
+
+      propagate;
+   }
+
+   ModifyDefensePower(who = $,what = $,defense_power = 0)
+   {
+      return defense_power + Send(self,@GetAttributeDefense);
+   }
+
+   ModifyDefenseDamage(who = $,what = $,damage = $,atype = 0,aspell = 0)
+   {
+      return damage;
+   }
+
+   DefendingHit(who = $,what = $)
+   "Jewellery doesn't wear."
+   {
+      return;
+   }
+
+   UpdateMagicTint()
+   "Its stone is drawn in the grey ramp (iconforge recolour greys): revealed, it takes the "
+   "colour of the ring round the icon, through a palette translation."
+   {
+      local iFlags, iShow, iTranslation;
+
+      iTranslation = 0;
+      iFlags = Send(self,@GetMagicShowFlags);
+      iShow = (iFlags & OF_MAGIC_SHOW_MASK) / OF_MAGIC_SHOW_MUL;
+      if iShow >= MAGIC_SHOW_REVEALED
+      {
+         iTranslation = Send(self,@StoneTranslation,
+                             #colour=(iFlags & OF_MAGIC_COLOUR_MASK) / OF_MAGIC_COLOUR_MUL);
+      }
+
+      if iTranslation <> Send(self,@GetPaletteTranslation)
+      {
+         Send(self,@SetPaletteTranslation,#translation=iTranslation);
+         if poOwner <> $
+         {
+            Send(poOwner,@SomethingChanged,#what=self);
+         }
+      }
+
+      propagate;
+   }
+
+   StoneTranslation(colour = 0)
+   "A ring colour (MAGIC_COLOUR_*) as the grey ramp's palette translation; 0 leaves it grey."
+   {
+      if colour = MAGIC_COLOUR_CRIMSON { return PT_GRAY_TO_RED; }
+      if colour = MAGIC_COLOUR_BLUE { return PT_GRAY_TO_DBLUE; }
+      if colour = MAGIC_COLOUR_YELLOW { return PT_GRAY_TO_GOLD; }
+      if colour = MAGIC_COLOUR_TEAL { return PT_GRAY_TO_SKY; }
+      if colour = MAGIC_COLOUR_GREEN { return PT_GRAY_TO_BGREEN; }
+      if colour = MAGIC_COLOUR_VIOLET { return PT_GRAY_TO_PURPLE; }
+      if colour = MAGIC_COLOUR_GOLD { return PT_GRAY_TO_LGOLD; }
+      if colour = MAGIC_COLOUR_AMBER { return PT_GRAY_TO_ORANGE; }
+      if colour = MAGIC_COLOUR_ORANGE { return PT_GRAY_TO_LORANGE; }
+
+      return 0;
+   }
+
 end
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,178 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+ArmorAttribute is ItemAttribute
+
+////////////////////////////////////////////////////////////////////////////////
+//  Ours (the magic item revamp, phase 3): random magic for armor, shields,
+//  helmets, gauntlets, caster gear and plain jewellery, as WeaponAttribute is
+//  for weapons. Each family (armoratt/) adds one thing while the item is worn,
+//  by tier, slight to enormous (ItemAttribute.RollTier from the treasure's
+//  difficulty): Warding defense, Resistance to one element, Focus spell power
+//  for one school, Vitality maximum health.
+//
+//  An armor attribute only goes on the item kinds its treasure list names
+//  (SetItemsToAttribute, ReqAddToItem). A family with a choice (an element, a
+//  school) keeps it as its primary state:
+//
+//      [ AA_..., $, choice ]
+//
+//  Its stats line reads "<Tier> magic: ..." as a weapon's does.
+////////////////////////////////////////////////////////////////////////////////
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+classvars:
+
+   vbTiered = TRUE
+   viNameKind = ITEMATT_NAME_SUFFIX
+
+   // What the family gives at each tier (GetTierValue)
+   viValue_slight = 0
+   viValue_moderate = 0
+   viValue_potent = 0
+   viValue_enormous = 0
+
+properties:
+
+   piValue_modifier = 150
+   piValue_power_modifier = 10
+
+messages:
+
+   InitialPower(oItem=$,diff_seed=1)
+   {
+      return Send(self,@RollTier,#diff_seed=diff_seed);
+   }
+
+   ReqAddToItem(oItem=$)
+   "Only on the kinds of item our treasure list names (or their subclasses)."
+   {
+      local i;
+
+      if oItem = $
+      {
+         return FALSE;
+      }
+
+      foreach i in plItems_to_Attribute
+      {
+         if IsClass(oItem,First(i))
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   AddSelfToRandomItem(oItem=$,who=$,diff_seed=1)
+   "Treasure: on oItem, unrevealed, with a tier for diff_seed and, for a family with a "
+   "choice, a random one (RandomChoice)."
+   {
+      if oItem = $
+         OR NOT Send(self,@ReqAddToItem,#oItem=oItem)
+      {
+         return FALSE;
+      }
+
+      Send(self,@AddToItem,#oItem=oItem,#state1=Send(self,@RandomChoice),
+           #diff_seed=diff_seed);
+
+      return TRUE;
+   }
+
+   RandomChoice()
+   "A family's element or school, or $ for none."
+   {
+      return $;
+   }
+
+   SetPrimaryState(state1=$)
+   {
+      return state1;
+   }
+
+   GetChoice(lData=$)
+   "The element or school in our node, or $."
+   {
+      if lData = $
+      {
+         return $;
+      }
+
+      if Length(lData) < 3
+      {
+         return $;
+      }
+
+      return Nth(lData,3);
+   }
+
+   GetTierValue(iTier=0)
+   {
+      if iTier <= MAGIC_TIER_SLIGHT { return viValue_slight; }
+      if iTier = MAGIC_TIER_MODERATE { return viValue_moderate; }
+      if iTier = MAGIC_TIER_POTENT { return viValue_potent; }
+
+      return viValue_enormous;
+   }
+
+   GetValue(lData=$)
+   "What we give on this item: our tier's value."
+   {
+      local iTier;
+
+      iTier = Send(self,@GetTier,#lData=lData);
+      if iTier = MAGIC_TIER_NONE
+      {
+         return 0;
+      }
+
+      return Send(self,@GetTierValue,#iTier=iTier);
+   }
+
+   AppendDescInfo(oItem = $,compound = $)
+   "Once revealed, the family's stats line (AppendOwnInfo)."
+   {
+      if NOT Send(oItem,@GetIDStatusFromCompound,#compound=compound)
+      {
+         AddPacket(4,system_blank_resource);
+
+         return;
+      }
+
+      Send(self,@AppendOwnInfo,#oItem=oItem,
+           #lData=Send(oItem,@GetAttributeData,#ItemAtt=viItem_Att_Num));
+
+      return;
+   }
+
+   AppendOwnInfo(oItem=$,lData=$)
+   "One resource and its parameters: by default vrInfoDesc with our tier's word and value."
+   {
+      AddPacket(4,vrInfoDesc,
+                4,Send(self,@GetTierWord,#iPower=Send(self,@GetTier,#lData=lData)),
+                4,Send(self,@GetValue,#lData=lData));
+
+      return;
+   }
+
+   IsMagicalEffect()
+   {
+      return TRUE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

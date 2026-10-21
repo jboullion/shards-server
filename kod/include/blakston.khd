@@ -2259,6 +2259,13 @@
    WA_PURGER               = 70
    WA_SIPHON               = 71
 
+   // Ours (the magic item revamp, phase 3): armor attributes, for armor, shields, helmets,
+   // gauntlets, caster gear and plain jewellery (itematt/armoratt.kod)
+   AA_WARDING              = 72
+   AA_RESISTANCE           = 73
+   AA_FOCUS                = 74
+   AA_VITALITY             = 75
+
    // Herald shields
 
    SHIELDSHAPE_SLASH   = 1

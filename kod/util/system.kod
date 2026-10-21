@@ -3759,6 +3759,11 @@ messages:
       Send(self,@CreateOneItemAttIfNew,#num=WA_PARALYZER,#class=&WeapAttParalyzer);
       Send(self,@CreateOneItemAttIfNew,#num=WA_VAMPER,#class=&WeapAttVamper);
       Send(self,@CreateOneItemAttIfNew,#num=WA_SIPHON,#class=&WeapAttSiphon);
+      // Ours (the magic item revamp, phase 3): armor attributes
+      Send(self,@CreateOneItemAttIfNew,#num=AA_WARDING,#class=&ArmorAttWarding);
+      Send(self,@CreateOneItemAttIfNew,#num=AA_RESISTANCE,#class=&ArmorAttResistance);
+      Send(self,@CreateOneItemAttIfNew,#num=AA_FOCUS,#class=&ArmorAttFocus);
+      Send(self,@CreateOneItemAttIfNew,#num=AA_VITALITY,#class=&ArmorAttVitality);
       Send(self,@CreateOneItemAttIfNew,#num=WA_PURGER,#class=&WeapAttPurger);
       Send(self,@CreateOneItemAttIfNew,#num=WA_FACTION,#class=&WeapAttFactionDefender);
       Send(self,@CreateOneItemAttIfNew,#num=WA_CEREMONIAL,#class=&WeapAttCeremonial);

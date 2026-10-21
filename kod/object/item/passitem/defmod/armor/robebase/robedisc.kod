@@ -23,6 +23,8 @@ resources:
    include robedisc.lkod
 
    RobeInsignia_name_rsc = "robes of the disciple"
+   // Ours (the magic item revamp): in a revealed robe's full name, "potent disciple robes of Qor"
+   disciplerobe_magic_base_name = "disciple robes"
    RobeInsignia_icon_rsc = Robe.bgf
    RobeInsignia_desc_rsc = \
       "Heavy and warm, disciple robes typically denote a fervent (and some "
@@ -94,11 +96,28 @@ messages:
       propagate;
    }
 
+   GetFocusSchool()
+   "Ours (the magic item revamp): Focus on a disciple's robes is for its own school, on top of "
+   "the school's usual bonus (itematt/armoratt/aafocus.kod)."
+   {
+      return piSchool;
+   }
+
+   GetMagicBaseName()
+   "Ours: its name inside a revealed robe's full name (Item.BuildMagicNameParts), where the "
+   "school follows: 'potent disciple robes of Qor'."
+   {
+      return disciplerobe_magic_base_name;
+   }
+
    GetBaseSpellModifier(oSpell=$)
    {
+      // Ours (the magic item revamp): +5 to every school and +10 more to its own, from the
+      // start (it used to grow with the wearer's level in the school, from +5 to +20). Focus
+      // magic on it adds to its own school too (GetFocusSchool).
       if Send(oSpell,@GetSchool) = piSchool
       {
-         return Bound(4 * piLevel,5,20);
+         return 15;
       }
 
       return 5;

@@ -32,6 +32,17 @@ resources:
    attribute_desc_default = "  This item appears enchanted in some way."
    attribute_name_default = "special %s"
 
+   // Ours (the magic item revamp): a found attribute's tier, in a revealed item's full name
+   // and in the stats block (GetTierNamePart, GetTierWord)
+   itematt_tier_name_slight = "slight %s"
+   itematt_tier_name_moderate = "moderate %s"
+   itematt_tier_name_potent = "potent %s"
+   itematt_tier_name_enormous = "enormous %s"
+   itematt_tier_slight = "Slight"
+   itematt_tier_moderate = "Moderate"
+   itematt_tier_potent = "Potent"
+   itematt_tier_enormous = "Enormous"
+
    itematt_made_rsc = "  Enchanted by %q, %s %s."
    itematt_novice_rsc = "Novice"
    itematt_apprentice_rsc = "Apprentice"
@@ -61,6 +72,8 @@ classvars:
    viNameKind = ITEMATT_NAME_NONE
    // ...and the colour of the ring on the item's icon once revealed (GetMagicColour)
    viMagicColour = MAGIC_COLOUR_NONE
+   // ...and whether, found as treasure, we carry a tier (GetTier: weapon and armor attributes)
+   vbTiered = FALSE
 
    // Whether users can add special attributes (e.g. via blood inheritance)
    // if this attribute is present.
@@ -313,11 +326,45 @@ messages:
       return vbAllowSpecialAttributes;
    }
 
-   ItemGetSpellModifier(oCaster=$,oItem=$)
+   ItemGetSpellModifier(oSpell=$,oCaster=$,oItem=$,lData=$)
    {
       /// this returns the amount added to an item's spell usage percentage.
-      /// for most itematts, this is 0.
+      /// for most itematts, this is 0. (Ours: oSpell, oItem and our node lData
+      /// now come too: Item.GetSpellModifier.)
       return 0;
+   }
+
+   // Ours (the magic item revamp, phase 3): what an attribute adds to the item while it's
+   // worn. Item and its subclasses ask for these; most attributes add nothing.
+
+   ItemGetDefense(oItem=$,lData=$)
+   "Defense power (DefenseModifier.ModifyDefensePower, gauntlets, plain jewellery)."
+   {
+      return 0;
+   }
+
+   ItemGetBlock(oItem=$,lData=$)
+   "Block ability, on a shield (Shield.GetBlockAbility)."
+   {
+      return 0;
+   }
+
+   ItemModifyResistance(oItem=$,lData=$,resistance_list=$)
+   "The item's resistances with ours (Item.GetCurrentResistances; SYS AddResistance)."
+   {
+      return resistance_list;
+   }
+
+   ItemWorn(oItem=$,lData=$,oPlayer=$)
+   "The item was put on (Item.NewUsed). Unlike ItemUsed, every item sends it."
+   {
+      return;
+   }
+
+   ItemRemoved(oItem=$,lData=$,oPlayer=$)
+   "The item was taken off (Item.NewUnused). Undo ItemWorn."
+   {
+      return;
    }
 
 ////////////////////////////////////////////////////
@@ -735,6 +782,88 @@ messages:
       AddPacket(4,vrName);
 
       return;
+   }
+
+   RollTier(diff_seed=1)
+   "Ours (the magic item revamp): a tier for an attribute found at this treasure difficulty "
+   "(1-10). Odds in percent, slight / moderate / potent / enormous:\n"
+   "   1-3: 70 / 30 /  0 /  0\n"
+   "   4-6: 40 / 40 / 18 /  2\n"
+   "   7-8: 15 / 40 / 35 / 10\n"
+   "  9-10:  5 / 30 / 45 / 20"
+   {
+      local iRoll, lOdds, iTier, iOdds;
+
+      diff_seed = Bound(diff_seed,1,10);
+
+      if diff_seed <= 3
+      {
+         lOdds = [70, 30, 0, 0];
+      }
+      else if diff_seed <= 6
+      {
+         lOdds = [40, 40, 18, 2];
+      }
+      else if diff_seed <= 8
+      {
+         lOdds = [15, 40, 35, 10];
+      }
+      else
+      {
+         lOdds = [5, 30, 45, 20];
+      }
+
+      iRoll = Random(1,100);
+      iTier = MAGIC_TIER_SLIGHT;
+      foreach iOdds in lOdds
+      {
+         iRoll = iRoll - iOdds;
+         if iRoll <= 0
+         {
+            return iTier;
+         }
+
+         iTier = iTier + 1;
+      }
+
+      return MAGIC_TIER_SLIGHT;
+   }
+
+   GetTier(lData=$)
+   "Our tier on an item (our node, lData), or MAGIC_TIER_NONE if we have none: we aren't "
+   "a tiered kind (vbTiered), or a spell put us on and we'll wear off (a timer)."
+   {
+      if NOT vbTiered
+         OR lData = $
+      {
+         return MAGIC_TIER_NONE;
+      }
+
+      if Send(self,@HasTimer,#lData=lData)
+      {
+         return MAGIC_TIER_NONE;
+      }
+
+      return Bound(Send(self,@TranslatePowerFromCompound,#iCompound=First(lData)),
+                   MAGIC_TIER_SLIGHT,MAGIC_TIER_ENORMOUS);
+   }
+
+   GetTierNamePart(iPower=0)
+   {
+      if iPower <= MAGIC_TIER_SLIGHT { return itematt_tier_name_slight; }
+      if iPower = MAGIC_TIER_MODERATE { return itematt_tier_name_moderate; }
+      if iPower = MAGIC_TIER_POTENT { return itematt_tier_name_potent; }
+
+      return itematt_tier_name_enormous;
+   }
+
+   GetTierWord(iPower=0)
+   {
+      if iPower <= MAGIC_TIER_SLIGHT { return itematt_tier_slight; }
+      if iPower = MAGIC_TIER_MODERATE { return itematt_tier_moderate; }
+      if iPower = MAGIC_TIER_POTENT { return itematt_tier_potent; }
+
+      return itematt_tier_enormous;
    }
 
    GetMagicColour(lData=$)

@@ -99,7 +99,16 @@ messages:
 
    ModifyDefensePower(who = $,what = $,defense_power = 0)
    {
-      return defense_power + piDefense_bonus;
+      local oAttribute;
+
+      // Ours: socketed gems' defense (it was never asked for), and our attributes' (Warding)
+      foreach oAttribute in plObject_attributes
+      {
+         defense_power = Send(oAttribute,@ModifyDefensePower,#who=who,#what=what,
+                              #defense_power=defense_power);
+      }
+
+      return defense_power + piDefense_bonus + Send(self,@GetAttributeDefense);
    }
 
    ModifyDefenseDamage(who = $,what = $,damage = $,atype = 0,aspell = 0)

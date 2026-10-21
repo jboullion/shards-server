@@ -1129,11 +1129,18 @@ messages:
 
    NewUsed(what=$, iSpecial = $)
    {
-      local oRoom, oSpell;
+      local oRoom, oSpell, i;
 
       iSpecial = piSpecial;
 
       pbIn_use = TRUE;
+
+      // Ours (the magic item revamp, phase 3): attributes that act while worn (Vitality)
+      foreach i in plItem_Attributes
+      {
+         Send(Send(SYS,@FindItemAttByNum,#num=Send(self,@GetNumFromCompound,#compound=First(i))),
+              @ItemWorn,#oItem=self,#lData=i,#oPlayer=what);
+      }
 
       Send(self,@DoPlayerArt);
 
@@ -1221,11 +1228,18 @@ messages:
 
    NewUnused(what=$, iSpecial = $)
    {
-      local oSpell;
+      local oSpell, i;
 
       iSpecial = piSpecial;
 
       pbIn_use = FALSE;
+
+      // Ours (phase 3): undo what attributes did while worn (ItemWorn)
+      foreach i in plItem_Attributes
+      {
+         Send(Send(SYS,@FindItemAttByNum,#num=Send(self,@GetNumFromCompound,#compound=First(i))),
+              @ItemRemoved,#oItem=self,#lData=i,#oPlayer=what);
+      }
 	  
       Send(self,@UndoPlayerArt);
 
@@ -2024,9 +2038,9 @@ messages:
    }
 
    GetMagicTierShown()
-   "A weapon's revealed tier (Weapon); other items have none."
+   "The tier, once revealed."
    {
-      return MAGIC_TIER_NONE;
+      return Send(self,@GetMagicTier,#bRevealedOnly=TRUE);
    }
 
    HasHiddenMagic()
@@ -2318,15 +2332,91 @@ messages:
          Send(oSuffix,@AddNamePart,#oItem=self,#lData=lSuffix);
       }
 
-      AddPacket(4,Send(self,@GetName));
+      AddPacket(4,Send(self,@GetMagicBaseName));
 
       return;
    }
 
-   AddMagicTierNamePart()
-   "A weapon's tier word (Weapon.AddMagicTierNamePart); other items have none."
+   GetMagicBaseName()
+   "Our own name inside our full name; an item whose name already says what follows can give "
+   "a shorter one (disciple robes)."
    {
-      return FALSE;
+      return Send(self,@GetName);
+   }
+
+   GetFocusSchool()
+   "The school Focus magic must be for on us (SS_*), or $ for any (itematt/armoratt/aafocus.kod)."
+   {
+      return $;
+   }
+
+   // Ours (the magic item revamp): an item's tier. Each tiered attribute carries one
+   // (ItemAttribute.GetTier: weapon and armor attributes found as treasure); the item takes
+   // the best, for its name and the ring on its icon. A weapon's tier is also a hit and
+   // damage bonus (Weapon).
+
+   GetMagicTierAttribute()
+   "The attribute whose tier the item takes, or $ if none has one."
+   {
+      local i, oItemAtt, iTier, iBest, oBest;
+
+      iBest = MAGIC_TIER_NONE;
+      oBest = $;
+      foreach i in plItem_Attributes
+      {
+         oItemAtt = Send(SYS,@FindItemAttByNum,
+                         #num=Send(self,@GetNumFromCompound,#compound=First(i)));
+         if oItemAtt <> $
+         {
+            iTier = Send(oItemAtt,@GetTier,#lData=i);
+            if iTier > iBest
+            {
+               iBest = iTier;
+               oBest = oItemAtt;
+            }
+         }
+      }
+
+      return oBest;
+   }
+
+   GetMagicTier(bRevealedOnly=FALSE)
+   "The item's tier (MAGIC_TIER_*), or MAGIC_TIER_NONE. With bRevealedOnly, only if the "
+   "attribute that sets it has been revealed."
+   {
+      local oItemAtt, lData;
+
+      oItemAtt = Send(self,@GetMagicTierAttribute);
+      if oItemAtt = $
+      {
+         return MAGIC_TIER_NONE;
+      }
+
+      lData = Send(self,@GetAttributeData,#ItemAtt=Send(oItemAtt,@GetItemAttNumber));
+      if bRevealedOnly
+         AND NOT Send(self,@GetIDStatusFromCompound,#compound=First(lData))
+      {
+         return MAGIC_TIER_NONE;
+      }
+
+      return Send(oItemAtt,@GetTier,#lData=lData);
+   }
+
+   AddMagicTierNamePart()
+   "BuildMagicNameParts: the revealed tier's word, if any. Returns whether one was added."
+   {
+      local oItemAtt, iTier;
+
+      iTier = Send(self,@GetMagicTier,#bRevealedOnly=TRUE);
+      if iTier = MAGIC_TIER_NONE
+      {
+         return FALSE;
+      }
+
+      oItemAtt = Send(self,@GetMagicTierAttribute);
+      AddPacket(4,Send(oItemAtt,@GetTierNamePart,#iPower=iTier));
+
+      return TRUE;
    }
 
    SetTimer(timer_duration=$)
@@ -2360,7 +2450,7 @@ messages:
          iNum = Send(self,@GetNumFromCompound,#compound=First(i));
          oItemAtt = Send(SYS,@FindItemAttByNum,#num=iNum);
          iModifier = iModifier + Send(oItemAtt,@ItemGetSpellModifier,
-                                      #oSpell=oSpell,#oCaster=poOwner);
+                                      #oSpell=oSpell,#oCaster=poOwner,#oItem=self,#lData=i);
       }
 
       foreach oObjectAttribute in plObject_attributes
@@ -2744,7 +2834,48 @@ messages:
                                     #resistance_list=lCurrentResistances);
       }
 
+      // Ours (the magic item revamp, phase 3): an attribute's resistance (Resistance)
+      foreach oObj in plItem_Attributes
+      {
+         lCurrentResistances = Send(Send(SYS,@FindItemAttByNum,
+                                         #num=Send(self,@GetNumFromCompound,#compound=First(oObj))),
+                                    @ItemModifyResistance,#oItem=self,#lData=oObj,
+                                    #resistance_list=lCurrentResistances);
+      }
+
       return lCurrentResistances;
+   }
+
+   GetAttributeDefense()
+   "Ours (phase 3): the defense power our attributes add while we're worn (Warding)."
+   {
+      local i, iDefense;
+
+      iDefense = 0;
+      foreach i in plItem_Attributes
+      {
+         iDefense = iDefense + Send(Send(SYS,@FindItemAttByNum,
+                                         #num=Send(self,@GetNumFromCompound,#compound=First(i))),
+                                    @ItemGetDefense,#oItem=self,#lData=i);
+      }
+
+      return iDefense;
+   }
+
+   GetAttributeBlock()
+   "Ours (phase 3): the block a shield's attributes add (Warding on a shield)."
+   {
+      local i, iBlock;
+
+      iBlock = 0;
+      foreach i in plItem_Attributes
+      {
+         iBlock = iBlock + Send(Send(SYS,@FindItemAttByNum,
+                                     #num=Send(self,@GetNumFromCompound,#compound=First(i))),
+                                @ItemGetBlock,#oItem=self,#lData=i);
+      }
+
+      return iBlock;
    }
 
    ModifyResistance(resistance_list=$)
