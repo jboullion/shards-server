@@ -251,6 +251,8 @@
    UC_SEASON = 115
    // Ours: mock bouts in the arenas (util/arenabouts.kod SendStatus, SendFloor)
    UC_ARENA = 116
+   // Ours: what a buyer would take from our inventory, and for how much (ShardsAbilities.SendSellable)
+   UC_SELLABLE = 117
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

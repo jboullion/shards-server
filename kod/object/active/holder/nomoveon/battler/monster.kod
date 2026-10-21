@@ -3240,6 +3240,18 @@ messages:
       return bAllWanted;
    }
    
+   GetOfferPrice(what = $)
+   "Ours: what a buyer pays for what (the whole stack of a number item), worked out as the "
+   "counteroffer is (Item.GetValue less the merchant's markup), for our client's Sell list."
+   {
+      local x, y;
+
+      x = Send(what,@GetValue);
+      y = x / 10 * viMerchant_markup;
+
+      return Bound(x - y,1,$);
+   }
+
    GotWantedItem(obj = $, who = $, funds=$)
    "We have been given an item on our wanted list. This is either a banker"
    "type, or a quest completion of some kind or an intrigue token."

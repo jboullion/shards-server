@@ -143,6 +143,18 @@ messages:
          return;
       }
 
+      // Our client asks a buyer what it would take before its Offer window lists anything
+      // (UC_SELLABLE back)
+      if StringEqual(sVerb,"sell")
+      {
+         if Length(words) >= 2 AND StringEqual(Nth(words,2),"list")
+         {
+            Send(self,@SendSellable,#who=who,#oNpc=what);
+         }
+
+         return;
+      }
+
       if StringEqual(sVerb,"vault")
       {
          Send(self,@Convey,#who=who,#oItem=what);
@@ -391,6 +403,74 @@ messages:
 
       AddPacket(1,BP_USERCOMMAND, 1,UC_APPRAISAL, 4,oItem,
                 1,Send(self,@IsAppraisable,#oItem=oItem), 4,iPrice);
+      SendPacket(oSession);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// sell
+
+   SendSellable(who = $,oNpc = $)
+   "UC_SELLABLE: what of who's inventory the buyer oNpc would take, and what it would pay for "
+   "each (0 when it can't say: the citizen's market prices by appraisal). Nothing for someone "
+   "who isn't a buyer in who's room. The rules are Monster.ReqOffer's."
+   {
+      local oSession, i, lItems, iCount, iPrice, bMarket, oOwner;
+
+      oSession = Send(who,@GetShardsSession);
+      oOwner = Send(who,@GetOwner);
+      if oSession = $ OR oNpc = $ OR NOT IsClass(oNpc,&Monster)
+         OR Send(oNpc,@GetOwner) <> oOwner
+      {
+         return;
+      }
+
+      lItems = $;
+      iCount = 0;
+      if Send(oNpc,@MobIsBuyer) AND Send(oNpc,@CanAcceptOffer,#who=who)
+      {
+         bMarket = (Send(oNpc,@GetOccupation) = MOB_ROLE_PMARKET);
+         foreach i in Send(who,@GetHolderPassive)
+         {
+            if Send(i,@IsInUse)
+               OR IsClass(i,&Money)
+               OR NOT Send(i,@CanBeGivenToNPC)
+               OR NOT Send(oNpc,@ObjectDesired,#what=i)
+            {
+               continue;
+            }
+
+            if bMarket
+            {
+               if NOT Send(i,@HasAttribute,#ItemAtt=IA_APPRAISE)
+                  OR NOT Send(self,@IsAppraisable,#oItem=i)
+               {
+                  continue;
+               }
+
+               iPrice = 0;
+            }
+            else
+            {
+               if Send(i,@GetValue) <= 0
+               {
+                  continue;
+               }
+
+               iPrice = Send(oNpc,@GetOfferPrice,#what=i);
+            }
+
+            lItems = Cons([i,iPrice],lItems);
+            iCount = iCount + 1;
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_SELLABLE, 4,oNpc, 2,iCount);
+      foreach i in lItems
+      {
+         AddPacket(4,First(i), 4,Nth(i,2));
+      }
+
       SendPacket(oSession);
 
       return;

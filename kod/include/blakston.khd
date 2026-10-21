@@ -136,6 +136,9 @@
    // Ours (util/cosmeticsbook.kod): a tailor or barber, which our client talks to on a
    // double-click rather than opening its shop
    MM_SERVICE              = 0x00800000
+   // Ours: an NPC that buys what players offer for shillings (MOB_BUYER), so our client
+   // shows Sell only for them (a quest NPC that merely receives things doesn't)
+   MM_BUYS                 = 0x01000000
 
    // Ours: companions (docs/adr/0010-followers.md, util/companionbook.kod). Its state:
    COMP_NONE = 0

@@ -3462,13 +3462,20 @@ messages:
          {
             // Draw dots for NPCs, and ours: their quest markers (util/questbook.kod), and
             // whether they're a tailor or barber (util/cosmeticsbook.kod)
+            // and whether they pay shillings for what we offer (MM_BUYS: MOB_BUYER)
+            iFlags = MM_NPC;
+            if Send(what,@MobIsBuyer)
+            {
+               iFlags |= MM_BUYS;
+            }
+
             if Send(what,@GetShardsService) <> 0
             {
-               return MM_NPC | MM_SERVICE
+               return iFlags | MM_SERVICE
                   | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
             }
 
-            return MM_NPC | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
+            return iFlags | Send(Send(SYS,@GetQuestBook),@MarkerFor,#viewer=self,#obj=what);
          }
          if IsClass(poOwner,&SurvivalRoom)
          {
