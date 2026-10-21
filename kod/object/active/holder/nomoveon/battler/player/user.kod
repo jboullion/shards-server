@@ -4598,6 +4598,14 @@ messages:
          return;
       }
 
+      // Ours (the magic item revamp): an elder's reveal, a smith's repair
+      if StringEqual(sVerb,"reveal") OR StringEqual(sVerb,"repair")
+      {
+         Send(Send(SYS,@GetItemServiceBook),@ServiceCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       if StringEqual(sVerb,"arena")
       {
          Send(Send(SYS,@GetArenaBouts),@ArenaCommand,#who=self,#words=lWords);

@@ -193,7 +193,7 @@ messages:
                             [ QN_PRIZETYPE_ITEMCLASS, &NeruditeArrow, 50 ] ],
                #prizelist=[[[ QN_PRIZETYPE_ITEMCLASS, &InkyCap, 10 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &Emerald, 6 ],
-                            [ QN_PRIZETYPE_ITEMCLASS, &IdentifyWand, 1 ],
+                            [ QN_PRIZETYPE_ITEMCLASS, &RevealWand, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &PurifyWand, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistColdPotion, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistFirePotion, 1 ],

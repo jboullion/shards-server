@@ -119,7 +119,7 @@ messages:
             SID_HOLY_WEAPON,
             SID_DETECT_EVIL,
             SID_HOLY_TOUCH,
-            SID_REMOVE_CURSE,
+            SID_REVEAL,
             SID_CURE_POISON,
             SID_CURE_DISEASE,
             SID_RESCUE,

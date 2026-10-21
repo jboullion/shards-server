@@ -59,6 +59,12 @@ classvars:
 
 messages:
 
+   GetShardsService()
+   "Ours (the magic item revamp, util/itemservicebook.kod): reveals magic items for a fee."
+   {
+      return SERVICE_REVEAL;
+   }
+
    SomeoneSaid(what = $,type = $,string = $,parm1 = $,parm2 = $,parm3 = $,
                parm4 = $, parm5 = $,parm6 = $,parm7 = $,parm8 = $)
    {

@@ -833,6 +833,8 @@ messages:
       Send(self,@SendOffers,#who=who,#npcobj=npcobj);
       // Ours: a tailor's or barber's menu (util/cosmeticsbook.kod)
       Send(Send(SYS,@GetCosmeticsBook),@ServiceActivated,#who=who,#npc=npcobj);
+      // ...or an elder's or smith's (util/itemservicebook.kod)
+      Send(Send(SYS,@GetItemServiceBook),@ServiceActivated,#who=who,#npc=npcobj);
 
       return;
    }

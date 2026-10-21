@@ -51,7 +51,6 @@ messages:
       plFor_sale = [
          [  
             Create(&PurifyPotion,#labelled=TRUE),
-            Create(&RemoveCursePotion,#labelled=TRUE),
             Create(&CurePoisonPotion,#labelled=TRUE),
             Create(&CureDiseasePotion,#labelled=TRUE),
             Create(&Flask),

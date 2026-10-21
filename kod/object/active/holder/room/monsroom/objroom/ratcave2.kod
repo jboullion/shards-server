@@ -370,7 +370,8 @@ messages:
                      oItemAtt = Send(SYS,@FindItemAttByNum,
                                      #num=Nth(Nth(plTreasuresList,i),4));
                      // Apply Itematt.
-                     Send(oItemAtt,@AddToItem,#oItem=oObject);
+                     // Ours (the magic item revamp): a tier rolled as for a middling monster's treasure
+                     Send(oItemAtt,@AddAsLoot,#oItem=oObject,#diff_seed=6);
                      // Put in chest.
                      Send(poChest,@NewHold,#what=oObject);
                }
@@ -382,7 +383,7 @@ messages:
                   oItemAtt = Send(SYS,@FindItemAttByNum,
                                   #num=Nth(Nth(plTreasuresList,i),4));
                   // Apply Itematt and randomize power.
-                  Send(oItemAtt,@AddToItem,#oItem=oObject,#iPower=Random(2,7));
+                  Send(oItemAtt,@AddAsLoot,#oItem=oObject,#diff_seed=8);
                   // Put in chest.
                   Send(poChest,@NewHold,#what=oObject);
                }
@@ -410,12 +411,9 @@ messages:
                           [ 1, TREASURE_SPECIAL, &Hammer, WA_PARALYZER ],
                           [ 1, TREASURE_SPECIAL, &Axe, WA_BLINDER ],
                           [ 1, TREASURE_SPECIAL, &Axe, WA_PARALYZER ],
-                          [ 1, TREASURE_SPECIAL, &PlateArmor, IA_DURABLE ],
-                          [ 1, TREASURE_SPECIAL, &Hammer, WA_SIPHON ],
-                          [ 1, TREASURE_SPECIAL, &LongSword, WA_SIPHON ],
-                          [ 1, TREASURE_POWER, &Hammer, WA_PUNISHER ],
-                          [ 1, TREASURE_POWER, &Axe, WA_PUNISHER ],
-                          [ 1, TREASURE_POWER, &LongSword, WA_PUNISHER ],
+                          [ 2, TREASURE_SPECIAL, &PlateArmor, IA_DURABLE ],
+                          [ 2, TREASURE_SPECIAL, &Hammer, WA_SIPHON ],
+                          [ 2, TREASURE_SPECIAL, &LongSword, WA_SIPHON ],
                           [ 1, TREASURE_POWER, &Hammer, IA_XP_KILL_BONUS ],
                           [ 1, TREASURE_POWER, &Axe, IA_XP_KILL_BONUS ],
                           [ 1, TREASURE_POWER, &Scimitar, IA_XP_KILL_BONUS ],

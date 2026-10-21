@@ -30,6 +30,8 @@ resources:
       "\n\nColhorr's signature is engraved on the handle of this weapon. This "
       "weapon looks to provide %s advantage - in the right hands."
    weapattexpert_name = "%s of the master"
+   weapattexpert_info = \
+      "In skilled hands: up to +%i to hit and +%i damage more, at full skill with it\n"
    expert_dm = "expert"
 
 classvars:
@@ -39,6 +41,8 @@ classvars:
    viItem_Att_Num = WA_EXPERT
    viDifficulty = 9
    vrName = weapattexpert_name
+   viNameKind = ITEMATT_NAME_SUFFIX
+   vrInfoDesc = weapattexpert_info
    vrDM_trigger = expert_dm
 
 properties:
@@ -49,24 +53,12 @@ properties:
 
 messages:
 
-   ////  Initialization Functions
-
-   InitialPower(oItem=$)
-   {
-      if oItem = $
-      {
-         Debug("This shouldn't have happened!");
-
-         return;
-      }
-
-      return Send(self,@InitialWeaponPower,#oItem=oItem);
-   }
-
    ///  Effect Functions
 
+   // Ours (the magic item revamp): on top of the weapon's tier, the tier's bonus again,
+   // scaled by the wielder's skill with the weapon. Never a penalty.
+
    ModifyDamage(damage=0,target=$,wielder=$,lData=$)
-   "Wielder gets a damage bonus, equal to (proficiency/4) - 2."
    {
       local oWeapon, iProf, iPower;
 
@@ -81,29 +73,10 @@ messages:
       iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
       iPower = Send(self,@DecipherDamageFromPower,#iPower=iPower);
 
-      if iPower = 0
-      {
-         // If no proficiency, then give a penalty to damage.
-         if iProf = 0
-         {
-            return damage - 1;
-         }
-
-         // Otherwise, no change in damage.
-         return damage;
-      }
-
-      Damage = damage - iPower;
-
-      // Results in proficiency percent of 2 * damage bonus
-      iProf = Bound(((iProf*(2*iPower))/100),1,$);
-      damage = damage + iProf;
-
-      return damage;
+      return damage + (iPower * Bound(iProf,0,100) / 100);
    }
 
    ModifyHitRoll(hitroll=0,target=$,wielder=$,lData=$)
-   "Wielder gets a bonus, equal to (proficiency/4) - 2."
    {
       local oWeapon, iProf, iPower;
 
@@ -118,25 +91,19 @@ messages:
       iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
       iPower = Send(self,@DecipherHitRollFromPower,#iPower=iPower);
 
-      if iPower = 0
-      {
-         // If no proficiency, then give a penalty to-hit.
-         if iProf = 0
-         {
-            return hitroll - 100;
-         }
+      return hitroll + (iPower * Bound(iProf,0,100) / 100);
+   }
 
-         // Otherwise, no change in to-hit.
-         return hitroll;
-      }
+   AppendOwnInfo(oItem=$)
+   {
+      local iPower;
 
-      hitroll = hitroll - iPower;
+      iPower = Send(self,@TranslatePowerFromCompound,
+                    #iCompound=First(Send(oItem,@GetAttributeData,#ItemAtt=viItem_Att_Num)));
+      AddPacket(4,vrInfoDesc, 4,Send(self,@DecipherHitRollFromPower,#iPower=iPower),
+                4,Send(self,@DecipherDamageFromPower,#iPower=iPower));
 
-      // Results in proficiency percent of 2 * to-hit bonus
-      iProf = Bound(((iProf*(2*iPower))/100),10,$);
-      hitroll = hitroll + iProf;
-
-      return hitroll;
+      return;
    }
 
    IsMagicalEffect()

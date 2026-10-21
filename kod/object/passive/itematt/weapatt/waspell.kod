@@ -36,12 +36,17 @@ resources:
       "\n\nMystical energy flits about this weapon. This weapon will cast "
       "the %s spell on the wielder."
    WeapAttSpellCaster_dm = "spellcaster"
+   WeapAttSpellCaster_name = "%s of sorcery"
+   WeapAttSpellCaster_info_target = "%i%% chance on hit to cast %s on the target\n"
+   WeapAttSpellCaster_info_self = "%i%% chance on hit to cast %s on you\n"
 
 classvars:
 
    vrDesc = WeapAttSpellCaster_desc
    vrDesc2 = WeapAttSpellCaster_desc_target
    vrDesc3 = WeapAttSpellCaster_desc_self
+   vrName = WeapAttSpellCaster_name
+   viNameKind = ITEMATT_NAME_SUFFIX
 
    viItem_Att_Num = WA_SPELLCASTER
 
@@ -161,7 +166,8 @@ messages:
       {
          Debug("Adding to item");
 
-         Send(self,@AddToItem,#oItem=oWeapon,#spellNum=iSpell,#random_gen=TRUE);
+         Send(self,@AddToItem,#oItem=oWeapon,#spellNum=iSpell,#random_gen=FALSE,
+              #diff_seed=10);
 
          return TRUE;
       }
@@ -171,9 +177,15 @@ messages:
       return FALSE;
    }
 
-   AddToItem(oItem=$,spellNum=$,oPlayer=$,identified=FALSE)
+   AddToItem(oItem=$,spellNum=$,oPlayer=$,identified=FALSE,random_gen=TRUE,iPower=$,
+             diff_seed=1)
    {
       local lData, iValue, i;
+
+      if Send(oItem,@HasAttribute,#ItemAtt=viItem_Att_Num)
+      {
+         return;
+      }
 
       lData = $;
 
@@ -205,7 +217,9 @@ messages:
       // makes new spell objects (this itematt keeps the old ones hanging around).
       lData = Cons(spellNum,lData);
 
-      iValue = Send(self,@SetCompound,#oItem=oItem,#iPower=0);
+      // Ours (the magic item revamp): a tier like any found weapon attribute
+      iValue = Send(self,@SetCompound,#oItem=oItem,#iPower=iPower,#random_gen=random_gen,
+                    #diff_seed=diff_seed);
       lData = Cons(iValue,lData);
 
       if identified
@@ -245,6 +259,24 @@ messages:
          AddPacket(4,vrDesc2, 4,Send(Send(SYS,@FindSpellByNum,
                                     #num=Nth(lData,2)),@GetName));
       }
+
+      return;
+   }
+
+   AppendOwnInfo(oItem=$)
+   {
+      local lData, rInfo;
+
+      lData = Send(oItem,@GetAttributeData,#ItemAtt=viItem_Att_Num);
+
+      rInfo = WeapAttSpellCaster_info_target;
+      if Nth(lData,2) = SID_INVISIBILITY OR Nth(lData,2) = SID_SHADOW_FORM
+      {
+         rInfo = WeapAttSpellCaster_info_self;
+      }
+
+      AddPacket(4,rInfo, 4,piEffect_percent,
+                4,Send(Send(SYS,@FindSpellByNum,#num=Nth(lData,2)),@GetName));
 
       return;
    }

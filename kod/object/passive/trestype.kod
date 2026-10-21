@@ -138,16 +138,19 @@ messages:
       // System stores a list of weapon atts at each difficulty
       // level.  Choose one.  If it returns nil list (which should
       // never happen), subtract one and choose again.
+      // Ours: diff_seed stays the level the list came from, which the attribute's
+      // tier is rolled for (it used to be passed on one too low).
       iCount = 0;
-      do
+      lOptions = Send(SYS,@GetItemAttTreasureList,#diff_seed=diff_seed);
+      while (lOptions = $ AND ++iCount < 10)
       {
-         lOptions = Send(SYS,@GetItemAttTreasureList,#diff_seed=diff_seed);
-
          if (--diff_seed < 1)
          {
             diff_seed = 10;
          }
-      } while (lOptions = $ AND ++iCount < 10);
+
+         lOptions = Send(SYS,@GetItemAttTreasureList,#diff_seed=diff_seed);
+      }
 
       // You now have a list of options.  Choose one.
 
@@ -370,8 +373,9 @@ messages:
          if vbDropItematt
             AND piDiff_seed > 0
          {
-            if Random(1,400) <= (Send(SETTINGS_OBJECT,@GetMagicItemModifier) *
-                                       piItem_Att_chance) / 100 
+            // Ours: compared in hundredths, so a small chance isn't rounded to none
+            if Random(1,40000) <= Send(SETTINGS_OBJECT,@GetMagicItemModifier) *
+                                     piItem_Att_chance
             {
                oObj = Send(self,@GenerateItemAtt,#who=who,#diff_seed=piDiff_seed);
                if oObj <> $

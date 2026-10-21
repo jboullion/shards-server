@@ -48,9 +48,12 @@ resources:
       "giving %s advantage for the undead army."
 
    weapatt_faction_duke_name = "%s of the duke"
-   weapatt_faction_princess_name = "the princess' %s"
-   weapatt_faction_rebel_name = "the rebel %s"
-   weapatt_faction_necro_name = "the necromancer %s"
+   weapatt_faction_princess_name = "%s of the princess"
+   weapatt_faction_rebel_name = "%s of the rebellion"
+   weapatt_faction_necro_name = "%s of the necromancers"
+   weapatt_faction_info = \
+      "Wielded by its faction's sworn against another faction: +%i to hit and +%i "
+      "damage more (half against the unaligned)\n"
 
    iafaction_duke_dm = "duke"
    iafaction_princess_dm = "princess"
@@ -63,6 +66,8 @@ classvars:
 
    viDifficulty = 8
    vrDM_trigger = iafaction_duke_dm
+   viNameKind = ITEMATT_NAME_SUFFIX
+   vrInfoDesc = weapatt_faction_info
 
    vbAppears_in_Happyland = FALSE
 
@@ -115,7 +120,7 @@ messages:
       return FALSE;
    }
 
-   AddSelfToRandomItem(oItem=$,who=$,iFact=FACTION_NEUTRAL)
+   AddSelfToRandomItem(oItem=$,who=$,iFact=FACTION_NEUTRAL,diff_seed=1)
    {
       if oItem = $
       {
@@ -134,7 +139,7 @@ messages:
 
       if Send(self,@ReqAddToItem,#state1=iFact,#oItem=oItem)
       {
-         Send(self,@AddToItem,#oItem=oItem,#state1=iFact);
+         Send(self,@AddToItem,#oItem=oItem,#state1=iFact,#diff_seed=diff_seed);
 
          return TRUE;
       }
@@ -142,11 +147,11 @@ messages:
       return FALSE;
    }
 
-   AddtoItem(oItem=$,state1=$)
+   AddtoItem(oItem=$,state1=$,diff_seed=1)
    {
       if state1 = $
       {
-         Send(self,@AddSelfToRandomItem,#oItem=oItem);
+         Send(self,@AddSelfToRandomItem,#oItem=oItem,#diff_seed=diff_seed);
 
          return;
       }
@@ -186,18 +191,6 @@ messages:
       }
 
       return state1;
-   }
-
-   InitialPower(oItem=$)
-   {
-      if oItem = $
-      {
-         Debug("This shouldn't have happened!");
-
-         return;
-      }
-
-      return Send(self,@InitialWeaponPower,#oItem=oItem);
    }
 
 ////////////////////////////////////////////////
@@ -296,35 +289,20 @@ messages:
 ///
 ////////////////////////////////////////////////
 
-   AppendDesc(oItem=$,lData=$,iFakeData=0,iFakePower=0)
+   AppendDesc(oItem=$,lData=$)
    {
       local iData, iPower, rPowerDesc;
 
-      iData = 0;
       if lData = $
       {
-         if iFakeData = 0
-         {
-            Debug("Got no data at all!  Bad.");
+         Debug("Got no data at all!  Bad.");
+         AddPacket(4,system_blank_resource);
 
-            return;
-         }
-
-         iData = iFakeData;
-         iPower = iFakePower;
+         return;
       }
-      else
-      {
-         if iFakeData <> 0
-         {
-            Debug("Got both real data and fake data!  Shouldn't!");
 
-            return;
-         }
-
-         iData = Nth(lData,3);
-         iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
-      }
+      iData = Nth(lData,3);
+      iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
 
       rPowerDesc = Send(self,@GetPowerDesc,#iPower=iPower);
 
@@ -349,15 +327,16 @@ messages:
       return;
    }
 
-////////////////////////////////////////////////
-///
-///  Artifice Spell Functions
-///
-////////////////////////////////////////////////
-
-   FakeAttData()
+   AppendOwnInfo(oItem=$)
    {
-      return Random(FACTION_DUKE,FACTION_NORMAL_MAX);
+      local iPower;
+
+      iPower = Send(self,@TranslatePowerFromCompound,
+                    #iCompound=First(Send(oItem,@GetAttributeData,#ItemAtt=viItem_Att_Num)));
+      AddPacket(4,vrInfoDesc, 4,Send(self,@DecipherHitRollFromPower,#iPower=iPower),
+                4,Send(self,@DecipherDamageFromPower,#iPower=iPower));
+
+      return;
    }
 
 /////////////////////////////////////////////////
@@ -366,19 +345,11 @@ messages:
 ///
 /////////////////////////////////////////////////
 
-   ItemBuildDescName(oItem=$,iFakeData=$)
+   AddNamePart(oItem=$,lData=$)
    {
-      local lData, iData;
+      local iData;
 
-      if iFakeData = $
-      {
-         lData = Send(oItem,@GetAttributeData,#ItemAtt=viItem_Att_num);
-         iData = Nth(lData,3);
-      }
-      else
-      {
-         iData = iFakeData;
-      }
+      iData = Nth(lData,3);
 
       if iData = FACTION_DUKE
       {
@@ -397,8 +368,6 @@ messages:
          // iData = FACTION_NECROMANCER
          AddPacket(4,weapatt_faction_necro_name);
       }
-
-      AddPacket(4,Send(oItem,@GetName));
 
       return;
    }

@@ -29,7 +29,8 @@ resources:
    include iatransc.lkod
 
    itematttranscendant_desc = "\n\nIt glows with a soft, white light."
-   itematttranscendant_name = "transcendant %s"
+   itematttranscendant_name = "transcendent %s"
+   itematttranscendant_info = "Stays with you when you die\n"
 
    transcendant_DM = "transcendant"
 
@@ -38,6 +39,8 @@ classvars:
    viItem_Att_Num = IA_TRANSCENDANT
    vrDesc = itematttranscendant_desc
    vrName = itematttranscendant_name
+   viNameKind = ITEMATT_NAME_PREFIX
+   vrInfoDesc = itematttranscendant_info
 
 /////////////////////////////////////////////////
 ///

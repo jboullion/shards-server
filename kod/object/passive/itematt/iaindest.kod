@@ -24,11 +24,16 @@ constants:
 resources:
 
    itematt_Indestructible_desc = "\n\nThis item is indestructible."
+   itematt_Indestructible_name = "indestructible %s"
+   itematt_Indestructible_info = "Never wears down\n"
 
 classvars:
 
    viItem_Att_Num = IA_INDESTRUCTIBLE
    vrDesc = itematt_Indestructible_desc
+   vrName = itematt_Indestructible_name
+   viNameKind = ITEMATT_NAME_PREFIX
+   vrInfoDesc = itematt_Indestructible_info
 
    viDifficulty = 5
 

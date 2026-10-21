@@ -32,12 +32,15 @@ resources:
    Poison_fail_use = "You are not yet ready to use %s%s."
    Poison_worked = "%s%s grasp the wound, screaming as the venom enters!"
    Poison_dm = "Poison"
-   Poison_info_desc = "15%% chance to cast poison on hit\n"
+   Poison_info_desc = "15%% chance on hit to poison the target\n"
+   weapattpoison_name = "%s of venom"
 
 classvars:
 
    vrDesc = weapattPoison_desc
    vrInfoDesc = Poison_info_desc
+   vrName = weapattpoison_name
+   viNameKind = ITEMATT_NAME_SUFFIX
    viItem_Att_Num = WA_POISON
 
    viDifficulty = 9
@@ -50,20 +53,6 @@ properties:
    piEffect_percent = 15
 
 messages:
-
-   ItemReqUse(oItem=$,oPlayer=$)
-   {
-      /// This person needs 50// in the weapon's proficiency to use
-      if Send(oItem,@GetProf,#who=oPlayer) < 50
-      {
-         Send(oPlayer,@MsgSendUser,#message_rsc=Poison_fail_use,
-               #parm1=Send(oItem,@GetDef),#parm2=Send(oItem,@GetName));
-
-         return FALSE;
-      }
-
-      return TRUE;
-   }
 
 ////////////////////////////////////////////////
 ///
@@ -82,7 +71,7 @@ messages:
          return damage;
       }
 
-      if Random(1,100) < piEffect_percent
+      if Random(1,100) <= piEffect_percent
       {
          iamount     = Random(2500,6500);
          iduration   = Random(80000,180000);

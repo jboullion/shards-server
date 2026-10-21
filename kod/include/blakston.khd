@@ -2165,6 +2165,22 @@
    ITEMTYPE_MASK =     0x010000
    ITEMTYPE_ROD =      0x020000
 
+   // Ours (the magic item revamp): a magic weapon's tier, kept in its weapon attribute's
+   // power digit (itematt/weapatt.kod)
+   MAGIC_TIER_NONE         = -1
+   MAGIC_TIER_SLIGHT       = 0
+   MAGIC_TIER_MODERATE     = 1
+   MAGIC_TIER_POTENT       = 2
+   MAGIC_TIER_ENORMOUS     = 3
+
+   // ...and where an attribute's word goes in a revealed item's full name (Item.BuildMagicName)
+   ITEMATT_NAME_NONE       = 0
+   ITEMATT_NAME_PREFIX     = 1
+   ITEMATT_NAME_SUFFIX     = 2
+
+   // ...and what a reveal costs at an elder (util/servicebook.kod)
+   REVEAL_FEE              = 1000
+
    // Item Attributes.  See the end of item.kod for details
    IA_DEFAULT              = 0
    IA_CORPSEPOINTER        = 1
@@ -2176,9 +2192,7 @@
    IA_SPELL_BONUS          = 7
    IA_CURSED               = 8
    IA_DURABLE              = 9
-   IA_SHROUD               = 10
    IA_ENGRAVED             = 11
-   IA_MISDIRECTION         = 12
    IA_SELL_INFO            = 13
    IA_NEW_DESCRIPTION      = 14
    IA_APPEND_DESCRIPTION   = 15
@@ -2200,17 +2214,12 @@
    WA_SPLINTERING          = 54
    WA_ATTACKSPELLTYPE      = 55
    WA_FACTION              = 56
-   WA_GUILD_HALL_DEFENDER  = 57
    WA_EXPERT               = 58
-   WA_PUNISHER             = 59
    WA_CEREMONIAL           = 60
-   WA_CURSED               = 61
    WA_ENCHANTED            = 62
    WA_BLINDER              = 63
    WA_PARALYZER            = 64
-   WA_BONKER               = 65
    WA_VAMPER               = 66
-   WA_TWISTER              = 67
    WA_SPELLCASTER          = 68
    WA_GLOWING              = 69
    WA_PURGER               = 70
@@ -2399,7 +2408,6 @@
    SID_RESIST_SHOCK = 28
    SID_RESIST_FIRE = 29
    SID_LIGHT = 30
-   SID_REMOVE_CURSE = 31
    SID_BLINK = 32
    SID_HEAT = 33
    SID_PAGE = 34
@@ -2448,12 +2456,8 @@
    SID_ILLUSIONARY_FORM = 77
    SID_ARMAGEDDON = 78
    SID_VILLIFY = 79
-   SID_IDENTIFY = 80
    SID_REVEAL = 81
-   SID_SHROUD = 82
    SID_ENGRAVE = 83
-   SID_ARTIFICE = 84
-   SID_CURSE_WEAPON = 85
    SID_ANONYMITY = 86
    SID_SPORE_BURST = 87
    SID_TRUTH     = 88
@@ -2576,7 +2580,6 @@
    SID_SUPERSTRENGTH = 17              // use SID_SUPER_STRENGTH
    SID_FORCESOFLIGHT = 27              // use SID_FORCES_OF_LIGHT
    SID_RESISTFIRE = 29                 // use SID_RESIST_FIRE
-   SID_REMOVECURSE = 31                // use SID_REMOVE_CURSE
    SID_SAND_STORM = 75                 // use SID_SANDSTORM
    SID_SUMMON_APPARITION = 101         // use SID_APPARITION
    SID_DEATHLINK = 111                 // use SID_DEATH_LINK
@@ -3117,6 +3120,13 @@
    // util/cosmeticsbook.kod), and what it costs
    SERVICE_TAILOR = 1
    SERVICE_BARBER = 2
+   // ...and (the magic item revamp, util/itemservicebook.kod) an elder who reveals magic items,
+   // for REVEAL_FEE, and a smith who repairs them: a full repair costs REPAIR_PRICE_PERCENT of
+   // the item's base value (Item.GetInitValue), never less than REPAIR_MIN_PRICE
+   SERVICE_REVEAL = 3
+   SERVICE_REPAIR = 4
+   REPAIR_PRICE_PERCENT = 50
+   REPAIR_MIN_PRICE = 10
    COSMETIC_DYE_PRICE = 250
    COSMETIC_UNDYE_PRICE = 50
    COSMETIC_HAIRCUT_PRICE = 500

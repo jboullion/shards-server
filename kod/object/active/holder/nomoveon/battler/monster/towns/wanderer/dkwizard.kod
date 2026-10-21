@@ -104,7 +104,6 @@ messages:
          $,$,
          [
             SID_SPORE_BURST,
-            SID_CURSE_WEAPON,
             SID_DEATHLINK,
             SID_GAZE_OF_THE_BASILISK,
             SID_ANIMATE,

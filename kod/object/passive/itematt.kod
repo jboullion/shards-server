@@ -57,6 +57,9 @@ classvars:
    vrDM_Trigger = $
    vbAppears_in_Happyland = TRUE
 
+   // Ours: where vrName goes in a revealed item's full name (GetNameKind)
+   viNameKind = ITEMATT_NAME_NONE
+
    // Whether users can add special attributes (e.g. via blood inheritance)
    // if this attribute is present.
    vbAllowSpecialAttributes = TRUE
@@ -183,11 +186,14 @@ messages:
       }
 
       // Okay, they've chosen our itematt.  Most of the time, let's just
-      // apply ourselves using the 'random' thing we use to make treasure.
-      return Send(self,@AddSelfToRandomItem,#oItem=oWeapon,#who=who);
+      // apply ourselves using the 'random' thing we use to make treasure
+      // (ours: at the hardest treasure's tier odds).
+      return Send(self,@AddSelfToRandomItem,#oItem=oWeapon,#who=who,#diff_seed=10);
    }
 
    AddSelfToRandomItem(oItem=$,who=$,diff_seed=1)
+   "Treasure: put ourselves on oItem, unrevealed, at a power rolled for diff_seed "
+   "(InitialPower; a weapon attribute's tier, WeaponAttribute.RollTier)."
    {
       if oItem = $
       {
@@ -196,12 +202,37 @@ messages:
 
       if Send(self,@ReqAddToItem,#oItem=oItem)
       {
-         Send(self,@AddToItem,#oItem=oItem,#iPower = 4,#diff_seed=diff_seed);
+         Send(self,@AddToItem,#oItem=oItem,#diff_seed=diff_seed);
 
          return TRUE;
       }
 
       return FALSE;
+   }
+
+   AddAsLoot(oItem=$,diff_seed=1,bRevealed=FALSE)
+   "Ours (the magic item revamp): for loot that names its attribute rather than rolling "
+   "one (gift boxes, chests, invasion rewards, Blood Inheritance): put ourselves on oItem "
+   "as treasure does, if we belong on it (ReqAddToItem), and reveal it if bRevealed. "
+   "Returns whether we were added."
+   {
+      if oItem = $
+         OR Send(oItem,@HasAttribute,#ItemAtt=viItem_Att_Num)
+      {
+         return FALSE;
+      }
+
+      if NOT Send(self,@AddSelfToRandomItem,#oItem=oItem,#diff_seed=diff_seed)
+      {
+         return FALSE;
+      }
+
+      if bRevealed
+      {
+         Send(oItem,@RevealHiddenAttributes);
+      }
+
+      return TRUE;
    }
 
 ////////////////////////////////////////////////
@@ -633,16 +664,6 @@ messages:
       return;
    }
 
-   CanBeSpoofed()
-   {
-      return TRUE;
-   }
-
-   FakeAttData()
-   {
-      return $;
-   }
-
 /////////////////////////////////////////////////
 ///
 ///  Value Functions
@@ -676,8 +697,9 @@ messages:
       /// don't make these too high.  Multiple item atts can knock an item value
       /// sky high.
 
+      // Ours: a weapon's tier (0-3) counts three steps of the old 0-9 power
       iPower = Send(self,@TranslatePowerFromCompound,#iCompound=iCompound);
-      iPower_mod = piValue_power_modifier * iPower;
+      iPower_mod = piValue_power_modifier * iPower * 3;
 
       return (value * (piValue_Modifier + iPower_mod) / 100);
    }
@@ -696,10 +718,19 @@ messages:
       return viDifficulty;
    }
 
-   ItemBuildDescName(oItem=$)
+   GetNameKind(lData=$)
+   "Ours (the magic item revamp): whether we add a word before the item's name in its full "
+   "name (ITEMATT_NAME_PREFIX, 'durable %s'), a phrase after it (ITEMATT_NAME_SUFFIX, "
+   "'%s of siphoning') or nothing (ITEMATT_NAME_NONE). Item.BuildMagicName."
+   {
+      return viNameKind;
+   }
+
+   AddNamePart(oItem=$,lData=$)
+   "Our part of the item's full name: one resource with a single %s, which the rest of "
+   "the name fills."
    {
       AddPacket(4,vrName);
-      AddPacket(4,Send(oItem,@GetName));
 
       return;
    }

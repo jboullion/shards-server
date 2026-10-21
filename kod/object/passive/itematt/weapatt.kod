@@ -8,7 +8,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-WeaponAttribute is ItemAttribute 
+WeaponAttribute is ItemAttribute
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Weapon Attributes, added 5 March 97 by Damion Schubert
@@ -25,6 +25,13 @@ WeaponAttribute is ItemAttribute
 //   hit percentage, that item needs to be added to the player's AttMod list.
 //   Weapons do not.
 //
+//   Ours (the magic item revamp): every permanent weapon attribute carries a
+//   tier in its power digit, slight to enormous (MAGIC_TIER_*), rolled from
+//   the difficulty of whatever dropped it (RollTier). The weapon takes the
+//   best tier's hit and damage bonus once (Weapon.GetMagicTier), on top of
+//   whatever the attribute itself does. Attributes put on by spells (they
+//   have a timer) carry no tier.
+//
 //   See item.kod for notes on implementation and structure used for ItemAtts
 //   on a per item basis.
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,16 +44,24 @@ resources:
 
    include weapatt.lkod
 
+   // Inside descriptions: "this weapon looks to provide %s advantage"
    weapatt_slight = "a slight"
-   weapatt_small = "a small"
-   weapatt_swift = "a swift"
    weapatt_moderate = "a moderate"
-   weapatt_damaging = "a damaging"
-   weapatt_solid = "a solid"
    weapatt_potent = "a potent"
-   weapatt_severe = "a severe"
    weapatt_enormous = "an enormous"
-   weapatt_crushing = "a crushing"
+
+   // In a revealed weapon's full name
+   weapatt_name_slight = "slight %s"
+   weapatt_name_moderate = "moderate %s"
+   weapatt_name_potent = "potent %s"
+   weapatt_name_enormous = "enormous %s"
+
+   // In the stats block
+   weapatt_tier_slight = "Slight"
+   weapatt_tier_moderate = "Moderate"
+   weapatt_tier_potent = "Potent"
+   weapatt_tier_enormous = "Enormous"
+   weapatt_tier_info = "%s magic: +%i to hit, +%i damage\n"
 
 classvars:
 
@@ -61,9 +76,9 @@ messages:
    SetItemsToAttribute()
    {
       // This is used by the weapon attribute when trestype decides
-      //  to apply this weapatt to a weapon.  The number given is a 
+      //  to apply this weapatt to a weapon.  The number given is a
       //  very approximate percentage of the chance that that particular
-      //  weapon will be the one created.  This will be modified by 
+      //  weapon will be the one created.  This will be modified by
       //  other factors, so that higher level characters are more likely
       //  to get better stuff.
 
@@ -80,162 +95,130 @@ messages:
 
 ////////////////////////////////////////////////
 ///
-///  Weapon Power
+///  Weapon Tier
 ///
 ////////////////////////////////////////////////
 
-   InitialWeaponPower(oItem=$)
+   InitialPower(oItem=$,diff_seed=1)
    {
-      local iRoll_number, iRand, iNumber, iSum, jIndex, iCount;
+      return Send(self,@RollTier,#diff_seed=diff_seed);
+   }
 
-      if oItem = $ or not IsClass(oItem,&weapon)
+   RollTier(diff_seed=1)
+   "A tier for a weapon found at this treasure difficulty (1-10). Odds in percent, "
+   "slight / moderate / potent / enormous:\n"
+   "   1-3: 70 / 30 /  0 /  0\n"
+   "   4-6: 40 / 40 / 18 /  2\n"
+   "   7-8: 15 / 40 / 35 / 10\n"
+   "  9-10:  5 / 30 / 45 / 20"
+   {
+      local iRoll, lOdds, iTier, iOdds;
+
+      diff_seed = Bound(diff_seed,1,10);
+
+      if diff_seed <= 3
       {
-         Debug("Called InitialWeaponPower with bad oItem!");
+         lOdds = [70, 30, 0, 0];
+      }
+      else if diff_seed <= 6
+      {
+         lOdds = [40, 40, 18, 2];
+      }
+      else if diff_seed <= 8
+      {
+         lOdds = [15, 40, 35, 10];
+      }
+      else
+      {
+         lOdds = [5, 30, 45, 20];
       }
 
-      // This determines how good certain weapon attributes are.
-      // For example, both guildhall and factions swords can have
-      // weapons of different strengths.  The standard weapons power
-      // table is as follows:
-      //
-      //  Power    +to-hit    +damage    description   rarity (from 100)
-      //    0        50          0        slight         19//
-      //    1         0          1        small          17//
-      //    2       100          0        swift          15//
-      //    3        50          1        moderate       13//
-      //    4         0          2        damaging       11//          
-      //    5       100          1        good            9//
-      //    6        50          2        potent          7//
-      //    7       150          0        severe          5//
-      //    8       100          2        enormous        3//
-      //    9         0          3        crushing        1//
-
-      // roll numbers:  each weapon gets iRoll_number rolls, and takes 
-      // the highest one.  Result: better maces and short swords floating
-      // around.
-
-      iRoll_number = 1;
-      
-      if IsClass(oItem,&Axe) OR IsClass(oItem,&Hammer)
+      iRoll = Random(1,100);
+      iTier = MAGIC_TIER_SLIGHT;
+      foreach iOdds in lOdds
       {
-         iRoll_number = 2;
-      }
-
-      if IsClass(oItem,&Mace) OR IsClass(oItem,&Shortsword)
-      {
-         iRoll_number = 3;
-      }
-
-      iNumber = 0;
-      while (iRoll_number > 0)
-      {
-         iRand = Random(1,99);
-         if iRand > iNumber
+         iRoll = iRoll - iOdds;
+         if iRoll <= 0
          {
-            iNumber = iRand;
-         }
-         iRoll_number = iRoll_number - 1;
-      }
-
-      // this should give us the highest value of 1,2, or 3 rolls.
-      // now find the power given by this value.
-
-      // jIndex goes down by 2 each turn,
-      jIndex = 19;
-
-      // iSum is sum of all jIndices.
-      iSum = jIndex;
-
-      // Count is the final bonus for the weapon, 0-9
-      iCount = 0;
-
-
-      while (iCount < 10)
-      {
-         if iNumber < iSum
-         {
-            return iCount;
+            return iTier;
          }
 
-         iCount = iCount + 1;
-         jIndex = jIndex - 2;
-         iSum = iSum + jIndex;
+         iTier = iTier + 1;
       }
 
-      Debug("Shouldn't have gotten here!");
-
-      return 0;             /// if we somehow get here, return a wimp value.
+      return MAGIC_TIER_SLIGHT;
    }
 
-   DecipherDamageFromPower(iPower=-1)
+   GetTier(lData=$)
+   "This attribute's tier on a weapon (its node, lData), or MAGIC_TIER_NONE if it has "
+   "none: it was put on by a spell and will wear off."
    {
-      if iPower = -1 
+      if lData = $
+         OR Send(self,@HasTimer,#lData=lData)
       {
-         Debug("Invalid Data, must pass a power to this");
-
-         return;
+         return MAGIC_TIER_NONE;
       }
 
-      if iPower = 0  { return 0; }
-      if iPower = 1  { return 1; }
-      if iPower = 2  { return 0; }
-      if iPower = 3  { return 1; }
-      if iPower = 4  { return 2; }
-      if iPower = 5  { return 1; }
-      if iPower = 6  { return 2; }
-      if iPower = 7  { return 0; }
-      if iPower = 8  { return 2; }
-      if iPower = 9  { return 3; }
-
-      Debug("invalid power data!");
-
-      return 0;
+      return Bound(Send(self,@TranslatePowerFromCompound,#iCompound=First(lData)),
+                   MAGIC_TIER_SLIGHT,MAGIC_TIER_ENORMOUS);
    }
 
-   DecipherHitRollFromPower(iPower=-1)
-   {      
-      if iPower = -1 
-      {
-         Debug("Invalid Data, must pass a power to this");
-
-         return;
-      }
-
-      if iPower = 0  { return 50; }
-      if iPower = 1  { return 0; }
-      if iPower = 2  { return 100; }
-      if iPower = 3  { return 50; }
-      if iPower = 4  { return 0; }
-      if iPower = 5  { return 100; }
-      if iPower = 6  { return 50; }
-      if iPower = 7  { return 150; }
-      if iPower = 8  { return 100; }
-      if iPower = 9  { return 0; }
-
-      Debug("invalid power data!");
-
-      return 0;
-   }
-
-   GetPowerDesc(iPower=$)
+   DecipherDamageFromPower(iPower=0)
+   "A tier's damage bonus."
    {
-      if iPower = 0 { return weapatt_slight; }
-      if iPower = 1 { return weapatt_small; }
-      if iPower = 2 { return weapatt_swift; }
-      if iPower = 3 { return weapatt_moderate; }
-      if iPower = 4 { return weapatt_damaging; }
-      if iPower = 5 { return weapatt_solid; }
-      if iPower = 6 { return weapatt_potent; }
-      if iPower = 7 { return weapatt_severe; }
-      if iPower = 8 { return weapatt_enormous; }
-      if iPower = 9 { return weapatt_crushing; }
+      if iPower <= MAGIC_TIER_MODERATE
+      {
+         return 1;
+      }
 
-      Debug("invalid power data!");
-      return;
+      if iPower = MAGIC_TIER_POTENT
+      {
+         return 2;
+      }
+
+      return 3;
+   }
+
+   DecipherHitRollFromPower(iPower=0)
+   "A tier's to-hit bonus."
+   {
+      if iPower <= MAGIC_TIER_SLIGHT
+      {
+         return 25;
+      }
+
+      return 50;
+   }
+
+   GetPowerDesc(iPower=0)
+   {
+      if iPower <= MAGIC_TIER_SLIGHT { return weapatt_slight; }
+      if iPower = MAGIC_TIER_MODERATE { return weapatt_moderate; }
+      if iPower = MAGIC_TIER_POTENT { return weapatt_potent; }
+
+      return weapatt_enormous;
+   }
+
+   GetTierNamePart(iPower=0)
+   {
+      if iPower <= MAGIC_TIER_SLIGHT { return weapatt_name_slight; }
+      if iPower = MAGIC_TIER_MODERATE { return weapatt_name_moderate; }
+      if iPower = MAGIC_TIER_POTENT { return weapatt_name_potent; }
+
+      return weapatt_name_enormous;
+   }
+
+   GetTierWord(iPower=0)
+   {
+      if iPower <= MAGIC_TIER_SLIGHT { return weapatt_tier_slight; }
+      if iPower = MAGIC_TIER_MODERATE { return weapatt_tier_moderate; }
+      if iPower = MAGIC_TIER_POTENT { return weapatt_tier_potent; }
+
+      return weapatt_tier_enormous;
    }
 
    //// Effect Functions
-   
+
    ModifyDamage(damage=0,target=$,wielder=$)
    "Item Attributes, in general, should only + or - damage."
    {
@@ -250,17 +233,14 @@ messages:
 
    //// Infrastructure (Adding and removing a ItemAtt from an item.)
 
-   AppendDesc(oItem=$,lData=$,iFakeData=0,iFakePower=0)
+   AppendDesc(oItem=$,lData=$)
    {
       local iPower;
 
       if vbPowerDesc
       {
-         if lData = $
-         {
-            iPower = iFakePower;
-         }
-         else
+         iPower = MAGIC_TIER_SLIGHT;
+         if lData <> $
          {
             iPower = Send(self,@TranslatePowerFromCompound,
                            #iCompound=First(lData));
@@ -272,6 +252,47 @@ messages:
       }
 
       propagate;
+   }
+
+   GetInfoDesc()
+   "Every weapon attribute can show the weapon's tier in the stats block."
+   {
+      return weapatt_tier_info;
+   }
+
+   AppendDescInfo(oItem = $,compound = $)
+   "Once revealed: the weapon's tier line, if this attribute is the one that sets it "
+   "(Weapon.GetMagicTierAttribute), then what this attribute does (AppendOwnInfo)."
+   {
+      local iTier;
+
+      if NOT Send(oItem,@GetIDStatusFromCompound,#compound=compound)
+      {
+         AddPacket(4,system_blank_resource);
+
+         return;
+      }
+
+      if Send(oItem,@GetMagicTierAttribute) = self
+      {
+         iTier = Send(oItem,@GetMagicTier);
+         AddPacket(4,system_rsc_template_2,
+                   4,weapatt_tier_info, 4,Send(self,@GetTierWord,#iPower=iTier),
+                   4,Send(self,@DecipherHitRollFromPower,#iPower=iTier),
+                   4,Send(self,@DecipherDamageFromPower,#iPower=iTier));
+      }
+
+      Send(self,@AppendOwnInfo,#oItem=oItem);
+
+      return;
+   }
+
+   AppendOwnInfo(oItem=$)
+   "What this attribute does, for the stats block; one resource and its parameters."
+   {
+      AddPacket(4,vrInfoDesc);
+
+      return;
    }
 
    ReqAddToItem(oItem=$)

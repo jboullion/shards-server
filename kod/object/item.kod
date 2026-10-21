@@ -40,7 +40,11 @@ resources:
 
    itematt_generic = \
       "\n\nAt first glance, it seems quite ordinary, but there is something odd "
-      "about it you can't put your finger on."
+      "about it you can't put your finger on. The elders of Jasper, Marion and Raza, "
+      "or the Reveal spell, could tell you what."
+
+   // Ours (the magic item revamp): a revealed magic item's full name (BuildMagicName)
+   item_magic_name = "~B%s~n\n\n"
 
    nakedleftarm_male = blg.bgf
    nakedrightarm_male = brg.bgf
@@ -828,17 +832,17 @@ messages:
 
       AddPacket(4,item_desc_template);
 
+      // Ours (the magic item revamp): a revealed magic item opens with its full name, e.g.
+      // "potent durable longsword of siphoning" (BuildMagicName)
+      if Send(self,@HasRevealedMagicName)
+      {
+         AddPacket(4,system_rsc_template_2);
+         Send(self,@BuildMagicName);
+      }
+
       Send(self,@DoBaseDesc);
 
-
-      if Send(self,@HasAttribute,#ItemAtt=IA_MISDIRECTION)
-         AND NOT bShowAll
-      {
-         oItemAtt = Send(SYS,@FindItemAttByNum,#num=IA_MISDIRECTION);
-         Send(oItemAtt,@AppendMisdirectedDesc,#oItem=self,
-               #lData=Send(self,@GetAttributeData,#ItemAtt=IA_MISDIRECTION));
-      }
-      else if plItem_Attributes <> $
+      if plItem_Attributes <> $
       {
          // Support for displaying up to 12 itematts.
          if Length(plItem_Attributes) > 1
@@ -1453,19 +1457,10 @@ messages:
    }
 
    ItemBrokenInBattle()
+   "Ours (the magic item revamp): a broken item keeps its magic; it can't be used "
+   "until it's mended (the Mend spell, or a smith: util/servicebook.kod)."
    {
-      local i, oItemAtt, iNum;
-
-      // Remove itematts from us, since we're not gonna use 'em anymore.
-      // This also lets cursed items finally remove themselves from us.
-      foreach i in plItem_Attributes
-      {
-         iNum = Send(self,@GetNumFromCompound,#compound=First(i));
-         oItemAtt = Send(SYS,@FindItemAttByNum,#num=iNum);
-         Send(oItemAtt,@RemoveFromItem,#oItem=self);
-      }
-   
-      Send(poOwner,@SomethingChanged,#what=self);        
+      Send(poOwner,@SomethingChanged,#what=self);
       Send(poOwner,@MsgSendUser,#message_rsc=vrItem_broken,
            #parm1=Send(self,@GetName));
       Send(poOwner,@TryUnuseItem,#what=self);
@@ -1664,46 +1659,10 @@ messages:
    }
 
    CanEnchant(oSpell = $)
-   "Can a particular spell enchantment target this item.  Note that for "
-   "artifice and shroud, this is true, but for curse and the three "
-   "enchantments, this is false."
+   "Can a particular spell enchantment target this item. Only weapons take "
+   "the weapon enchantments (Weapon.CanEnchant); Shroud, the one spell this "
+   "used to allow, is gone (the magic item revamp)."
    {
-      local i, oItemAtt, iSpell, iNum;
-
-      iSpell = Send(oSpell,@GetSpellNum);
-      if iSpell = SID_HOLY_WEAPON
-         OR iSpell = SID_UNHOLY_WEAPON
-         OR iSpell = SID_ENCHANT_WEAPON
-         OR iSpell = SID_CURSE_WEAPON
-      {
-         return FALSE;
-      }
-
-      if iSpell = SID_SHROUD
-      AND (IsClass(self,&Weapon)
-         OR IsClass(self,&DefenseModifier))
-      {
-         foreach i in plItem_Attributes
-         {
-            iNum = Send(self,@GetNumFromCompound,#compound=First(i));
-            oItemAtt = Send(SYS,@FindItemAttByNum,#num=iNum);
-                            
-            if oItemAtt = $
-            {
-               Debug("Illegal ItemAtt in list!");
-               
-               continue;
-            }
-            
-            if NOT Send(oItemAtt,@ItemCanEnchant,#oItem=self)
-            {
-               return FALSE;
-            }
-         }
-
-         return TRUE;
-      }
-
       return FALSE;
    }
 
@@ -1990,6 +1949,28 @@ messages:
       return FALSE;
    }
 
+   HasHiddenMagic()
+   "Ours (the magic item revamp): whether an elder could reveal something about us "
+   "(util/itemservicebook.kod): an attribute not yet revealed, that may be."
+   {
+      local i;
+
+      if NOT Send(self,@CanIdentify)
+      {
+         return FALSE;
+      }
+
+      foreach i in plItem_Attributes
+      {
+         if NOT Send(self,@GetIDStatusFromCompound,#compound=First(i))
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
    RevealHiddenAttributes()
    {
       local i, bDone;
@@ -2165,43 +2146,91 @@ messages:
       return;
    }
 
-   BuildDescName()
+   // Ours (the magic item revamp): a revealed magic item's full name, for the top of its
+   // description: the weapon's tier, then every revealed attribute that adds a word
+   // before the name, the item's own name, and the best one that adds a phrase after it.
+   // "potent durable longsword of siphoning". Each part is a resource with one %s that
+   // the rest of the name fills.
+
+   HasRevealedMagicName()
    {
-      local i, iHigh_index, oHigh_obj, oItemAtt, iPriority, iNum;
+      local i, oItemAtt;
 
-      if plItem_Attributes = $
-      {
-         propagate;
-      }
-
-      iHigh_index = 0;  oHigh_obj = $;
       foreach i in plItem_Attributes
       {
          if NOT Send(self,@GetIDStatusFromCompound,#compound=First(i))
          {
-            // If not identified, keep on marching.
             continue;
          }
 
-         iNum = Send(self,@GetNumFromCompound,#compound=First(i));
-         oItemAtt = Send(SYS,@FindItemAttByNum,#num=iNum);
-
-         iPriority = Send(oItemAtt,@GetNamePriority);
-         if iPriority > iHigh_index
+         oItemAtt = Send(SYS,@FindItemAttByNum,
+                         #num=Send(self,@GetNumFromCompound,#compound=First(i)));
+         if oItemAtt <> $
+            AND Send(oItemAtt,@GetNameKind,#lData=i) <> ITEMATT_NAME_NONE
          {
-            iHigh_index = iPriority;
-            oHigh_obj = oItemAtt;
+            return TRUE;
          }
       }
 
-      if oHigh_obj = $
+      return FALSE;
+   }
+
+   BuildMagicName()
+   {
+      local i, oItemAtt, iKind, oSuffix, lSuffix, iPriority, iBest;
+
+      AddPacket(4,item_magic_name);
+
+      Send(self,@AddMagicTierNamePart);
+
+      oSuffix = $;
+      lSuffix = $;
+      iBest = -1;
+      foreach i in plItem_Attributes
       {
-         propagate;
+         if NOT Send(self,@GetIDStatusFromCompound,#compound=First(i))
+         {
+            continue;
+         }
+
+         oItemAtt = Send(SYS,@FindItemAttByNum,
+                         #num=Send(self,@GetNumFromCompound,#compound=First(i)));
+         if oItemAtt = $
+         {
+            continue;
+         }
+
+         iKind = Send(oItemAtt,@GetNameKind,#lData=i);
+         if iKind = ITEMATT_NAME_PREFIX
+         {
+            Send(oItemAtt,@AddNamePart,#oItem=self,#lData=i);
+         }
+         else if iKind = ITEMATT_NAME_SUFFIX
+         {
+            iPriority = Send(oItemAtt,@GetNamePriority);
+            if iPriority > iBest
+            {
+               iBest = iPriority;
+               oSuffix = oItemAtt;
+               lSuffix = i;
+            }
+         }
       }
 
-      Send(oHigh_obj,@ItemBuildDescName,#oItem=self);
+      if oSuffix <> $
+      {
+         Send(oSuffix,@AddNamePart,#oItem=self,#lData=lSuffix);
+      }
+
+      AddPacket(4,Send(self,@GetName));
 
       return;
+   }
+
+   AddMagicTierNamePart()
+   "A weapon's tier word (Weapon.AddMagicTierNamePart); other items have none."
+   {
+      return FALSE;
    }
 
    SetTimer(timer_duration=$)

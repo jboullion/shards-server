@@ -59,6 +59,12 @@ properties:
 
 messages:
 
+   GetShardsService()
+   "Ours (the magic item revamp, util/itemservicebook.kod): reveals magic items for a fee."
+   {
+      return SERVICE_REVEAL;
+   }
+
    Constructor()
    {
       plWantedItems = [&StatsResetToken];

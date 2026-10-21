@@ -409,8 +409,7 @@ messages:
       {
          oWeaponUsed = Send(what,@LookupPlayerWeapon);
          if oWeaponUsed <> $
-            AND (Send(what,@FindHoldingActive,#class=&HunterSword) <> $
-               OR Send(oWeaponUsed,@GetAttributeData,#ItemAtt=WA_PUNISHER) <> $)
+            AND Send(what,@FindHoldingActive,#class=&HunterSword) <> $
          {
             return FALSE;
          }

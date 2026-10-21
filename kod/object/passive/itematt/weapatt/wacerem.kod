@@ -12,9 +12,9 @@ WeapAttCeremonial is WeaponAttribute
 
 ///////////////////////////////////////////////////////////////////////
 //
-//   This Weapon Attribute offers a +Power bonus in the arena, but a -Power
-//   damage penalty anywhere else.  Power is determined using standard
-//   WeapAtt powers table.
+//   This Weapon Attribute offers a +Power bonus in the arena (ours: and no
+//   longer a penalty anywhere else).  Power is the weapon's tier, from the
+//   WeapAtt tier table.
 //
 //  Form is:
 //
@@ -34,6 +34,7 @@ resources:
       "\n\nBeautiful and ornate, this weapon is obviously unsuitable for blood "
       "combat, though it might provide %s edge in games and tourneys."
    weapatt_ceremonial_name = "ceremonial %s"
+   weapatt_ceremonial_info = "In the arena: +%i to hit and +%i damage more\n"
    ceremonial_dm = "ceremonial"
 
 classvars:
@@ -44,6 +45,9 @@ classvars:
    viDamage_bonus = 2
    viDifficulty = 5
    vrDM_Trigger = ceremonial_dm
+   vrName = weapatt_ceremonial_name
+   viNameKind = ITEMATT_NAME_PREFIX
+   vrInfoDesc = weapatt_ceremonial_info
 
 properties:
 
@@ -54,30 +58,14 @@ messages:
 
 ////////////////////////////////////////////////
 ///
-///  Initialization Functions
-///
-////////////////////////////////////////////////
-
-   InitialPower(oItem=$)
-   {
-      if oItem = $
-      {
-         Debug("This shouldn't have happened!");
-
-         return;
-      }
-
-      return Send(self,@InitialWeaponPower,#oItem=oItem);
-   }
-
-////////////////////////////////////////////////
-///
 ///  Effect Functions
 ///
 ////////////////////////////////////////////////
 
+   // Ours (the magic item revamp): the tier's bonus again in the arena, and no penalty
+   // anywhere else.
+
    ModifyHitRoll(hitroll=0,target=$,wielder=$,lData=$)
-   "Give a +power bonus in the arena, but -power everywhere else."
    {
       local oRoom, iPower;
 
@@ -86,21 +74,19 @@ messages:
          return hitroll;
       }
 
-      iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
-      iPower = Send(self,@DecipherHitRollFromPower,#iPower=iPower);
-
       oRoom = Send(wielder,@GetOwner);
-
-      if Send(oRoom,@CheckRoomFlag,#flag=ROOM_SAFE_DEATH)
+      if oRoom = $
+         OR NOT Send(oRoom,@CheckRoomFlag,#flag=ROOM_SAFE_DEATH)
       {
-         return (hitroll + iPower);
+         return hitroll;
       }
 
-      return (hitroll - iPower);
+      iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
+
+      return hitroll + Send(self,@DecipherHitRollFromPower,#iPower=iPower);
    }
 
    ModifyDamage(damage=0,target=$,wielder=$,lData=$)
-   "Give a +power bonus in the arena, but -power everywhere else."
    {
       local oRoom, iPower;
 
@@ -109,17 +95,28 @@ messages:
          return damage;
       }
 
-      iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
-      iPower = Send(self,@DecipherDamageFromPower,#iPower=iPower);
-
       oRoom = Send(wielder,@GetOwner);
-
-      if Send(oRoom,@CheckRoomFlag,#flag=ROOM_SAFE_DEATH)
+      if oRoom = $
+         OR NOT Send(oRoom,@CheckRoomFlag,#flag=ROOM_SAFE_DEATH)
       {
-         return (damage + iPower);
+         return damage;
       }
 
-      return (damage - iPower);
+      iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
+
+      return damage + Send(self,@DecipherDamageFromPower,#iPower=iPower);
+   }
+
+   AppendOwnInfo(oItem=$)
+   {
+      local iPower;
+
+      iPower = Send(self,@TranslatePowerFromCompound,
+                    #iCompound=First(Send(oItem,@GetAttributeData,#ItemAtt=viItem_Att_Num)));
+      AddPacket(4,vrInfoDesc, 4,Send(self,@DecipherHitRollFromPower,#iPower=iPower),
+                4,Send(self,@DecipherDamageFromPower,#iPower=iPower));
+
+      return;
    }
 
    IsMagicalEffect()

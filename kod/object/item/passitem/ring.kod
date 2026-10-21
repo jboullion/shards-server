@@ -66,6 +66,17 @@ messages:
       return TRUE;
    }
 
+   HasHiddenMagic()
+   "Ours: an unknown ring is a 'magical ring' until revealed."
+   {
+      if vrName <> vrRealName
+      {
+         return TRUE;
+      }
+
+      propagate;
+   }
+
    RevealHiddenAttributes()
    {
       if vrName <> vrRealName

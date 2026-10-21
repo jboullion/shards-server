@@ -30,6 +30,7 @@ resources:
 
    weapattglowing_desc = "\n\nIt glows softly like a torch."
    weapattglowing_name = "glowing %s"
+   weapattglowing_info = "Gives off light while wielded\n"
 
    waglowing_gone = "Your %s stops glowing."
    glowing_dm = "glowing"
@@ -39,6 +40,8 @@ classvars:
    viItem_Att_Num = WA_GLOWING
    vrDesc = weapattglowing_desc
    vrName = weapattglowing_name
+   viNameKind = ITEMATT_NAME_PREFIX
+   vrInfoDesc = weapattglowing_info
 
    vrDM_Trigger = glowing_dm
 
@@ -63,10 +66,10 @@ messages:
 
       if StringContain(string,glowing_dm)
       {
-         // If DM created, it's 100 light (more than the spell allows)
-         //  and 35 hours in duration.
+         // If DM created, it's 100 light (more than the spell allows),
+         //  and (ours) for good, at the best tier.
          Send(self,@AddToItem,#oItem=oWeapon,#random_gen=FALSE,
-              #timer_duration=(35*60*60*1000),#state1=100);
+              #state1=100,#diff_seed=10);
 
          return TRUE;
       }
@@ -99,7 +102,9 @@ messages:
       return;
    }
 
-   AddSelfToRandomItem(oItem=$)
+   AddSelfToRandomItem(oItem=$,who=$,diff_seed=1)
+   "Treasure: ours (the magic item revamp) glows for good, with a tier. The Glow "
+   "spell's wears off (it has a timer)."
    {
       local iGlowLevel;
 
@@ -112,8 +117,8 @@ messages:
 
       if Send(self,@ReqAddToItem,#state1=iGlowLevel,#oItem=oItem)
       {
-         Send(self,@AddToItem,#oItem=oItem,#state1=iGlowLevel,
-               #timer_duration=random(3600000,86400000),#random_gen=TRUE);
+         Send(self,@AddToItem,#oItem=oItem,#state1=iGlowLevel,#random_gen=TRUE,
+              #diff_seed=diff_seed);
 
          return TRUE;
       }
@@ -129,8 +134,19 @@ messages:
    ////  Timer Functions
 
    HasTimer(lData=$)
+   "Only the spell's version has a timer."
    {
-      return TRUE;
+      if lData = $
+      {
+         return FALSE;
+      }
+
+      if Length(lData) < 2
+      {
+         return FALSE;
+      }
+
+      return Nth(lData,2) <> $;
    }
 
    TimerExpired(oItem=$,lData=$)

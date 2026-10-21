@@ -118,9 +118,7 @@ messages:
             SKID_BLOCK 
          ],
          [ 
-            SID_IDENTIFY,
             SID_REVEAL,
-            SID_SHROUD,
             SID_DISPEL_ILLUSION,
             SID_HASTE,
             SID_RESIST_POISON,
@@ -141,9 +139,7 @@ messages:
             SKID_BLOCK 
          ],
          [ 
-            SID_IDENTIFY,
             SID_REVEAL,
-            SID_SHROUD,
             SID_DISPEL_ILLUSION,
             SID_HASTE,
             SID_RESIST_POISON,

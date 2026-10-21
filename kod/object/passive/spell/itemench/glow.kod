@@ -34,6 +34,7 @@ resources:
    GlowWeapon_no_can = "You cannot enchant %s%s to glow."
    GlowWeapon_no_weapon = "%s%s has no wielded item."
    GlowWeapon_broken = "You cannot enchant %s%s. It's broken."
+   GlowWeapon_already = "%s%s already glows with a light of its own."
    GlowWeapon_already_stronger = \
       "The item already has a stronger glow enchantment upon it."
    GlowWeapon_cap_your = "Your "
@@ -132,6 +133,17 @@ messages:
 
             return FALSE;
          }
+      }
+
+      // Ours (the magic item revamp): a weapon found glowing glows for good, and this
+      // mustn't take that away
+      if IsClass(oTarget,&Weapon)
+         AND Send(oTarget,@HasPermanentAttribute,#ItemAtt=WA_GLOWING)
+      {
+         Send(who,@MsgSendUser,#message_rsc=GlowWeapon_already,
+               #parm1=Send(oTarget,@GetCapDef),#parm2=Send(oTarget,@GetName));
+
+         return FALSE;
       }
 
       propagate;

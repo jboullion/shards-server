@@ -22,11 +22,10 @@ resources:
    mend_icon_rsc = imend.bgf
    mend_desc_rsc = \
       "Erases the wear of battle from a piece of equipment, restoring it to "
-      "near new condition.  "
+      "new condition, even if it's broken.  "
       "Requires an orc tooth and a sapphire to cast."
 
    mend_not_weaponry = "You try to focus on %s%s, but nothing happens!"
-   mend_beyond_hope = "%s%s is beyond salvage."
    mend_full_healed = "%s%s is already in perfect condition."
    mend_working = "Pieces of %s%s bind themselves together to form a new whole."
 
@@ -93,14 +92,8 @@ messages:
       iHits = Send(oTarget,@GetHits);
       iMaxHits = Send(oTarget,@GetMaxHits);
 
-      // Is the item broken?
-      if iHits = 0
-      {
-         Send(who,@MsgSendUser,#message_rsc=mend_beyond_hope,
-               #parm1=Send(oTarget,@GetCapDef),#parm2=Send(oTarget,@GetName));
-
-         return FALSE;
-      }
+      // Ours (the magic item revamp): a broken item keeps its magic, so it's worth
+      // mending, and Mend will.
 
       // Is the item already at perfect condition?
       if iHits = iMaxHits AND iHits > 0
@@ -116,31 +109,13 @@ messages:
 
    CastSpell(who=$,lTargets=$,iSpellPower=0)
    {
-      local oTarget, iAmount, iMultiplier;
+      local oTarget;
 
       oTarget = First(lTargets);
-      iAmount = Send(oTarget,@GetMaxHits);
 
-      if IsClass(who,&DM) AND Send(who,@PlayerIsImmortal)
-      {
-         // Immortals heal items back up to full.
-         iMultiplier = 100;
-      }
-      else if iSpellPower = 99
-      {
-         iMultiplier = 100;
-      }
-      else
-      {
-         // Multiplier is a number from 75// to 95//.
-         iMultiplier = 75 + iSpellpower/5;
-         iMultiplier = bound(iMultiplier,75,95);
-      }
-
-      iAmount = (iAmount*iMultiplier)/100;
-
-      Send(oTarget,@SetMaxHits,#number=iAmount);
-      Send(oTarget,@SetHits,#number=iAmount);
+      // Ours (the magic item revamp): back to full, and the item keeps its maximum
+      // durability (Mend used to cut it to 75-95%, by spellpower)
+      Send(oTarget,@SetHits,#number=Send(oTarget,@GetMaxHits));
       Send(who,@MsgSendUser,#message_rsc=mend_working,
               #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
 

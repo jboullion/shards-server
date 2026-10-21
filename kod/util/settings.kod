@@ -33,8 +33,9 @@ properties:
    // Increase this to increase the number of items dropped from monster deaths.
    piItemFactor = 100
 
-   // Modifier to the chance for items to be generated.
-   piMagicItemModifier = 50
+   // Modifier to the chance for items to be generated. Ours (the magic item revamp):
+   // doubled from 50, so monsters rather than gift boxes are where magic comes from.
+   piMagicItemModifier = 100
    
    // Changed the wait for monsters to spawn.  A decrease means things
    //  spawn faster (less time waiting between spawns).

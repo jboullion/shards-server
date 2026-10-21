@@ -1083,7 +1083,8 @@ messages:
                      oItemAtt = Send(SYS,@FindItemAttByNum,
                                      #num=Nth(Nth(plTreasuresList,i),4));
                      // Apply Itematt.
-                     Send(oItemAtt,@AddToItem,#oItem=oObject);
+                     // Ours (the magic item revamp): a tier rolled as for a hard monster's treasure
+                     Send(oItemAtt,@AddAsLoot,#oItem=oObject,#diff_seed=8);
                      // Put in chest.
                      Send(poChest,@NewHold,#what=oObject);
                   }

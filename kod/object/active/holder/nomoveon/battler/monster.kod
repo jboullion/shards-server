@@ -6583,7 +6583,9 @@ messages:
                               iNum = Send(oTreasure,@GetNumFromCompound,#compound=First(i));
                               oItemAtt = Send(SYS,@FindItemAttByNum,#num=iNum);
                               oTreasure = Create(GetClass(oTreasure));
-                              Send(oItemAtt,@AddToItem,#oItem=oTreasure,#iPower=Random(1,9));
+                              // Ours (the magic item revamp): a tier rolled as for a
+                              // hard monster's treasure
+                              Send(oItemAtt,@AddAsLoot,#oItem=oTreasure,#diff_seed=8);
                               Send(oAttacker,@NewHold,#what=oTreasure);
                            }
                         }

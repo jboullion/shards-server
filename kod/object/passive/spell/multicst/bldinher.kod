@@ -134,21 +134,24 @@ messages:
       iCount = 0;
       do
       {
-         switch(Random(1,8))
+         // Ours (the magic item revamp): no more curses
+         switch(Random(1,5))
          {
             case 1: ItemAtt = WA_VAMPER; break;
             case 2: ItemAtt = WA_BLINDER; break;
             case 3: ItemAtt = WA_PARALYZER; break;
             case 4: ItemAtt = WA_SIPHON; break;
-            case 5: ItemAtt = WA_POISON; break;
-            default: ItemAtt = WA_CURSED;
+            default: ItemAtt = WA_POISON; break;
          }
 
-      } 
-      
+      }
+
       while (Send(oTarget,@HasAttribute,#ItemAtt=ItemAtt) AND ++iCount < 10);
 
-      Send(Send(SYS,@FindItemAttByNum,#Num=ItemAtt),@AddToItem,#oItem=oTarget);
+      // ...and, cast by several, a tier rolled as for a hard monster's treasure, already
+      // known to its casters
+      Send(Send(SYS,@FindItemAttByNum,#Num=ItemAtt),@AddAsLoot,#oItem=oTarget,
+           #diff_seed=8,#bRevealed=TRUE);
 
       return;
    }

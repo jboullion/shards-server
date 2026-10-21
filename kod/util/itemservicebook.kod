@@ -1,0 +1,381 @@
+// Ours (Meridian Shards, the magic item revamp): elders who reveal magic items, and smiths who
+// repair them. Like the tailor and barber (util/cosmeticsbook.kod), an NPC whose
+// GetShardsService says so sends our client its menu when activated (QuestBook.NpcActivated),
+// as UC_ITEM_SERVICE, and the client's window answers with the `reveal` and `repair` commands
+// (UC_SHARDS, User.ShardsCommand). The menu's items are remembered on the player
+// (User.plServiceItems) and a command names one by its slot.
+//
+//   Reveal   an elder (Jasper, Marion, Raza) reveals one magic item we carry or wear, for
+//            REVEAL_FEE shillings: all its hidden properties, as the Reveal spell does.
+//   Repair   a smith makes one weapon or piece of armor we carry or wear as good as new, broken
+//            or not, for up to REPAIR_PRICE_PERCENT of its base value (less the less it's worn).
+
+////////////////////////////////////////////////////////////////////////////////
+ItemServiceBook is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   ITEM_SERVICE_PKT_REVEAL = 1
+   ITEM_SERVICE_PKT_REPAIR = 2
+
+resources:
+
+   isvc_not_revealer = "%s%s doesn't reveal magic."
+   isvc_not_smith = "%s%s doesn't repair things."
+   isvc_nothing_hidden = "There's nothing hidden about %s%s."
+   isvc_revealed = \
+      "%s%s turns %s%s over in %s hands, murmuring, and its secrets come plain. "
+      "That was %i shillings."
+   isvc_not_worn = "%s%s is in perfect condition."
+   isvc_cant_repair = "%s%s can't be repaired."
+   isvc_repaired = "%s%s works %s%s back into shape. That was %i shillings."
+
+classvars:
+
+properties:
+
+messages:
+
+   ////////////////////////////////////////////////////////////// talking to them
+
+   ServiceActivated(who = $,npc = $)
+   "QuestBook.NpcActivated: an elder or a smith sends who its menu, and is who's to deal with."
+   {
+      local iService;
+
+      if who = $ OR npc = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      iService = Send(npc,@GetShardsService);
+      if iService = SERVICE_REVEAL
+      {
+         Send(who,@SetServiceNpc,#what=npc);
+         Send(self,@SendRevealMenu,#who=who);
+
+         return TRUE;
+      }
+
+      if iService = SERVICE_REPAIR
+      {
+         Send(who,@SetServiceNpc,#what=npc);
+         Send(self,@SendRepairMenu,#who=who);
+
+         return TRUE;
+      }
+
+      return FALSE;
+   }
+
+   ServiceNpc(who = $,service = 0)
+   "who's elder or smith, still near; else who is told why and it's $."
+   {
+      return Send(Send(SYS,@GetCosmeticsBook),@ServiceNpc,#who=who,#service=service);
+   }
+
+   ItemAt(who = $,slot = 0)
+   "The menu's item at slot, if who still carries or wears it."
+   {
+      return Send(Send(SYS,@GetCosmeticsBook),@ItemAt,#who=who,#slot=slot);
+   }
+
+   Charge(who = $,price = 0)
+   {
+      return Send(Send(SYS,@GetCosmeticsBook),@Charge,#who=who,#price=price);
+   }
+
+   ////////////////////////////////////////////////////////////// the client's commands
+
+   ServiceCommand(who = $,words = $)
+   "reveal <item> | reveal menu | repair <item> | repair menu. <item> is a slot in the last "
+   "menu (from 1)."
+   {
+      local sVerb, sWhat;
+
+      if who = $ OR NOT IsClass(who,&User) OR words = $
+      {
+         return;
+      }
+
+      sVerb = First(words);
+      sWhat = $;
+      if Length(words) >= 2
+      {
+         sWhat = Nth(words,2);
+      }
+
+      if StringEqual(sVerb,"reveal")
+      {
+         if sWhat = $ OR StringEqual(sWhat,"menu")
+         {
+            if Send(self,@ServiceNpc,#who=who,#service=SERVICE_REVEAL) <> $
+            {
+               Send(self,@SendRevealMenu,#who=who);
+            }
+
+            return;
+         }
+
+         Send(self,@RevealItem,#who=who,#slot=StringToNumber(sWhat));
+
+         return;
+      }
+
+      if StringEqual(sVerb,"repair")
+      {
+         if sWhat = $ OR StringEqual(sWhat,"menu")
+         {
+            if Send(self,@ServiceNpc,#who=who,#service=SERVICE_REPAIR) <> $
+            {
+               Send(self,@SendRepairMenu,#who=who);
+            }
+
+            return;
+         }
+
+         Send(self,@RepairItem,#who=who,#slot=StringToNumber(sWhat));
+      }
+
+      return;
+   }
+
+   RevealItem(who = $,slot = 0)
+   {
+      local oNpc, oItem, oOwner;
+
+      oNpc = Send(self,@ServiceNpc,#who=who,#service=SERVICE_REVEAL);
+      if oNpc = $
+      {
+         return;
+      }
+
+      oItem = Send(self,@ItemAt,#who=who,#slot=slot);
+      if oItem = $
+      {
+         return;
+      }
+
+      if NOT Send(oItem,@HasHiddenMagic)
+      {
+         Send(who,@MsgSendUser,#message_rsc=isvc_nothing_hidden,
+              #parm1=Send(oItem,@GetDef),#parm2=Send(oItem,@GetName));
+
+         return;
+      }
+
+      if NOT Send(self,@Charge,#who=who,#price=REVEAL_FEE)
+      {
+         return;
+      }
+
+      Send(oItem,@RevealHiddenAttributes);
+      Send(oItem,@RevealHiddenColor);
+
+      oOwner = Send(oItem,@GetOwner);
+      if oOwner <> $
+      {
+         Send(oOwner,@SomethingChanged,#what=oItem);
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=isvc_revealed,
+           #parm1=Send(oNpc,@GetCapDef),#parm2=Send(oNpc,@GetName),
+           #parm3=Send(oItem,@GetDef),#parm4=Send(oItem,@GetName),
+           #parm5=Send(oNpc,@GetHisHer),#parm6=REVEAL_FEE);
+      Send(who,@SendLook,#what=oItem);
+      Send(self,@SendRevealMenu,#who=who);
+
+      return;
+   }
+
+   RepairPrice(oItem = $)
+   "What a smith asks to make oItem as good as new: up to REPAIR_PRICE_PERCENT of its base "
+   "value, in proportion to how worn it is, and never less than REPAIR_MIN_PRICE."
+   {
+      local iMax, iWorn;
+
+      iMax = Send(oItem,@GetMaxHits);
+      if iMax <= 0
+      {
+         return REPAIR_MIN_PRICE;
+      }
+
+      iWorn = iMax - Bound(Send(oItem,@GetHits),0,iMax);
+
+      return Bound(Send(oItem,@GetInitValue) * REPAIR_PRICE_PERCENT / 100 * iWorn / iMax,
+                   REPAIR_MIN_PRICE,$);
+   }
+
+   CanRepair(oItem = $)
+   "Whether a smith would repair oItem: worn weapons and armor (what the Mend spell takes)."
+   {
+      if oItem = $ OR NOT IsClass(oItem,&Item) OR IsClass(oItem,&Torch)
+      {
+         return FALSE;
+      }
+
+      if NOT Send(oItem,@CanMend)
+      {
+         return FALSE;
+      }
+
+      return Send(oItem,@GetHits) < Send(oItem,@GetMaxHits);
+   }
+
+   RepairItem(who = $,slot = 0)
+   {
+      local oNpc, oItem, iPrice, oOwner;
+
+      oNpc = Send(self,@ServiceNpc,#who=who,#service=SERVICE_REPAIR);
+      if oNpc = $
+      {
+         return;
+      }
+
+      oItem = Send(self,@ItemAt,#who=who,#slot=slot);
+      if oItem = $
+      {
+         return;
+      }
+
+      if Send(oItem,@GetHits) >= Send(oItem,@GetMaxHits)
+      {
+         Send(who,@MsgSendUser,#message_rsc=isvc_not_worn,
+              #parm1=Send(oItem,@GetCapDef),#parm2=Send(oItem,@GetName));
+
+         return;
+      }
+
+      if NOT Send(self,@CanRepair,#oItem=oItem)
+      {
+         Send(who,@MsgSendUser,#message_rsc=isvc_cant_repair,
+              #parm1=Send(oItem,@GetCapDef),#parm2=Send(oItem,@GetName));
+
+         return;
+      }
+
+      iPrice = Send(self,@RepairPrice,#oItem=oItem);
+      if NOT Send(self,@Charge,#who=who,#price=iPrice)
+      {
+         return;
+      }
+
+      Send(oItem,@SetHits,#number=Send(oItem,@GetMaxHits));
+
+      oOwner = Send(oItem,@GetOwner);
+      if oOwner <> $
+      {
+         Send(oOwner,@SomethingChanged,#what=oItem);
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=isvc_repaired,
+           #parm1=Send(oNpc,@GetCapDef),#parm2=Send(oNpc,@GetName),
+           #parm3=Send(oItem,@GetDef),#parm4=Send(oItem,@GetName),#parm5=iPrice);
+      Send(self,@SendRepairMenu,#who=who);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// our client
+
+   ServiceItems(who = $,service = 0)
+   "What of who's (worn first) the service could do something for, up to "
+   "COSMETIC_MENU_ITEMS."
+   {
+      local i, lItems;
+
+      lItems = $;
+      foreach i in Send(who,@GetPlayerUsing)
+      {
+         if Length(lItems) < COSMETIC_MENU_ITEMS
+            AND Send(self,@Wants,#oItem=i,#service=service)
+         {
+            lItems = AppendListElem(i,lItems);
+         }
+      }
+
+      foreach i in Send(who,@GetHolderPassive)
+      {
+         if IsClass(i,&Item) AND FindListElem(lItems,i) = 0
+            AND Length(lItems) < COSMETIC_MENU_ITEMS
+            AND Send(self,@Wants,#oItem=i,#service=service)
+         {
+            lItems = AppendListElem(i,lItems);
+         }
+      }
+
+      return lItems;
+   }
+
+   Wants(oItem = $,service = 0)
+   {
+      if service = SERVICE_REVEAL
+      {
+         return Send(oItem,@HasHiddenMagic);
+      }
+
+      return Send(self,@CanRepair,#oItem=oItem);
+   }
+
+   SendRevealMenu(who = $)
+   "UC_ITEM_SERVICE kind 1: the elder, the fee, and who's things with hidden magic (worn "
+   "first), which are remembered for the commands."
+   {
+      local oSession, oNpc, i, lItems;
+
+      oSession = Send(who,@GetShardsSession);
+      oNpc = Send(who,@GetServiceNpc);
+      if oSession = $ OR oNpc = $
+      {
+         return;
+      }
+
+      lItems = Send(self,@ServiceItems,#who=who,#service=SERVICE_REVEAL);
+      Send(who,@SetServiceItems,#items=lItems);
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_ITEM_SERVICE, 1,ITEM_SERVICE_PKT_REVEAL, 4,oNpc,
+                1,Length(lItems));
+      foreach i in lItems
+      {
+         AddPacket(4,i, 4,REVEAL_FEE, 4,Send(i,@GetHits), 4,Send(i,@GetMaxHits));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendRepairMenu(who = $)
+   "UC_ITEM_SERVICE kind 2: the smith, and who's worn weapons and armor (worn first) with "
+   "what each repair costs and how worn it is, which are remembered for the commands."
+   {
+      local oSession, oNpc, i, lItems;
+
+      oSession = Send(who,@GetShardsSession);
+      oNpc = Send(who,@GetServiceNpc);
+      if oSession = $ OR oNpc = $
+      {
+         return;
+      }
+
+      lItems = Send(self,@ServiceItems,#who=who,#service=SERVICE_REPAIR);
+      Send(who,@SetServiceItems,#items=lItems);
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_ITEM_SERVICE, 1,ITEM_SERVICE_PKT_REPAIR, 4,oNpc,
+                1,Length(lItems));
+      foreach i in lItems
+      {
+         AddPacket(4,i, 4,Send(self,@RepairPrice,#oItem=i), 4,Send(i,@GetHits),
+                   4,Send(i,@GetMaxHits));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

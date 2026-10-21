@@ -387,7 +387,7 @@ messages:
 
          if IsClass(oReward,&Weapon)
          {
-            switch(Random(1,12))
+            switch(Random(1,9))
             {
                case 1:  ItemAtt = WA_BLINDER; break;
                case 2:  ItemAtt = WA_PARALYZER; break;
@@ -396,15 +396,13 @@ messages:
                case 5:  ItemAtt = WA_PURGER; break;
                case 6:  ItemAtt = WA_SIPHON; break;
                case 7:  ItemAtt = WA_POISON; break;
-               case 8:  ItemAtt = WA_BONKER; break;
-               case 9:  ItemAtt = WA_TWISTER; break;
-               case 10: ItemAtt = WA_GLOWING; break;
-               case 11: ItemAtt = WA_EXPERT; break;
-               case 12: ItemAtt = WA_PUNISHER; break;
-               default: ItemAtt = WA_CURSED;
+               case 8:  ItemAtt = WA_GLOWING; break;
+               default: ItemAtt = WA_EXPERT; break;
             }
 
-            Send(Send(SYS,@FindItemAttByNum,#Num=ItemAtt),@AddToItem,#oItem=oReward);
+            // Ours (the magic item revamp): a tier rolled as for a hard monster's treasure
+            Send(Send(SYS,@FindItemAttByNum,#Num=ItemAtt),@AddAsLoot,#oItem=oReward,
+                 #diff_seed=8);
          }
 
          Send(poLeader,@NewHold,#what=oReward);

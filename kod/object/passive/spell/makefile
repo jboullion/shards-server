@@ -45,7 +45,6 @@ BOFS = animate.bof \
        purify.bof \
        radiusench.bof \
        relay.bof \
-       remcurse.bof \
        roomench.bof \
        seance.bof \
        shatter.bof \

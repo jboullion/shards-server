@@ -87,7 +87,6 @@ messages:
    {
       plFor_sale = [
          [
-            Create(&RemoveCursePotion,#labelled=TRUE),
             Create(&Torch),
             Create(&BlueMushroom,#number=4),
             Create(&RedMushroom,#number=4),

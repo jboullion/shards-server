@@ -253,6 +253,8 @@
    UC_ARENA = 116
    // Ours: what a buyer would take from our inventory, and for how much (ShardsAbilities.SendSellable)
    UC_SELLABLE = 117
+   // Ours (the magic item revamp): an elder's reveal or a smith's repair menu (util/itemservicebook.kod)
+   UC_ITEM_SERVICE = 118
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

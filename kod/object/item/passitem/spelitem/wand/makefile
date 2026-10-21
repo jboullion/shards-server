@@ -6,7 +6,7 @@
 
 DEPEND = ..\wand.bof
 BOFS = blindw.bof holdw.bof brittlew.bof bonkstik.bof dementw.bof \
-      markdisw.bof enfblew.bof forgetw.bof hospicew.bof identifw.bof \
+      markdisw.bof enfblew.bof forgetw.bof hospicew.bof revealw.bof \
       purifyw.bof seducew.bof shatterw.bof swapw.bof lightngw.bof slitherw.bof
 
 !include $(KODDIR)\kod.mak

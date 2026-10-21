@@ -34,12 +34,15 @@ resources:
    purger_worked_user = "Your weapon tears at the magic surrounding %s%s."
    purger_worked_target = "%s%s's weapon tears at the magic surrounding you!"
    purger_dm = "purger"
-   purger_info_desc = "15%% chance to cast Purge on hit\n"
+   purger_info_desc = "15%% chance on hit to purge the target's enchantments\n"
+   weapattpurger_name = "%s of purging"
 
 classvars:
 
    vrDesc = weapattpurger_desc
    vrInfoDesc = purger_info_desc
+   vrName = weapattpurger_name
+   viNameKind = ITEMATT_NAME_SUFFIX
    viItem_Att_Num = WA_PURGER
    viDifficulty = 9
    vrDM_trigger = purger_dm
@@ -56,20 +59,6 @@ properties:
 
 messages:
 
-   ItemReqUse(oItem=$,oPlayer=$)
-   {
-      // this person needs 50// in the weapon's proficiency to use
-      if Send(oItem,@GetProf,#who=oPlayer) < 50
-      {
-         Send(oPlayer,@MsgSendUser,#message_rsc=purger_fail_use,
-              #parm1=Send(oItem,@GetDef),#parm2=Send(oItem,@GetName));
-
-         return FALSE;
-      }
-
-      return TRUE;
-   }
-
    //// Effect Functions
 
    ModifyDamage(damage=0,target=$,wielder=$,lData=$)
@@ -83,7 +72,7 @@ messages:
          return damage;
       }
 
-      if Random(1,100) < piEffect_percent
+      if Random(1,100) <= piEffect_percent
       {
          oSpell = Send(SYS,@FindSpellByNum,#num=SID_PURGE);
 

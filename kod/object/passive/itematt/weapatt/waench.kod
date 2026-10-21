@@ -40,6 +40,7 @@ resources:
    waEnchant_gone = "Your %s suddenly seems a little more... ordinary."
    waEnchanted = "\n\nThis weapon has been dedicated to Kraanan's glory."
    waEnchanted_name = "enchanted %s"
+   waEnchanted_info = "Strikes creatures that only magic can harm\n"
    enchanted_dm = "enchanted"
 
 classvars:
@@ -47,6 +48,8 @@ classvars:
    viItem_Att_Num = WA_ENCHANTED
    vrDesc = waEnchanted
    vrName = waEnchanted_name
+   viNameKind = ITEMATT_NAME_PREFIX
+   vrInfoDesc = waEnchanted_info
 
    vrDM_trigger = enchanted_dm
 
@@ -60,9 +63,11 @@ messages:
 ///
 ////////////////////////////////////////////////
 
-   AddSelfToRandomItem(oItem=$,who=$)
+   AddSelfToRandomItem(oItem=$,who=$,diff_seed=1)
+   "Treasure: ours (the magic item revamp) is for good, with a tier. The Enchant "
+   "Weapon spell's wears off (it has a timer)."
    {
-      if oItem = $ OR who = $
+      if oItem = $
       {
          Debug("BAD BAD BAD");
 
@@ -71,8 +76,7 @@ messages:
 
       if Send(self,@ReqAddToItem,#oItem=oItem)
       {
-         Send(self,@AddToItem,#oItem=oItem,
-               #timer_duration = Random(3600000,86400000),#random_gen=TRUE);
+         Send(self,@AddToItem,#oItem=oItem,#random_gen=TRUE,#diff_seed=diff_seed);
 
          return TRUE;
       }
@@ -84,16 +88,24 @@ messages:
    "You currently cannot have two different spelltypes "
    "on a weapon at the same time."
    {
-      return Send(oItem,@GetAttackSpell) = 0;
+      return IsClass(oItem,&Weapon) AND Send(oItem,@GetAttackSpell) = 0
+         AND NOT Send(oItem,@CheckTypeFlag,#flag=ATCK_WEAP_MAGIC);
    }
 
    HasTimer(lData=$)
-   "This must return true for any attribute that has a timer!"
-   "Theoretically, some atts could have or not have a timer, "
-   "depending on certain factors, so lData is the ItemAtt structure,"
-   "which can be examined for length to see if the timer exists."
+   "Only the spell's version has a timer."
    {
-      return TRUE;
+      if lData = $
+      {
+         return FALSE;
+      }
+
+      if Length(lData) < 2
+      {
+         return FALSE;
+      }
+
+      return Nth(lData,2) <> $;
    }
 
    TimerExpired(oItem=$,lData=$)

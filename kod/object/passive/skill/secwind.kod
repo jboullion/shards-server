@@ -129,7 +129,6 @@ messages:
       // to trigger the skill.  This includes tokens, cursed rings, or
       // (token) deaths.
       if Send(who,@PossessesA,#class=&Token)
-         OR Send(who,@PossessesA,#class=&RingOfLethargy)
          OR Send(send(who,@GetOwner),@GetRoomNum) = RID_UNDERWORLD
       {
          // No initial chance to succeed; that is, you will always fail to advance.

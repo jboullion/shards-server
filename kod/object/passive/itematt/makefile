@@ -6,7 +6,7 @@
 
 DEPEND = ..\itematt.bof
 BOFS = weapatt.bof iacorptr.bof iadurabl.bof iatransc.bof \
-       iashroud.bof iaengrav.bof iamisdir.bof iaselinf.bof \
+       iaengrav.bof iaselinf.bof \
        ianewdsc.bof iaappdsc.bof iaquest.bof iapkptr.bof \
        iabonded.bof iamade.bof iadmcreated.bof iaxpkillbonus.bof \
        iaindest.bof ianotdropbl.bof iaappraise.bof

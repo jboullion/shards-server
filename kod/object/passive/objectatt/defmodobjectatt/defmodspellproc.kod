@@ -114,7 +114,7 @@ messages:
          }
          if iRandomSpell < 100
          {
-            poSpell = Send(SYS,@FindSpellByNum,#num=SID_REMOVE_CURSE);
+            poSpell = Send(SYS,@FindSpellByNum,#num=SID_PURIFY);
             piType = 1;
             piSpellPower = Random(1,99);
             piProcChance = Random(1,3);

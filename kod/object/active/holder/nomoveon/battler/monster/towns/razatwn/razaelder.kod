@@ -76,6 +76,12 @@ classvars:
 
 messages:
 
+   GetShardsService()
+   "Ours (the magic item revamp, util/itemservicebook.kod): reveals magic items for a fee."
+   {
+      return SERVICE_REVEAL;
+   }
+
    Constructor()
    {
       plWantedItems = [&StatsResetToken];
@@ -158,7 +164,7 @@ messages:
             SID_DARKNESS,
             SID_CLOAK,
             SID_RESIST_ACID,
-            SID_REMOVE_CURSE,
+            SID_REVEAL,
             SID_HOLY_WEAPON,
             SID_HOLY_TOUCH,
             SID_CURE_POISON,

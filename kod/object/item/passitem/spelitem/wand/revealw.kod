@@ -8,7 +8,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-IdentifyWand is Wand
+RevealWand is Wand
 
 constants:
 
@@ -16,22 +16,21 @@ constants:
 
 resources:
 
-   include identifw.lkod
 
-   IdentifyWand_label_name_rsc = "wand of identification"
-   IdentifyWand_icon_rsc = wand6.bgf
-   IdentifyWand_desc_rsc = "Magical energy crackles about this slender wand."
+   RevealWand_label_name_rsc = "wand of revealing"
+   RevealWand_icon_rsc = wand6.bgf
+   RevealWand_desc_rsc = "Magical energy crackles about this slender wand."
 
 classvars:
 
-   vrLabelName = IdentifyWand_label_name_rsc
-   vrIcon = IdentifyWand_icon_rsc
-   viSpellEffect = SID_IDENTIFY
+   vrLabelName = RevealWand_label_name_rsc
+   vrIcon = RevealWand_icon_rsc
+   viSpellEffect = SID_REVEAL
    viColor = XLAT_TO_BLUE
 
 properties:
 
-   vrDesc = IdentifyWand_desc_rsc
+   vrDesc = RevealWand_desc_rsc
 
 messages:
 

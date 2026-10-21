@@ -216,7 +216,7 @@ messages:
          }
       }
 
-      return hit_roll;
+      return hit_roll + Send(self,@GetMagicTierHitBonus);
    }
 
    GetBaseDamage(who=$,target=$)

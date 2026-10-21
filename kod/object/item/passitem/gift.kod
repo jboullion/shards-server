@@ -15,6 +15,10 @@ constants:
    include blakston.khd
    include protocol.khd
 
+   // Ours (the magic item revamp): the treasure difficulty a gift's attribute tier is
+   // rolled for (WeaponAttribute.RollTier)
+   GIFT_DIFFICULTY = 7
+
 resources:
 
    include gift.lkod
@@ -96,6 +100,31 @@ messages:
       return TRUE;
    }
 
+   AddGiftAttribute()
+   "Ours (the magic item revamp): one of plItematt that fits what's inside, revealed, at "
+   "a tier rolled as for a hard monster's treasure (GIFT_DIFFICULTY). A few tries, in "
+   "case the first picks don't fit (a weapon's attribute for armor)."
+   {
+      local iTry, oItemAtt;
+
+      iTry = 0;
+      while (iTry < 5)
+      {
+         poItematt = Nth(plItematt,Random(1,Length(plItematt)));
+         oItemAtt = Send(SYS,@FindItemAttByNum,#num=poItematt);
+         if oItemAtt <> $
+            AND Send(oItemAtt,@AddAsLoot,#oItem=poContents,#diff_seed=GIFT_DIFFICULTY,
+                     #bRevealed=TRUE)
+         {
+            return;
+         }
+
+         iTry = iTry + 1;
+      }
+
+      return;
+   }
+
    NewApplied(what = $)
    {
       local oldOwner, oItemAtt, iChance;
@@ -137,18 +166,12 @@ messages:
 
             if iChance <= 10
             {
-               poItematt = Nth(plItematt,Random(1,length(plItematt)));
-               oItemAtt = Send(SYS,@FindItemAttByNum,#num=poItematt);
-               Send(oItemAtt,@AddtoItem,#oItem=poContents,#iPower=random(1,9));
-               send(poContents,@RevealHiddenAttributes);
+               Send(self,@AddGiftAttribute);
             }
          }
          else
          {
-            poItematt = Nth(plItematt,Random(1,length(plItematt)));
-            oItemAtt = Send(SYS,@FindItemAttByNum,#num=poItematt);
-            Send(oItemAtt,@AddtoItem,#oItem=poContents,#iPower=random(1,9));
-            send(poContents,@RevealHiddenAttributes);
+            Send(self,@AddGiftAttribute);
          }
       }
 

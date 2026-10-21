@@ -424,6 +424,8 @@ properties:
    // Ours: mock bouts in the arenas (util/arenabouts.kod), made on demand
    poArenaBouts = $
    poCosmeticsBook = $
+   // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
+   poItemServiceBook = $
    // Ours: training, and the item abilities that were utility spells (util/shardsabilities.kod)
    poShardsAbilities = $
    poNecromancerBalance = $
@@ -3523,7 +3525,6 @@ messages:
 	   Send(self,@CreateOneSpellIfNew,#num=SID_NODROP,#class=&NotDroppable);
 	   Send(self,@CreateOneSpellIfNew,#num=SID_ADDPETOITEM,#class=&AddPEtoItem);
 
-      Send(self,@CreateOneSpellIfNew,#num=SID_CURSE_WEAPON,#class=&CurseWeapon);
       Send(self,@CreateOneSpellIfNew,#num=SID_PARDON,#class=&Pardon);
       Send(self,@CreateOneSpellIfNew,#num=SID_BLESS,#class=&Bless);
       Send(self,@CreateOneSpellIfNew,#num=SID_MAGIC_SHIELD,#class=&MagicShield);
@@ -3531,7 +3532,6 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_EARTHQUAKE,#class=&Earthquake);
       Send(self,@CreateOneSpellIfNew,#num=SID_POISON,#class=&Poison);
       Send(self,@CreateOneSpellIfNew,#num=SID_SUPER_STRENGTH,#class=&SuperStrength);
-      Send(self,@CreateOneSpellIfNew,#num=SID_ARTIFICE,#class=&Artifice);
 
       Send(self,@CreateOneSpellIfNew,#num=SID_TOUCH_OF_FLAME,#class=&TouchofFlame);
       Send(self,@CreateOneSpellIfNew,#num=SID_ZAP,#class=&Zap);
@@ -3546,7 +3546,6 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_RESIST_SHOCK,#class=&ResistShock);
       Send(self,@CreateOneSpellIfNew,#num=SID_RESIST_FIRE,#class=&ResistFire);
       Send(self,@CreateOneSpellIfNew,#num=SID_LIGHT,#class=&Light);
-      Send(self,@CreateOneSpellIfNew,#num=SID_REMOVE_CURSE,#class=&RemoveCurse);
 
       Send(self,@CreateOneSpellIfNew,#num=SID_BLINK,#class=&Blink);
       Send(self,@CreateOneSpellIfNew,#num=SID_HEAT,#class=&Heat);
@@ -3611,9 +3610,7 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_ARMAGEDDON,#class=&Armageddon);
 
       Send(self,@CreateOneSpellIfNew,#num=SID_VILLIFY,#class=&Villify);
-      Send(self,@CreateOneSpellIfNew,#num=SID_IDENTIFY,#class=&Identify);
       Send(self,@CreateOneSpellIfNew,#num=SID_REVEAL,#class=&Reveal);
-      Send(self,@CreateOneSpellIfNew,#num=SID_SHROUD,#class=&Shroud);
       Send(self,@CreateOneSpellIfNew,#num=SID_ANONYMITY,#class=&Anonymity);
       Send(self,@CreateOneSpellIfNew,#num=SID_REFLECTION,#class=&SummonReflection);
 
@@ -3759,20 +3756,16 @@ messages:
       Send(self,@CreateOneItemAttIfNew,#num=WA_SPELLCASTER,#class=&WeapAttSpellCaster);
       Send(self,@CreateOneItemAttIfNew,#num=WA_EXPERT,#class=&WeapAttExpert);
       Send(self,@CreateOneItemAttIfNew,#num=WA_BLINDER,#class=&WeapAttBlinder);
-      Send(self,@CreateOneItemAttIfNew,#num=WA_BONKER,#class=&WeapAttBonker);
       Send(self,@CreateOneItemAttIfNew,#num=WA_PARALYZER,#class=&WeapAttParalyzer);
-      Send(self,@CreateOneItemAttIfNew,#num=WA_TWISTER,#class=&WeapAttTwister);
       Send(self,@CreateOneItemAttIfNew,#num=WA_VAMPER,#class=&WeapAttVamper);
       Send(self,@CreateOneItemAttIfNew,#num=WA_SIPHON,#class=&WeapAttSiphon);
       Send(self,@CreateOneItemAttIfNew,#num=WA_PURGER,#class=&WeapAttPurger);
-      Send(self,@CreateOneItemAttIfNew,#num=WA_GUILD_HALL_DEFENDER,#class=&WeapAttGuildHallDefender);
       Send(self,@CreateOneItemAttIfNew,#num=WA_FACTION,#class=&WeapAttFactionDefender);
       Send(self,@CreateOneItemAttIfNew,#num=WA_CEREMONIAL,#class=&WeapAttCeremonial);
       Send(self,@CreateOneItemAttIfNew,#num=WA_POISON,#class=&WeapAttPoison);
 
       Send(self,@CreateOneItemAttIfNew,#num=IA_DURABLE,#class=&ItemAttDurable);
       Send(self,@CreateOneItemAttIfNew,#num=IA_XP_KILL_BONUS,#class=&ItemAttXPKillBonus);
-      Send(self,@CreateOneItemAttIfNew,#num=WA_PUNISHER,#class=&WeapAttPunisher);
       Send(self,@CreateOneItemAttIfNew,#num=IA_TRANSCENDANT,#class=&ItemAttTranscendant);
       Send(self,@CreateOneItemAttIfNew,#num=IA_APPRAISE,#class=&ItemAttAppraise);
       Send(self,@CreateOneItemAttIfNew,#num=IA_SELL_INFO,#class=&ItemAttSellInfo);
@@ -3781,10 +3774,7 @@ messages:
       Send(self,@CreateOneItemAttIfNew,#num=IA_QUEST_CARGO,#class=&ItemAttQuestCargo);
 
       // More common, since they can be created by players.
-      Send(self,@CreateOneItemAttIfNew,#num=WA_CURSED,#class=&WeapAttCursed);
       Send(self,@CreateOneItemAttIfNew,#num=IA_ENGRAVED,#class=&ItemAttEngraved);
-      Send(self,@CreateOneItemAttIfNew,#num=IA_SHROUD,#class=&ItemAttShroud);
-      Send(self,@CreateOneItemAttIfNew,#num=IA_MISDIRECTION,#class=&ItemAttMisdirection);
       Send(self,@CreateOneItemAttIfNew,#num=WA_ATTACKSPELLTYPE,#class=&WeapAttSpellType);
       Send(self,@CreateOneItemAttIfNew,#num=WA_ENCHANTED,#class=&WeapAttEnchanted);
       Send(self,@CreateOneItemAttIfNew,#num=IA_BONDED,#class=&ItemAttBonded);
@@ -5400,6 +5390,18 @@ messages:
       return poCosmeticsBook;
    }
 
+   GetItemServiceBook()
+   "Ours: elders who reveal magic items and smiths who repair them "
+   "(util/itemservicebook.kod), made on demand."
+   {
+      if poItemServiceBook = $
+      {
+         poItemServiceBook = Create(&ItemServiceBook);
+      }
+
+      return poItemServiceBook;
+   }
+
    GetShardsAbilities()
    "Ours: training and the item abilities (util/shardsabilities.kod), made on demand."
    {
@@ -6197,7 +6199,7 @@ messages:
       plItemTemplates = cons(create(&PurifyWand),plItemTemplates);
       plItemTemplates = cons(create(&MarkOfDishonorWand),plItemTemplates);
       plItemTemplates = cons(create(&LightningWand),plItemTemplates);
-      plItemTemplates = cons(create(&IdentifyWand),plItemTemplates);
+      plItemTemplates = cons(create(&RevealWand),plItemTemplates);
       plItemTemplates = cons(create(&BlindWand),plItemTemplates);
       plItemTemplates = cons(create(&HoldWand),plItemTemplates);
       plItemTemplates = cons(create(&EnfeebleWand),plItemTemplates);
@@ -6221,7 +6223,6 @@ messages:
       plItemTemplates = cons(create(&RingWedding),plItemTemplates);
       plItemTemplates = cons(create(&RingInvisibility),plItemTemplates);
       plItemTemplates = cons(create(&BerserkerRing),plItemTemplates);
-      plItemTemplates = cons(create(&RingOfLethargy),plItemTemplates);
 
       plItemTemplates = cons(create(&AcidRing),plItemTemplates);
       plItemTemplates = cons(create(&ShockRing),plItemTemplates);
@@ -6240,7 +6241,6 @@ messages:
       plItemTemplates = cons(create(&IllusionaryFormPotion),plItemTemplates);
       plItemTemplates = cons(create(&PurifyPotion),plItemTemplates);
       plItemTemplates = cons(create(&CurePoisonPotion),plItemTemplates);
-      plItemTemplates = cons(create(&RemoveCursePotion),plItemTemplates);
       plItemTemplates = cons(create(&CureDiseasePotion),plItemTemplates);
       plItemTemplates = cons(create(&ShadowFormPotion),plItemTemplates);
       plItemTemplates = cons(create(&AnonymityPotion),plItemTemplates);

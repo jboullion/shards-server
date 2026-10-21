@@ -3057,12 +3057,11 @@ messages:
       prRank = dm_sr_bard;
       piDMFlags = DMFLAG_SET_BARD;
 
-      Send(self,@AddSpell,#num=SID_ARTIFICE,#iability=99);
       Send(self,@AddSpell,#num=SID_BOND,#iability=99);
       Send(self,@AddSpell,#num=SID_BONK,#iability=99);
       Send(self,@AddSpell,#num=SID_ENGRAVE,#iability=99);
       Send(self,@AddSpell,#num=SID_FORESIGHT,#iability=99);
-      Send(self,@AddSpell,#num=SID_IDENTIFY,#iability=99);
+      Send(self,@AddSpell,#num=SID_REVEAL,#iability=99);
       Send(self,@AddSpell,#num=SID_JIG,#iability=99);
       Send(self,@AddSpell,#num=SID_PURIFY,#iability=99);
       // Ability level determines level of detail for Scry.

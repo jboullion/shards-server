@@ -44,6 +44,12 @@ classvars:
 
 messages:
 
+   GetShardsService()
+   "Ours (the magic item revamp, util/itemservicebook.kod): repairs weapons and armor for a fee."
+   {
+      return SERVICE_REPAIR;
+   }
+
    AffectMood(what=$,why=$)
    {
       if why = MOODMOD_DAWN

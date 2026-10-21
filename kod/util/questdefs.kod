@@ -1130,7 +1130,7 @@ messages:
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &DukeLiege, 0, qd_47_s1, $, qd_47_p1, qd_47_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &InkyCap, 10 ], [ &Emerald, 6 ], [ &IdentifyWand, 1 ], [ &PurifyWand, 1 ], [ &ResistColdPotion, 1 ], [ &ResistFirePotion, 1 ], [ &ResistMagicPotion, 1 ], [ &ResistPoisonPotion, 1 ], [ &ResistShockPotion, 1 ] ], 0, $, $, $ ],
+           0, 0, $, 0, 3, $, [ [ &InkyCap, 10 ], [ &Emerald, 6 ], [ &RevealWand, 1 ], [ &PurifyWand, 1 ], [ &ResistColdPotion, 1 ], [ &ResistFirePotion, 1 ], [ &ResistMagicPotion, 1 ], [ &ResistPoisonPotion, 1 ], [ &ResistShockPotion, 1 ] ], 0, $, $, $ ],
          // story-chicken-soup
          [ 50, qd_50_name, &CornothGrocer, 0, 0, 40, $,
            $, $, 86400, $,

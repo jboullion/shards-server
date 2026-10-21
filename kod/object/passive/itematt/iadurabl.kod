@@ -38,7 +38,8 @@ resources:
 
    include iadurabl.lkod
 
-   itematt_durable_name = "well-crafted %s"
+   itematt_durable_name = "durable %s"
+   itematt_durable_info = "Three times the usual durability\n"
    durable_dm = "durable"
    itematt_durable_desc = \
       "\n\nThe craftsmanship of this %s is admirable, obviously the result of "
@@ -48,6 +49,8 @@ classvars:
 
    viItem_Att_Num = IA_DURABLE
    vrName = itematt_durable_name
+   viNameKind = ITEMATT_NAME_PREFIX
+   vrInfoDesc = itematt_durable_info
    vrDesc = itematt_durable_desc
    viDefault_bonus = 300    //// 300 percent bonus to enchanted item.
    vrDM_Trigger = durable_DM
