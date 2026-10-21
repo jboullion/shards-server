@@ -1,0 +1,58 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours (the magic item revamp, phase 3): a plain ring, the base random jewellery magic is put
+// on (its armor attributes: warding, resistance, focus, vitality). It has no magic of its own,
+// so unlike other rings it isn't a "magical ring" until revealed: its attributes are what's
+// hidden. Two can be worn at once, one on each hand.
+
+PlainRing is Ring
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   plainring_name_rsc = "plain ring"
+   plainring_icon_rsc = plainring.bgf
+   plainring_desc_rsc = "A plain, wide band of polished silver."
+
+classvars:
+
+   vrRealName = plainring_name_rsc
+   vrRealDesc = plainring_desc_rsc
+   vrIcon = plainring_icon_rsc
+
+   viBulk = 2
+   viWeight = 3
+
+   viValue_average = 100
+
+properties:
+
+   vrName = plainring_name_rsc
+   vrDesc = plainring_desc_rsc
+
+messages:
+
+   ReqUseSomething(what = $)
+   "Ring won't have two of a kind on; a plain ring's magic is its own, so two may be."
+   {
+      if IsClass(what,&PlainRing)
+      {
+         return TRUE;
+      }
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -6057,6 +6057,7 @@ messages:
       plItemTemplates = cons(create(&JalaNecklace),plItemTemplates);
       plItemTemplates = cons(create(&NecromancerAmulet),plItemTemplates);
       plItemTemplates = cons(create(&ShadowAmulet),plItemTemplates);
+      plItemTemplates = cons(create(&PlainAmulet),plItemTemplates);
       
       plItemTemplates = cons(create(&TrueLute),plItemTemplates);
       plItemTemplates = cons(create(&FineLute),plItemTemplates);
@@ -6223,6 +6224,7 @@ messages:
       plItemTemplates = cons(create(&RingWedding),plItemTemplates);
       plItemTemplates = cons(create(&RingInvisibility),plItemTemplates);
       plItemTemplates = cons(create(&BerserkerRing),plItemTemplates);
+      plItemTemplates = cons(create(&PlainRing),plItemTemplates);
 
       plItemTemplates = cons(create(&AcidRing),plItemTemplates);
       plItemTemplates = cons(create(&ShockRing),plItemTemplates);

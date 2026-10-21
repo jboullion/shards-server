@@ -6,6 +6,6 @@
 
 DEPEND = ..\ring.bof
 BOFS = ringinv.bof besring.bof resring.bof \
-       ringwedd.bof ringsgnt.bof ringreag.bof ringdefense.bof
+       ringwedd.bof ringsgnt.bof ringreag.bof ringdefense.bof plainring.bof
 
 !include $(KODDIR)\kod.mak
