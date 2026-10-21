@@ -74,6 +74,9 @@ messages:
       // Hidden Gate
       plExits = Cons([ 59, 32, RID_JASPER, 51, 28, ROTATE_NONE ],plExits);
       plExits = Cons([ 59, 33, RID_JASPER, 51, 28, ROTATE_NONE ],plExits);
+      // Shards: the square at the crack's mouth too. The crack is half a square wide and the
+      // squares above are inside it, where a player can't get to; this one works like a door.
+      plExits = Cons([ 60, 31, RID_JASPER, 51, 28, ROTATE_NONE ],plExits);
 
       plExits = Cons([ 44, 25, RID_JAS_INN, 3, 8, ROTATE_NONE ],plExits);
       plExits = Cons([ 44, 26, RID_JAS_INN, 3, 8, ROTATE_NONE ],plExits);
