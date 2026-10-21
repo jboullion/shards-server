@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_TEAL
+
    vrDesc = weapattParalyzer_desc
    vrInfoDesc = holder_info_desc
    vrName = weapattparalyzer_name

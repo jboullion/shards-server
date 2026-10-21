@@ -74,6 +74,13 @@
    OF_FLICKERING     = 0x00020000
    OF_FLASHING       = 0x00040000
    OF_PHASING        = 0x00080000
+   // Ours (the magic item revamp, phase 2): how an item's magic shows on its icon, packed in
+   // otherwise unused bits (Item.GetMagicShowFlags). Bits 20-22 are MAGIC_SHOW_*, bits 23-26 a
+   // MAGIC_COLOUR_*. Kod ints are 28 bits, so nothing above bit 26.
+   OF_MAGIC_SHOW_MUL   = 0x00100000
+   OF_MAGIC_SHOW_MASK  = 0x00700000
+   OF_MAGIC_COLOUR_MUL = 0x00800000
+   OF_MAGIC_COLOUR_MASK = 0x07800000
 
    // Client preference flags (stored in piPreferences in Player)
    // Default preferences - all on except safety (which is reverse)
@@ -2172,6 +2179,33 @@
    MAGIC_TIER_MODERATE     = 1
    MAGIC_TIER_POTENT       = 2
    MAGIC_TIER_ENORMOUS     = 3
+
+   // ...what an item's icon shows (OF_MAGIC_SHOW_*): nothing, hidden magic (a grey ring),
+   // revealed magic with no tier, or a weapon's tier (MAGIC_SHOW_SLIGHT + its tier)
+   MAGIC_SHOW_NONE         = 0
+   MAGIC_SHOW_UNREVEALED   = 1
+   MAGIC_SHOW_REVEALED     = 2
+   MAGIC_SHOW_SLIGHT       = 3
+
+   // ...the ring's colour (OF_MAGIC_COLOUR_*), which our client turns into a colour: an
+   // attribute's own (ItemAttribute.GetMagicColour), shared where the sprite's tint tells
+   // them apart
+   MAGIC_COLOUR_NONE       = 0
+   MAGIC_COLOUR_CRIMSON    = 1
+   MAGIC_COLOUR_BLUE       = 2
+   MAGIC_COLOUR_YELLOW     = 3
+   MAGIC_COLOUR_TEAL       = 4
+   MAGIC_COLOUR_GREEN      = 5
+   MAGIC_COLOUR_SILVER     = 6
+   MAGIC_COLOUR_VIOLET     = 7
+   MAGIC_COLOUR_GOLD       = 8
+   MAGIC_COLOUR_AMBER      = 9
+   MAGIC_COLOUR_ORANGE     = 10
+   MAGIC_COLOUR_WHITE      = 11
+   MAGIC_COLOUR_DUKE       = 12
+   MAGIC_COLOUR_PRINCESS   = 13
+   MAGIC_COLOUR_REBEL      = 14
+   MAGIC_COLOUR_NECROMANCER = 15
 
    // ...and where an attribute's word goes in a revealed item's full name (Item.BuildMagicName)
    ITEMATT_NAME_NONE       = 0

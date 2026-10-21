@@ -575,6 +575,12 @@ messages:
       return Send(oWeapAtt,@DecipherDamageFromPower,#iPower=Send(self,@GetMagicTier));
    }
 
+   GetMagicTierShown()
+   "Item.GetMagicShowFlags: the tier, once revealed."
+   {
+      return Send(self,@GetMagicTier,#bRevealedOnly=TRUE);
+   }
+
    AddMagicTierNamePart()
    "Item.BuildMagicName: the revealed tier's word, if any. Returns whether one was added."
    {

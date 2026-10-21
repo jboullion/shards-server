@@ -255,6 +255,9 @@
    UC_SELLABLE = 117
    // Ours (the magic item revamp): an elder's reveal or a smith's repair menu (util/itemservicebook.kod)
    UC_ITEM_SERVICE = 118
+   // Ours (the magic item revamp, phase 2): a revealed magic item's full name, asked for with
+   // UC_SHARDS_OBJECT "magicname" (util/itemservicebook.kod SendMagicName)
+   UC_MAGIC_NAME = 119
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

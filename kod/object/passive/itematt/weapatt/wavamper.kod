@@ -42,6 +42,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_CRIMSON
+
    vrDesc = weapattVamper_desc
    vrInfoDesc = vamper_info_desc
    vrName = weapattvamper_name

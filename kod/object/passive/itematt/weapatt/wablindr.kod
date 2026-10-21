@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_YELLOW
+
    vrDesc = weapattblinder_desc
    vrInfoDesc = blinder_info_desc
    vrName = weapattblinder_name

@@ -37,6 +37,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_GOLD
+
    viItem_Att_Num = WA_GLOWING
    vrDesc = weapattglowing_desc
    vrName = weapattglowing_name

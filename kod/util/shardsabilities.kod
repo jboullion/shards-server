@@ -155,6 +155,15 @@ messages:
          return;
       }
 
+      // Ours (the magic item revamp, phase 2): a revealed magic item's full name, for our
+      // client's lists (UC_MAGIC_NAME back)
+      if StringEqual(sVerb,"magicname")
+      {
+         Send(Send(SYS,@GetItemServiceBook),@SendMagicName,#who=who,#oItem=what);
+
+         return;
+      }
+
       if StringEqual(sVerb,"vault")
       {
          Send(self,@Convey,#who=who,#oItem=what);

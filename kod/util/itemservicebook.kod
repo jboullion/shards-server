@@ -32,6 +32,8 @@ resources:
    isvc_not_worn = "%s%s is in perfect condition."
    isvc_cant_repair = "%s%s can't be repaired."
    isvc_repaired = "%s%s works %s%s back into shape. That was %i shillings."
+   // UC_MAGIC_NAME's message: the name parts fill it (Item.BuildMagicNameParts)
+   isvc_magic_name = "%s"
 
 classvars:
 
@@ -280,6 +282,66 @@ messages:
    }
 
    ////////////////////////////////////////////////////////////// our client
+
+   CanSee(who = $,oItem = $)
+   "Whether who could be looking at oItem: carried (or in something carried), on the floor "
+   "where who is, or held by someone there (a shopkeeper's wares)."
+   {
+      local oOwner, oRoom;
+
+      oRoom = Send(who,@GetOwner);
+      oOwner = Send(oItem,@GetOwner);
+      if oOwner = $
+      {
+         return FALSE;
+      }
+
+      if oOwner = who OR oOwner = oRoom
+      {
+         return TRUE;
+      }
+
+      if IsClass(oOwner,&Item) OR IsClass(oOwner,&Battler)
+      {
+         oOwner = Send(oOwner,@GetOwner);
+
+         return oOwner = who OR oOwner = oRoom;
+      }
+
+      return FALSE;
+   }
+
+   SendMagicName(who = $,oItem = $)
+   "UC_MAGIC_NAME: a revealed magic item's full name for our client's lists, as the chain of "
+   "resources it opens its description with (Item.BuildMagicNameParts), which the client "
+   "fills in."
+   {
+      local oSession;
+
+      if who = $ OR oItem = $ OR NOT IsClass(oItem,&Item)
+      {
+         return;
+      }
+
+      if NOT Send(oItem,@HasRevealedMagicName)
+         OR NOT Send(self,@CanSee,#who=who,#oItem=oItem)
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_MAGIC_NAME, 4,oItem, 4,Send(oItem,@GetObjectFlags),
+                4,isvc_magic_name);
+      Send(oItem,@BuildMagicNameParts);
+      SendPacket(oSession);
+
+      return;
+   }
 
    ServiceItems(who = $,service = 0)
    "What of who's (worn first) the service could do something for, up to "

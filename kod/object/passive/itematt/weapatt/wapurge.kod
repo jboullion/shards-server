@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_SILVER
+
    vrDesc = weapattpurger_desc
    vrInfoDesc = purger_info_desc
    vrName = weapattpurger_name

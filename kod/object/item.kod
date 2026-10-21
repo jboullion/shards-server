@@ -168,6 +168,9 @@ properties:
    pbColored = FALSE
    // Ours: its dye (ANIMATE_DYE's cloth and trim fields, no skin), 0 for none
    piDye = 0
+   // Ours (the magic item revamp, phase 2): the colour a revealed faction, elemental or
+   // ceremonial weapon takes, in piDye's form; piDye wins over it (GetShownDye)
+   piMagicTint = 0
    piSpecial = $
 
    piIndestructible = FALSE
@@ -1949,6 +1952,83 @@ messages:
       return FALSE;
    }
 
+   GetObjectFlags()
+   "Ours (the magic item revamp, phase 2): with how our magic shows on our icon "
+   "(GetMagicShowFlags)."
+   {
+      return viObject_flags | piDrawEffectFlag | Send(self,@GetMagicShowFlags);
+   }
+
+   GetMagicShowFlags()
+   "OF_MAGIC_SHOW_* and OF_MAGIC_COLOUR_* bits for our client's ring round our icon: hidden "
+   "magic is grey (MAGIC_SHOW_UNREVEALED); revealed, a weapon shows its tier and every item "
+   "the colour of the attribute that names it (its 'of ...' phrase, else its first word)."
+   {
+      local i, oItemAtt, iKind, bMagic, iColour, iBest, iPriority, iTier, iShow;
+
+      if plItem_Attributes = $
+      {
+         return 0;
+      }
+
+      bMagic = FALSE;
+      iColour = MAGIC_COLOUR_NONE;
+      iBest = -1;
+      foreach i in plItem_Attributes
+      {
+         oItemAtt = Send(SYS,@FindItemAttByNum,
+                         #num=Send(self,@GetNumFromCompound,#compound=First(i)));
+         if oItemAtt = $
+         {
+            continue;
+         }
+
+         iKind = Send(oItemAtt,@GetNameKind,#lData=i);
+         if iKind = ITEMATT_NAME_NONE
+         {
+            continue;
+         }
+
+         if NOT Send(self,@GetIDStatusFromCompound,#compound=First(i))
+         {
+            return MAGIC_SHOW_UNREVEALED * OF_MAGIC_SHOW_MUL;
+         }
+
+         bMagic = TRUE;
+         iPriority = Send(oItemAtt,@GetNamePriority);
+         if iKind = ITEMATT_NAME_SUFFIX
+         {
+            iPriority = iPriority + 100;
+         }
+
+         if iPriority > iBest
+         {
+            iBest = iPriority;
+            iColour = Send(oItemAtt,@GetMagicColour,#lData=i);
+         }
+      }
+
+      if NOT bMagic
+      {
+         return 0;
+      }
+
+      iShow = MAGIC_SHOW_REVEALED;
+      iTier = Send(self,@GetMagicTierShown);
+      if iTier <> MAGIC_TIER_NONE
+      {
+         iShow = MAGIC_SHOW_SLIGHT + iTier;
+      }
+
+      return iShow * OF_MAGIC_SHOW_MUL + Bound(iColour,0,15) * OF_MAGIC_COLOUR_MUL;
+   }
+
+   GetMagicTierShown()
+   "A weapon's revealed tier (Weapon); other items have none."
+   {
+      return MAGIC_TIER_NONE;
+   }
+
    HasHiddenMagic()
    "Ours (the magic item revamp): whether an elder could reveal something about us "
    "(util/itemservicebook.kod): an attribute not yet revealed, that may be."
@@ -1985,6 +2065,11 @@ messages:
          }
       }
 
+      if bDone
+      {
+         Send(self,@UpdateMagicTint);
+      }
+
       return bDone;
    }
 
@@ -1998,6 +2083,7 @@ messages:
       }
 
       plItem_attributes = Cons(lItemAtt,plItem_attributes);
+      Send(self,@UpdateMagicTint);
 
       return;
    }
@@ -2083,6 +2169,7 @@ messages:
       }
       // now free the nodes
       plItem_Attributes = DelListElem(plItem_Attributes,lData);
+      Send(self,@UpdateMagicTint);
 
       return;
    }
@@ -2176,10 +2263,19 @@ messages:
    }
 
    BuildMagicName()
+   "The bold full name line at the top of our description."
+   {
+      AddPacket(4,item_magic_name);
+      Send(self,@BuildMagicNameParts);
+
+      return;
+   }
+
+   BuildMagicNameParts()
+   "Our full name as a chain of resources each with one %s the next fills, ending in our "
+   "own name. Also sent on its own, for our client's lists (ItemServiceBook.SendMagicName)."
    {
       local i, oItemAtt, iKind, oSuffix, lSuffix, iPriority, iBest;
-
-      AddPacket(4,item_magic_name);
 
       Send(self,@AddMagicTierNamePart);
 
@@ -2581,7 +2677,7 @@ messages:
       Send(poOwner,@SetPlayerArms,#what=self,
             #new_left_arm=Send(self,@GetLeftArm,#who=poOwner),
             #new_right_arm=Send(self,@GetRightArm,#who=poOwner),
-            #translation=Send(self,@GetPaletteTranslation),#dye=piDye,#alldone=FALSE);
+            #translation=Send(self,@GetPaletteTranslation),#dye=Send(self,@GetShownDye),#alldone=FALSE);
 
       return;
    }
@@ -2590,7 +2686,7 @@ messages:
    {
       Send(poOwner,@SetPlayerIcon,#what=self,
             #new_icon=Send(self,@GetShirtIcon,#who=poOwner),
-            #translation=Send(self,@GetPaletteTranslation),#dye=piDye,#alldone=FALSE);
+            #translation=Send(self,@GetPaletteTranslation),#dye=Send(self,@GetShownDye),#alldone=FALSE);
 
       return;
    }
@@ -2599,7 +2695,7 @@ messages:
    {
       Send(poOwner,@SetPlayerLegs,#what=self,
             #new_legs=Send(self,@GetLegs,#who=poOwner),
-            #translation=Send(self,@GetPaletteTranslation),#dye=piDye,#alldone=FALSE);
+            #translation=Send(self,@GetPaletteTranslation),#dye=Send(self,@GetShownDye),#alldone=FALSE);
 
       return;
    }
@@ -2969,12 +3065,15 @@ messages:
    }
 
    AddColour()
-   "The colour before an animation: its dye (ANIMATE_DYE), else its palette translation as "
-   "before, else nothing."
+   "The colour before an animation: its dye (ANIMATE_DYE, or ours: a revealed magic tint), "
+   "else its palette translation as before, else nothing."
    {
-      if piDye <> 0
+      local iDye;
+
+      iDye = Send(self,@GetShownDye);
+      if iDye <> 0
       {
-         AddPacket(1,ANIMATE_DYE, 2,piDye);
+         AddPacket(1,ANIMATE_DYE, 2,iDye);
 
          return;
       }
@@ -2982,6 +3081,66 @@ messages:
       if (piItem_flags & ITEM_PALETTE_MASK) <> 0
       {
          AddPacket(1,ANIMATE_TRANSLATION, 1,piItem_flags & ITEM_PALETTE_MASK);
+      }
+
+      return;
+   }
+
+   GetShownDye()
+   "Ours (phase 2): the dye it shows: its owner's, else its revealed magic tint, else 0."
+   {
+      if piDye <> 0
+      {
+         return piDye;
+      }
+
+      return piMagicTint;
+   }
+
+   UpdateMagicTint()
+   "Ours (phase 2): the tint its revealed attributes give it (ItemAttribute.GetRevealTint), on "
+   "the ramp its art dyes. Called when attributes come, go or are revealed."
+   {
+      local i, oItemAtt, iField, iTint;
+
+      iTint = 0;
+      if viDyeRamp <> DYE_RAMP_NONE
+      {
+         foreach i in plItem_Attributes
+         {
+            if NOT Send(self,@GetIDStatusFromCompound,#compound=First(i))
+            {
+               continue;
+            }
+
+            oItemAtt = Send(SYS,@FindItemAttByNum,
+                            #num=Send(self,@GetNumFromCompound,#compound=First(i)));
+            if oItemAtt = $
+            {
+               continue;
+            }
+
+            iField = Send(oItemAtt,@GetRevealTint,#lData=i) & DYE_FIELD_MASK;
+            if iField <> 0
+            {
+               iTint = iField;
+               if viDyeRamp = DYE_RAMP_TRIM
+               {
+                  iTint = iField * DYE_TRIM_MUL;
+               }
+
+               break;
+            }
+         }
+      }
+
+      if iTint <> piMagicTint
+      {
+         piMagicTint = iTint;
+         if piDye = 0
+         {
+            Send(self,@DyeChanged);
+         }
       }
 
       return;

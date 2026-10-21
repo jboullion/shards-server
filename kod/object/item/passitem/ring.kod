@@ -66,6 +66,17 @@ messages:
       return TRUE;
    }
 
+   GetMagicShowFlags()
+   "Ours (phase 2): an unknown ring shows a grey ring on its icon."
+   {
+      if vrName <> vrRealName
+      {
+         return MAGIC_SHOW_UNREVEALED * OF_MAGIC_SHOW_MUL;
+      }
+
+      propagate;
+   }
+
    HasHiddenMagic()
    "Ours: an unknown ring is a 'magical ring' until revealed."
    {

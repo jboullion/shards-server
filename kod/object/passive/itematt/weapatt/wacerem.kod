@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_GOLD
+
    vrDesc = weapattcerem_desc
    vbPowerDesc = TRUE
    viItem_Att_Num = WA_CEREMONIAL
@@ -105,6 +107,12 @@ messages:
       iPower = Send(self,@TranslatePowerFromCompound,#iCompound=First(lData));
 
       return damage + Send(self,@DecipherDamageFromPower,#iPower=iPower);
+   }
+
+   GetRevealTint(lData=$)
+   "Ours (phase 2): arena gold."
+   {
+      return Send(SYS,@MakeDye,#ramp=0xc,#shade=DYE_SHADE_FULL);
    }
 
    AppendOwnInfo(oItem=$)

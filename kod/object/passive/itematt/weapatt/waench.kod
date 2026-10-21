@@ -45,6 +45,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_GOLD
+
    viItem_Att_Num = WA_ENCHANTED
    vrDesc = waEnchanted
    vrName = waEnchanted_name

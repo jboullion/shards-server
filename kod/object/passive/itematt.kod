@@ -59,6 +59,8 @@ classvars:
 
    // Ours: where vrName goes in a revealed item's full name (GetNameKind)
    viNameKind = ITEMATT_NAME_NONE
+   // ...and the colour of the ring on the item's icon once revealed (GetMagicColour)
+   viMagicColour = MAGIC_COLOUR_NONE
 
    // Whether users can add special attributes (e.g. via blood inheritance)
    // if this attribute is present.
@@ -733,6 +735,20 @@ messages:
       AddPacket(4,vrName);
 
       return;
+   }
+
+   GetMagicColour(lData=$)
+   "Ours (phase 2): the ring our client draws round the item's icon once we're revealed "
+   "(MAGIC_COLOUR_*). Item.GetMagicShowFlags."
+   {
+      return viMagicColour;
+   }
+
+   GetRevealTint(lData=$)
+   "Ours (phase 2): a dye field (SYS MakeDye) the item takes once we're revealed, unless "
+   "its owner has had it dyed; 0 for none. Item.UpdateMagicTint."
+   {
+      return 0;
    }
 
    IsMagicalEffect()

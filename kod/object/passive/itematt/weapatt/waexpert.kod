@@ -36,6 +36,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_GOLD
+
    vrDesc = weapattexpert_desc
    vbPowerDesc = TRUE
    viItem_Att_Num = WA_EXPERT

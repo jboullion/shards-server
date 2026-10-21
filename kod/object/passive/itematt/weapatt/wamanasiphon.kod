@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_BLUE
+
    vrDesc = weapattSiphon_desc
    vrInfoDesc = siphon_info_desc
    vrName = weapattsiphon_name

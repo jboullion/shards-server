@@ -47,6 +47,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_AMBER
+
    viItem_Att_Num = IA_DURABLE
    vrName = itematt_durable_name
    viNameKind = ITEMATT_NAME_PREFIX

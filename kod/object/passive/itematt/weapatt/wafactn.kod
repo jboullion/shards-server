@@ -341,6 +341,47 @@ messages:
 
 /////////////////////////////////////////////////
 ///
+///  Look Functions (ours, phase 2): the faction's colour
+///
+/////////////////////////////////////////////////
+
+   GetMagicColour(lData=$)
+   {
+      local iData;
+
+      iData = Nth(lData,3);
+      if iData = FACTION_DUKE { return MAGIC_COLOUR_DUKE; }
+      if iData = FACTION_PRINCESS { return MAGIC_COLOUR_PRINCESS; }
+      if iData = FACTION_REBEL { return MAGIC_COLOUR_REBEL; }
+
+      return MAGIC_COLOUR_NECROMANCER;
+   }
+
+   GetRevealTint(lData=$)
+   {
+      local iData;
+
+      iData = Nth(lData,3);
+      if iData = FACTION_DUKE
+      {
+         return Send(SYS,@MakeDye,#ramp=0x9,#shade=DYE_SHADE_FULL);
+      }
+
+      if iData = FACTION_PRINCESS
+      {
+         return Send(SYS,@MakeDye,#ramp=0xa,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if iData = FACTION_REBEL
+      {
+         return Send(SYS,@MakeDye,#ramp=0x7,#shade=DYE_SHADE_DARK);
+      }
+
+      return Send(SYS,@MakeDye,#ramp=0xd,#shade=DYE_SHADE_DARK);
+   }
+
+/////////////////////////////////////////////////
+///
 ///  Name Functions
 ///
 /////////////////////////////////////////////////

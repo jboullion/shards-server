@@ -29,6 +29,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_AMBER
+
    viItem_Att_Num = IA_INDESTRUCTIBLE
    vrDesc = itematt_Indestructible_desc
    vrName = itematt_Indestructible_name

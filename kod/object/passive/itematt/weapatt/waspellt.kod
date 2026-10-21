@@ -398,6 +398,61 @@ messages:
       return TRUE;
    }
 
+   //// Look Functions (ours, phase 2)
+
+   GetMagicColour(lData=$)
+   {
+      local iData;
+
+      iData = Send(self,@GetSpellType,#lData=lData);
+      if iData & ATCK_SPELL_HOLY { return MAGIC_COLOUR_WHITE; }
+      if iData & ATCK_SPELL_UNHOLY { return MAGIC_COLOUR_VIOLET; }
+      if iData & ATCK_SPELL_FIRE { return MAGIC_COLOUR_ORANGE; }
+      if iData & ATCK_SPELL_COLD { return MAGIC_COLOUR_TEAL; }
+      if iData & ATCK_SPELL_SHOCK { return MAGIC_COLOUR_YELLOW; }
+
+      return MAGIC_COLOUR_GREEN;
+   }
+
+   GetRevealTint(lData=$)
+   "Only for good: a spell's holy or unholy edge (it has a timer) leaves the weapon's colour be."
+   {
+      local iData;
+
+      if Send(self,@HasTimer,#lData=lData)
+      {
+         return 0;
+      }
+
+      iData = Send(self,@GetSpellType,#lData=lData);
+      if iData & ATCK_SPELL_HOLY
+      {
+         return Send(SYS,@MakeDye,#ramp=0xd,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if iData & ATCK_SPELL_UNHOLY
+      {
+         return Send(SYS,@MakeDye,#ramp=0xa,#shade=DYE_SHADE_DARK);
+      }
+
+      if iData & ATCK_SPELL_FIRE
+      {
+         return Send(SYS,@MakeDye,#ramp=0x5,#shade=DYE_SHADE_FULL);
+      }
+
+      if iData & ATCK_SPELL_COLD
+      {
+         return Send(SYS,@MakeDye,#ramp=0xe,#shade=DYE_SHADE_LIGHT);
+      }
+
+      if iData & ATCK_SPELL_SHOCK
+      {
+         return Send(SYS,@MakeDye,#ramp=0xc,#shade=DYE_SHADE_LIGHT);
+      }
+
+      return Send(SYS,@MakeDye,#ramp=0x7,#shade=DYE_SHADE_LIGHT);
+   }
+
    //// Name Functions
 
    AddNamePart(oItem=$,lData=$)

@@ -37,6 +37,8 @@ resources:
 
 classvars:
 
+   viMagicColour = MAGIC_COLOUR_GREEN
+
    vrDesc = weapattPoison_desc
    vrInfoDesc = Poison_info_desc
    vrName = weapattpoison_name
