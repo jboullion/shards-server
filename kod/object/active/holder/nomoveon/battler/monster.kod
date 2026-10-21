@@ -328,6 +328,10 @@ classvars:
    // monsters use for determining combat/aggro behavior.
    viDefault_behavior = 0
 
+   // A Random(viCashmin,viCashmax) roll of 0 or less means no money. Above
+   // that, the amount comes from viLevel (see GetKillCash), unless
+   // vbCashRange is set, which uses the roll itself.
+   vbCashRange = FALSE
    viCashmin = 1
    viCashmax = 10
 
@@ -6510,6 +6514,27 @@ messages:
       return viTreasure_type;
    }
 
+   GetKillCash()
+   "How much money this monster drops when killed. Rats give about 15, "
+   "orcs about 30, trolls about 85, scaling with the square of viLevel."
+   {
+      local iCash;
+
+      iCash = Random(viCashMin,viCashMax);
+      if iCash <= 0
+      {
+         return 0;
+      }
+
+      if NOT vbCashRange
+      {
+         iCash = Random((viLevel * viLevel) / 200 + viLevel / 4,
+                        (viLevel * viLevel) / 100 + viLevel / 3);
+      }
+
+      return (iCash * Send(SETTINGS_OBJECT,@GetMoneyFactor)) / 100;
+   }
+
    CreateTreasure(who=$,corpse=$,funds=$)
    {
       local i, j, oReagent, iNumberItems, oTreasure, oTreasure_type,
@@ -6604,7 +6629,7 @@ messages:
       }
 
       // Add money to the treasure
-      iRandomCashAmount = Random(viCashMin,viCashMax);
+      iRandomCashAmount = Send(self,@GetKillCash);
       if iRandomCashAmount > 0
       {
          // Don't send a corpse unless the player killed the mob. Minion kills
@@ -6615,8 +6640,6 @@ messages:
          {
             corpse = $;
          }
-
-		   iRandomCashAmount = iRandomCashAmount * (Send(SETTINGS_OBJECT, @GetMoneyFactor) / 100);
 
          oMoney = Create(funds,#corpse=corpse,#number=iRandomCashAmount + (piBoostedLevel
                      * Send(Send(SYS,@GetSurvivalRoomMaintenance),@GetSurvivalCash)));

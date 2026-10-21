@@ -76,7 +76,26 @@ KINDS = {
                   "slightly grainy pre-rendered look and its soft light from the upper left. Keep every view inside "
                   "its own cell. The background must stay flat pure green (#00B140) everywhere outside the heads. "
                   "No text, no borders.")},
+    # Headwear (helmets hang on HS_TOUPEE and take the hair off): the head is shown bald, with room above
+    # it for a tall hat. A hat's item frames (inventory, ground, broken) are made from its worn views.
+    "hat": {"hotspot": 13, "slots": [0, 1, 2, 3, 6, 7], "groups": [[0, 1, 2, 3, 3, 3, 4, 5], [6], [7], [8]], "cols": 3,
+            "fit": 0.42, "head_y": 0.85,
+            "prompt": (
+                "The image is a sheet of {n} views of one bald character's head from a 1990s pre-rendered fantasy "
+                "role-playing game, one view per cell on flat green (front, three-quarter, side, back and the other "
+                "side). Put this hat on every view: {describe}. It sits snugly on the head, and every view shows the "
+                "same hat from that view's angle. Keep each head, face, skin, ears, viewing angle, size and position "
+                "exactly as they are; add only the hat. Draw the whole hat in neutral grey shades only, light grey "
+                "highlights through mid greys to dark grey shadows, mostly light and mid greys, with no colour at all "
+                "(the game recolours it). Match the original's painted, slightly grainy pre-rendered look and its "
+                "soft light from the upper left. Keep every view, the whole hat included, inside its own cell. The "
+                "background must stay flat pure green (#00B140) everywhere outside the heads and hats. No text, no "
+                "borders.")},
 }
+
+# Hat previews: the school colours a wizard's hat takes (wizardhat.kod ResetColors): none, Qor's black,
+# Shal'ille's platinum, Faren's red, Kraanan's blue, Riija's purple, Jala's green
+SCHOOL_COLOURS = [0, 0x2C, 0x30, 0x21, 0x20, 0x18, 0x15]
 
 
 def render(gender: str, slots, parts, masks=(), override: Path | None = None) -> list[dict]:
@@ -97,23 +116,28 @@ def render(gender: str, slots, parts, masks=(), override: Path | None = None) ->
     return views
 
 
-def layout(views, cols: int):
-    """One scale for every view (sheet px per image px) and each view's cell and integer offset in it."""
+def layout(views, cols: int, fit: float = 0.62, head_y: float = 0.45):
+    """Each view's scale (sheet px per image px), cell and integer offset in it. Every head is drawn the
+    same size: a view's image can be finer than another's (a back view with no face parts on it is drawn
+    at the head's own resolution, the others finer), so the scale goes by head pixels.
+    fit: how much of the cell the head fills; head_y: how far down the cell it sits (room above for a hat)."""
     rows = -(-len(views) // cols)
     cw, ch = SHEET // cols, SHEET // rows
-    s = min(min(cw * 0.62 / v["w"], ch * 0.62 / v["h"]) for v in views)
-    places = []
+    per_head = min(min(cw * fit * v["res"] / v["w"], ch * fit * v["res"] / v["h"]) for v in views)
+    scales, places = [], []
     for i, v in enumerate(views):
+        s = per_head / v["res"]
         cx, cy = (i % cols) * cw, (i // cols) * ch
         # the head's top-left sits at the same spot in every cell, on whole image pixels
-        ox = int(round((cw / s - v["w"]) / 2)); oy = int(round((ch / s - v["h"]) * 0.45))
+        ox = int(round((cw / s - v["w"]) / 2)); oy = int(round((ch / s - v["h"]) * head_y))
+        scales.append(s)
         places.append((cx, cy, ox, oy))
-    return s, cw, ch, places
+    return scales, cw, ch, places
 
 
-def compose(views, s, cw, ch, places) -> Image.Image:
+def compose(views, scales, cw, ch, places) -> Image.Image:
     sheet = Image.new("RGB", (SHEET, SHEET), GREEN)
-    for v, (cx, cy, ox, oy) in zip(views, places):
+    for v, s, (cx, cy, ox, oy) in zip(views, scales, places):
         im = Image.fromarray(v["img"], "RGBA")
         im = im.resize((round(v["w"] * s), round(v["h"] * s)), Image.LANCZOS)
         im.putalpha(im.getchannel("A").point(lambda a: 255 if a >= 128 else 0))
@@ -178,7 +202,71 @@ def to_ramp(grid: np.ndarray, keep: np.ndarray, pal) -> np.ndarray:
     return out
 
 
-def build(kind: str, name: str, describe: str, ref: str | None, force: bool) -> Path:
+# Palette whites outside the hair ramp: no hair colour or school colour (a GRAY_TO_* translation) changes them
+FIXED_WHITE, FIXED_LIGHT = 0xFF, 0x07
+
+
+def white_details(grid: np.ndarray, keep: np.ndarray, size: int = 9, lift: float = 30.0) -> np.ndarray:
+    """Small bright shapes on the part (embroidered stars, buttons): pixels well above the brightness
+    around them (a white top-hat over `size` px). Broad highlights rise slowly, so they stay in the ramp."""
+    lum = grid @ np.array([0.299, 0.587, 0.114], np.float32)
+    img = Image.fromarray(np.clip(lum, 0, 255).astype(np.uint8), "L")
+    opened = np.asarray(img.filter(ImageFilter.MinFilter(size)).filter(ImageFilter.MaxFilter(size))).astype(np.float32)
+    m = keep & (lum - opened > lift) & (lum > 130)
+    # whole shapes: grow back onto their soft edges that are still light, then drop single specks
+    grown = np.asarray(Image.fromarray((m * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(3))) > 0
+    m = m | (grown & keep & (lum > 150))
+    m = np.asarray(Image.fromarray((m * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))) > 0
+    # the part's rim (its outline, a few px deep): edge highlights live there, embroidery doesn't
+    inner = np.asarray(Image.fromarray((keep * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(7))) > 0
+    return compact_shapes(m & keep, rim=keep & ~inner)
+
+
+def compact_shapes(m: np.ndarray, rim: np.ndarray | None = None, min_area: int = 70, max_area: int = 400,
+                   max_aspect: float = 1.75, min_fill: float = 0.48, max_on_rim: float = 0.3) -> np.ndarray:
+    """Only the compact pieces of a mask away from the part's rim (stars, a moon, a button): the strokes
+    and specks a highlight leaves along an edge or a curl are dropped."""
+    out = np.zeros_like(m)
+    seen = np.zeros_like(m)
+    H, W = m.shape
+    for y0, x0 in zip(*np.nonzero(m)):
+        if seen[y0, x0]:
+            continue
+        stack, piece = [(y0, x0)], []
+        seen[y0, x0] = True
+        while stack:
+            y, x = stack.pop()
+            piece.append((y, x))
+            for yy, xx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+                if 0 <= yy < H and 0 <= xx < W and m[yy, xx] and not seen[yy, xx]:
+                    seen[yy, xx] = True
+                    stack.append((yy, xx))
+        ys, xs = np.array(piece).T
+        h, w = ys.max() - ys.min() + 1, xs.max() - xs.min() + 1
+        on_rim = rim[ys, xs].mean() if rim is not None else 0.0
+        if __import__("os").environ.get("HAIR_DEBUG"):
+            print(f"  shape at {int(xs.mean())},{int(ys.mean())}: area {len(piece)} {w}x{h} "
+                  f"fill {len(piece) / (h * w):.2f} rim {on_rim:.2f}")
+        if (min_area <= len(piece) <= max_area and max(h, w) / min(h, w) <= max_aspect
+                and len(piece) / (h * w) >= min_fill and on_rim <= max_on_rim):
+            out[ys, xs] = True
+    return out
+
+
+def item_frames(views: list) -> list:
+    """A hat's frames off the head, from its worn views (the classic hats have them in groups 2-4):
+    the inventory picture (the three-quarter view), lying on the ground (the front view), and broken
+    (the front view crushed flat)."""
+    def copy(b, squash=1.0):
+        idx = np.frombuffer(b.pixels, np.uint8).reshape(b.h, b.w)
+        h = max(1, round(b.h * squash))
+        if h != b.h:
+            idx = np.asarray(Image.fromarray(idx, "L").resize((b.w, h), Image.NEAREST))
+        return Bitmap(b.w, h, 0, 0, [], idx.tobytes())
+    return [copy(views[1]), copy(views[0]), copy(views[0], 0.45)]
+
+
+def build(kind: str, name: str, describe: str, ref: str | None, force: bool, white: bool = False) -> Path:
     spec = KINDS[kind]
     d = OUT / name
     d.mkdir(parents=True, exist_ok=True)
@@ -186,6 +274,15 @@ def build(kind: str, name: str, describe: str, ref: str | None, force: bool) -> 
     if kind == "hair":
         shown = render("male", spec["slots"], [{"bgf": (ref or "ptbb") + ".bgf", "hotspot": 13, "translation": 0}])
         face = render("male", spec["slots"], [], masks=[11, 12, 14])
+    elif kind == "hat":
+        # bald, as a worn helmet leaves the head (Helmet.NewUsed: RemoveHair). An empty shrink-14 part
+        # on the toupee keeps every view as fine as the hat will be: a back view has no face parts, and
+        # without one it would come out at the head's own resolution, half that of the others.
+        OVERRIDE.mkdir(parents=True, exist_ok=True)
+        BGF(name="_fine", shrink=14, groups=[[0]], bitmaps=[Bitmap(1, 1, 0, 0, [], bytes([254]))]).write(OVERRIDE / "_fine.bgf")
+        fine = [{"bgf": "_fine.bgf", "hotspot": 13, "translation": 0}]
+        shown = render("male", spec["slots"], fine, override=OVERRIDE)
+        face = render("male", spec["slots"], fine, masks=[11, 12, 14], override=OVERRIDE)
     else:
         # the hair coloured (dark orange), so the matte never takes it for the new grey
         hair = [{"bgf": (ref or "ptad") + ".bgf", "hotspot": 13, "translation": 0x22}]
@@ -193,8 +290,8 @@ def build(kind: str, name: str, describe: str, ref: str | None, force: bool) -> 
         # clear of the eyes and nose only: the mouth sprite covers the whole jaw (the lips are red,
         # which the grey test leaves out anyway)
         face = render("male", spec["slots"], hair, masks=[11, 14])
-    s, cw, ch, places = layout(shown, spec["cols"])
-    sheet = compose(shown, s, cw, ch, places)
+    scales, cw, ch, places = layout(shown, spec["cols"], spec.get("fit", 0.62), spec.get("head_y", 0.45))
+    sheet = compose(shown, scales, cw, ch, places)
     sheet.save(d / "input.png")
     raw = d / "raw.png"
     if force or not raw.exists():
@@ -204,10 +301,17 @@ def build(kind: str, name: str, describe: str, ref: str | None, force: bool) -> 
         (d / "request.json").write_text(json.dumps({"describe": describe, "ref": ref, "prompt": text, "usage": info.get("usage")}, indent=1))
     gen = Image.open(raw)
     bitmaps = []
-    for v, f, place in zip(shown, face, places):
+    for v, f, s, place in zip(shown, face, scales, places):
         grid = back_to_grid(gen, s, cw, ch, place)
         keep = matte(kind, grid, v, f, place)
         idx = to_ramp(grid, keep, pal)
+        if white:
+            # stars and the like stay white whatever colour the rest takes
+            if __import__("os").environ.get("HAIR_DEBUG"):
+                print("view", v["slot"])
+            wm = white_details(grid, keep)
+            lum = grid @ np.array([0.299, 0.587, 0.114], np.float32)
+            idx[wm] = np.where(lum[wm] >= 205, FIXED_WHITE, FIXED_LIGHT)
         ys, xs = np.nonzero(idx != 254)
         _, _, ox, oy = place
         hx, hy = v["hotspots"][spec["hotspot"]]
@@ -226,6 +330,8 @@ def build(kind: str, name: str, describe: str, ref: str | None, force: bool) -> 
         # meridian-browser sprites.ts HS_OVER_FIGURE: drawn over the body, whose collar would hide it
         for b in bitmaps:
             b.hotspots.append({"num": OVER_FIGURE, "x": 0, "y": 0})
+    if kind == "hat":
+        bitmaps += item_frames(bitmaps)
     part = BGF(name=name, shrink=14, groups=spec["groups"], bitmaps=bitmaps)
     out = d / f"{name}.bgf"
     part.write(out)
@@ -241,11 +347,12 @@ def preview(names, kind: str | None = None):
     for name in names:
         src = OUT / name / f"{name}.bgf"
         (OVERRIDE / f"{name}.bgf").write_bytes(src.read_bytes())
-        k = kind or ("beard" if BGF.read(src).groups[0][3] == -1 else "hair")
+        groups = BGF.read(src).groups
+        k = kind or ("hat" if len(groups) == 4 else "beard" if groups[0][3] == -1 else "hair")
         spec = KINDS[k]
         tiles = []
         for gender in ("male", "female"):
-            for colour in PREVIEW_COLOURS:
+            for colour in SCHOOL_COLOURS if k == "hat" else PREVIEW_COLOURS:
                 parts = [{"bgf": f"{name}.bgf", "hotspot": spec["hotspot"], "translation": colour}]
                 if k == "beard":
                     parts.insert(0, {"bgf": "ptad.bgf", "hotspot": 13, "translation": colour})
@@ -258,16 +365,18 @@ def preview(names, kind: str | None = None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("kind", choices=["hair", "beard", "preview"])
+    ap.add_argument("kind", choices=["hair", "beard", "hat", "preview"])
     ap.add_argument("names", nargs="+")
     ap.add_argument("--describe", default="")
     ap.add_argument("--ref")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--white-details", action="store_true",
+                    help="small bright shapes (stars, buttons) stay white instead of taking the colour")
     a = ap.parse_args()
     if a.kind == "preview":
         preview(a.names)
     else:
-        build(a.kind, a.names[0], a.describe, a.ref, a.force)
+        build(a.kind, a.names[0], a.describe, a.ref, a.force, a.white_details)
 
 
 if __name__ == "__main__":

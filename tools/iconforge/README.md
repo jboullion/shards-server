@@ -98,6 +98,18 @@ python tools/iconforge/hair.py beard pbdc --describe "a pointed goatee with a th
 - Outputs go to `build/iconforge/hair/<name>/` (`raw.png` is cached, `preview.png` shows the part on both heads in four hair colours). Install by copying the BGF to `resource/graphics/shards/` and listing it in `kod/util/system.kod` (`GetAllowedHairIcons`, `GetAllowedBeardIcons`).
 - `data/iconforge/hair.json` lists every style made so far, with its reference and description.
 
+### Hats (`hair.py hat`)
+
+```
+python tools/iconforge/hair.py hat wizhatb --white-details --describe "a whimsical wizard's hat with a long crooked tip ..."
+```
+
+- Hats hang where hair does (hotspot 13), so the same steps make them. The head is drawn bald, as a worn helmet leaves it, with room above for a tall hat.
+- The hat's item frames come from its worn views: the inventory picture (the three-quarter view), on the ground (the front view) and broken (the front view crushed flat). The groups are `[[views], [6], [7], [8]]`, like the classic hats.
+- The hat is in the grey ramp, so the item's palette translation colours it: the wizard's hat takes its school's colour (`wizardhat.kod` `ResetColors`). `preview.png` shows the six school colours.
+- `--white-details` keeps small bright shapes white (embroidered stars, a moon, buttons): palette 255 and 7, which no translation changes. The shapes are told from highlights by being compact and off the hat's rim; `HAIR_DEBUG=1` prints what each one measures. Check the result and fix a stray speck in the sprite editor.
+- The wizard's hat (`wizardhat.bgf`, and `wizardhatf.bgf`, the same file for women) came from `wizhatb`. Its copy in `build/iconforge/kept/` is the new hat, so `forge.py install` keeps it.
+
 ## Weapons in every view (`weapon.py`)
 
 A weapon has up to three sprites: its icon, the overlay in the player's hand (24 frames) and the first-person view (5 frames). `weapon.py` gets one large upright drawing from the model and poses it into every frame of all three, so they show the same object:

@@ -1932,13 +1932,21 @@
       "openai"
      ],
      "decision": "keep"
+    },
+    {
+     "batch": "hair.py",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep",
+     "note": "redrawn as a whimsical wizard's hat: hair.py hat wizhatb --white-details (curled tip; leather in the hair ramp for the school colours, stars white)"
     }
    ],
    "chosen": {
-    "batch": "016",
+    "batch": "hair.py",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\016\\wizardhat\\v0.bgf"
+    "bgf": "build\\iconforge\\hair\\wizhatb\\wizhatb.bgf"
    }
   },
   "wolfmask.bgf": {
