@@ -60,20 +60,12 @@ resources:
       "Nevermind about the shipment.  I shall find another courier."
    barrestock_assign_3 = \
       "Ah yes, the shipment is ready for delivery.  Make haste with these "
-      "%INDEF_CARGO%CARGO back to %NPC, and no dishonesty now, or I shall "
-      "have to report you to the justicar as an outlaw."
-   barrestock_assign_3_h = \
-      "Ah yes, the shipment is ready for delivery.  Make haste with these "
       "%INDEF_CARGO%CARGO back to %NPC, and no dishonesty now, or your "
       "misdeeds shall surely haunt you."
    barrestock_success_3 = \
       "Thank you, %NAME, you have done me a great service this day.  Take "
       "this small token of my thanks."
    barrestock_failure_3 = \
-      "Subject: Thief!\n"
-      "I have reported your theft of %CARGO to the justicar, and henceforth "
-      "you are to be considered an outlaw."
-   barrestock_failure_3_h = \
       "Subject: Thief!\n"
       "I have reported your theft of %CARGO to a wizard friend of mine, and "
       "he has ensured that you will suffer for your dishonesty."
@@ -186,24 +178,13 @@ messages:
                               [ QN_PRIZETYPE_ITEMCLASS, &SilverArrow, 35 ],
                               [ QN_PRIZETYPE_ITEMCLASS, &ShadowformPotion, 1 ],
                               [ QN_PRIZETYPE_ITEMCLASS, &KaraholsCursePotion, 1 ] ] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=2 * 3600,#quest_node_index=QNT_ID_BAR_RESTOCK_THREE)
       {
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_BAR_RESTOCK_THREE,
-                  #new_hint=barrestock_assign_3_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_BAR_RESTOCK_THREE,
-                  #new_hint=barrestock_failure_3_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_BAR_RESTOCK_THREE,
-                  #new_hint=barrestock_assign_3);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_BAR_RESTOCK_THREE,
-                  #new_hint=barrestock_failure_3);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_BAR_RESTOCK_THREE,
+               #new_hint=barrestock_assign_3);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_BAR_RESTOCK_THREE,
+               #new_hint=barrestock_failure_3);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_BAR_RESTOCK_THREE,
                #new_hint=barrestock_success_3);
       }

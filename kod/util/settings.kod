@@ -249,8 +249,8 @@ properties:
    // Do safe rooms recharge rods?
    pbInnsRechargeRods = TRUE
 
-   // Determines whether players lose faction for attacking each other
-   // in a way that requires turning safety off.
+   // Determines whether players lose renown, then their faction, for attacking
+   // their own side or preying on newbies (Player.CheckFactionAttack).
    pbFactionLoss = TRUE
 
    // Do all users get "logged on for first time" messages?

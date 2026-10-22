@@ -45,17 +45,17 @@ resources:
    vaulttax_assign_2 = \
       "Yes, I have need of a courier.  %NPC is due a certain percentage of "
       "profits from my business.  Please take this tithe of %INDEF_CARGO%CARGO "
-      "to %HIMHER_NPC quickly.  I am too busy to do it myself.  Be warned "
-      "that any thievery will be reported and you will be labeled an outlaw.  "
-      "Perhaps worse, I hear that %NPC now keeps company with a wizard.  I "
-      "have arranged for %NPC to pay you for your troubles."
+      "to %HIMHER_NPC quickly.  I am too busy to do it myself.  Be warned that "
+      "any thievery will be reported and I hear that %NPC now keeps company "
+      "with a wizard.  I have arranged for %NPC to pay you for your troubles."
 
    vaulttax_success_2 = \
       "Ah, I see %SOURCE_NPC is on time this week.  Thank you for your "
       "swiftness and honor.  %SOURCE_NPC could use you around more often."
    vaulttax_failure_2 = \
       "Subject: Thief!\n"
-      "Your thievery of %CARGO has made you an outlaw by decree of %NPC."
+      "I have spoken to a wizard friend of mine, and he has ensured that you "
+      "will suffer for your dishonesty."
 
 classvars:
 
@@ -159,7 +159,7 @@ messages:
                            [ QN_PRIZETYPE_ITEMCLASS, &NeruditeArrow, 30 ],
                            [ QN_PRIZETYPE_ITEMCLASS, &SilverArrow, 30 ],
                            [ QN_PRIZETYPE_ITEMCLASS, &NodeBurstPotion, 1 ] ] ],
-            #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+            #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
             #timelimit=2 * 3600,#quest_node_index=QNT_ID_VAULT_TAX_TWO)
       {
          lNPCs = $;
@@ -170,21 +170,10 @@ messages:
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_VAULT_TAX_TWO,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_VAULT_TAX_TWO,
-                  #new_hint=vaulttax_assign_2_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_VAULT_TAX_TWO,
-                  #new_hint=vaulttax_failure_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_VAULT_TAX_TWO,
-                  #new_hint=vaulttax_assign_2);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_VAULT_TAX_TWO,
-                  #new_hint=vaulttax_failure_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_VAULT_TAX_TWO,
+               #new_hint=vaulttax_assign_2);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_VAULT_TAX_TWO,
+               #new_hint=vaulttax_failure_2);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_VAULT_TAX_TWO,
                #new_hint=vaulttax_success_2);
       }

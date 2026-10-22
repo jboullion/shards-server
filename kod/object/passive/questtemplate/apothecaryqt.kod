@@ -49,12 +49,6 @@ resources:
 
    // Quest resources.
    apothecary_assign_2 = \
-      "%NPC has need of these %INDEF_CARGO%CARGO, please take them "
-      "to %HIMHER_NPC.  Thievery of any of the items will result in your "
-      "being labelled an outlaw.  I have made arrangements for %NPC to pay "
-      "you for your time.  You have one Meridian day in which to deliver "
-      "these items."
-   apothecary_assign_2_h = \
       "%NPC has need of these %INDEF_CARGO%CARGO, please take them to "
       "%HIMHER_NPC.  Thievery of any of the items will result in grave "
       "misfortune.  I have made arrangements for %NPC to pay you for "
@@ -65,9 +59,6 @@ resources:
       "later if you are interested in performing this service again.  You "
       "have helped relations between myself and %SOURCE_NPC."
    apothecary_failure_2 = \
-      "Subject: Thief!\n"
-      "Your thievery of %INDEF_CARGO%CARGO has labelled you an outlaw."
-   apothecary_failure_2_h = \
       "Subject: Thief!\n"
       "Your thievery of %INDEF_CARGO%CARGO has forced me to have a curse "
       "placed upon you.  Wear it well."
@@ -167,27 +158,16 @@ messages:
                               [ QN_PRIZETYPE_ITEMCLASS, &Shillings, 800 ],
                               [ QN_PRIZETYPE_ITEMCLASS, &DetectInvisibilityPotion, 1 ],
                               [ QN_PRIZETYPE_ITEMCLASS, &NightVisionPotion, 1 ]] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=2 * 3600,#quest_node_index=QNT_ID_APOTHECARY_TWO)
       {
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_APOTHECARY_TWO,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_APOTHECARY_TWO,
-                  #new_hint=apothecary_assign_2_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_APOTHECARY_TWO,
-                  #new_hint=apothecary_failure_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_APOTHECARY_TWO,
-                  #new_hint=apothecary_assign_2);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_APOTHECARY_TWO,
-                  #new_hint=apothecary_failure_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_APOTHECARY_TWO,
+               #new_hint=apothecary_assign_2);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_APOTHECARY_TWO,
+               #new_hint=apothecary_failure_2);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_APOTHECARY_TWO,
                #new_hint=apothecary_success_2);
       }

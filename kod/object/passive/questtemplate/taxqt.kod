@@ -38,16 +38,6 @@ resources:
       "for yourself; any thievery will be punished!"
 
    // Quest resources.
-   vaulttax_assign_2_h = \
-      "Yes, I have need of a courier.  %NPC is due a certain percentage of "
-      "profits from my business.  Please take this tithe of %INDEF_CARGO%CARGO "
-      "to %HIMHER_NPC quickly.  I am too busy to do it myself.  Be warned that "
-      "any thievery will be reported and I hear that %NPC now keeps company "
-      "with a wizard.  I have arranged for %NPC to pay you for your troubles."
-   vaulttax_failure_2_h = \
-      "Subject: Thief!\n"
-      "I have spoken to a wizard friend of mine, and he has ensured that you "
-      "will suffer for your dishonesty."
 
 classvars:
 

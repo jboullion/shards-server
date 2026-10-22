@@ -2079,8 +2079,8 @@ messages:
    }
 
    IsOutlawCast(who = $, lTargets = $)
-   "If true, this spell cast will result"
-   "in the caster being labeled an outlaw."
+   "If true, this spell cast is hostile to other players and is checked like an "
+   "attack (viOutlaw)."
    {
       local i, oRoom, each_obj;
 

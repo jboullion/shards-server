@@ -201,7 +201,7 @@ messages:
       }
 
       // If this is harmful, and both caster and victim are players,
-      //  then disallow damage if caster's safety is on or if cannot do attack
+      //  then disallow damage if the caster may not attack the victim
       if NOT Send(poCaster,@AllowBattlerAttack,#victim=what,#report=FALSE,
                   #stroke_obj=self)
       {

@@ -4031,7 +4031,7 @@
    QN_PRIZETYPE_PASS_PREVIOUS_SOURCE_NPC  = 0x0F      // Set dest npc -> current PreviousSourceNPC
    QN_PRIZETYPE_SCHEDULE_QUEST            = 0x10      // Schedule a quest of this type
    QN_PRIZETYPE_ESTABLISH_NECROGUILD      = 0x11      // Form the Order of Necromancers
-   QN_PRIZETYPE_OUTLAW                    = 0x12      // A small stat penalty (once made the player an outlaw)
+   QN_PRIZETYPE_CURSE                     = 0x12      // A curse: a small stat penalty for two days
    QN_PRIZETYPE_NPC_RESPONSE              = 0x13      // Let the QuestTemplate give different responses for each NPC.
    QN_PRIZETYPE_TRAINING_POINTS           = 0x014      // Award training points.
    QN_PRIZETYPE_EXPERIENCE_POINTS         = 0x015      // Award "experience points" (gain chance).

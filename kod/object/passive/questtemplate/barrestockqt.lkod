@@ -18,19 +18,12 @@ barrestock_failure_2 = de \
    "einen anderen Kurier finden."
 barrestock_assign_3 = de \
    "Äh, ja, die Lieferung ist versandbereit.  Eile mit diesen %INDEF_CARGO%CARGO "
-   "zurück zu %NPC, und bitte keine Unehrlichkeiten, oder ich muss Dich als "
-   "ein Gesetzloser bei Gericht melden."
-barrestock_assign_3_h = de \
-   "Äh, ja, die Lieferung ist versandbereit.  Eile mit diesen %INDEF_CARGO%CARGO "
    "zurück zu %NPC, und keine Unehrlichkeiten, oder Deine Missetaten werden "
    "sicherlich Folgen haben."
 barrestock_success_3 = de \
    "Vielen Dank, %NAME, Du hast mir heute einen großen Dienst erwiesen.  "
    "Nimm diese, kleine Aufmerksamkeit als mein Dank."
 barrestock_failure_3 = de \
-   "Betreff: Dieb!\nIch habe Deinen Diebstahl von %CARGO beim Gericht gemeldet, "
-   "und von nun an wirst Du als Gesetzloser deklariert."
-barrestock_failure_3_h = de \
    "Betreff: Dieb!\nIch habe Deinen Diebstahl von %CARGO an einen befreundeten "
    "Zauberer gemeldet und er wird dafür Sorge tragen, dass Du leidest."
 
@@ -42,8 +35,6 @@ barrestockqt_completed_rsc = pt "Você completou a missão de reabastecimento do b
 barrestock_assign_2 = pt "Sim, estou com estoque muito baixo de suprimentos. %NPC sabe do que eu preciso e já está pago. Basta perguntar a %HIMHER_NPC sobre o envio e se apressar!"
 barrestock_trigger_2 = pt "envio"
 barrestock_failure_2 = pt "Assunto: meu envio de suprimentos\nEsqueça o envio. Eu vou encontrar outro mensageiro."
-barrestock_assign_3 = pt "Ah sim, o envio está pronto para entrega. Se apresse com estes %INDEF_CARGO%CARGO de volta para %NPC, e sem desonestidade agora, ou eu terei que te denunciar ao justicar como um fora da lei."
-barrestock_assign_3_h = pt "Ah sim, o envio está pronto para entrega. Se apresse com estes %INDEF_CARGO%CARGO de volta para %NPC, e sem desonestidade agora, ou seus delitos certamente te assombrarão."
+barrestock_assign_3 = pt "Ah sim, o envio está pronto para entrega. Se apresse com estes %INDEF_CARGO%CARGO de volta para %NPC, e sem desonestidade agora, ou seus delitos certamente te assombrarão."
 barrestock_success_3 = pt "Obrigado, %NAME, você me fez um grande favor hoje. Pegue este pequeno símbolo da minha gratidão."
-barrestock_failure_3 = pt "Assunto: Ladrão!\nEu denunciei seu furto de %CARGO ao justicar, e daqui para frente você será considerado um fora da lei."
-barrestock_failure_3_h = pt "Assunto: Ladrão!\nEu denunciei seu furto de %CARGO a um amigo mago meu, e ele garantiu que você sofrerá por sua desonestidade."
+barrestock_failure_3 = pt "Assunto: Ladrão!\nEu denunciei seu furto de %CARGO a um amigo mago meu, e ele garantiu que você sofrerá por sua desonestidade."

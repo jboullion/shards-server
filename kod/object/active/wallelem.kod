@@ -170,7 +170,7 @@ messages:
       }
 
       // If this is harmful, and both caster and victim are players, then
-      // disallow damage if caster's safety is on or if cannot do attack.
+      // disallow damage if the caster may not attack the victim.
       // AllowBattlerAttack also performs all the other required checks,
       // so they are no longer needed in this class.
       if vbIsHarmful

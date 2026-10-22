@@ -53,11 +53,7 @@ resources:
       "You have completed the Ko'catan weapon trade quest."
 
    // Quest resources.
-   kocweapon_assign_2 = \
-      "I need a guaranteed delivery made to the mainland.  It's government "
-      "business, so failure to deliver it would result in outlaw status.  Are "
-      "you willing to accept these terms?"
-   kocweapon_assign_2_h = "I need a guaranteed delivery made to the mainland.  "
+   kocweapon_assign_2 = "I need a guaranteed delivery made to the mainland.  "
       "It's government business, so failure to deliver it would result in "
       "misfortune.  Are you willing to accept these terms?"
    kocweapon_failure_2 = \
@@ -69,20 +65,9 @@ resources:
       "troops, but unfortunately I have no one to take the supplies to "
       "%HIMHER_NPC.  Here are %INDEF_CARGO%CARGO to be delivered;  I am "
       "sure that %NPC will pay your for your troubles.  Remember that you are "
-      "bound by law to deliver the supplies, and  failure to deliver them "
-      "will result in your being branded an outlaw.  For some reason I trust "
-      "you, though."
-   kocweapon_assign_3_h = \
-      "%NPC has requested my services for %HIMHER_NPC to supply the faction's "
-      "troops, but unfortunately I have no one to take the supplies to "
-      "%HIMHER_NPC.  Here are %INDEF_CARGO%CARGO to be delivered;  I am "
-      "sure that %NPC will pay your for your troubles.  Remember that you are "
       "bound by law to deliver the supplies, and failure to deliver them "
       "will result in misfortune.  For some reason I trust you, though."
    kocweapon_failure_3 = \
-      "Subject: Thief!\n"
-      "Your thievery has made you an outlaw by decree of %NPC."
-   kocweapon_failure_3_h = \
       "Subject: Thief!\n"
       "The bad luck brought on by your evil deed shall now follow you "
       "wherever you go."
@@ -166,17 +151,8 @@ messages:
                #NPC_modifier=QN_NPCMOD_SAME,#cargolist=[ chess_trigger ],
                #timelimit=2 * 60,#quest_node_index=QNT_ID_KOC_WEAP_TRADE_TWO)
       {
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_WEAP_TRADE_TWO,
-                  #new_hint=kocweapon_assign_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_WEAP_TRADE_TWO,
-                  #new_hint=kocweapon_assign_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_WEAP_TRADE_TWO,
+               #new_hint=kocweapon_assign_2);
          Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_WEAP_TRADE_TWO,
                #new_hint=kocweapon_failure_2);
       }
@@ -200,7 +176,7 @@ messages:
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistMagicPotion, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistPoisonPotion, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistShockPotion, 1 ] ] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=4 * 3600,#quest_node_index=QNT_ID_KOC_WEAP_TRADE_THREE)
       {
          lNPCs = $;
@@ -215,21 +191,10 @@ messages:
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
-                  #new_hint=kocweapon_assign_3_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
-                  #new_hint=kocweapon_failure_3_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
-                  #new_hint=kocweapon_assign_3);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
-                  #new_hint=kocweapon_failure_3);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
+               #new_hint=kocweapon_assign_3);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
+               #new_hint=kocweapon_failure_3);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_KOC_WEAP_TRADE_THREE,
                #new_hint=kocweapon_success_3);
       }

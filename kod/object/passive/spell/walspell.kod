@@ -18,13 +18,6 @@ resources:
 
    include walspell.lkod
 
-   WallSpell_outlaw = \
-      "\nNOTE: If your safety is ON, this spell will not affect innocents.  "
-      "If your safety is OFF, you can become an outlaw for harming other players."
-   WallSpell_outlaw_murderer = \
-      "\nNOTE: If your safety is ON, this spell will not affect innocents.  "
-      "If your safety is OFF, you can become an outlaw for harming other players "
-      "or a murderer for killing other players."
 
    WallSpell_failed_rsc = \
       "There is too much summoning magic focused here to cast that spell." 
@@ -100,24 +93,6 @@ messages:
       }
 
       return TRUE;
-   }
-
-   GetExtraDesc()
-   {
-      if viHarmful
-         AND Send(SYS,@IsPKAllowed)
-      {
-         if viWallCanKill
-         {
-            // Give a little warning about harming or killing other players.
-            return WallSpell_outlaw_murderer;
-         }
-
-         // Can't kill, just warn about outlaw status;
-         return WallSpell_outlaw;
-      }
-
-      propagate;
    }
 
 

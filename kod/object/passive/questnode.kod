@@ -1600,10 +1600,10 @@ messages:
          return;
       }
    
-      if iPrizeType = QN_PRIZETYPE_OUTLAW
+      if iPrizeType = QN_PRIZETYPE_CURSE
       {
          // format for a prize entry of this type:
-         //     [ QN_PRIZETYPE_OUTLAW ]
+         //     [ QN_PRIZETYPE_CURSE ]
 
          foreach oQuester in recipients
          {

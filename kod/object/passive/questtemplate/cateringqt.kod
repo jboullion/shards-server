@@ -66,20 +66,9 @@ resources:
       "food, %INDEF_CARGO%CARGO.  Please take it to %NPC, setting up the "
       "party preparations is up to %HIMHER_NPC.  Please don't lose track "
       "of the food, this business is very important to me.  Should the "
-      "delivery never reach %NPC, I will be forced to inform the justicar "
-      "of your theft.  I'm sure this won't be necessary, though."
-   catering_assign_3_h = \
-      "Yes, the party!  I was worried no one would show up!  Here is the "
-      "food, %INDEF_CARGO%CARGO.  Please take it to %NPC, setting up the "
-      "party preparations is up to %HIMHER_NPC.  Please don't lose track "
-      "of the food, this business is very important to me.  Should the "
       "delivery never reach %NPC, I will be forced to speak to a wizard "
       "friend of mine.  I'm sure this won't be necessary, though."
    catering_failure_3 = \
-      "Subject: you stole the food for the party!\n"
-      "I have reported you to the justicar, and henceforth you are to "
-      "be considered an outlaw."
-   catering_failure_3_h = \
       "Subject: you stole the food for the party!\n"
       "I have spoken to a wizard friend of mine, and he has ensured that "
       "you will suffer for your dishonesty."
@@ -260,21 +249,10 @@ messages:
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_CATERING_THREE,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_CATERING_THREE,
-                  #new_hint=catering_assign_3_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_CATERING_THREE,
-                  #new_hint=catering_failure_3_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_CATERING_THREE,
-                  #new_hint=catering_assign_3);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_CATERING_THREE,
-                  #new_hint=catering_failure_3);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_CATERING_THREE,
+               #new_hint=catering_assign_3);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_CATERING_THREE,
+               #new_hint=catering_failure_3);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_CATERING_THREE,
                #new_hint=catering_success_3);
       }

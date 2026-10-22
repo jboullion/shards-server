@@ -45,11 +45,6 @@ resources:
    merchanttax_assign_2 = \
       "Will you take my taxes to %NPC?  I am certain I am late this time and "
       "need you to take these %INDEF_CARGO%CARGO to %NPC.  Thievery will "
-      "brand you an outlaw quickly so think not about deception.  I have "
-      "arranged for your fee to be paid by %HIMHER_NPC."
-   merchanttax_assign_2_h = \
-      "Will you take my taxes to %NPC?  I am certain I am late this time and "
-      "need you to take these %INDEF_CARGO%CARGO to %NPC.  Thievery will "
       "result in misfortune so think not about deception.  I have arranged for "
       "your fee to be paid by %HIMHER_NPC."
    merchanttax_success_2 = \
@@ -57,7 +52,8 @@ resources:
       "Here is your payment for your... speedy service.   "
    merchanttax_failure_2 = \
       "Subject: Thief!\n"
-      "Your thievery of %CARGO has made you an outlaw by decree of %NPC."
+      "I have spoken to a wizard friend of mine, and he has ensured that you "
+      "will suffer for your dishonesty."
 
 classvars:
 
@@ -156,7 +152,7 @@ messages:
                             [ QN_PRIZETYPE_ITEMCLASS, &IllusionaryFormPotion, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &NeruditeArrow, 20 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &NodeBurstPotion, 1 ] ] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=2 * 3600,#quest_node_index=QNT_ID_MERCHANT_TAX_TWO)
       {
          lNPCs = $;
@@ -167,21 +163,10 @@ messages:
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_MERCHANT_TAX_TWO,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_MERCHANT_TAX_TWO,
-                  #new_hint=vaulttax_assign_2_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_MERCHANT_TAX_TWO,
-                  #new_hint=vaulttax_failure_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_MERCHANT_TAX_TWO,
-                  #new_hint=merchanttax_assign_2);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_MERCHANT_TAX_TWO,
-                  #new_hint=merchanttax_failure_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_MERCHANT_TAX_TWO,
+               #new_hint=merchanttax_assign_2);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_MERCHANT_TAX_TWO,
+               #new_hint=merchanttax_failure_2);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_MERCHANT_TAX_TWO,
                #new_hint=merchanttax_success_2);
       }

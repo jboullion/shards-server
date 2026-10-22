@@ -52,13 +52,6 @@ resources:
       "property and business owners in the community have been remiss in "
       "their financial obligations to me.  Will you please take this letter "
       "to %NPC immediately.  Be warned that this letter is the property of "
-      "the realm and failure to deliver it in a timely fashion will brand you "
-      "an outlaw.  Here is something for your troubles.  Now make haste."
-   latetax_assign_2_h = \
-      "A matter of urgency has been brought to my attention.  Certain "
-      "property and business owners in the community have been remiss in "
-      "their financial obligations to me.  Will you please take this letter "
-      "to %NPC immediately.  Be warned that this letter is the property of "
       "the realm and failure to deliver it in a timely fashion will most "
       "certainly result in much suffering for you.  Here is something for "
       "your troubles.  Now make haste."
@@ -67,10 +60,6 @@ resources:
       "become about collecting taxes.  I suspect there is more to this than "
       "meets the eye.  I have my suspicions but they are of no concern to you."
    latetax_failure_2 = \
-      "Subject: You are now an outlaw\n"
-      "You have been branded an outlaw for failure to deliver a government "
-      "issued letter to %NPC."
-   latetax_failure_2_h = \
       "Subject: You will now suffer, thief\n"
       "I have spoken to a wizard friend of mine, and he has ensured that you "
       "will suffer for your dishonesty."
@@ -142,7 +131,7 @@ messages:
       if Send(oQE,@AddQuestNodeTemplate,#questnode_type=QN_TYPE_ITEM,
                #NPC_modifier=QN_NPCMOD_NONE,
                #cargolist=[ [ QN_PRIZETYPE_ITEMCLASS, &TaxLetter, 1 ] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=2 * 3600,#quest_node_index=QNT_ID_LATE_TAX_TWO)
       {
          lNPCs = $;
@@ -177,21 +166,10 @@ messages:
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_LATE_TAX_TWO,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_LATE_TAX_TWO,
-                  #new_hint=latetax_assign_2_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_LATE_TAX_TWO,
-                  #new_hint=latetax_failure_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_LATE_TAX_TWO,
-                  #new_hint=latetax_assign_2);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_LATE_TAX_TWO,
-                  #new_hint=latetax_failure_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_LATE_TAX_TWO,
+               #new_hint=latetax_assign_2);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_LATE_TAX_TWO,
+               #new_hint=latetax_failure_2);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_LATE_TAX_TWO,
                #new_hint=latetax_success_2);
       }

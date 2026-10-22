@@ -53,9 +53,6 @@ resources:
 
    // Quest resources.
    kocale_assign_2 = \
-      "I need a guaranteed delivery made to the island.  Failure to deliver it "
-      "would result in outlaw status.  Are you willing to accept these terms?"
-   kocale_assign_2_h = \
       "I need a guaranteed delivery made to the island.  Failure to deliver "
       "it would be very unfortunate for you.  Are you willing to accept "
       "these terms?"
@@ -67,22 +64,11 @@ resources:
       "%NPC in Kocatan has asked for supplies of our brew for his customers "
       "on the other side.  Please take these %INDEF_CARGO%CARGO to "
       "%HIMHER_NPC.  I have arranged for %NPC to pay you for the journey.  Do "
-      "not steal my goods.  Not only will it brand you an outlaw but I also "
-      "have a friend, a wizard, very proficient in curses.  But let us not "
-      "dwell on the seedier side of life.  This could be the beginning of "
-      "something very profitable for all involved, my friend!"
-   kocale_assign_3_h = \
-      "%NPC in Kocatan has asked for supplies of our brew for his customers "
-      "on the other side.  Please take these %INDEF_CARGO%CARGO to "
-      "%HIMHER_NPC.  I have arranged for %NPC to pay you for the journey.  Do "
       "not steal my goods;  I have a friend, a wizard, very proficient in "
       "curses.  But let us not dwell on the seedier side of life.  This could "
       "be the beginning of something very profitable for all involved, "
       "my friend!"
    kocale_failure_3 = \
-      "Subject: Thief!\n"
-      "Your thievery has made you an outlaw by decree of the Duke."
-   kocale_failure_3_h = \
       "Subject: Thief!\n"
       "The bad luck brought on by your evil deed shall now follow you "
       "wherever you go."
@@ -182,17 +168,8 @@ messages:
                #NPC_modifier=QN_NPCMOD_SAME,#cargolist=[ chess_trigger ],
                #timelimit=2 * 60,#quest_node_index=QNT_ID_KOC_ALE_TRADE_TWO)
       {
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_ALE_TRADE_TWO,
-                  #new_hint=kocale_assign_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_ALE_TRADE_TWO,
-                  #new_hint=kocale_assign_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_ALE_TRADE_TWO,
+               #new_hint=kocale_assign_2);
          Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_ALE_TRADE_TWO,
                #new_hint=kocale_failure_2);
       }
@@ -223,7 +200,7 @@ messages:
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistMagicPotion, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistPoisonPotion, 1 ],
                             [ QN_PRIZETYPE_ITEMCLASS, &ResistShockPotion, 1 ] ] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=4 * 3600,#quest_node_index=QNT_ID_KOC_ALE_TRADE_THREE)
       {
          lNPCs = $;
@@ -234,21 +211,10 @@ messages:
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_KOC_ALE_TRADE_THREE,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
-                  #new_hint=kocale_assign_3_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
-                  #new_hint=kocale_failure_3_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
-                  #new_hint=kocale_assign_3);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
-                  #new_hint=kocale_failure_3);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
+               #new_hint=kocale_assign_3);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
+               #new_hint=kocale_failure_3);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_KOC_ALE_TRADE_THREE,
                #new_hint=kocale_success_3);
       }

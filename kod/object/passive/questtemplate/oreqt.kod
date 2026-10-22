@@ -50,21 +50,12 @@ resources:
    // Quest resources.
    ore_assign_2 = \
       "%NPC has run out of ore.  Take this ore to %HIMHER_NPC, and quickly.  "
-      "It would be unwise to betray me.  Theft will be reported and you will "
-      "thenceforth be deemed an outlaw.  Please hurry.  %NPC will pay you "
-      "for your troubles."
-   ore_assign_2_h = \
-      "%NPC has run out of ore.  Take this ore to %HIMHER_NPC, and quickly.  "
       "It would be unwise to betray me.  Theft will result in misfortune "
       "for us both.  Please hurry.  %NPC will pay you for your troubles."
    ore_success_2 = \
       "Thank you for the ore.  Here is your reward.  Perhaps we can do "
       "business again."
-   ore_failure_2 = \
-      "Subject: Thief!\n"
-      "Your theft of the ore has been reported.  You have been deemed an "
-      "outlaw and will need to contact the authorities to rectify this matter."
-   ore_failure_2_h = "Subject: Thief!\n"
+   ore_failure_2 = "Subject: Thief!\n"
       "Your theft of the ore has been reported.  I have spoken to a wizard "
       "friend of mine, and he has ensured that you will suffer for "
       "your dishonesty."
@@ -167,27 +158,16 @@ messages:
                               [ QN_PRIZETYPE_ITEMCLASS, &StrengthPotion, 1 ],
                               [ QN_PRIZETYPE_ITEMCLASS, &HastePotion, 1 ],
                               [ QN_PRIZETYPE_ITEMCLASS, &MagicShieldPotion, 1 ] ] ],
-               #penaltylist=[ [ QN_PRIZETYPE_OUTLAW ] ],
+               #penaltylist=[ [ QN_PRIZETYPE_CURSE ] ],
                #timelimit=2 * 3600,#quest_node_index=QNT_ID_BLACKSMITH_ORE_TWO)
       {
          Send(oQE,@SetQuestNodeNPCList,#index=QNT_ID_BLACKSMITH_ORE_TWO,
                #new_NPC_list=lNPCs);
 
-         // Happy land subs.
-         if NOT Send(SYS,@IsPKAllowed)
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
-                  #new_hint=ore_assign_2_h);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
-                  #new_hint=ore_failure_2_h);
-         }
-         else
-         {
-            Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
-                  #new_hint=ore_assign_2);
-            Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
-                  #new_hint=ore_failure_2);
-         }
+         Send(oQE,@SetQuestNodeAssignHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
+               #new_hint=ore_assign_2);
+         Send(oQE,@SetQuestNodeFailureHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
+               #new_hint=ore_failure_2);
          Send(oQE,@SetQuestNodeSuccessHint,#index=QNT_ID_BLACKSMITH_ORE_TWO,
                #new_hint=ore_success_2);
       }
