@@ -1,0 +1,153 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+ContractDagger is BlackDagger
+
+// Ours (the faction revamp): the blade of one of Roq's contracts (util/roqcontracts.kod).
+// It names its mark (troop/contractmark.kod) and where they were seen, and has nothing to do
+// with the Assassin's Game the black daggers were made for: AssassinGame.TryAssassinAttack
+// hands its strikes to ContractStrike. Half of them land; the mark takes four.
+
+constants:
+
+   include blakston.khd
+
+   CONTRACT_HIT_CHANCE = 50
+
+resources:
+
+   ContractDagger_name_rsc = "contract dagger"
+   ContractDagger_desc_rsc = \
+      "A black blade from Roq the Dark Blade, meant for one throat only: %s%s, "
+      "last seen near %s.  Four true strikes will finish them; nothing else will."
+   ContractDagger_spent_rsc = \
+      "A black blade from Roq the Dark Blade.  Its work is done."
+   ContractDagger_wrong_target = \
+      "Roq's blade turns aside.  It was made for your mark alone."
+
+classvars:
+
+   vrName = ContractDagger_name_rsc
+
+properties:
+
+   poMark = $
+   poMarkRoom = $
+
+messages:
+
+   SetMark(mark = $, where = $)
+   {
+      poMark = mark;
+      poMarkRoom = where;
+
+      return;
+   }
+
+   ClearMark()
+   {
+      poMark = $;
+
+      return;
+   }
+
+   GetMark()
+   {
+      return poMark;
+   }
+
+   ShowDesc()
+   {
+      if poMark = $
+         OR poMarkRoom = $
+      {
+         AddPacket(4,ContractDagger_spent_rsc);
+
+         return;
+      }
+
+      AddPacket(4,ContractDagger_desc_rsc,4,Send(poMark,@GetDef),4,Send(poMark,@GetName),
+                4,Send(poMarkRoom,@GetName));
+
+      return;
+   }
+
+   ContractStrike(target = $)
+   "Our bearer struck at target (AssassinGame.TryAssassinAttack). TRUE if it was a swing."
+   {
+      if poOwner = $
+         OR target = $
+      {
+         return FALSE;
+      }
+
+      if target <> poMark
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=ContractDagger_wrong_target);
+
+         return FALSE;
+      }
+
+      // Does the animations and overlays.
+      Send(self,@WeaponAttack);
+
+      if Random(1,100) > CONTRACT_HIT_CHANCE
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=BlackDagger_miss,
+              #parm1=Send(target,@GetDef),#parm2=Send(target,@GetName));
+
+         return TRUE;
+      }
+
+      Send(poOwner,@MsgSendUser,#message_rsc=BlackDagger_surehit,
+           #parm1=Send(target,@GetDef),#parm2=Send(target,@GetName));
+      Send(poOwner,@DoHitMessageSound,#what=target,
+           #damage=10,#stroke_obj=Send(SYS,@FindSkillByNum,#num=SKID_SLASH));
+      Send(target,@ContractHit,#attacker=poOwner,#dagger=self);
+
+      return TRUE;
+   }
+
+   ReqUse(what = $)
+   "Anyone holding a contract dagger may wield it."
+   {
+      return TRUE;
+   }
+
+   UserLogoff()
+   {
+      return;
+   }
+
+   UserLogon()
+   {
+      return;
+   }
+
+   CleanUp()
+   "The Assassin's Game clears away every black dagger when it resets (Send(&BlackDagger)); "
+   "not ours."
+   {
+      return;
+   }
+
+   Delete()
+   {
+      // Deleted from outside (a DM) while the contract still runs: it ends.
+      if poMark <> $
+      {
+         poMark = $;
+         Send(Send(SYS,@GetRoqContracts),@DaggerGone,#dagger=self);
+      }
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

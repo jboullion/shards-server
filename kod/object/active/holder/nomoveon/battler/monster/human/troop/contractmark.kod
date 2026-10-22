@@ -1,0 +1,170 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+ContractMark is FactionTroop
+
+// Ours (the faction revamp): a mark of one of Roq's contracts (util/roqcontracts.kod), an
+// agent of a liege (contractmark/: the Duke's courier, the Princess's spy, Jonas's
+// agitator). It fights like that liege's troops, but only its hunter's contract dagger can
+// harm it (AssessDamage): half the dagger's strikes land, and the fourth finishes it
+// (ContractHit). After the contract's hour it slips away (LeaveTimer).
+
+constants:
+
+   include blakston.khd
+
+   CONTRACT_STRIKES = 4
+
+resources:
+
+   ContractMark_untouchable = \
+      "Your blow glances off %s%s.  Only one of Roq's black blades will finish this one."
+   ContractMark_struck = \
+      "~IYour black blade finds a gap in %s%s's guard!  %i more true strikes will finish it."
+   ContractMark_struck_last = \
+      "~IYour black blade finds a gap in %s%s's guard!  One more true strike will finish it."
+
+classvars:
+
+   viTreasure_type = TID_EMPTY
+
+properties:
+
+   poHunter = $
+   piStrikesLeft = CONTRACT_STRIKES
+   ptLeave = $
+   piLastGlance = 0
+
+messages:
+
+   SetHunter(who = $, minutes = 60)
+   {
+      poHunter = who;
+
+      if ptLeave <> $
+      {
+         DeleteTimer(ptLeave);
+      }
+      ptLeave = CreateTimer(self,@LeaveTimer,minutes * 60 * 1000);
+
+      return;
+   }
+
+   ClearHunter()
+   {
+      poHunter = $;
+
+      return;
+   }
+
+   GetHunter()
+   {
+      return poHunter;
+   }
+
+   LeaveTimer()
+   {
+      ptLeave = $;
+      Send(Send(SYS,@GetRoqContracts),@ContractTimeUp,#mark=self);
+
+      return;
+   }
+
+   AssessDamage(what=$,damage=$,atype=0,aspell=0,bonus=0,scalefactor=1000,
+                absolute=FALSE,precision=FALSE)
+   "Nothing but the contract dagger harms a mark (ContractHit)."
+   {
+      if what <> $
+         AND IsClass(what,&User)
+         AND GetTime() > piLastGlance + 5
+      {
+         piLastGlance = GetTime();
+         Send(what,@MsgSendUser,#message_rsc=ContractMark_untouchable,
+              #parm1=Send(self,@GetDef),#parm2=Send(self,@GetName));
+      }
+
+      return 0;
+   }
+
+   ContractHit(attacker = $, dagger = $)
+   "A true strike from attacker's contract dagger (ContractDagger.ContractStrike)."
+   {
+      if attacker = $
+         OR attacker <> poHunter
+         OR piStrikesLeft <= 0
+      {
+         return;
+      }
+
+      piStrikesLeft = piStrikesLeft - 1;
+
+      if piStrikesLeft > 1
+      {
+         Send(attacker,@MsgSendUser,#message_rsc=ContractMark_struck,
+              #parm1=Send(self,@GetDef),#parm2=Send(self,@GetName),#parm3=piStrikesLeft);
+      }
+      else if piStrikesLeft = 1
+      {
+         Send(attacker,@MsgSendUser,#message_rsc=ContractMark_struck_last,
+              #parm1=Send(self,@GetDef),#parm2=Send(self,@GetName));
+      }
+      else
+      {
+         // After the dagger's swing is done: the dagger goes when Roq pays.
+         Post(self,@ContractFinished,#attacker=attacker);
+      }
+
+      return;
+   }
+
+   ContractFinished(attacker = $)
+   "Roq pays, then we die at attacker's hand."
+   {
+      if ptLeave <> $
+      {
+         DeleteTimer(ptLeave);
+         ptLeave = $;
+      }
+
+      Send(Send(SYS,@GetRoqContracts),@ContractDone,#mark=self,#who=attacker);
+      poHunter = $;
+
+      if attacker <> $
+         AND Send(attacker,@GetOwner) = poOwner
+      {
+         Send(attacker,@KilledSomething,#what=self);
+      }
+      else
+      {
+         Send(self,@Delete);
+      }
+
+      return;
+   }
+
+   Delete()
+   {
+      if ptLeave <> $
+      {
+         DeleteTimer(ptLeave);
+         ptLeave = $;
+      }
+
+      // Deleted from outside (a DM, a reset) while the contract still runs.
+      if poHunter <> $
+      {
+         poHunter = $;
+         Send(Send(SYS,@GetRoqContracts),@MarkGone,#mark=self);
+      }
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,449 @@
+// Ours (Meridian Shards, the faction revamp): Roq's contracts. One object,
+// SYS@GetRoqContracts, made on demand. Roq the Dark Blade serves no liege and sells his
+// blades to all of them: a player in a faction who says "contract" to him (Assassin.
+// SomeoneSaid) is given a mark, an agent of a rival liege (troop/contractmark.kod: the
+// Duke's courier, the Princess's spy, Jonas's agitator) placed somewhere in the open lands,
+// and a contract dagger (weapon/bkdagger/contractdagger.kod) that names them and where they
+// were last seen. Nothing but that dagger can harm the mark; half its strikes land, and four
+// finish the mark (ContractMark.ContractHit). Roq pays at once (ContractDone): renown with
+// the player's liege and coin. A contract lasts CONTRACT_MINUTES, after which the mark slips
+// away and the dagger crumbles; "abandon contract" ends one early. Up to CONTRACTS_PER_DAY
+// are paid a day.
+//
+// Once the faction battles exist (the faction revamp's phase 2), a finished contract is
+// meant to tilt the next battle against the mark's liege.
+//
+// plContracts: [ player, mark, dagger ] (the mark keeps the hour, ContractMark.SetHunter);
+// plPaid: [ player, day, count ].
+////////////////////////////////////////////////////////////////////////////////
+RoqContracts is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   CONTRACT_MINUTES = 60
+   CONTRACTS_PER_DAY = 5
+   CONTRACT_RENOWN = 3
+   CONTRACT_SHILLINGS = 1000
+
+   // How many rooms to try before giving up on placing a mark
+   PLACE_TRIES = 12
+
+resources:
+
+   roq_contract_trigger = "contract"
+   roq_abandon_trigger = "abandon contract"
+
+   roq_contract_no_faction = \
+      "~IRoq looks through you.  \"I sell blades to the lieges' servants, and you serve "
+      "no liege.\""
+   roq_contract_newbie = \
+      "~IRoq laughs softly.  \"Come back when you have some blood on your hands.\""
+   roq_contract_have_one = \
+      "~I\"You already carry one of my blades.  Finish your work, or say 'abandon contract'.\""
+   roq_contract_enough = \
+      "~I\"Enough for one day.  Even I need my marks to grow careless again.\""
+   roq_contract_none_found = \
+      "~I\"My informants have nothing for you just now.  Try me again soon.\""
+   roq_contract_cant_hold = "~I\"Make room for the blade first.\""
+   roq_contract_given = \
+      "~I\"I have a mark for you: %s%s.  My informants saw them near %s.  Take this "
+      "blade; nothing else will touch them, and four true strikes will finish them.  You "
+      "have an hour.\""
+   roq_contract_abandoned = "~I\"Coward's choice.  The mark lives.\"  Roq takes back his blade."
+   roq_contract_no_contract = "~I\"You carry none of my blades.\""
+
+   roq_contract_paid = \
+      "~IRoq's coin finds its way into your purse: %i shillings.  %s will hear of your work."
+   roq_contract_expired = \
+      "~IYour mark has slipped away.  Roq's dagger crumbles to dust in your hand."
+   roq_contract_mark_lost = \
+      "~IYour mark is gone from the lands.  Roq's dagger crumbles to dust in your hand."
+
+   roq_liege_duke = "the Duke"
+   roq_liege_princess = "the Princess"
+   roq_liege_rebel = "Jonas D'Accor"
+
+classvars:
+
+properties:
+
+   plContracts = $
+   plPaid = $
+
+messages:
+
+   IsContractTrigger(string = $)
+   {
+      return string <> $
+         AND StringEqual(string,roq_contract_trigger);
+   }
+
+   IsAbandonTrigger(string = $)
+   {
+      return string <> $
+         AND StringEqual(string,roq_abandon_trigger);
+   }
+
+   FindContract(who = $, mark = $)
+   "The contract who holds, or the one on mark."
+   {
+      local i;
+
+      foreach i in plContracts
+      {
+         if (who <> $ AND First(i) = who)
+            OR (mark <> $ AND Nth(i,2) = mark)
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   LiegeName(faction = $)
+   {
+      if faction = FACTION_DUKE
+      {
+         return roq_liege_duke;
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         return roq_liege_princess;
+      }
+
+      return roq_liege_rebel;
+   }
+
+   PaidToday(who = $)
+   {
+      local i, iDay;
+
+      iDay = GetTime() / 86400;
+      foreach i in plPaid
+      {
+         if First(i) = who
+         {
+            if Nth(i,2) = iDay
+            {
+               return Nth(i,3);
+            }
+
+            return 0;
+         }
+      }
+
+      return 0;
+   }
+
+   CountPaid(who = $)
+   {
+      local i, iDay;
+
+      iDay = GetTime() / 86400;
+      foreach i in plPaid
+      {
+         if First(i) = who
+         {
+            if Nth(i,2) = iDay
+            {
+               SetNth(i,3,Nth(i,3) + 1);
+            }
+            else
+            {
+               SetNth(i,2,iDay);
+               SetNth(i,3,1);
+            }
+
+            return;
+         }
+      }
+
+      plPaid = Cons([who,iDay,1],plPaid);
+
+      return;
+   }
+
+   MarkClass(faction = $)
+   {
+      if faction = FACTION_DUKE
+      {
+         return &DukeCourier;
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         return &PrincessSpy;
+      }
+
+      return &RebelAgitator;
+   }
+
+   RivalFaction(faction = $)
+   "One of the two lieges faction is against, at random."
+   {
+      local lRivals;
+
+      lRivals = $;
+      if faction <> FACTION_DUKE
+      {
+         lRivals = Cons(FACTION_DUKE,lRivals);
+      }
+
+      if faction <> FACTION_PRINCESS
+      {
+         lRivals = Cons(FACTION_PRINCESS,lRivals);
+      }
+
+      if faction <> FACTION_REBEL
+      {
+         lRivals = Cons(FACTION_REBEL,lRivals);
+      }
+
+      return Nth(lRivals,Random(1,Length(lRivals)));
+   }
+
+   PlaceMark(cMark = $, who = $)
+   "Make a mark of class cMark hunted by who, somewhere in the open lands (the outdoor grid, "
+   "rooms 511 to 618). Returns [ mark, room ], or $ if no room would take one."
+   {
+      local i, iRID, oRoom, oMark;
+
+      i = 0;
+      while i < PLACE_TRIES
+      {
+         i = i + 1;
+         iRID = Random(RID_A1,RID_K8);
+         oRoom = Send(SYS,@FindRoomByNum,#num=iRID);
+         if oRoom <> $
+            AND NOT Send(oRoom,@CheckRoomFlag,#flag=ROOM_NO_COMBAT)
+            AND NOT Send(oRoom,@CheckRoomFlag,#flag=ROOM_SANCTUARY)
+            AND NOT IsClass(oRoom,&GuildHall)
+         {
+            oMark = Create(cMark);
+            // GenerateMonster deletes a monster it can't place.
+            if Send(oRoom,@GenerateMonster,#oMonster=oMark,#bRandom=TRUE)
+            {
+               Send(oMark,@SetHunter,#who=who,#minutes=CONTRACT_MINUTES);
+
+               return [ oMark, oRoom ];
+            }
+         }
+      }
+
+      return $;
+   }
+
+   AskForContract(who = $, roq = $)
+   "who said 'contract' to Roq."
+   {
+      local iFaction, iMarkFaction, oMark, oRoom, oDagger, lPlaced;
+
+      if who = $
+         OR roq = $
+         OR NOT IsClass(who,&Player)
+      {
+         return;
+      }
+
+      iFaction = Send(who,@GetFaction);
+      if iFaction = FACTION_NEUTRAL
+      {
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_no_faction);
+
+         return;
+      }
+
+      if NOT Send(who,@CanPlayerPvP)
+      {
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_newbie);
+
+         return;
+      }
+
+      if Send(self,@FindContract,#who=who) <> $
+      {
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_have_one);
+
+         return;
+      }
+
+      if Send(self,@PaidToday,#who=who) >= CONTRACTS_PER_DAY
+      {
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_enough);
+
+         return;
+      }
+
+      oDagger = Create(&ContractDagger);
+      if NOT Send(who,@ReqNewHold,#what=oDagger)
+      {
+         Send(oDagger,@Delete);
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_cant_hold);
+
+         return;
+      }
+
+      iMarkFaction = Send(self,@RivalFaction,#faction=iFaction);
+      lPlaced = Send(self,@PlaceMark,#cMark=Send(self,@MarkClass,#faction=iMarkFaction),
+                     #who=who);
+      if lPlaced = $
+      {
+         Send(oDagger,@Delete);
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_none_found);
+
+         return;
+      }
+
+      oMark = First(lPlaced);
+      oRoom = Nth(lPlaced,2);
+
+      Send(oDagger,@SetMark,#mark=oMark,#where=oRoom);
+      Send(who,@NewHold,#what=oDagger);
+
+      plContracts = Cons([who,oMark,oDagger],plContracts);
+
+      Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_given,
+           #parm1=Send(oMark,@GetIndef),#parm2=Send(oMark,@GetName),
+           #parm3=Send(oRoom,@GetName));
+
+      return;
+   }
+
+   EndContract(contract = $, rMessage = $)
+   "Take contract off the books: its timer, mark and dagger go."
+   {
+      local oWho, oMark, oDagger;
+
+      if contract = $
+      {
+         return;
+      }
+
+      plContracts = DelListElem(plContracts,contract);
+
+      oWho = First(contract);
+      oMark = Nth(contract,2);
+      oDagger = Nth(contract,3);
+
+      if oDagger <> $
+      {
+         Send(oDagger,@ClearMark);
+         Send(oDagger,@Delete);
+      }
+
+      if oMark <> $
+      {
+         Send(oMark,@ClearHunter);
+         Send(oMark,@Delete);
+      }
+
+      if rMessage <> $
+         AND oWho <> $
+      {
+         Send(oWho,@MsgSendUser,#message_rsc=rMessage);
+      }
+
+      return;
+   }
+
+   AbandonContract(who = $, roq = $)
+   "who said 'abandon contract' to Roq."
+   {
+      local lContract;
+
+      lContract = Send(self,@FindContract,#who=who);
+      if lContract = $
+      {
+         Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_no_contract);
+
+         return;
+      }
+
+      Send(self,@EndContract,#contract=lContract);
+      Send(roq,@SayToOne,#target=who,#message_rsc=roq_contract_abandoned);
+
+      return;
+   }
+
+   ContractTimeUp(mark = $)
+   "mark's hour is up (ContractMark.LeaveTimer): it slips away."
+   {
+      local lContract;
+
+      lContract = Send(self,@FindContract,#mark=mark);
+      if lContract <> $
+      {
+         Send(self,@EndContract,#contract=lContract,#rMessage=roq_contract_expired);
+      }
+
+      return;
+   }
+
+   DaggerGone(dagger = $)
+   "A contract's dagger was deleted from outside: the contract ends, the mark slips away."
+   {
+      local i;
+
+      foreach i in plContracts
+      {
+         if Nth(i,3) = dagger
+         {
+            SetNth(i,3,$);
+            Send(self,@EndContract,#contract=i);
+
+            return;
+         }
+      }
+
+      return;
+   }
+
+   MarkGone(mark = $)
+   "mark was deleted from outside (a DM, a room reset): the contract ends."
+   {
+      local lContract;
+
+      lContract = Send(self,@FindContract,#mark=mark);
+      if lContract <> $
+      {
+         SetNth(lContract,2,$);
+         Send(self,@EndContract,#contract=lContract,#rMessage=roq_contract_mark_lost);
+      }
+
+      return;
+   }
+
+   ContractDone(mark = $, who = $)
+   "who's fourth strike finished mark: Roq pays. The mark dies (ContractMark.ContractHit)."
+   {
+      local lContract, iShillings;
+
+      lContract = Send(self,@FindContract,#mark=mark);
+      if lContract = $
+         OR First(lContract) <> who
+      {
+         return;
+      }
+
+      // The mark goes on to die; just the dagger and the timer go here.
+      SetNth(lContract,2,$);
+      Send(self,@EndContract,#contract=lContract);
+
+      Send(self,@CountPaid,#who=who);
+      Send(who,@AddFactionRenown,#amount=CONTRACT_RENOWN);
+
+      iShillings = CONTRACT_SHILLINGS;
+      Send(who,@NewHold,#what=Create(&Shillings,#number=iShillings));
+      Send(who,@MsgSendUser,#message_rsc=roq_contract_paid,#parm1=iShillings,
+           #parm2=Send(self,@LiegeName,#faction=Send(who,@GetFaction)));
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

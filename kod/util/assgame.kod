@@ -503,6 +503,12 @@ messages:
    {
       local bLegal_Opponent;
 
+      // Ours: a contract dagger strikes only at its contract's mark (util/roqcontracts.kod).
+      if IsClass(dagger_obj,&ContractDagger)
+      {
+         return Send(dagger_obj,@ContractStrike,#target=target);
+      }
+
       if (attacker = $ OR target = $) OR dagger_obj = $
       {
          Debug("TryAssassin attack reached with null attacker,dagger or "

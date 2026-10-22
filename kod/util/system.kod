@@ -420,6 +420,8 @@ properties:
    poArenaBouts = $
    // Ours: the lieges' gifts to their champions (util/championgifts.kod), made on demand
    poChampionGifts = $
+   // Ours: Roq's contracts on the lieges' agents (util/roqcontracts.kod), made on demand
+   poRoqContracts = $
    poCosmeticsBook = $
    // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
    poItemServiceBook = $
@@ -5313,6 +5315,17 @@ messages:
       }
 
       return poArenaBouts;
+   }
+
+   GetRoqContracts()
+   "Ours: Roq's contracts on the lieges' agents (util/roqcontracts.kod), made on demand."
+   {
+      if poRoqContracts = $
+      {
+         poRoqContracts = Create(&RoqContracts);
+      }
+
+      return poRoqContracts;
    }
 
    GetChampionGifts()

@@ -36,7 +36,9 @@ resources:
    assassin_help = "Say 'blade' to get a weapon for the next game.  Say "
       "'quit' to hand your blade back in.  Say 'advertise' to be told when a "
       "fight starts.  Say 'no advertise' if you do not wish to be informed of "
-      "current developments."
+      "current developments.  If you serve a liege, say 'contract' and I will "
+      "sell you one of the other lieges' agents; 'abandon contract' if you lose "
+      "your nerve."
 
    assassin_in_session = \
       "~IYou may not join in while a game is in session.  %s."
@@ -126,12 +128,28 @@ messages:
 
    SomeoneSaid(what=$,string=$,type=$)
    {
-      local oGame;
+      local oGame, oContracts;
 
       // If not a player, ignore it all.
       if NOT IsClass(what,&User)
       {
          propagate;
+      }
+
+      // Ours: contracts on the lieges' agents (util/roqcontracts.kod).
+      oContracts = Send(SYS,@GetRoqContracts);
+      if Send(oContracts,@IsContractTrigger,#string=string)
+      {
+         Send(oContracts,@AskForContract,#who=what,#roq=self);
+
+         return;
+      }
+
+      if Send(oContracts,@IsAbandonTrigger,#string=string)
+      {
+         Send(oContracts,@AbandonContract,#who=what,#roq=self);
+
+         return;
       }
 
       // Beta test check:  during a beta test, a player can say 'goodbye angel'

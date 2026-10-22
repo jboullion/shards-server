@@ -4,11 +4,6 @@ assassin_desc_rsc = de \
    "Diesen Mann umgibt eine mißgünstige, ins Jenseits gerichtete Aura. Er "
    "hängt an den Schatten dieses schändlichen Ortes, ein Diener irgendeiner "
    "dunklen Macht.."
-assassin_help = de \
-   "Sag 'Klinge' um eine Waffe für das nächste Spiel zu bekommen.  Sag 'Aufgabe' "
-   "um deine Klinge zurück zu geben.  Sag 'Ankündigung' um eine Mitteilung "
-   "zu bekommen wenn das Spiel beginnt.  Sag 'keine Ankündigung' wenn du "
-   "nicht mehr über die derzeitige Spielentwicklung informiert werden willst."
 assassin_in_session = de \
    "~IDu kannst nicht beitreten, solange ein Spiel läuft.  %s."
 assassin_is_advertised = de \
@@ -55,7 +50,6 @@ assassin_accept_mode = de "accept mode"
 assassin_name_rsc = pt "Roq"
 assassin_mailname_rsc = pt "Roq a Lâmina Sombria"
 assassin_desc_rsc = pt "Há uma qualidade malévola e sobrenatural neste homem. Ele se agarra às sombras deste lugar vil, um servo de algum poder sombrio."
-assassin_help = pt "Diga 'lâmina' para obter uma arma para o próximo jogo. Diga 'sair' para devolver sua lâmina. Diga 'anunciar' para ser informado quando uma luta começar. Diga 'não anunciar' se você não deseja ser informado dos desenvolvimentos atuais."
 assassin_in_session = pt "~INão é possível participar enquanto um jogo está em andamento. %s."
 assassin_is_advertised = pt "No entanto, eu o informarei quando o próximo começar"
 assassin_is_not_advertised = pt "Diga 'anunciar' se desejar ser informado quando o próximo começar"
