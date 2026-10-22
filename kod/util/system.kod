@@ -422,6 +422,7 @@ properties:
    poChampionGifts = $
    // Ours: Roq's contracts on the lieges' agents (util/roqcontracts.kod), made on demand
    poRoqContracts = $
+   poFactionWar = $
    poCosmeticsBook = $
    // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
    poItemServiceBook = $
@@ -1463,6 +1464,10 @@ messages:
       {
          Send(poPlayerMarket,@ExpireListings);
       }
+
+      // Ours: the lieges' battles keep their schedule (util/factionwar.kod; this also makes
+      //  it on a world that has none yet)
+      Send(Send(self,@GetFactionWar),@NewGameHour);
 
       return;
    }
@@ -5337,6 +5342,17 @@ messages:
       }
 
       return poChampionGifts;
+   }
+
+   GetFactionWar()
+   "Ours: the lieges' battles over the flagpoles (util/factionwar.kod), made on demand."
+   {
+      if poFactionWar = $
+      {
+         poFactionWar = Create(&FactionWar);
+      }
+
+      return poFactionWar;
    }
 
    GetCosmeticsBook()

@@ -1,0 +1,1271 @@
+// Ours (Meridian Shards, the faction revamp's phase 2; docs/adr/0021): the lieges' battles
+// over the flagpoles. One object, SYS@GetFactionWar, made on demand (System.NewGameHour
+// asks for it every game hour, which keeps the schedule going on any world).
+//
+// Every piBattleMinutes a battle is called at a front (PickFront): a flag room whose pole's
+// liege differs from a neighbouring pole's (an assault), or a pole no liege holds next to a
+// liege's land (open ground: a rival liege marches on it too). A liege's own city and its
+// capture points are never attacked, nor a town's own pole.
+//
+//   STATE_MUSTER   announced to everyone; piMusterMinutes to come.
+//   STATE_FIGHT    up to piFightMinutes. The armies take the field only once a player is in
+//                  the room (SpawnArmies): piArmySize a side, with a captain, archers and mages
+//                  of the liege's two schools, each twice a flag troop's strength
+//                  (FactionTroop.SetBattle), plus a troop for each point of war effort. They
+//                  fight each other and the other side's soldiers, nobody else. A side loses
+//                  when its captain falls or its army is gone.
+//
+// Unwatched, or out of time, the battle is rolled: 50/50 shifted EFFORT_PERCENT for each
+// point of war effort either side brought (AddWarEffort: Roq's contracts, the ground
+// dailies), or, if it was fought, by the health each army has left. The winner takes the
+// pole (Flagpole.SetFaction, which recounts the territory and the lieges' power), and the
+// soldiers who stood there are paid (Resolve). Both sides' war effort is spent.
+//
+// Maintenance port: StartBattle (rid int, attacker int), EndBattle (winner int),
+// AddWarEffort (faction int, amount int), and the settings below.
+////////////////////////////////////////////////////////////////////////////////
+FactionWar is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+
+   STATE_NONE = 0
+   STATE_MUSTER = 1
+   STATE_FIGHT = 2
+
+   // War effort: each point moves an unwatched battle this much (percent), and brings a
+   // troop more to a fought one; at most this many points count
+   EFFORT_PERCENT = 5
+   EFFORT_MAX = 4
+
+   WIN_RENOWN = 5
+   FOUGHT_RENOWN = 2
+   WIN_SHILLINGS = 1000
+   FOUGHT_SHILLINGS = 250
+
+   HOW_FIELD = 1
+   HOW_TIME = 2
+   HOW_UNWATCHED = 3
+
+   HISTORY_MAX = 10
+
+resources:
+
+   fw_muster = \
+      "~B~k[Battle]~n ~B%s marches on %s, held by %s!  The armies meet there in %i "
+      "minutes.  Soldiers of either liege, take up your shields."
+   fw_muster_open = \
+      "~B~k[Battle]~n ~B%s and %s both march on %s, which no liege holds.  The armies meet "
+      "there in %i minutes.  Soldiers of either liege, take up your shields."
+   fw_begin = "~B~k[Battle]~n ~BThe armies of %s and %s clash at %s!"
+   fw_won_field = "~B~k[Battle]~n ~B%s carries the field at %s.  The day is theirs."
+   fw_won_time = \
+      "~B~k[Battle]~n ~BThe armies draw back from %s as the light fails.  %s holds the field."
+   fw_won_unwatched = "~B~k[Battle]~n ~BWord comes from %s: the day belongs to %s."
+   fw_paid_win = "~IYour liege pays %i shillings to those who won the day at %s."
+   fw_paid_lose = \
+      "~IThe day is lost, but your liege remembers who stood at %s.  %i shillings for your "
+      "trouble."
+   fw_effort = "~IYour work strengthens %s's next battle."
+
+classvars:
+
+properties:
+
+   piState = STATE_NONE
+
+   // Settings
+   piBattleMinutes = 120
+   piMusterMinutes = 10
+   piFightMinutes = 20
+   piArmySize = 10
+
+   ptNext = $
+   ptStage = $
+   ptTick = $
+
+   poRoom = $
+   poFlag = $
+   piAttacker = FACTION_NEUTRAL
+   piDefender = FACTION_NEUTRAL
+   pbOpenGround = FALSE
+   piDeadline = 0
+   pbSpawned = FALSE
+   // Where the attackers gather: [ row, col ] (SpawnArmies), or $
+   plAttackAnchor = $
+
+   // The armies' troops, and their captains (FALSE once fallen)
+   plAttackArmy = $
+   plDefendArmy = $
+   poAttackCaptain = $
+   poDefendCaptain = $
+   // How many each army raised, and whether its captain is still guarded
+   piAttackRaised = 0
+   piDefendRaised = 0
+   pbAttackGuarded = TRUE
+   pbDefendGuarded = TRUE
+
+   // The soldiers who stood in the battle: [ player, faction ]
+   plParticipants = $
+
+   // War effort: [ Duke, Princess, Rebels ]
+   plWarEffort = $
+
+   // The last battles: [ GetTime(), rid, attacker, defender, winner, how ]
+   plHistory = $
+
+messages:
+
+   Constructor()
+   {
+      plWarEffort = [ 0, 0, 0 ];
+      Send(self,@ScheduleNext);
+
+      propagate;
+   }
+
+   Delete()
+   {
+      Send(self,@ClearTimers);
+      Send(self,@ClearArmies);
+      if ptNext <> $
+      {
+         DeleteTimer(ptNext);
+         ptNext = $;
+      }
+
+      propagate;
+   }
+
+   NewGameHour()
+   "From System.NewGameHour: keeps the schedule going if it was ever lost."
+   {
+      if piState = STATE_NONE
+         AND ptNext = $
+      {
+         Send(self,@ScheduleNext);
+      }
+
+      return;
+   }
+
+   ScheduleNext(minutes = $)
+   {
+      if minutes = $
+      {
+         minutes = piBattleMinutes;
+      }
+
+      if ptNext <> $
+      {
+         DeleteTimer(ptNext);
+      }
+
+      ptNext = CreateTimer(self,@NextBattleTimer,Bound(minutes,1,1440) * 60000);
+
+      return;
+   }
+
+   NextBattleTimer()
+   {
+      ptNext = $;
+      if NOT Send(self,@StartBattle)
+      {
+         Send(self,@ScheduleNext);
+      }
+
+      return;
+   }
+
+   //// Who's fighting
+
+   GetState()
+   {
+      return piState;
+   }
+
+   GetStatus()
+   "[ state, rid, attacker, defender, armies on the field, attackers, defenders, seconds left, "
+   "war effort ]: for the admin."
+   {
+      local iRID;
+
+      iRID = 0;
+      if poRoom <> $
+      {
+         iRID = Send(poRoom,@GetRoomNum);
+      }
+
+      return [ piState, iRID, piAttacker, piDefender, pbSpawned, Length(plAttackArmy),
+               Length(plDefendArmy), Bound(piDeadline - GetTime(),0,$), plWarEffort ];
+   }
+
+   IsBattleSide(faction = $)
+   {
+      return piState <> STATE_NONE
+             AND faction <> FACTION_NEUTRAL
+             AND (faction = piAttacker OR faction = piDefender);
+   }
+
+   IsBattleAt(flag = $)
+   {
+      return piState <> STATE_NONE AND flag <> $ AND flag = poFlag;
+   }
+
+   LiegeName(faction = $)
+   {
+      return Send(Send(SYS,@GetParliament),@GetFactionLiegeName,#faction=faction);
+   }
+
+   Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $)
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         Send(i,@MsgSendUser,#message_rsc=rsc,#parm1=parm1,#parm2=parm2,#parm3=parm3,
+              #parm4=parm4);
+      }
+
+      return;
+   }
+
+   //// War effort
+
+   AddWarEffort(faction = $,amount = 1,who = $)
+   "Work done for faction's next battle (Roq's contracts, quests): who is told."
+   {
+      local iIndex;
+
+      if faction = $
+         OR faction <= FACTION_NEUTRAL
+         OR faction > FACTION_NORMAL_MAX
+      {
+         return;
+      }
+
+      if plWarEffort = $
+      {
+         plWarEffort = [ 0, 0, 0 ];
+      }
+
+      iIndex = faction;
+      SetNth(plWarEffort,iIndex,Bound(Nth(plWarEffort,iIndex) + amount,0,EFFORT_MAX));
+
+      if who <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=fw_effort,
+              #parm1=Send(self,@LiegeName,#faction=faction));
+      }
+
+      return;
+   }
+
+   GetWarEffort(faction = $)
+   {
+      if plWarEffort = $
+         OR faction = $
+         OR faction <= FACTION_NEUTRAL
+         OR faction > FACTION_NORMAL_MAX
+      {
+         return 0;
+      }
+
+      return Nth(plWarEffort,faction);
+   }
+
+   //// Calling a battle
+
+   PickFront()
+   "[ room, flag, attacker, defender, open ground ] for the next battle, or $ if there's no "
+   "front anywhere."
+   {
+      local oTG, iRID, oRoom, oFlag, iOwner, iNear, oNearRoom, oNearFlag, iNearFaction,
+            lFronts, lFront, iRival, lRivals, i;
+
+      oTG = Send(SYS,@GetTerritoryGame);
+      if oTG = $
+      {
+         return $;
+      }
+
+      lFronts = $;
+      foreach iRID in Send(oTG,@GetFlagRIDs)
+      {
+         oRoom = Send(SYS,@FindRoomByNum,#num=iRID);
+         if oRoom = $
+         {
+            continue;
+         }
+
+         oFlag = Send(oRoom,@FindHoldingActive,#class=&Flagpole);
+         if oFlag = $
+            OR NOT Send(oFlag,@IsClaimable)
+            OR Send(oFlag,@IsClaimAttemptInProgress)
+         {
+            continue;
+         }
+
+         iOwner = Send(oFlag,@GetFaction);
+         if iOwner <> FACTION_NEUTRAL
+            AND Send(oTG,@IsHometownFlag,#RID=iRID,#faction=iOwner)
+         {
+            continue;
+         }
+
+         foreach iNear in Send(oRoom,@GetYellZone)
+         {
+            if iNear = iRID
+            {
+               continue;
+            }
+
+            oNearRoom = Send(SYS,@FindRoomByNum,#num=iNear);
+            if oNearRoom = $
+            {
+               continue;
+            }
+
+            oNearFlag = Send(oNearRoom,@FindHoldingActive,#class=&Flagpole);
+            if oNearFlag = $
+            {
+               continue;
+            }
+
+            iNearFaction = Send(oNearFlag,@GetFaction);
+            if iNearFaction = FACTION_NEUTRAL
+               OR iNearFaction = iOwner
+            {
+               continue;
+            }
+
+            if iOwner <> FACTION_NEUTRAL
+            {
+               // An assault counts twice: the war is between the lieges
+               lFront = [ oRoom, oFlag, iNearFaction, iOwner, FALSE ];
+               lFronts = Cons(lFront,Cons(lFront,lFronts));
+            }
+            else
+            {
+               lRivals = $;
+               i = FACTION_DUKE;
+               while i <= FACTION_NORMAL_MAX
+               {
+                  if i <> iNearFaction
+                  {
+                     lRivals = Cons(i,lRivals);
+                  }
+
+                  i = i + 1;
+               }
+
+               iRival = Nth(lRivals,Random(1,Length(lRivals)));
+               lFronts = Cons([ oRoom, oFlag, iNearFaction, iRival, TRUE ],lFronts);
+            }
+         }
+      }
+
+      if lFronts = $
+      {
+         return $;
+      }
+
+      return Nth(lFronts,Random(1,Length(lFronts)));
+   }
+
+   StartBattle(rid = $,attacker = $)
+   "Call a battle: at the room rid (for the admin; attacker, or a rival of its holder, attacks) "
+   "or at a front (PickFront). Returns whether one was called."
+   {
+      local lFront, oRoom, oFlag, iDefender, lRivals, i;
+
+      if piState <> STATE_NONE
+      {
+         return FALSE;
+      }
+
+      if rid <> $
+      {
+         oRoom = Send(SYS,@FindRoomByNum,#num=rid);
+         if oRoom = $
+         {
+            return FALSE;
+         }
+
+         oFlag = Send(oRoom,@FindHoldingActive,#class=&Flagpole);
+         if oFlag = $
+         {
+            return FALSE;
+         }
+
+         iDefender = Send(oFlag,@GetFaction);
+         lRivals = $;
+         i = FACTION_DUKE;
+         while i <= FACTION_NORMAL_MAX
+         {
+            if i <> iDefender
+            {
+               lRivals = Cons(i,lRivals);
+            }
+
+            i = i + 1;
+         }
+
+         if attacker = $
+            OR attacker = iDefender
+            OR attacker <= FACTION_NEUTRAL
+            OR attacker > FACTION_NORMAL_MAX
+         {
+            attacker = Nth(lRivals,Random(1,Length(lRivals)));
+         }
+
+         if iDefender = FACTION_NEUTRAL
+         {
+            lRivals = DelListElem(lRivals,attacker);
+            lFront = [ oRoom, oFlag, attacker, Nth(lRivals,Random(1,Length(lRivals))), TRUE ];
+         }
+         else
+         {
+            lFront = [ oRoom, oFlag, attacker, iDefender, FALSE ];
+         }
+      }
+      else
+      {
+         lFront = Send(self,@PickFront);
+      }
+
+      if lFront = $
+      {
+         return FALSE;
+      }
+
+      if ptNext <> $
+      {
+         DeleteTimer(ptNext);
+         ptNext = $;
+      }
+
+      poRoom = First(lFront);
+      poFlag = Nth(lFront,2);
+      piAttacker = Nth(lFront,3);
+      piDefender = Nth(lFront,4);
+      pbOpenGround = Nth(lFront,5);
+      pbSpawned = FALSE;
+      plParticipants = $;
+      plAttackArmy = $;
+      plDefendArmy = $;
+      poAttackCaptain = $;
+      poDefendCaptain = $;
+      piState = STATE_MUSTER;
+
+      if pbOpenGround
+      {
+         Send(self,@Announce,#rsc=fw_muster_open,
+              #parm1=Send(self,@LiegeName,#faction=piAttacker),
+              #parm2=Send(self,@LiegeName,#faction=piDefender),
+              #parm3=Send(poRoom,@GetName),#parm4=piMusterMinutes);
+      }
+      else
+      {
+         Send(self,@Announce,#rsc=fw_muster,
+              #parm1=Send(self,@LiegeName,#faction=piAttacker),
+              #parm2=Send(poRoom,@GetName),
+              #parm3=Send(self,@LiegeName,#faction=piDefender),#parm4=piMusterMinutes);
+      }
+
+      ptStage = CreateTimer(self,@OpenBattle,Bound(piMusterMinutes,0,60) * 60000 + 1);
+
+      return TRUE;
+   }
+
+   OpenBattle()
+   {
+      ptStage = $;
+      if piState <> STATE_MUSTER
+      {
+         return;
+      }
+
+      piState = STATE_FIGHT;
+      piDeadline = GetTime() + Bound(piFightMinutes,1,120) * 60;
+
+      Send(self,@Announce,#rsc=fw_begin,
+           #parm1=Send(self,@LiegeName,#faction=piAttacker),
+           #parm2=Send(self,@LiegeName,#faction=piDefender),
+           #parm3=Send(poRoom,@GetName));
+
+      Send(self,@Tick);
+
+      return;
+   }
+
+   //// The fight
+
+   Tick()
+   {
+      ptTick = $;
+
+      if piState <> STATE_FIGHT
+      {
+         return;
+      }
+
+      if NOT pbSpawned
+         AND Send(poRoom,@IsUserInRoom)
+      {
+         Send(self,@SpawnArmies);
+      }
+
+      if pbSpawned
+      {
+         Send(self,@NoteParticipants);
+
+         if poAttackCaptain = FALSE
+            OR plAttackArmy = $
+         {
+            Send(self,@Resolve,#winner=piDefender,#how=HOW_FIELD);
+
+            return;
+         }
+
+         if poDefendCaptain = FALSE
+            OR plDefendArmy = $
+         {
+            Send(self,@Resolve,#winner=piAttacker,#how=HOW_FIELD);
+
+            return;
+         }
+
+         Send(self,@CheckGuards);
+         Send(self,@KeepTargets);
+      }
+
+      if GetTime() >= piDeadline
+      {
+         Send(self,@ResolveByRoll);
+
+         return;
+      }
+
+      ptTick = CreateTimer(self,@Tick,1000);
+
+      return;
+   }
+
+   MageSchool(faction = $,which = 1)
+   "The liege's two schools: the Princess Shal'ille and Faren, the Duke Qor and Riija, Jonas "
+   "Kraanan and Jala."
+   {
+      if faction = FACTION_PRINCESS
+      {
+         return Nth([ SS_SHALILLE, SS_FAREN ],which);
+      }
+
+      if faction = FACTION_DUKE
+      {
+         return Nth([ SS_QOR, SS_RIIJA ],which);
+      }
+
+      return Nth([ SS_KRAANAN, SS_JALA ],which);
+   }
+
+   TroopClass(faction = $,mage = FALSE)
+   {
+      if faction = FACTION_DUKE
+      {
+         if mage
+         {
+            return &DukeMage;
+         }
+
+         return &DukeTroop;
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         if mage
+         {
+            return &PrincessMage;
+         }
+
+         return &PrincessTroop;
+      }
+
+      if mage
+      {
+         return &RebelMage;
+      }
+
+      return &RebelTroop;
+   }
+
+   SpawnArmies()
+   "Both armies take the field: the defenders round the pole, the attackers round the room's "
+   "spawning place farthest from it."
+   {
+      local i, iBest, iDist, iFlagRow, iFlagCol;
+
+      pbSpawned = TRUE;
+
+      plAttackAnchor = $;
+      if poFlag <> $
+         AND IsClass(poRoom,&MonsterRoom)
+      {
+         iFlagRow = Send(poFlag,@GetRow);
+         iFlagCol = Send(poFlag,@GetCol);
+         iBest = $;
+         foreach i in Send(poRoom,@GetGenerators)
+         {
+            iDist = (First(i) - iFlagRow) * (First(i) - iFlagRow)
+                    + (Nth(i,2) - iFlagCol) * (Nth(i,2) - iFlagCol);
+            if iBest = $ OR iDist > iBest
+            {
+               iBest = iDist;
+               plAttackAnchor = [ First(i), Nth(i,2) ];
+            }
+         }
+      }
+
+      Send(self,@RaiseArmy,#faction=piAttacker,#bHome=FALSE);
+      Send(self,@RaiseArmy,#faction=piDefender,#bHome=TRUE);
+
+      if poAttackCaptain = $
+      {
+         poAttackCaptain = FALSE;
+      }
+
+      if poDefendCaptain = $
+      {
+         poDefendCaptain = FALSE;
+      }
+
+      piAttackRaised = Length(plAttackArmy);
+      piDefendRaised = Length(plDefendArmy);
+      pbAttackGuarded = TRUE;
+      pbDefendGuarded = TRUE;
+
+      // Now they're known as captains, they hold their ground (FactionTroop.TweakBehavior)
+      if poAttackCaptain <> FALSE
+      {
+         Send(poAttackCaptain,@ResetBehaviorFlags);
+      }
+
+      if poDefendCaptain <> FALSE
+      {
+         Send(poDefendCaptain,@ResetBehaviorFlags);
+      }
+
+      Send(self,@KeepTargets,#all=TRUE);
+
+      return;
+   }
+
+   IsGuardedCaptain(troop = $)
+   "A captain is guarded, and holds their ground, while more than half their army stands."
+   {
+      if troop = $
+      {
+         return FALSE;
+      }
+
+      if troop = poAttackCaptain
+      {
+         return pbAttackGuarded;
+      }
+
+      if troop = poDefendCaptain
+      {
+         return pbDefendGuarded;
+      }
+
+      return FALSE;
+   }
+
+   CheckGuards()
+   "When half an army has fallen, its captain takes the field and becomes fair game."
+   {
+      if pbAttackGuarded
+         AND Length(plAttackArmy) * 2 <= piAttackRaised
+      {
+         pbAttackGuarded = FALSE;
+         if poAttackCaptain <> FALSE AND poAttackCaptain <> $
+         {
+            Send(poAttackCaptain,@ResetBehaviorFlags);
+         }
+      }
+
+      if pbDefendGuarded
+         AND Length(plDefendArmy) * 2 <= piDefendRaised
+      {
+         pbDefendGuarded = FALSE;
+         if poDefendCaptain <> FALSE AND poDefendCaptain <> $
+         {
+            Send(poDefendCaptain,@ResetBehaviorFlags);
+         }
+      }
+
+      return;
+   }
+
+   RaiseArmy(faction = $,bHome = FALSE)
+   {
+      local iSize, iArchers, iMages, i, iRole, oTroop, iMage;
+
+      iSize = Bound(piArmySize,2,30)
+              + Bound(Send(self,@GetWarEffort,#faction=faction),0,EFFORT_MAX);
+      iArchers = Bound(iSize / 10,1,$);
+      iMages = Bound(iSize / 10,1,$);
+      iMage = 0;
+
+      i = 0;
+      while i < iSize
+      {
+         i = i + 1;
+         if i = 1
+         {
+            iRole = BATTLE_ROLE_CAPTAIN;
+            oTroop = Create(Send(self,@TroopClass,#faction=faction));
+            Send(oTroop,@SetBattle,#battle=self,#role=iRole);
+         }
+         else if i <= 1 + iMages
+         {
+            iRole = BATTLE_ROLE_MAGE;
+            iMage = iMage + 1;
+            oTroop = Create(Send(self,@TroopClass,#faction=faction,#mage=TRUE));
+            Send(oTroop,@SetBattle,#battle=self,#role=iRole,
+                 #school=Send(self,@MageSchool,#faction=faction,#which=((iMage - 1) % 2) + 1));
+         }
+         else if i <= 1 + iMages + iArchers
+         {
+            iRole = BATTLE_ROLE_ARCHER;
+            oTroop = Create(Send(self,@TroopClass,#faction=faction));
+            Send(oTroop,@SetBattle,#battle=self,#role=iRole);
+         }
+         else
+         {
+            iRole = BATTLE_ROLE_SOLDIER;
+            oTroop = Create(Send(self,@TroopClass,#faction=faction));
+            Send(oTroop,@SetBattle,#battle=self,#role=iRole);
+         }
+
+         if NOT Send(self,@PlaceTroop,#troop=oTroop,#bHome=bHome)
+         {
+            // GenerateMonster deleted it (TroopGone found it in no army)
+            continue;
+         }
+
+         if bHome
+         {
+            plDefendArmy = Cons(oTroop,plDefendArmy);
+            if iRole = BATTLE_ROLE_CAPTAIN
+            {
+               poDefendCaptain = oTroop;
+            }
+         }
+         else
+         {
+            plAttackArmy = Cons(oTroop,plAttackArmy);
+            if iRole = BATTLE_ROLE_CAPTAIN
+            {
+               poAttackCaptain = oTroop;
+            }
+         }
+      }
+
+      return;
+   }
+
+   PlaceTroop(troop = $,bHome = FALSE)
+   "Defenders near the pole, attackers near their anchor (SpawnArmies); anywhere in the room "
+   "if there's no room there. Returns whether it was placed (if not, the troop is gone)."
+   {
+      local iTry, iRow, iCol, iAnchorRow, iAnchorCol;
+
+      iAnchorRow = $;
+      if bHome
+      {
+         if poFlag <> $
+         {
+            iAnchorRow = Send(poFlag,@GetRow);
+            iAnchorCol = Send(poFlag,@GetCol);
+         }
+      }
+      else if plAttackAnchor <> $
+      {
+         iAnchorRow = First(plAttackAnchor);
+         iAnchorCol = Nth(plAttackAnchor,2);
+      }
+
+      if iAnchorRow <> $
+      {
+         iTry = 0;
+         while iTry < 10
+         {
+            iTry = iTry + 1;
+            iRow = iAnchorRow + Random(-3,3);
+            iCol = iAnchorCol + Random(-3,3);
+            if iRow > 0 AND iCol > 0
+               AND Send(poRoom,@ReqNewHold,#what=troop,#new_row=iRow,#new_col=iCol)
+               AND Send(poRoom,@ReqSomethingMoved,#what=troop,#new_row=iRow,#new_col=iCol)
+            {
+               Send(poRoom,@NewHold,#what=troop,#new_row=iRow,#new_col=iCol);
+
+               return TRUE;
+            }
+         }
+      }
+
+      return Send(poRoom,@GenerateMonster,#oMonster=troop,#bRandom=TRUE);
+   }
+
+   IsFoeOf(troop = $,what = $)
+   {
+      return Send(troop,@IsBattleFoe,#what=what);
+   }
+
+   KeepTargets(all = FALSE)
+   "Each troop without a foe in its sights goes for the nearest; one others are already on "
+   "counts as further off, so the armies spread out (as ArenaBouts.PickTarget)."
+   {
+      local i, oTarget;
+
+      foreach i in Send(self,@AllTroops)
+      {
+         oTarget = Send(i,@GetTarget);
+         if all
+            OR oTarget = $
+            OR NOT IsObject(oTarget)
+            OR NOT Send(i,@IsBattleFoe,#what=oTarget)
+            OR Send(oTarget,@GetOwner) <> poRoom
+         {
+            Send(self,@PickTarget,#troop=i);
+         }
+      }
+
+      return;
+   }
+
+   AllTroops()
+   {
+      local i, lAll;
+
+      lAll = $;
+      foreach i in plAttackArmy
+      {
+         lAll = Cons(i,lAll);
+      }
+
+      foreach i in plDefendArmy
+      {
+         lAll = Cons(i,lAll);
+      }
+
+      return lAll;
+   }
+
+   PickTarget(troop = $)
+   {
+      local lFoes, lTroops, i, j, iScore, iBest, oBest, oThing;
+
+      lTroops = Send(self,@AllTroops);
+      lFoes = $;
+      foreach i in lTroops
+      {
+         if Send(troop,@IsBattleFoe,#what=i)
+         {
+            lFoes = Cons(i,lFoes);
+         }
+      }
+
+      foreach i in Send(poRoom,@GetHolderActive)
+      {
+         oThing = First(i);
+         if IsClass(oThing,&User)
+            AND Send(troop,@IsBattleFoe,#what=oThing)
+         {
+            lFoes = Cons(oThing,lFoes);
+         }
+      }
+
+      oBest = $;
+      iBest = $;
+      foreach i in lFoes
+      {
+         iScore = Send(troop,@SquaredFineDistanceTo,#what=i);
+         if iScore = $
+         {
+            continue;
+         }
+
+         iScore = iScore / (FINENESS * FINENESS);
+         foreach j in lTroops
+         {
+            if j <> troop AND Send(j,@GetTarget) = i
+            {
+               iScore = iScore + 16;
+            }
+         }
+
+         if iBest = $ OR iScore < iBest
+         {
+            iBest = iScore;
+            oBest = i;
+         }
+      }
+
+      if oBest <> $
+      {
+         Send(troop,@TargetSwitch,#what=oBest,#iHatred=100);
+         Send(troop,@EnterStateChase,#target=oBest,#actnow=TRUE);
+      }
+
+      return;
+   }
+
+   NoteParticipants()
+   "Soldiers of either liege in the room, shields worn, fight in it (and stop regrouping)."
+   {
+      local i, j, oThing, oShield, iFaction, bKnown;
+
+      foreach i in Send(poRoom,@GetHolderActive)
+      {
+         oThing = First(i);
+         if NOT IsClass(oThing,&User)
+            OR IsClass(oThing,&DM)
+         {
+            continue;
+         }
+
+         oShield = Send(oThing,@FindUsing,#class=&SoldierShield);
+         if oShield = $
+         {
+            continue;
+         }
+
+         iFaction = Send(oShield,@GetFaction);
+         if NOT Send(self,@IsBattleSide,#faction=iFaction)
+         {
+            continue;
+         }
+
+         bKnown = FALSE;
+         foreach j in plParticipants
+         {
+            if First(j) = oThing
+            {
+               bKnown = TRUE;
+
+               break;
+            }
+         }
+
+         if NOT bKnown
+         {
+            plParticipants = Cons([ oThing, iFaction ],plParticipants);
+            Send(oThing,@EndRegrouping,#report=FALSE);
+         }
+      }
+
+      return;
+   }
+
+   TroopGone(troop = $)
+   "One of the armies' troops fell or was cleared away (FactionTroop.Delete)."
+   {
+      if troop = $
+      {
+         return;
+      }
+
+      // DelListElem empties a list it can't find the element in: look first
+      if FindListElem(plAttackArmy,troop)
+      {
+         plAttackArmy = DelListElem(plAttackArmy,troop);
+      }
+
+      if FindListElem(plDefendArmy,troop)
+      {
+         plDefendArmy = DelListElem(plDefendArmy,troop);
+      }
+
+      if troop = poAttackCaptain
+      {
+         poAttackCaptain = FALSE;
+      }
+
+      if troop = poDefendCaptain
+      {
+         poDefendCaptain = FALSE;
+      }
+
+      return;
+   }
+
+   //// The end
+
+   ArmyHealth(army = $)
+   {
+      local i, iTotal;
+
+      iTotal = 0;
+      foreach i in army
+      {
+         iTotal = iTotal + Send(i,@GetHealth);
+      }
+
+      return iTotal;
+   }
+
+   ResolveByRoll()
+   "Out of time, or never fought: a fought battle goes by the health each army has left, an "
+   "unwatched one by the dice and the war effort."
+   {
+      local iChance, iA, iD;
+
+      if pbSpawned
+      {
+         iA = Send(self,@ArmyHealth,#army=plAttackArmy);
+         iD = Send(self,@ArmyHealth,#army=plDefendArmy);
+         iChance = 50;
+         if iA + iD > 0
+         {
+            iChance = iA * 100 / (iA + iD);
+         }
+
+         if Random(1,100) <= iChance
+         {
+            Send(self,@Resolve,#winner=piAttacker,#how=HOW_TIME);
+         }
+         else
+         {
+            Send(self,@Resolve,#winner=piDefender,#how=HOW_TIME);
+         }
+
+         return;
+      }
+
+      iChance = 50 + EFFORT_PERCENT * (Send(self,@GetWarEffort,#faction=piAttacker)
+                                       - Send(self,@GetWarEffort,#faction=piDefender));
+      iChance = Bound(iChance,50 - EFFORT_PERCENT * EFFORT_MAX,50 + EFFORT_PERCENT * EFFORT_MAX);
+
+      if Random(1,100) <= iChance
+      {
+         Send(self,@Resolve,#winner=piAttacker,#how=HOW_UNWATCHED);
+      }
+      else
+      {
+         Send(self,@Resolve,#winner=piDefender,#how=HOW_UNWATCHED);
+      }
+
+      return;
+   }
+
+   EndBattle(winner = $)
+   "For the admin: end the battle now, winner taking the day (or the dice deciding)."
+   {
+      if piState = STATE_NONE
+      {
+         return FALSE;
+      }
+
+      if winner = piAttacker OR winner = piDefender
+      {
+         Send(self,@Resolve,#winner=winner,#how=HOW_FIELD);
+      }
+      else
+      {
+         Send(self,@ResolveByRoll);
+      }
+
+      return TRUE;
+   }
+
+   Resolve(winner = $,how = HOW_FIELD)
+   {
+      local i, oWho, iFaction, iLoser, oRoom, rWinner;
+
+      if piState = STATE_NONE
+      {
+         return;
+      }
+
+      piState = STATE_NONE;
+      Send(self,@ClearTimers);
+
+      Debug("FactionWar: battle at",Send(poRoom,@GetRoomNum),"attacker",piAttacker,
+            "defender",piDefender,"won by",winner,"how",how,"armies left",
+            Length(plAttackArmy),Length(plDefendArmy),"soldiers",Length(plParticipants));
+
+      oRoom = poRoom;
+      iLoser = piDefender;
+      if winner = piDefender
+      {
+         iLoser = piAttacker;
+      }
+
+      // The winner takes the pole: SetFaction recounts the land and the lieges' power.
+      if poFlag <> $
+         AND Send(poFlag,@GetFaction) <> winner
+      {
+         Send(poFlag,@SetFaction,#faction=winner);
+      }
+
+      rWinner = Send(self,@LiegeName,#faction=winner);
+      if how = HOW_FIELD
+      {
+         Send(self,@Announce,#rsc=fw_won_field,#parm1=rWinner,#parm2=Send(oRoom,@GetName));
+      }
+      else if how = HOW_TIME
+      {
+         Send(self,@Announce,#rsc=fw_won_time,#parm1=Send(oRoom,@GetName),#parm2=rWinner);
+      }
+      else
+      {
+         Send(self,@Announce,#rsc=fw_won_unwatched,#parm1=Send(oRoom,@GetName),
+              #parm2=rWinner);
+      }
+
+      foreach i in plParticipants
+      {
+         oWho = First(i);
+         iFaction = Nth(i,2);
+         if NOT IsObject(oWho)
+            OR Send(oWho,@GetFaction) <> iFaction
+         {
+            continue;
+         }
+
+         if iFaction = winner
+         {
+            Send(oWho,@NoteBattle,#won=TRUE);
+            Send(oWho,@AddFactionRenown,#amount=WIN_RENOWN);
+            Send(oWho,@NewHold,#what=Create(&Shillings,#number=WIN_SHILLINGS));
+            Send(oWho,@MsgSendUser,#message_rsc=fw_paid_win,#parm1=WIN_SHILLINGS,
+                 #parm2=Send(oRoom,@GetName));
+         }
+         else
+         {
+            Send(oWho,@NoteBattle,#won=FALSE);
+            Send(oWho,@AddFactionRenown,#amount=FOUGHT_RENOWN);
+            Send(oWho,@NewHold,#what=Create(&Shillings,#number=FOUGHT_SHILLINGS));
+            Send(oWho,@MsgSendUser,#message_rsc=fw_paid_lose,#parm1=Send(oRoom,@GetName),
+                 #parm2=FOUGHT_SHILLINGS);
+         }
+      }
+
+      // Both sides' war effort is spent.
+      if plWarEffort <> $
+      {
+         if winner > FACTION_NEUTRAL AND winner <= FACTION_NORMAL_MAX
+         {
+            SetNth(plWarEffort,winner,0);
+         }
+
+         if iLoser > FACTION_NEUTRAL AND iLoser <= FACTION_NORMAL_MAX
+         {
+            SetNth(plWarEffort,iLoser,0);
+         }
+      }
+
+      plHistory = Cons([ GetTime(), Send(oRoom,@GetRoomNum), piAttacker, piDefender, winner,
+                         how ],plHistory);
+      if Length(plHistory) > HISTORY_MAX
+      {
+         plHistory = DelListElem(plHistory,Last(plHistory));
+      }
+
+      Send(self,@ClearArmies);
+
+      poRoom = $;
+      poFlag = $;
+      plParticipants = $;
+      pbSpawned = FALSE;
+      piAttacker = FACTION_NEUTRAL;
+      piDefender = FACTION_NEUTRAL;
+
+      Send(self,@ScheduleNext);
+
+      return;
+   }
+
+   GetHistory()
+   {
+      return plHistory;
+   }
+
+   ClearTimers()
+   {
+      if ptStage <> $
+      {
+         DeleteTimer(ptStage);
+         ptStage = $;
+      }
+
+      if ptTick <> $
+      {
+         DeleteTimer(ptTick);
+         ptTick = $;
+      }
+
+      return;
+   }
+
+   ClearArmies()
+   "The troops still standing march away."
+   {
+      local i, lAll;
+
+      lAll = Send(self,@AllTroops);
+      plAttackArmy = $;
+      plDefendArmy = $;
+      poAttackCaptain = $;
+      poDefendCaptain = $;
+
+      foreach i in lAll
+      {
+         if IsObject(i)
+         {
+            Send(i,@Delete);
+         }
+      }
+
+      return;
+   }
+
+   //// Settings, for the admin
+
+   SetBattleMinutes(minutes = 120)
+   {
+      piBattleMinutes = Bound(minutes,1,1440);
+      if piState = STATE_NONE
+      {
+         Send(self,@ScheduleNext);
+      }
+
+      return;
+   }
+
+   SetMusterMinutes(minutes = 10)
+   {
+      piMusterMinutes = Bound(minutes,0,60);
+
+      return;
+   }
+
+   SetFightMinutes(minutes = 20)
+   {
+      piFightMinutes = Bound(minutes,1,120);
+
+      return;
+   }
+
+   SetArmySize(size = 10)
+   {
+      piArmySize = Bound(size,2,30);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

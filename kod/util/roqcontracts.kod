@@ -10,8 +10,8 @@
 // away and the dagger crumbles; "abandon contract" ends one early. Up to CONTRACTS_PER_DAY
 // are paid a day.
 //
-// Once the faction battles exist (the faction revamp's phase 2), a finished contract is
-// meant to tilt the next battle against the mark's liege.
+// A finished contract is a point of war effort for the player's liege: it tilts their next
+// battle (util/factionwar.kod).
 //
 // plContracts: [ player, mark, dagger ] (the mark keeps the hour, ContractMark.SetHunter);
 // plPaid: [ player, day, count ].
@@ -441,6 +441,10 @@ messages:
       Send(who,@NewHold,#what=Create(&Shillings,#number=iShillings));
       Send(who,@MsgSendUser,#message_rsc=roq_contract_paid,#parm1=iShillings,
            #parm2=Send(self,@LiegeName,#faction=Send(who,@GetFaction)));
+
+      // A rival's agent gone tilts our liege's next battle (util/factionwar.kod)
+      Send(Send(SYS,@GetFactionWar),@AddWarEffort,#faction=Send(who,@GetFaction),#amount=1,
+           #who=who);
 
       return;
    }

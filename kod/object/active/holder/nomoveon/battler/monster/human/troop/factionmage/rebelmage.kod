@@ -1,0 +1,56 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+RebelMage is FactionMage
+
+// Ours (the faction revamp's battles): Jonas's battle priests of Kraanan and bards of Jala
+// (FactionMage.SetBattleSchool). The flagpoles still raise only RebelTroops.
+
+constants:
+
+include blakston.khd
+
+resources:
+
+   RebelMage_name_rsc = "battle priest of Jonas's rebels"
+
+   RebelMage_desc_rsc = \
+   "This priest of the rebellion wears Jonas's red and black under a robe of the old gods."
+
+   RebelMage_dead_name_rsc = "dead battle priest"
+   RebelMage_sound_aware = trps1awr.ogg
+
+classvars:
+
+   vrName = RebelMage_name_rsc
+   vrDesc = RebelMage_desc_rsc
+   vrDead_name = RebelMage_dead_name_rsc
+
+   viColorTranslate1 = XLAT_TO_RED     // Shirt
+   viColorTranslate2 = XLAT_TO_BLACK   // Pants
+   vcShieldClass = &RebelShield
+
+   viFaction = FACTION_REBEL
+
+properties:
+
+   piBaseLevel = 50
+   piBaseDifficulty = 2
+
+   // Here so they can be set
+   viLevel = 50         // piBaseLevel
+   viDifficulty = 2     // piBaseDifficulty
+
+   vrSound_aware = RebelMage_sound_aware
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

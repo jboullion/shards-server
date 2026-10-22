@@ -68,5 +68,72 @@ messages:
       return;
    }
 
+   SetBattleSchool(school = 0)
+   "Ours (the faction revamp's battles): a battle mage of school, in its robe. Qor, Riija, "
+   "Faren and Shal'ille cast; Kraanan's war priests and Jala's bards have no spells a monster "
+   "can turn on a foe, so they fight with a blade."
+   {
+      local i, lOld;
+
+      lOld = $;
+      foreach i in plUsing
+      {
+         if IsClass(i,&RobeBase)
+            OR IsClass(i,&ApprenticeWand)
+            OR IsClass(i,&Weapon)
+         {
+            lOld = Cons(i,lOld);
+         }
+      }
+
+      foreach i in lOld
+      {
+         Send(self,@UnuseItem,#what=i);
+         Send(i,@Delete);
+      }
+
+      Send(self,@AddEquipmentObject,#what=Create(&DiscipleRobe,#school=school));
+
+      if school = SS_KRAANAN
+         OR school = SS_JALA
+      {
+         plSpellBook = $;
+         if school = SS_KRAANAN
+         {
+            Send(self,@AddEquipmentObject,#what=Create(&Scimitar));
+         }
+         else
+         {
+            Send(self,@AddEquipmentObject,#what=Create(&ShortSword));
+         }
+
+         return;
+      }
+
+      Send(self,@AddEquipmentObject,#what=Create(&ApprenticeWand,#school=school));
+
+      if school = SS_QOR
+      {
+         // (No Vampiric Drain: it heals its caster, which a troop can't take)
+         plSpellBook = [ [SID_HOLD,6,20], [SID_BLIND,6,40], [SID_SPLASH_OF_ACID,8,100] ];
+      }
+      else if school = SS_RIIJA
+      {
+         plSpellBook = [ [SID_VERTIGO,6,25], [SID_DAZZLE,6,45],
+                         [SID_ILLUSIONARY_WOUNDS,7,100] ];
+      }
+      else if school = SS_FAREN
+      {
+         plSpellBook = [ [SID_SPIDER_WEB,6,20], [SID_LIGHTNING_BOLT,6,55],
+                         [SID_FIREBALL,7,80], [SID_ICESHARD,7,100] ];
+      }
+      else
+      {
+         plSpellBook = [ [SID_DAZZLE,6,30], [SID_HOLY_BLAZE,7,100] ];
+      }
+
+      return;
+   }
+
 end
 ////////////////////////////////////////////////////////////////////////////////

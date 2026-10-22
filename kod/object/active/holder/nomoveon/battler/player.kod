@@ -13380,14 +13380,29 @@ messages:
       return GetTime() < piRegroupUntil;
    }
 
-   EndRegrouping()
+   EndRegrouping(report = TRUE)
+   "We strike first (report), or join a battle (util/factionwar.kod): enemy soldiers may "
+   "attack us again."
    {
-      if Send(self,@IsRegrouping)
+      if report
+         AND Send(self,@IsRegrouping)
       {
          Send(self,@MsgSendUser,#message_rsc=player_war_regroup_over);
       }
 
       piRegroupUntil = 0;
+
+      return;
+   }
+
+   NoteBattle(won = FALSE)
+   "We stood in one of the lieges' battles (FactionWar.Resolve)."
+   {
+      piBattlesFought = piBattlesFought + 1;
+      if won
+      {
+         piBattlesWon = piBattlesWon + 1;
+      }
 
       return;
    }

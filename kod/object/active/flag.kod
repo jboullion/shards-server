@@ -76,6 +76,8 @@ resources:
       "soldier of your faction."
    flag_failed_in_progress = \
       "A claim to this territory staked by %s%s is already in progress."
+   flag_failed_battle = \
+      "The lieges' armies are fighting for this ground.  The battle will settle it."
    flag_failed_too_recent = \
       "By the laws of the Council, this territory has been in dispute too "
       "recently to stake another claim."
@@ -236,6 +238,14 @@ messages:
       {
          // Message: already claimed for your faction
          Send(who,@MsgSendUser,#message_rsc=flag_failed_yours);
+
+         return FALSE;
+      }
+
+      // Ours: no claims on a pole the lieges' battle is for (util/factionwar.kod)
+      if Send(Send(SYS,@GetFactionWar),@IsBattleAt,#flag=self)
+      {
+         Send(who,@MsgSendUser,#message_rsc=flag_failed_battle);
 
          return FALSE;
       }
@@ -771,6 +781,12 @@ messages:
       return;
    }
 
+   IsClaimable()
+   "Ours: a town's own pole isn't; it follows its capture points."
+   {
+      return pbClaimable;
+   }
+
    SetClaimable(claimable=TRUE)
    {
       pbClaimable=claimable;
@@ -941,13 +957,30 @@ messages:
 
    CleanupExtraTroops()
    {
-      local iDelete;
+      local i, oTroop, lPole, iDelete;
 
-      iDelete = Send(poOwner,@CountHoldingHowMany,#class=&FactionTroop) - piTroopCap;
-      while iDelete > 0
+      // Ours: only the pole's own troops; a battle's armies (util/factionwar.kod) aren't ours
+      lPole = $;
+      foreach i in Send(poOwner,@GetHolderActive)
       {
+         oTroop = First(i);
+         if IsClass(oTroop,&FactionTroop)
+            AND Send(oTroop,@GetBattle) = $
+         {
+            lPole = Cons(oTroop,lPole);
+         }
+      }
+
+      iDelete = Length(lPole) - piTroopCap;
+      foreach oTroop in lPole
+      {
+         if iDelete <= 0
+         {
+            break;
+         }
+
          iDelete = iDelete - 1;
-         Send(Send(poOwner,@FindHoldingActive,#class=&FactionTroop),@Delete);
+         Send(oTroop,@Delete);
       }
 
       return;

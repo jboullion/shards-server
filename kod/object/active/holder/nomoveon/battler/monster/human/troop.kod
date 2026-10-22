@@ -16,6 +16,14 @@ constants:
 
    EQUIPMENT_DROP_PERCENT = 100
 
+   // Ours (the faction revamp's battles, util/factionwar.kod): a battle troop is twice a flag
+   // troop's level, up to this; a captain is more
+   BATTLE_LEVEL_MAX = 240
+   BATTLE_CAPTAIN_LEVEL = 300
+   // How far off archers and mages keep (fine units, as ArenaFighter's)
+   BATTLE_ARCHER_RANGE = 320
+   BATTLE_MAGE_RANGE = 192
+
 resources:
 
    include troop.lkod
@@ -24,6 +32,12 @@ resources:
    FactionTroop_desc_rsc = \
    "This is a member of the local militia."
    FactionTroop_dead_name_rsc = "dead faction troop"
+
+   FactionTroop_captain_duke = "captain of the Duke's army"
+   FactionTroop_captain_princess = "captain of the Princess' army"
+   FactionTroop_captain_rebel = "captain of Jonas's rebels"
+   FactionTroop_not_your_battle = \
+      "%s%s has no quarrel with you.  This battle is for the soldiers of two lieges."
 
 classvars:
 
@@ -65,6 +79,10 @@ properties:
    viDifficulty = 4     // piBaseDifficulty
    piGender = GENDER_MALE
    viKarma = 0
+
+   // Ours: the battle we fight in (util/factionwar.kod), and what we are in it
+   poBattle = $
+   piBattleRole = BATTLE_ROLE_NONE
 
 messages:
 
@@ -193,7 +211,21 @@ messages:
    CreateTreasure(who = $, corpse = $)
    {
       local oUsedItem, oItemAtt, iPercentDrop;
-	  
+
+      // Ours: a battle's troops leave nothing behind; the battle pays its fighters
+      //  (util/factionwar.kod), so a field of twenty fallen isn't a looting ground.
+      if poBattle <> $
+      {
+         foreach oUsedItem in plUsing
+         {
+            Send(oUsedItem,@Delete);
+         }
+
+         plUsing = $;
+
+         return;
+      }
+
 	  iPercentDrop = EQUIPMENT_DROP_PERCENT;
 	  
       oItemAtt = Send(SYS,@FindItemAttByNum,#num=IA_CORPSEPOINTER);
@@ -245,6 +277,13 @@ messages:
          return TRUE;
       }
 
+      // Ours: a liege's soldiers and mages stand together (a DukeMage beside a DukeTroop)
+      if IsClass(target,&FactionTroop)
+         AND Send(target,@GetFaction) = viFaction
+      {
+         return TRUE;
+      }
+
       if IsClass(target,&Player)
       {
          iFaction = Send(target,@GetFaction);
@@ -270,6 +309,18 @@ messages:
    {
       local iFaction;
 
+      // Ours: in a battle, only the other army and the other side's soldiers, the
+      //  nearest most; nobody else at all (as ArenaFighter's).
+      if poBattle <> $
+      {
+         if NOT Send(self,@IsBattleFoe,#what=what)
+         {
+            return -10000;
+         }
+
+         return 1000 - 4 * (Send(self,@SquaredFineDistanceTo,#what=what) / (FINENESS * FINENESS));
+      }
+
       if (IsClass(what,&User)
          AND (Send(SETTINGS_OBJECT,@TroopsAttackNonShielded)
             OR Send(what,@FindUsing,#class=&SoldierShield) <> $))
@@ -289,6 +340,285 @@ messages:
       }
 
       return 0;
+   }
+
+   //// Ours (the faction revamp): battles (util/factionwar.kod)
+
+   SetBattle(battle = $, role = BATTLE_ROLE_SOLDIER, school = 0)
+   "We fight in battle, as role: twice a flag troop's strength (a captain more), fighting the "
+   "other army as well as its soldiers. A mage takes up school's robe and spells."
+   {
+      poBattle = battle;
+      piBattleRole = role;
+
+      if role = BATTLE_ROLE_ARCHER
+      {
+         Send(self,@ReplaceGear,#old=&Weapon,#new=&LongBow);
+      }
+      else if role = BATTLE_ROLE_CAPTAIN
+      {
+         Send(self,@ReplaceGear,#old=&Weapon,#new=&Scimitar);
+         Send(self,@ReplaceGear,#old=&Armor,#new=&PlateArmor);
+         Send(self,@ReplaceGear,#old=&Helmet,#new=&KnightsHelm);
+      }
+      else if role = BATTLE_ROLE_MAGE
+         AND IsClass(self,&FactionMage)
+      {
+         Send(self,@SetBattleSchool,#school=school);
+      }
+
+      if role = BATTLE_ROLE_CAPTAIN
+      {
+         viLevel = BATTLE_CAPTAIN_LEVEL;
+         viDifficulty = 9;
+      }
+      else if role = BATTLE_ROLE_MAGE
+         AND plSpellBook = $
+      {
+         // Kraanan's war priests and Jala's bards have no spells to cast: they make up for
+         //  it with the blade (FactionMage.SetBattleSchool).
+         viLevel = Bound(viLevel * 5 / 2,1,BATTLE_CAPTAIN_LEVEL - 30);
+         viDifficulty = 9;
+      }
+      else
+      {
+         viLevel = Bound(viLevel * 2,1,BATTLE_LEVEL_MAX);
+         viDifficulty = Bound(viDifficulty + 2,1,9);
+      }
+
+      piMax_hit_points = Send(self,@GetMaxHitPoints);
+      if role = BATTLE_ROLE_CAPTAIN
+      {
+         piMax_hit_points = piMax_hit_points * 3 / 2;
+      }
+
+      piHit_points = piMax_hit_points * 100;
+      piAttackRange = Send(self,@GetAttackRange);
+      Send(self,@ResetBehaviorFlags);
+
+      return;
+   }
+
+   ReplaceGear(old = $, new = $)
+   "Trade what we wear of class old for a new one of class new (a weapon's arrows go with "
+   "it; a bow brings its own)."
+   {
+      local i, lOld;
+
+      lOld = $;
+      foreach i in plUsing
+      {
+         if IsClass(i,old)
+         {
+            lOld = Cons(i,lOld);
+         }
+      }
+
+      foreach i in lOld
+      {
+         Send(self,@UnuseItem,#what=i);
+         Send(i,@Delete);
+      }
+
+      if old = &Weapon
+      {
+         if poArrow <> $
+         {
+            Send(poArrow,@Delete);
+            poArrow = $;
+         }
+
+         if new = &LongBow
+         {
+            poArrow = Create(&NeruditeArrow);
+         }
+      }
+
+      Send(self,@AddEquipmentObject,#what=Create(new));
+
+      return;
+   }
+
+   GetBattle()
+   {
+      return poBattle;
+   }
+
+   GetBattleRole()
+   {
+      return piBattleRole;
+   }
+
+   IsBattleFoe(what = $)
+   "In a battle: the other army's troops, and soldiers of a rival liege wearing their shields."
+   {
+      local oShield, iFaction;
+
+      if poBattle = $
+         OR what = $
+         OR what = self
+      {
+         return FALSE;
+      }
+
+      // A captain is guarded while half their army stands: the troops fight the army first
+      //  (a soldier may still go for them).
+      if IsClass(what,&FactionTroop)
+      {
+         return Send(what,@GetBattle) = poBattle
+                AND Send(what,@GetFaction) <> viFaction
+                AND NOT Send(poBattle,@IsGuardedCaptain,#troop=what);
+      }
+
+      if IsClass(what,&Player)
+      {
+         oShield = Send(what,@FindUsing,#class=&SoldierShield);
+         if oShield = $
+         {
+            return FALSE;
+         }
+
+         iFaction = Send(oShield,@GetFaction);
+
+         return iFaction <> viFaction
+                AND Send(poBattle,@IsBattleSide,#faction=iFaction);
+      }
+
+      return FALSE;
+   }
+
+   TweakBehavior()
+   {
+      if poBattle <> $
+      {
+         // The other army is monsters: we fight them too (SpecialHatredBehavior keeps it
+         //  to them), and keep fighting whoever we're on.
+         piBehavior |= AI_FIGHT_MONSTERS | AI_FIGHT_HYPERAGGRESSIVE;
+         piBehavior = piBehavior & ~AI_FIGHT_NEWBIESAFE;
+
+         if piBattleRole = BATTLE_ROLE_ARCHER
+            OR piBattleRole = BATTLE_ROLE_MAGE
+         {
+            piBehavior |= AI_MOVE_OPTIMAL_RANGE;
+         }
+
+         // A guarded captain holds their ground (FactionWar.Tick frees them)
+         if piBattleRole = BATTLE_ROLE_CAPTAIN
+            AND Send(poBattle,@IsGuardedCaptain,#troop=self)
+         {
+            piBehavior |= AI_NOMOVE;
+         }
+      }
+
+      propagate;
+   }
+
+   GetOptimalRange()
+   {
+      if poBattle <> $
+      {
+         if piBattleRole = BATTLE_ROLE_ARCHER
+         {
+            return BATTLE_ARCHER_RANGE;
+         }
+
+         if piBattleRole = BATTLE_ROLE_MAGE
+         {
+            return BATTLE_MAGE_RANGE;
+         }
+      }
+
+      propagate;
+   }
+
+   TargetSwitch(what = $, iHatred = 0)
+   {
+      // In a battle, never turn on a bystander.
+      if poBattle <> $
+         AND NOT Send(self,@IsBattleFoe,#what=what)
+      {
+         return;
+      }
+
+      propagate;
+   }
+
+   CanMonsterFight(who = $)
+   "In a battle, only the two lieges' soldiers may strike us; anyone else is a bystander."
+   {
+      local oShield;
+
+      if poBattle <> $
+         AND who <> $
+         AND IsClass(who,&Player)
+         AND NOT IsClass(who,&DM)
+      {
+         oShield = Send(who,@FindUsing,#class=&SoldierShield);
+         if oShield = $
+            OR NOT Send(poBattle,@IsBattleSide,#faction=Send(oShield,@GetFaction))
+         {
+            Send(who,@MsgSendUser,#message_rsc=FactionTroop_not_your_battle,
+                 #parm1=Send(self,@GetCapDef),#parm2=Send(self,@GetName));
+
+            return FALSE;
+         }
+      }
+
+      propagate;
+   }
+
+   GetName()
+   {
+      if piBattleRole = BATTLE_ROLE_CAPTAIN
+      {
+         if viFaction = FACTION_DUKE
+         {
+            return FactionTroop_captain_duke;
+         }
+
+         if viFaction = FACTION_PRINCESS
+         {
+            return FactionTroop_captain_princess;
+         }
+
+         return FactionTroop_captain_rebel;
+      }
+
+      propagate;
+   }
+
+   GetTrueName()
+   {
+      return Send(self,@GetName);
+   }
+
+   GetApparentName()
+   {
+      return Send(self,@GetName);
+   }
+
+   DestroyDisposable()
+   "An empty room clears its monsters away now and then (Room.DisposeTimer); a battle's "
+   "armies stay until their battle is done, watched or not."
+   {
+      if poBattle <> $
+      {
+         return;
+      }
+
+      propagate;
+   }
+
+   Delete()
+   {
+      // Fallen or cleared away: our battle counts us out.
+      if poBattle <> $
+      {
+         Send(poBattle,@TroopGone,#troop=self);
+         poBattle = $;
+      }
+
+      propagate;
    }
 
 end

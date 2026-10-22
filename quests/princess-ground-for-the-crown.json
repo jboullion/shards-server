@@ -51,6 +51,7 @@
   ],
   "rewards": {
     "renown": 3,
+    "warEffort": 1,
     "xpPoints": 1,
     "trainingPoints": 300,
     "shillings": 500

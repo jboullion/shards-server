@@ -3107,6 +3107,14 @@
    WAR_REPEAT_KILL_SECS = 1800
    WAR_REGROUP_SECS = 600
 
+   // Ours (the faction revamp's battles, util/factionwar.kod): what a troop is in a battle
+   // (FactionTroop.SetBattle)
+   BATTLE_ROLE_NONE = 0
+   BATTLE_ROLE_SOLDIER = 1
+   BATTLE_ROLE_ARCHER = 2
+   BATTLE_ROLE_MAGE = 3
+   BATTLE_ROLE_CAPTAIN = 4
+
    PARLIAMENT_SIZE = 5
 
    TOKEN_ONE   = 1

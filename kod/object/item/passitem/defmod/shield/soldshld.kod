@@ -330,7 +330,9 @@ messages:
    {
       // Ours (the faction revamp): wearing the shield is joining the Faction War, and
       //  putting it away leaves it; but not in the middle of a fight.
+      // A troop's shield (troop.kod) comes and goes as the troop pleases
       if IsClass(poOwner,&DM)
+         OR NOT IsClass(poOwner,&Player)
       {
          return TRUE;
       }
@@ -348,6 +350,7 @@ messages:
    NewUnused(what=$, Recalibrate=FALSE)
    {
       if NOT (Recalibrate OR IsClass(what,&DM))
+         AND IsClass(what,&Player)
       {
          if Send(what,@IsInPvP)
          {

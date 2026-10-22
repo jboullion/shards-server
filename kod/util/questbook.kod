@@ -109,6 +109,9 @@ constants:
    QRW_NECRO_GUILD = 3
    // Ours (the faction revamp): renown with the player's faction, its number the amount
    QRW_RENOWN = 4
+   // Ours (the faction revamp's battles): war effort for the player's faction's next battle
+   // (util/factionwar.kod), its number the points
+   QRW_WAR_EFFORT = 5
 
    // Step kinds (tools/quests/validate.ts KIND_NUM)
    QK_KILL = 1
@@ -1430,6 +1433,14 @@ messages:
       {
          // Posted, so a quest that also joins a faction gives renown with the new one
          Post(who,@AddFactionRenown,#amount=num);
+
+         return;
+      }
+
+      if kind = QRW_WAR_EFFORT
+      {
+         Send(Send(SYS,@GetFactionWar),@AddWarEffort,#faction=Send(who,@GetFaction),
+              #amount=num,#who=who);
 
          return;
       }

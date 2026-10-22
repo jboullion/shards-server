@@ -572,6 +572,12 @@ messages:
       return;
    }
 
+   GetFlagRIDs()
+   "Ours: every flag room (util/factionwar.kod picks its fronts from them)."
+   {
+      return plFlagRIDs;
+   }
+
    GetFlagCounts()
    {
       if plFlagCounts = $
