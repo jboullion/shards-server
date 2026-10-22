@@ -188,6 +188,31 @@ resources:
       "~IYour liege has no use for one such as you, lacking in prowess or "
       "devotion.  Your name has been stricken from the roll of membership.~n"
 
+   // Ours (the faction revamp)
+   player_renown_gain = "~IYou gain %i renown with your liege (%i of 100)."
+   player_renown_loss = "~IYou lose %i renown with your liege (%i of 100)."
+   player_renown_rank_up = "~I~BYou rise to the rank of %s."
+   player_renown_rank_down = "~IYou fall to the rank of %s."
+   player_renown_rank_1 = "Recruit"
+   player_renown_rank_2 = "Soldier"
+   player_renown_rank_3 = "Sergeant"
+   player_renown_rank_4 = "Lieutenant"
+   player_renown_rank_5 = "Captain"
+   player_renown_rank_6 = "Champion"
+   player_faction_attacked_renown = \
+      "~BYou have attacked a member of your own faction! Your liege will remember it."
+   player_war_kill_unworthy = \
+      "~IThere's no glory for your liege in felling so slight a foe."
+   player_war_kill_again = \
+      "~IYou have bested %s%s too recently for your liege to count it again."
+   player_war_death = \
+      "~BYou fall in the Faction War. Your weapon and armour are broken; a smith can "
+      "mend them. Enemy soldiers will leave you be while you regroup, until you "
+      "strike first."
+   player_war_regrouping = \
+      "%s%s is regrouping after a fall in battle. Let them recover first."
+   player_war_regroup_over = "~IYou strike first, and are no longer regrouping."
+
    player_cancel_rescue = \
       "~IYour aggression halts your attempt to escape from the "
       "current situation."
@@ -1075,6 +1100,25 @@ properties:
    piFactionServiceUpdate = 0
    piFactionTimeUpdated = 0
    ptFactionTimer = $
+
+   // Ours (the faction revamp): renown with our faction, 0 to RENOWN_MAX
+   piFactionRenown = 0
+   // The Faction War's records
+   piWarKills = 0
+   piWarDeaths = 0
+   piBattlesFought = 0
+   piBattlesWon = 0
+   // Enemy troops killed toward the next point of renown; the renown they've given on
+   // piTroopRenownDay (GetTime() / 86400)
+   piTroopKills = 0
+   piTroopRenownToday = 0
+   piTroopRenownDay = 0
+   // Soldiers we've killed lately: [ victim, GetTime() ]
+   plRecentWarKills = $
+   // Until this GetTime(), enemy soldiers can't attack us (after a war death)
+   piRegroupUntil = 0
+   // When attacking our own faction last cost renown (CheckFactionAttack)
+   piOwnAttackTime = 0
 
    piKill_count = 0
    piKill_count_decay = 0
@@ -4885,6 +4929,29 @@ messages:
       oEnemyGuild = Send(victim,@GetGuild);
       oSoldierShield = Send(self,@FindUsing,#class=&SoldierShield);
 
+      // Ours (the faction revamp): a soldier who fell in the Faction War is left be while
+      // they regroup, until they strike first.
+      if oSoldierShield <> $
+         AND IsClass(victim,&Player)
+         AND Send(oSoldierShield,@IsEnemyAttack,#what=victim)
+      {
+         if Send(victim,@IsRegrouping)
+         {
+            if report
+            {
+               Send(self,@MsgSendUser,#message_rsc=player_war_regrouping,
+                    #parm1=Send(victim,@GetCapDef),#parm2=Send(victim,@GetName));
+            }
+
+            return FALSE;
+         }
+
+         if actual
+         {
+            Send(self,@EndRegrouping);
+         }
+      }
+
       // Check for enemy guild or faction soldier fighting - If attacking a (mutual)
       //  enemy, then they can whack on each other freely, without outlaw penalty
       //  or faction loss.
@@ -5085,6 +5152,22 @@ messages:
                OR (IsClass(stroke_obj,&Monster)
                   AND Send(stroke_obj,@IsMinion))))
          {
+            return TRUE;
+         }
+
+         // Ours (the faction revamp): attacking our own faction costs renown; we're
+         // booted only once there's none left. Preying on newbies still boots us.
+         // Once a minute at most, so a fight isn't charged blow by blow.
+         if rMessage = player_faction_attacked
+            AND piFactionRenown > 0
+         {
+            if GetTime() - piOwnAttackTime >= 60
+            {
+               piOwnAttackTime = GetTime();
+               Send(self,@MsgSendUser,#message_rsc=player_faction_attacked_renown);
+               Send(self,@AddFactionRenown,#amount=RENOWN_ATTACK_OWN);
+            }
+
             return TRUE;
          }
 
@@ -9653,7 +9736,10 @@ messages:
       local lItems,i, j, amount, oBody, oSoldierShield, bNo_drop_death, oItemAtt,
             oRoom, iRow, iCol, iFine_Row, iFine_Col, iAngle, oItem,
             iRoom, lInventoryContents, lBagContents, oSkull, oSword, oAmulet,
-            oHunterSword, oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1;
+            oHunterSword, oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1,
+            bWarDeath;
+
+      bWarDeath = FALSE;
 
       // If this player has created any evil twins, delete them.
       Send(self,@RemoveAllCreatedEvilTwins);
@@ -9783,6 +9869,14 @@ messages:
          // If we get to here and we are in an arena, check for item drop.
          bNo_drop_death = TRUE;
       }
+      else if Send(self,@IsWarDeath,#what=what)
+      {
+         // Ours (the faction revamp): a Faction War death drops nothing and costs no
+         // skill, spell or XP; WarDeath breaks the gear we had on instead.
+         bWarDeath = TRUE;
+         bNo_drop_death = TRUE;
+         piDeathCost = FALSE;
+      }
 
       // Currently, the following block is only for Necromancer Amulets
       // and Hunter Swords. This is placed before the token death check,
@@ -9841,6 +9935,11 @@ messages:
 
       Send(oRoom,@NewHold,#what=oSkull,#new_row=iRow,#new_col=iCol,
       #fine_row=iFine_Row,#fine_col=iFine_Col,#new_angle=iAngle);
+
+      if bWarDeath
+      {
+         Send(self,@WarDeath);
+      }
 
       // Start losing stuff if applicable.
       if NOT bNo_drop_death
@@ -13292,6 +13391,12 @@ messages:
          Send(oSoldierShield,@LostFaction);
       }
 
+      // Ours: renown is with one faction; leaving it, or changing it, starts again
+      if faction <> piFaction
+      {
+         Send(self,@ClearFactionRenown);
+      }
+
       piFaction = faction;
 
       return TRUE;
@@ -13566,6 +13671,8 @@ messages:
       }
 
       piFaction = new_faction;
+      // Ours: a new member, or a defector, starts with no renown
+      Send(self,@ClearFactionRenown);
       // The loyalty quests are QuestBook favours now (ADR 0009): nothing to schedule
       if piFaction = FACTION_PRINCESS
       {
@@ -13669,6 +13776,315 @@ messages:
 
          Send(oParliament,@UpdateEffects,#who=self);
       }
+
+      return;
+   }
+
+   //// Ours (the faction revamp): renown and the Faction War
+
+   GetFactionRenown()
+   {
+      return piFactionRenown;
+   }
+
+   GetRenownRank(renown = $)
+   "The rank renown gives (RENOWN_RANK_*): ours if renown isn't given."
+   {
+      if renown = $
+      {
+         renown = piFactionRenown;
+      }
+
+      if renown >= 100
+      {
+         return RENOWN_RANK_CHAMPION;
+      }
+
+      if renown >= 70
+      {
+         return RENOWN_RANK_CAPTAIN;
+      }
+
+      if renown >= 45
+      {
+         return RENOWN_RANK_LIEUTENANT;
+      }
+
+      if renown >= 25
+      {
+         return RENOWN_RANK_SERGEANT;
+      }
+
+      if renown >= 10
+      {
+         return RENOWN_RANK_SOLDIER;
+      }
+
+      return RENOWN_RANK_RECRUIT;
+   }
+
+   GetRenownRankName(rank = $)
+   {
+      if rank = $
+      {
+         rank = Send(self,@GetRenownRank);
+      }
+
+      return Nth([ player_renown_rank_1, player_renown_rank_2, player_renown_rank_3,
+                   player_renown_rank_4, player_renown_rank_5, player_renown_rank_6 ],
+                 Bound(rank,RENOWN_RANK_RECRUIT,RENOWN_RANK_CHAMPION));
+   }
+
+   AddFactionRenown(amount = 0,report = TRUE)
+   "Renown with our faction, bound to 0 to RENOWN_MAX. Nothing for a neutral. Returns the new renown."
+   {
+      local iOld, iOldRank, iRank, oShield;
+
+      if piFaction = FACTION_NEUTRAL
+         OR amount = 0
+      {
+         return piFactionRenown;
+      }
+
+      iOld = piFactionRenown;
+      iOldRank = Send(self,@GetRenownRank);
+      piFactionRenown = Bound(piFactionRenown + amount,0,RENOWN_MAX);
+      if piFactionRenown = iOld
+      {
+         return piFactionRenown;
+      }
+
+      iRank = Send(self,@GetRenownRank);
+      if report
+         AND pbLogged_on
+      {
+         if piFactionRenown > iOld
+         {
+            Send(self,@MsgSendUser,#message_rsc=player_renown_gain,
+                 #parm1=piFactionRenown - iOld,#parm2=piFactionRenown);
+         }
+         else
+         {
+            Send(self,@MsgSendUser,#message_rsc=player_renown_loss,
+                 #parm1=iOld - piFactionRenown,#parm2=piFactionRenown);
+         }
+      }
+
+      if iRank <> iOldRank
+         AND pbLogged_on
+      {
+         if iRank > iOldRank
+         {
+            Send(self,@MsgSendUser,#message_rsc=player_renown_rank_up,
+                 #parm1=Send(self,@GetRenownRankName,#rank=iRank));
+         }
+         else
+         {
+            Send(self,@MsgSendUser,#message_rsc=player_renown_rank_down,
+                 #parm1=Send(self,@GetRenownRankName,#rank=iRank));
+         }
+      }
+
+      // The soldier shield's powers follow renown
+      oShield = Send(self,@FindSoldierShield);
+      if oShield <> $
+      {
+         Send(oShield,@RenownChanged);
+      }
+
+      return piFactionRenown;
+   }
+
+   ClearFactionRenown()
+   "A new faction, or none: renown and the troop count start again. The war records stay."
+   {
+      piFactionRenown = 0;
+      piTroopKills = 0;
+      piTroopRenownToday = 0;
+
+      return;
+   }
+
+   FindSoldierShield()
+   "Our soldier shield, worn or put away."
+   {
+      local oShield;
+
+      oShield = GetListElemByClass(plUsing,&SoldierShield);
+      if oShield = $
+      {
+         oShield = GetListElemByClass(plPassive,&SoldierShield);
+      }
+
+      return oShield;
+   }
+
+   GetWarRecord()
+   "[ kills, deaths, battles fought, battles won ] in the Faction War."
+   {
+      return [ piWarKills, piWarDeaths, piBattlesFought, piBattlesWon ];
+   }
+
+   WarKill(victim = $)
+   "We killed an enemy soldier (SoldierShield.KilledSomething). It scores, unless they were far "
+   "weaker than us or we've killed them too recently."
+   {
+      local i, iNow, lKeep;
+
+      if victim = $
+      {
+         return;
+      }
+
+      if Send(self,@GetBaseMaxHealth) > Send(victim,@GetBaseMaxHealth) + WAR_HEALTH_GAP
+      {
+         Send(self,@MsgSendUser,#message_rsc=player_war_kill_unworthy);
+
+         return;
+      }
+
+      iNow = GetTime();
+      lKeep = $;
+      foreach i in plRecentWarKills
+      {
+         if iNow - Nth(i,2) < WAR_REPEAT_KILL_SECS
+         {
+            lKeep = Cons(i,lKeep);
+         }
+      }
+
+      plRecentWarKills = lKeep;
+      foreach i in plRecentWarKills
+      {
+         if First(i) = victim
+         {
+            Send(self,@MsgSendUser,#message_rsc=player_war_kill_again,
+                 #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
+
+            return;
+         }
+      }
+
+      plRecentWarKills = Cons([ victim, iNow ],plRecentWarKills);
+      piWarKills = piWarKills + 1;
+      Send(self,@AddFactionRenown,#amount=RENOWN_SOLDIER_KILL);
+
+      return;
+   }
+
+   EnemyTroopKilled()
+   "We killed an enemy faction's troop: renown for every RENOWN_TROOP_KILLS, at most "
+   "RENOWN_TROOP_DAILY a day."
+   {
+      local iDay;
+
+      iDay = GetTime() / 86400;
+      if iDay <> piTroopRenownDay
+      {
+         piTroopRenownDay = iDay;
+         piTroopRenownToday = 0;
+      }
+
+      if piTroopRenownToday >= RENOWN_TROOP_DAILY
+      {
+         return;
+      }
+
+      piTroopKills = piTroopKills + 1;
+      if piTroopKills >= RENOWN_TROOP_KILLS
+      {
+         piTroopKills = 0;
+         piTroopRenownToday = piTroopRenownToday + 1;
+         Send(self,@AddFactionRenown,#amount=1);
+      }
+
+      return;
+   }
+
+   IsWarDeath(what = $)
+   "Dying to what is a death in the Faction War: we wear our soldier shield, and what is an "
+   "enemy soldier or an enemy faction's troop."
+   {
+      local oShield, oTheirShield, iTheirFaction;
+
+      oShield = GetListElemByClass(plUsing,&SoldierShield);
+      if oShield = $
+         OR what = $
+         OR what = self
+      {
+         return FALSE;
+      }
+
+      if IsClass(what,&Player)
+      {
+         oTheirShield = Send(what,@FindUsing,#class=&SoldierShield);
+
+         return oTheirShield <> $
+                AND Send(oTheirShield,@GetFaction) <> Send(oShield,@GetFaction);
+      }
+
+      if IsClass(what,&FactionTroop)
+      {
+         iTheirFaction = Send(what,@GetFaction);
+
+         return iTheirFaction <> FACTION_NEUTRAL
+                AND iTheirFaction <> Send(oShield,@GetFaction);
+      }
+
+      return FALSE;
+   }
+
+   WarDeath()
+   "We fell in the Faction War (Killed): nothing drops, but the weapon and armour we had on "
+   "break (a smith mends them); no skill, spell or XP is lost (piDeathCost is 0). Enemy "
+   "soldiers leave us be while we regroup."
+   {
+      local i, lBreak;
+
+      lBreak = $;
+      foreach i in plUsing
+      {
+         if (IsClass(i,&Weapon)
+             OR IsClass(i,&Armor)
+             OR IsClass(i,&Helmet)
+             OR IsClass(i,&Shield))
+            AND NOT IsClass(i,&SoldierShield)
+            AND NOT IsClass(i,&FaceMask)
+            AND NOT Send(i,@IsIndestructible)
+            AND Send(i,@GetMaxHits) > 0
+         {
+            lBreak = Cons(i,lBreak);
+         }
+      }
+
+      foreach i in lBreak
+      {
+         Send(i,@SetHits,#number=0);
+         Send(self,@TryUnuseItem,#what=i);
+         Send(self,@SomethingChanged,#what=i);
+      }
+
+      piWarDeaths = piWarDeaths + 1;
+      piRegroupUntil = GetTime() + WAR_REGROUP_SECS;
+      Send(self,@MsgSendUser,#message_rsc=player_war_death);
+      Send(self,@AddFactionRenown,#amount=RENOWN_WAR_DEATH);
+
+      return;
+   }
+
+   IsRegrouping()
+   {
+      return GetTime() < piRegroupUntil;
+   }
+
+   EndRegrouping()
+   {
+      if Send(self,@IsRegrouping)
+      {
+         Send(self,@MsgSendUser,#message_rsc=player_war_regroup_over);
+      }
+
+      piRegroupUntil = 0;
 
       return;
    }

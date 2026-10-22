@@ -19,12 +19,6 @@ constants:
    UNUSED = 2
    DEFENDING = 3
 
-   // Max rank you can get from killing factioned NPCs
-   MAX_RANK_FROM_MONSTERS = 10
-
-   // How many meridian days (approximate) before you lose a rank.
-   DAYS_PER_RANK_LOSS = 60
-
 resources:
 
    include soldshld.lkod
@@ -36,6 +30,13 @@ resources:
    SoldierShield_icon_back_rsc = gsheback.bgf
    SoldierShield_window_overlay_rsc = povgshE.bgf
    SoldierShield_rank_desc = "\n\nYour rank within %s is: %s."
+   SoldierShield_renown_desc = \
+      "\n\nYou are %s of %s, with %i renown of 100.\n"
+      "In the Faction War: %i kills, %i deaths; %i battles fought, %i won."
+   SoldierShield_in_battle = "You can't put your shield away in the middle of a fight."
+   SoldierShield_put_away = \
+      "You put your soldier's shield away. Enemy soldiers will pass you by while it stays "
+      "off; take it up again to rejoin the Faction War."
    SoldierShield_ArmyName = "the forces of neutrality"
    SoldierShield_rank_name1 = "a lowly peon"
    SoldierShield_rank_name2 = "an average soldier"
@@ -91,13 +92,8 @@ classvars:
 
 properties:
 
-   piFactionRank = 4
-
-   // Number of M59 days left until we lose a rank.
-   piDaysUntilRankLoss = 0
-
-   // A count of how many kills scored.
-   piFactionKills = 0
+   // 1 to 10: the owner's renown / 10 (RenownChanged); the subclasses' powers read it
+   piFactionRank = 1
 
    poLastEnemyToAttack = $
 
@@ -116,8 +112,6 @@ messages:
       Send(self,@SetPaletteTranslation,
            #translation=Send(SYS,@EncodeTwoColorXLAT,#color1=viColor,
                              #color2=viColor));
-
-      Send(self,@ResetRankLossCount);
 
       propagate;
    }
@@ -177,13 +171,15 @@ messages:
       return viFaction;
    }
 
-   ModifyFactionRank(amount=0)
-   "Adds 'amount' of rank.  Can be negative.  Binds value to acceptable "
-   "ranges."
+   RenownChanged()
+   "Ours (the faction revamp): the rank, 1 to 10, is the owner's renown / 10, and the "
+   "powers follow it."
    {
-      // Ranges from 1-10
-      piFactionRank = piFactionRank + amount;
-      piFactionRank = bound(piFactionRank,1,10);
+      if poOwner <> $
+         AND IsClass(poOwner,&Player)
+      {
+         piFactionRank = Bound(Send(poOwner,@GetFactionRenown) / 10,1,10);
+      }
 
       Send(self,@UpdateRankPowers);
 
@@ -203,9 +199,11 @@ messages:
    }
 
    KilledSomething(what=$)
-   "Called when our owner killed something."
+   "Called when our owner killed something. Ours (the faction revamp): an enemy soldier "
+   "is a war kill (Player.WarKill), and enemy troops count toward renown. Attacking our own "
+   "faction is charged by Player.CheckFactionAttack."
    {
-      local oOwnerOwner, iAdvance;
+      local oOwnerOwner;
 
       // No bonus for killing neutrals or for killing in the Arena.
       oOwnerOwner = Send(poOwner,@GetOwner);
@@ -226,53 +224,15 @@ messages:
             return;
          }
 
-         // Killing an enemy player gets us 2 ranks and resets our loss counter.
-         iAdvance = 2;
-         Send(self,@ResetRankLossCount);
-         piFactionKills = piFactionKills + 1;
-      }
-      else
-      {
-         // It's a factioned monster
-         if piFactionRank >= MAX_RANK_FROM_MONSTERS
-            AND Send(SYS,@IsPKAllowed)
-         {
-            return;
-         }
+         Send(poOwner,@WarKill,#victim=what);
 
-         if Send(what,@GetFaction) <> viFaction
-         {
-            // Killing a factioned mosnter just gives us 1 rank.
-            iAdvance = 1;
-         }
-         else
-         {
-            // One level penalty for killing an NPC ally.
-            iAdvance = -1;
-         }
+         return;
       }
 
-      Send(self,@ModifyFactionRank,#amount=iAdvance);
-
-      return;
-   }
-
-   ResetRankLossCount()
-   {
-      piDaysUntilRankLoss = (DAYS_PER_RANK_LOSS * random(80,110)) / 100;
-
-      return;
-   }
-
-   NewGameDay()
-   "Called every new M59 day."
-   {
-      piDaysUntilRankLoss = piDaysUntilRankLoss - 1;
-
-      if piDaysUntilRankLoss <= 0
+      if IsClass(what,&FactionTroop)
+         AND Send(what,@GetFaction) <> viFaction
       {
-         Send(self,@ModifyFactionRank,#amount=-1);
-         Send(self,@ResetRankLossCount);
+         Send(poOwner,@EnemyTroopKilled);
       }
 
       return;
@@ -293,29 +253,21 @@ messages:
       local oSoldierShield;
 
       // logoff is used for logoff ghosts to thump us a good one for being
-      //  cowardly.
+      //  cowardly. Ours (the faction revamp): a war death is Player.WarDeath, so
+      //  this is only the logoff: it costs renown as a war death would, and the last
+      //  enemy to attack us scores the kill.
       if logoff
-         OR Send(self,@IsEnemyAttack,#what=what)
       {
-         // If we're rank 3 or below, then we lose our item for slacking.
-         if piFactionRank <= 3
-         {
-            Post(self,@Delete);
+         Send(poOwner,@AddFactionRenown,#amount=RENOWN_WAR_DEATH,#report=FALSE);
 
-            return;
-         }
-
-         // Otherwise, lose 4 ranks for dying to a faction enemy
-         Send(self,@ModifyFactionRank,#amount=-4);
-
-         // Give the last person to attack us a bonus for forcing owner off if
-         //  logged
-         if logoff
-            AND poLastEnemyToAttack <> $
+         if poLastEnemyToAttack <> $
          {
             oSoldierShield = Send(poLastEnemyToAttack,@FindUsing,
                                   #class=&SoldierShield);
-            Send(oSoldierShield,@KilledSomething,#what=poOwner);
+            if oSoldierShield <> $
+            {
+               Send(oSoldierShield,@KilledSomething,#what=poOwner);
+            }
          }
       }
 
@@ -360,7 +312,7 @@ messages:
       if Send(poOwner,@GetFaction) = viFaction
          OR IsClass(poOwner,&DM)
       {
-         Post(self,@UpdateRankPowers);
+         Post(self,@RenownChanged);
 
          return TRUE;
       }
@@ -375,16 +327,33 @@ messages:
 
    ReqUnuse()
    {
-      // You're stuck with it.  Cannot be unused by normal players.
-      return IsClass(poOwner,&DM);
+      // Ours (the faction revamp): wearing the shield is joining the Faction War, and
+      //  putting it away leaves it; but not in the middle of a fight.
+      if IsClass(poOwner,&DM)
+      {
+         return TRUE;
+      }
+
+      if Send(poOwner,@IsInPvP)
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=SoldierShield_in_battle);
+
+         return FALSE;
+      }
+
+      return TRUE;
    }
 
    NewUnused(what=$, Recalibrate=FALSE)
    {
-      // Non DMs cannot unuse the item.
       if NOT (Recalibrate OR IsClass(what,&DM))
       {
-         return FALSE;
+         if Send(what,@IsInPvP)
+         {
+            return FALSE;
+         }
+
+         Send(what,@MsgSendUser,#message_rsc=SoldierShield_put_away);
       }
 
       // Remove it from our back and remove our stats.
@@ -541,28 +510,21 @@ messages:
    //// Misc. Infrastructure
 
    AppendDesc()
-   "Appends faction rank to description."
+   "Ours (the faction revamp): the owner's renown rank, renown and war record."
    {
-      if piFactionRank <= 2
+      local lRecord;
+
+      if poOwner = $
+         OR NOT IsClass(poOwner,&Player)
       {
-         AddPacket(4,SoldierShield_rank_desc,4,vrArmyName,4,vrRank1);
+         return;
       }
-      else if piFactionRank <= 4
-      {
-         AddPacket(4,SoldierShield_rank_desc,4,vrArmyName,4,vrRank2);
-      }
-      else if piFactionRank <= 6
-      {
-         AddPacket(4,SoldierShield_rank_desc,4,vrArmyName,4,vrRank3);
-      }
-      else if piFactionRank <= 8
-      {
-         AddPacket(4,SoldierShield_rank_desc,4,vrArmyName,4,vrRank4);
-      }
-      else
-      {
-         AddPacket(4,SoldierShield_rank_desc,4,vrArmyName,4,vrRank5);
-      }
+
+      lRecord = Send(poOwner,@GetWarRecord);
+      AddPacket(4,SoldierShield_renown_desc,
+                4,Send(poOwner,@GetRenownRankName),4,vrArmyName,
+                4,Send(poOwner,@GetFactionRenown),
+                4,Nth(lRecord,1),4,Nth(lRecord,2),4,Nth(lRecord,3),4,Nth(lRecord,4));
 
       return;
    }

@@ -3082,6 +3082,31 @@
    FACTION_NECROMANCER = 4
    FACTION_MAX         = 4
 
+   // Ours (the faction revamp): a player's renown with their faction, 0 to RENOWN_MAX
+   // (Player.AddFactionRenown), and what earns or costs it.
+   RENOWN_MAX = 100
+   RENOWN_SOLDIER_KILL = 1
+   RENOWN_FLAG_CLAIM = 3
+   RENOWN_TOKEN = 3
+   RENOWN_WAR_DEATH = -1
+   RENOWN_ATTACK_OWN = -10
+   // Enemy troops killed for each point of renown, and the most they give in a day
+   RENOWN_TROOP_KILLS = 10
+   RENOWN_TROOP_DAILY = 5
+   // The ranks, from renown 0 (Player.GetRenownRank)
+   RENOWN_RANK_RECRUIT = 1
+   RENOWN_RANK_SOLDIER = 2
+   RENOWN_RANK_SERGEANT = 3
+   RENOWN_RANK_LIEUTENANT = 4
+   RENOWN_RANK_CAPTAIN = 5
+   RENOWN_RANK_CHAMPION = 6
+   // The Faction War: no score for a kill when the killer's base health is more than this
+   // above the victim's, nor for the same victim again within WAR_REPEAT_KILL_SECS; a war
+   // death keeps enemy soldiers off for WAR_REGROUP_SECS
+   WAR_HEALTH_GAP = 30
+   WAR_REPEAT_KILL_SECS = 1800
+   WAR_REGROUP_SECS = 600
+
    PARLIAMENT_SIZE = 5
 
    TOKEN_ONE   = 1

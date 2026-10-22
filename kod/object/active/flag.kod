@@ -470,6 +470,9 @@ messages:
       Send(Send(SYS,@GetQuestBook),@FlagClaimed,#who=poClaimer,
            #rid=Send(poOwner,@GetRoomNum));
 
+      // Ours (the faction revamp): renown for the claim
+      Send(poClaimer,@AddFactionRenown,#amount=RENOWN_FLAG_CLAIM);
+
       poClaimer = $;
 
       // Slow down troop generation again.

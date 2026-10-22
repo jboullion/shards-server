@@ -36,6 +36,7 @@
     }
   ],
   "rewards": {
+    "renown": 2,
     "trainingPoints": 100,
     "oneOf": [
       {

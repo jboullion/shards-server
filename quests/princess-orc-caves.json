@@ -55,6 +55,7 @@
     }
   ],
   "rewards": {
+    "renown": 3,
     "xpPoints": 1,
     "shillings": 500
   }

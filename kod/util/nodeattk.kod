@@ -258,6 +258,13 @@ messages:
       local lUsers;
 
       ptAttack = $;
+
+      // Ours: switched off since the timer was set (SetAttacks); don't try again
+      if NOT pbAttackEnabled
+      {
+         return;
+      }
+
       if NOT Send(self,@DoNodeAttack)
       {
          // Between 1 and 2 hours

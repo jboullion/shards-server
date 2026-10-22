@@ -4612,7 +4612,6 @@ messages:
       Send(poParliament,@NewGameDay);
       Send(poNodeAttack,@NewGameDay);
       Send(poRentableRoomMaintenance,@NewGameDay);
-      Send(&SoldierShield,@NewGameDay);
 
       Send(Send(self,@FindSpellByNum,#num=SID_NODEBURST),@NewGameDay);
 

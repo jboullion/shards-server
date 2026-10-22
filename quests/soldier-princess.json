@@ -38,6 +38,7 @@
     }
   ],
   "rewards": {
+    "renown": 10,
     "xpPoints": 1.5,
     "items": [
       {

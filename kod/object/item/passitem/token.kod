@@ -513,6 +513,15 @@ messages:
                   Send(who,@JoinFaction,#new_faction=Send(mob,@GetFaction));
                }
             }
+
+            // Ours (the faction revamp): renown for a token brought to a councilor
+            //  or to our own liege
+            if Send(who,@GetFaction) <> FACTION_NEUTRAL
+               AND (IsClass(mob,&Council)
+                    OR Send(who,@GetFaction) = Send(mob,@GetFaction))
+            {
+               Send(who,@AddFactionRenown,#amount=RENOWN_TOKEN);
+            }
          }
       }
 

@@ -61,6 +61,9 @@ constants:
    QB_EXCLUDES = 22
    // Ours: offered only while base health is under this ($: no cap; Raza's repeatable hunts)
    QB_HEALTH_BELOW = 23
+   // Ours (the faction revamp): offered only from this much renown with the player's
+   // faction ($: any)
+   QB_RENOWN_MIN = 24
 
    // What a quest needs of a player besides (QB_NEEDS bits)
    QBQ_INTRIGUING = 1
@@ -104,6 +107,8 @@ constants:
    QRW_JOIN = 1
    QRW_INSIGNIA = 2
    QRW_NECRO_GUILD = 3
+   // Ours (the faction revamp): renown with the player's faction, its number the amount
+   QRW_RENOWN = 4
 
    // Step kinds (tools/quests/validate.ts KIND_NUM)
    QK_KILL = 1
@@ -507,6 +512,13 @@ messages:
          {
             return QO_NONE;
          }
+      }
+
+      if Nth(qrow,QB_RENOWN_MIN) <> $
+         AND (Send(who,@GetFaction) = FACTION_NEUTRAL
+              OR Send(who,@GetFactionRenown) < Nth(qrow,QB_RENOWN_MIN))
+      {
+         return QO_NONE;
       }
 
       if NOT Send(self,@MeetsNeeds,#who=who,#needs=Nth(qrow,QB_NEEDS),#death=death)
@@ -1400,7 +1412,8 @@ messages:
    }
 
    AwardSpecial(who = $,kind = $,num = 0)
-   "The rewards that aren't things: joining a faction, a sign on a guild shield, the necromancer guild."
+   "The rewards that aren't things: joining a faction, a sign on a guild shield, the necromancer guild, "
+   "renown."
    {
       local oShield, oLich;
 
@@ -1409,6 +1422,14 @@ messages:
          // As the old faction quests: leave any faction first (posted, as they were)
          Post(who,@ResignFaction);
          Post(who,@JoinFaction,#new_faction=num);
+
+         return;
+      }
+
+      if kind = QRW_RENOWN
+      {
+         // Posted, so a quest that also joins a faction gives renown with the new one
+         Post(who,@AddFactionRenown,#amount=num);
 
          return;
       }
