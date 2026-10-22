@@ -1563,18 +1563,15 @@ messages:
       // What this if statement translates to:
       // If we're in a room that restricts attacks to guilds only:
       // And if there is a victim, if s/he does not have a token,
-      //  is unguilded and not a murder and doesn't have a soldier shield,
-      //  then the attack fails.
-      //  Or, if the person attacking is not in a guild and not a murder and
-      //   doesn't have a soldier shield, then the attack fails as well.
+      //  is unguilded and doesn't have a soldier shield, then the attack fails.
+      //  Or, if the person attacking is not in a guild and doesn't have a
+      //   soldier shield, then the attack fails as well.
       if Send(self,@CheckRoomFlag,#flag=ROOM_GUILD_PK_ONLY)
          AND ((Send(what,@GetGuild) = $
-               AND NOT Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
                AND oSoldierShield = $)
               OR (victim <> $
                   AND NOT Send(victim,@PossessesA,#class=&Token)
                   AND Send(victim,@GetGuild) = $
-                  AND NOT Send(victim,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
                   AND oOtherShield = $))
       {
          return FALSE;

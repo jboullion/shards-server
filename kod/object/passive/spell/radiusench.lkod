@@ -9,9 +9,6 @@ radench_enter = de \
    "Du begibst dich in einem magischen Kreis, gezaubert von %s%s."
 radench_leave = de \
    "Du verlässteinem magischen Kreis, gezaubert von %s%s."
-radench_no_newbie = de \
-   "Dein Schutzengel sagt dir, \"Du bist noch nicht in der Lage Zauber die "
-   "andere Spieler behindern, zu zaubern.\""
 radench_already_cast = de "Du zauberst bereits einen Kreiszauber."
 radench_need_instrument = de "Du benötigst ein Instrument!"
 radench_not_guilded = de \
@@ -39,4 +36,3 @@ radench_target_already_enchanted = pt "%s%s tentou lançar %s%s em você."
 radench_caster_enter = pt "Você sente que seu círculo de magia está tendo um efeito."
 radench_enter = pt "Você entra em um círculo de efeito mágico mantido por %s%s."
 radench_leave = pt "Você sai de um círculo de efeito mágico mantido por %s%s."
-radench_no_newbie = pt "Seu anjo da guarda lhe diz: \"Você não está pronto para lançar feitiços que possam prejudicar outros jogadores.\""

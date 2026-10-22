@@ -335,11 +335,6 @@ messages:
 
    UserEntered(who=$)
    {
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-      {
-         Send(self,@SetMood,#new_mood=piMood+2);
-      }
-
       Post(who,@SomeoneSaid,#what=self,#string=BergMerch_entry_welcome,
             #type=SAY_RESOURCE);
 

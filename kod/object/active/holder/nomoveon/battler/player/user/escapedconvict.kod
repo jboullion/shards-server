@@ -183,9 +183,8 @@ messages:
 
       Send(self,@GivePlayerAllSpells,#override=TRUE);
       Send(self,@GivePlayerAllSKills,#override=TRUE);
-      Send(self,@EvaluatePKStatus);
+      Send(self,@EvaluateNewbieStatus);
       Send(self,@PlayerIsIntriguing);
-      Send(self,@SetPlayerFlag,#flag=PFLAG_MURDERER,#value=TRUE);
 
       Send(self,@EquipEscapedConvict);
 
@@ -275,12 +274,6 @@ messages:
    GetClientObjectType()
    {
       return OT_EVENTCHAR;
-   }
-
-   RevenantChance()
-   "No revenants for Escaped Convict."
-   {
-      return 0;
    }
 
 end

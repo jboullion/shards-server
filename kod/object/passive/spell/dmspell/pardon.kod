@@ -10,20 +10,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 Pardon is DMSpell
 
+// Ours (no random PvP, 2026-10-21): this DM spell took the murderer and outlaw
+// flags off a player. Nobody is a murderer or an outlaw any more, so the spell is
+// retired: the system no longer creates it and no DM is given it. The class
+// stays, doing nothing, so a saved world that has one still loads.
+
 constants:
+
    include blakston.khd
 
 resources:
 
-   include pardon.lkod
-
    pardon_name_rsc = "pardon"
    pardon_icon_rsc = light.bgf
-   pardon_desc_rsc = "Removes both murderer flags and outlaw flags."
-
-   pardon_msg_DM = "You pardon %s%s."
-   pardon_msg_target = "You have been pardoned by %s%s."
-   pardon_failed = "%s%s is not a murderer or an outlaw, and cannot be pardoned."
+   pardon_desc_rsc = "Retired: there are no murderers or outlaws any more."
 
 classvars:
 
@@ -38,51 +38,10 @@ properties:
 
 messages:
 
-
-   GetNumSpellTargets()
-   {
-      return 1;
-   }
-
    CanPayCosts(who = $, lTargets = $)
    {
-      if not IsClass(First(lTargets),&User)
-      {
-	 send(who,@MsgSendUser,#message_rsc=pardon_failed,
-	      #parm1=Send(First(lTargets),@GetDef),#parm2=Send(First(lTargets),@getname));
-	 return False;
-      }
-      propagate;
-   }
-
-   CastSpell(who = $, lTargets = $)
-   {
-      local i;
-      
-      foreach i in lTargets
-      {
-	 if send(i,@checkplayerflag,#flag=PFLAG_MURDERER)
-         or send(i,@checkplayerflag,#flag=PFLAG_OUTLAW)
-	 {
-	    send(who,@MsgSendUser,#message_rsc=pardon_msg_DM,
-		#parm1=Send(i,@getdef),#parm2=Send(i,@getname));
-	    send(i,@MsgSendUser,#message_rsc=pardon_msg_target,
-		#parm1=Send(who,@getindef),#parm2=Send(who,@getname));      
-	    
-	    Send(i,@setplayerflag,#flag=PFLAG_MURDERER,#value=false); 
-            Send(i,@setplayerflag,#flag=PFLAG_OUTLAW,#value=false); 
-            post(i,@evaluatePKstatus);
-	 }
-	 else
-	 {
-	    send(who,@MsgSendUser,#message_rsc=pardon_failed,
-		 #parm1=Send(i,@GetDef),#parm2=Send(i,@getname));
-            return;
-         }
-      }
-      propagate;
+      return FALSE;
    }
 
 end
-
 ////////////////////////////////////////////////////////////////////////////////

@@ -12,19 +12,6 @@ Phase_penned = de \
 Phase_penned_others = de \
    "%s's Bezug zur Realität reißt %s$0ab, und wird mit Gewalt an einen sicheren Ort "
    "gebracht!"
-Phase_penned_others_item = de \
-   "Der gewalttätige Ausstieg hat dafür gesorgt, dass %s%s aus dem Inventar "
-   "von %s gerissen wurde."
-Phase_lost_one_item = de \
-   "Du hast %s Skill Punkte, %s Zauber Punkte, und %s%s verloren."
-Phase_lost_two_items = de \
-   "Du hast %s Skill Punkte, %s Zauber Punkte, %s%s, und %s%s verloren."
-penalties_inflicted_one_item = de \
-   "Diese qualvolle Erfahrung kostet Dich %i XP, einen Gegenstand, %i%% in "
-   "Zaubersprüchen und %i%% in Waffenfertigkeiten."
-penalties_inflicted_plural = de \
-   "Diese qualvolle Erfahrung kostet Dich %i XP, %i Gegenstände, %i%% in "
-   "Zaubersprüchen und %i%% in Waffenfertigkeiten."
 no_phasing_in_safe_place_msg = de \
    "Dieser Ort ist sicher und ruhig. Du kannst hier nicht aussteigen."
 no_phasing_in_guildhall_msg = de \
@@ -56,18 +43,6 @@ Phase_penned = pt \
 Phase_penned_others = pt \
    "O controle de %s sobre a realidade se rompe, lançando %s violentamente "
    "ao longo das correntes mágicas!"
-Phase_penned_others_item = pt \
-   "As correntes violentas parecem ter arrancado %s%s do inventário de %s."
-Phase_lost_one_item = pt \
-   "Você perdeu %s pontos de habilidade, %s pontos de magia e %s%s."
-Phase_lost_two_items = pt \
-   "Você perdeu %s pontos de habilidade, %s pontos de magia, %s%s e %s%s."
-penalties_inflicted_one_item = pt \
-   "A experiência torturante custou-lhe %i XP, um item, %i pontos de magia "
-   "e %i pontos de habilidade."
-penalties_inflicted_plural = pt \
-   "A experiência torturante custou-lhe %i XP, %i itens, %i pontos de magia "
-   "e %i pontos de habilidade."
 no_phasing_in_safe_place_msg = pt \
    "Este lugar seguro está ancorado e calmo, e você não pode "
    "sair de fase aqui."

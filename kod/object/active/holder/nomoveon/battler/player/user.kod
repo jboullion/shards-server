@@ -252,19 +252,6 @@ resources:
    user_guildmate_logon = "~IHail your guildmate %s!"
    user_guildmate_logoff = "~IYour guildmate %s has just departed."
 
-   user_safety_on = \
-      "~B~U~k[###]~n ~B~vYour safety is now ~I~gON~n~B:  You can no longer "
-      "strike innocents."
-   user_safety_off = \
-      "~B~U~k[###]~n ~B~vYour safety is now ~B~rOFF~n~B:  Be careful, you are "
-      "now able to hurt those around you."
-   user_temp_safe_on = \
-      "~B~U~k[###]~n ~B~vYou will receive a temporary guardian angel on death."
-   user_temp_safe_off = \
-      "~B~U~k[###]~n ~B~vYou will no longer receive a temporary guardian "
-      "angel on death."
-   user_temp_safe_invalid = \
-      "~B~U~k[###]~n ~B~vYour guardian angel can no longer protect you."
    user_grouping_on = \
       "~B~U~k[###]~n ~B~vYou will now join builder groups."
    user_grouping_off = \
@@ -285,8 +272,6 @@ resources:
       "for.  You must abdicate the leadership of your guild before you can "
       "commit suicide."
 
-   user_cant_suicide_justicar = \
-      "It would be unseemly for such a high official to take his own life!"
 
    user_cant_suicide_yet = \
       "You can't seem to kill yourself, you feel you've only just begun this "
@@ -366,9 +351,6 @@ resources:
       "~B~U~k[###]~n ~B~v%s has just logged on for the first time."
    user_did_appeal = "You appeal, \"%q~n\""
    user_appeal_squelched = "Your appeal privileges have been revoked."
-   user_kill_zone = \
-      "Your guardian angel whispers to you, \"I cannot defend you here.\""
-   user_angel_rejoins = "Your guardian angel rejoins you."
 
    user_fumble = "You fumble and drop your %s."     
 
@@ -385,9 +367,6 @@ resources:
    user_guildofficer_rsc = "guildofficer"
 
    user_default_url = "http://meridian59.us/"
-
-   user_safety_on_wav_rsc = safety_on.ogg
-   user_safety_off_wav_rsc = safety_off.ogg
 
    // Guild MOTD user say commands.
    user_say_guild_motd = "motd"
@@ -901,16 +880,6 @@ messages:
 
       Send(SYS,@SystemUserLogon,#what=self);
 
-      // Let the user know whether safety is on or off.
-      if piPreferences & CF_SAFETY_OFF
-      {
-         Send(self,@MsgSendUser,#message_rsc=user_safety_off);
-      }
-      else
-      {
-         Send(self,@MsgSendUser,#message_rsc=user_safety_on);
-      }
-
       if NOT (IsClass(self,&DM) AND Send(self,@IsHidden))
       {
          // Advertise as normally.
@@ -1239,337 +1208,37 @@ messages:
    }
 
    CalculatePenalties(what=$)
-   "'what' is the calling object, i.e. logoff ghost, phase spell."
+   "'what' is the calling object, i.e. logoff ghost, phase spell. Ours (no random "
+   "PvP): leaving the game in an unsafe place costs no XP, item, spell or skill. Only "
+   "a soldier who leaves soon after a fight with a player pays, as if fallen in the "
+   "Faction War (SoldierShield.OwnerDied)."
    {
-      local iPenCount, iEquivDeath, iPointLoss, iItemLoss, oDrop,
-            iXPLoss, iNumItems, iNumSpellPts, iNumSkillPts, oSoldierShield;
+      local oSoldierShield;
 
-      // Check if we're eligible for a free pen.
-      if (Send(SETTINGS_OBJECT,@GetFreeNoPvPPenActive,
-               #flag=piFlags & PFLAG_MURDERER)
-         AND NOT Send(self,@IsRecentPvPCombatant))
+      if Send(self,@IsRecentPvPCombatant)
       {
-         // Reset the time to avoid any funny business like potential double
-         // penalties.
-         Send(self,@ResetLogoffPenaltyTime);
+         Send(self,@IncrementLogoffPenaltyCount);
 
-         // Calling object still needs to display a message for the free pen.
-         if (what <> $)
+         oSoldierShield = Send(self,@FindUsing,#class=&SoldierShield);
+         if oSoldierShield <> $
          {
-            Send(what,@SendPenaltyInfo,#who=self);
+            Send(oSoldierShield,@OwnerDied,#logoff=TRUE);
          }
 
-         return;
-      }
-
-      // Add the penalty for repeat logging to the number of recent kills.
-      iPenCount = (Send(self,@GetLogoffPenaltyCount)
-                       + Send(self,@GetDecayedUnjustifiedKills));
-
-      // The point at which iPenCount = same cost as a death.
-      iEquivDeath = (Send(SYS,@GetLogoffPenaltyEquivDeath));
-
-      // Increase the penalty counter due to taking a pen.
-      Send(self,@IncrementLogoffPenaltyCount);
-
-      // Flat pens are just x item, y spell, y skill, with iPenCount set to 0.
-      if Send(SETTINGS_OBJECT,@GetFlatPenaltiesEnable,
-               #flag=piFlags & PFLAG_MURDERER)
-      {
-         iPenCount = 0;
-         iPointLoss = 2;
-         iItemloss = 1;
-      }
-      else
-      {
-         iPointLoss = 0;
-         iItemloss = 0;
-      }
-
-      if (pbLogged_On)
-      {
-         oDrop = self;
-      }
-      else
-      {
-         oDrop = what;
-      }
-
-      // Potentially lose XP
-      iXPLoss = Send(self,@PenaltyLoseXP,#iPenCount=iPenCount,
-                     #iEquivDeath=iEquivDeath);
-      iNumItems = Send(self,@PenaltyDropItems,#iNumDrop=iItemloss,
-                        #iPenCount=iPenCount,#iEquivDeath=iEquivDeath,
-                        #where=oDrop);
-      iNumSpellPts = Send(self,@PenaltyLoseSpellPoints,
-                           #iNumPoints=iPointLoss,#iPenCount=iPenCount,
-                           #iEquivDeath=iEquivDeath);
-      iNumSkillPts = Send(self,@PenaltyLoseSkillPoints,
-                           #iNumPoints=iPointLoss,#iPenCount=iPenCount,
-                           #iEquivDeath=iEquivDeath);
-
-      // Let the faction shield know of this person's naughtiness if we took a
-      // penalty.
-      oSoldierShield = Send(self,@FindUsing,#class=&SoldierShield);
-      if oSoldierShield <> $
-         AND iPenCount > 0
-      {
-         // Treat it like a death.
-         Send(oSoldierShield,@OwnerDied,#logoff=TRUE);
+         Send(SYS,@UserGotLogged,#who=self);
       }
 
       // Reset the time to avoid any funny business like potential double
       // penalties.
       Send(self,@ResetLogoffPenaltyTime);
 
-      // The calling object will let the user know what the penalties were.
+      // The calling object lets the user know.
       if (what <> $)
       {
-         Send(what,@SendPenaltyInfo,#who=self,#iXPLost=iXPLoss,
-               #iItemsLost=iNumItems,#iSpellPtLost=iNumSpellPts,
-               #iSkillPtLost=iNumSkillPts);
+         Send(what,@SendPenaltyInfo,#who=self);
       }
-
-      
-      Send(SYS,@UserGotLogged,#who=self);
 
       return;
-   }
-
-   PenaltyLoseXP(iPenCount=0, iEquivDeath=0)
-   {
-      local iXPLoss;
-
-      if iPenCount < iEquivDeath
-         OR NOT Send(SETTINGS_OBJECT,@LoseXPOnPenalty)
-      {
-         return 0;
-      }
-
-      iXPLoss = Send(SYS,@GetXPDiffForLevel,#iLevel=Send(self,@GetBaseMaxHealth));
-      Send(self,@AddXP,#iAmount=-iXPLoss);
-
-      return iXPLoss;
-   }
-
-   PenaltyDropItems(iPenCount=0, iEquivDeath=0, iNumDrop=0, where=$)
-   {
-      local i, iNumInventory, iNumItemsLeft;
-
-      if (where = $)
-      {
-         return 0;
-      }
-
-      iNumInventory = Send(self,@GetNumItemsInInventory);
-
-      // If there's no parameter sent for the number of items to drop,
-      // calculate it here.
-      if (iNumDrop <= 0)
-      {
-         iNumDrop = iNumInventory * iPenCount / Bound(iEquivDeath, 1, $);
-
-         // Add two items for murderers.
-         if (piFlags & PFLAG_MURDERER)
-         {
-            iNumDrop += 2;
-         }
-
-      }
-      else if (piFlags & PFLAG_MURDERER)
-      {
-         // Double item drop on flat pens for murderers.
-         iNumDrop *= 2;
-      }
-
-      // Need to drop more items than we have.
-      if iNumDrop >= iNumInventory
-      {
-         iNumDrop = iNumInventory;
-         i = 1;
-         while i <= iNumDrop
-         {
-            if Send(self,@DropItem,#index=i,#targetGhost=where)
-            {
-               --iNumDrop;
-            }
-            else
-            {
-               // If item doesn't drop, increment i.
-               ++i;
-            }
-         }
-         iNumItemsLeft = Send(self,@GetNumItemsInInventory);
-      }
-      else
-      {
-         iNumItemsLeft = iNumInventory;
-         while iNumDrop-- > 0 AND iNumItemsLeft > 0
-         {
-            // Try to drop a random item.
-            i = Random(1,iNumItemsLeft);
-            if Send(self,@DropItem,#index=i,#targetGhost=where)
-            {
-               --iNumItemsLeft;
-            }
-            else
-            {
-               // If the Random drop fails, scan through and drop one.
-               i = 1;
-               while i <= iNumItemsLeft
-                     AND NOT Send(self,@DropItem,#index=i,#targetGhost=where)
-               {
-                  ++i;
-               }
-
-               iNumItemsLeft = Send(self,@GetNumItemsInInventory);
-               // If nothing can be dropped, exit.
-               if i > iNumItemsLeft
-               {
-                  break;
-               }
-            }
-         }
-      }
-
-      // iNumItemsLeft is still accurate here.
-      return iNumInventory - iNumItemsLeft;
-   }
-
-   PenaltyLoseSpellPoints(iPenCount=0, iEquivDeath=0, iNumPoints=0)
-   {
-      local i, iSpellNum, iLoops, bLooped, iLossAmount, iPointsLost, iStart;
-
-      if (plSpells = $)
-      {
-         return 0;
-      }
-
-      iPointsLost = 0;
-
-      // Calculate the number of points to take if not set.
-      if (iNumPoints <= 0)
-      {
-         iNumPoints = (Length(plSpells) * iPenCount) / iEquivDeath;
-         if Random(1,(iEquivDeath - 1)) < (iPenCount % iEquivDeath)
-         {
-            ++iNumPoints;
-         }
-      }
-
-      // Double the point loss for murderers.
-      if (piFlags & PFLAG_MURDERER)
-      {
-         iLossAmount = -2;
-      }
-      else
-      {
-         iLossAmount = -1;
-      }
-
-      // Pick random spells to subtract points from.
-      for (iLoops = 0; iNumPoints > 0 AND iLoops < 200; ++iLoops, --iNumPoints)
-      {
-         // Don't iterate more than once through the spell list.
-         bLooped = FALSE;
-
-         // Try to lower a random spell.
-         i = Random(1,Length(plSpells));
-         // Save this index as our starting point.
-         iStart = i;
-         // Iterate through if we couldn't lower this one.
-         while (i <> iStart OR NOT bLooped)
-            AND (Send(self,@DecodeSpellAbility,#compound=Nth(plSpells,i)) < 6)
-         {
-            if ++i > Length(plSpells) AND NOT bLooped
-            {
-               // We get one free reset (since we started in the middle)
-               i = 1;
-               bLooped = TRUE;
-            }
-         }
-
-         // If we got all the way through the spell list without lowering
-         // anything, bail.
-         if i = iStart AND bLooped
-         {
-            break;
-         }
-
-         iSpellNum = Send(self,@DecodeSpellNum,#compound=Nth(plSpells,i));
-         Send(self,@ChangeSpellAbility,#spell_num=iSpellNum,#amount=iLossAmount);
-         iPointsLost -= iLossAmount;
-      }
-
-      return iPointsLost;
-   }
-
-   PenaltyLoseSkillPoints(iPenCount=0, iEquivDeath=0, iNumPoints=0)
-   {
-      local i, iSkillNum, iLoops, bLooped, iLossAmount, iPointsLost, iStart;
-
-      if (plSkills = $)
-      {
-         return 0;
-      }
-
-      iPointsLost = 0;
-
-      // Calculate the number of points to take if not set.
-      if (iNumPoints <= 0)
-      {
-         iNumPoints = (Length(plSkills) * iPenCount) / iEquivDeath;
-         if Random(1,(iEquivDeath - 1)) < (iPenCount % iEquivDeath)
-         {
-            ++iNumPoints;
-         }
-      }
-
-      // Double the point loss for murderers.
-      if (piFlags & PFLAG_MURDERER)
-      {
-         iLossAmount = -2;
-      }
-      else
-      {
-         iLossAmount = -1;
-      }
-
-      // Pick random skills to subtract points from.
-      for (iLoops = 0; iNumPoints > 0 AND iLoops < 200; ++iLoops, --iNumPoints)
-      {
-         // Don't iterate more than once through the skill list.
-         bLooped = FALSE;
-
-         // Try to lower a random spell.
-         i = Random(1,Length(plSkills));
-         // Save this index as our starting point.
-         iStart = i;
-         // Iterate through if we couldn't lower this one.
-         while (i <> iStart OR NOT bLooped)
-            AND (Send(self,@DecodeSkillAbility,#compound=Nth(plSkills,i)) < 6)
-         {
-            if ++i > Length(plSkills) AND NOT bLooped
-            {
-               // We get one free reset (since we started in the middle)
-               i = 1;
-               bLooped = TRUE;
-            }
-         }
-
-         // If we got all the way through the skill list without lowering
-         // anything, bail.
-         if i = iStart AND bLooped
-         {
-            break;
-         }
-
-         iSkillNum = Send(self,@DecodeSkillNum,#compound=Nth(plSkills,i));
-         Send(self,@ChangeSkillAbility,#skill_num=iSkillNum,#amount=iLossAmount);
-         iPointsLost -= iLossAmount;
-      }
-
-      return iPointsLost;
    }
 
 #endregion Penalties
@@ -2226,7 +1895,7 @@ messages:
    "appropriate. This function will force a suicide and clean up anything, "
    "ignoring game rules."
    {
-      local oObj, sName;
+      local sName;
 
       Send(self,@CancelIfOffer);
 
@@ -2235,13 +1904,6 @@ messages:
       {
          // guild master must disband guild if forced to suicide
          Send(self,@PerformGuildDisband);
-      }
-
-      oObj = Send(SYS,@GetCaramo);
-      if (Send(oObj,@GetJusticar) = self)
-      {
-         // Justicar must give up office.
-         Send(oObj,@SetJusticar,#who=$);
       }
 
       piLast_Restart_time = GetTime();
@@ -2291,13 +1953,6 @@ messages:
          return;
       }
 
-      if Send(Send(SYS,@GetCaramo),@GetJusticar) = self
-      {
-         Send(self,@MsgSendUser,#message_rsc=user_cant_suicide_justicar);
-
-         return;
-      }
-
       if GetTime() < piLast_restart_time + SUICIDE_REPEAT_TIME
       {
          Send(self,@MsgSendUser,#message_rsc=user_cant_suicide_yet);
@@ -2321,66 +1976,6 @@ messages:
 
       // Successful SUICIDE.
       Send(self,@PerformSuicide);
-
-      return;
-   }
-
-   UserCommandSetSafety(value = 0)
-   {
-      Send(self,@SetPlayerPreference,#flag=CF_SAFETY_OFF,#value=value);
-      if value
-      {
-         if Send(SYS,@IsPKAllowed)
-         {
-            Send(self,@MsgSendUser,#message_rsc=user_safety_off);
-            Send(self,@WaveSendUser,#what=self,
-                  #wave_rsc=user_safety_off_wav_rsc);
-         }
-      }
-      else
-      {
-         if Send(SYS,@IsPKAllowed)
-         {
-            Send(self,@MsgSendUser,#message_rsc=user_safety_on);
-            Send(self,@WaveSendUser,#what=self,
-                  #wave_rsc=user_safety_on_wav_rsc);
-         }
-
-      }
-
-      return;
-   }
-
-   UserCommandSetTempSafe(value = 0)
-   {
-      if piBase_max_health > 99
-         OR (piFlags & PFLAG_MURDERER)
-         OR (piFlags & PFLAG_OUTLAW)
-         OR Send(self,@FindUsing,#class=&SoldierShield) <> $
-      {
-         if value
-         {
-            piPreferences |= CF_TEMPSAFE;
-         }
-         else
-         {
-            piPreferences &= ~CF_TEMPSAFE;
-         }
-         Send(self,@MsgSendUser,#message_rsc=user_temp_safe_invalid);
-
-         return;
-      }
-
-      if value
-      {
-         piPreferences |= CF_TEMPSAFE;
-         Send(self,@MsgSendUser,#message_rsc=user_temp_safe_on);
-      }
-      else
-      {
-         piPreferences &= ~CF_TEMPSAFE;
-         Send(self,@MsgSendUser,#message_rsc=user_temp_safe_off);
-      }
 
       return;
    }
@@ -2469,16 +2064,6 @@ messages:
    {
       // Check each possible preference, improvement over sending 7 messages
       // from client to server with each preference.
-      if (value & CF_SAFETY_OFF) <> (piPreferences & CF_SAFETY_OFF)
-      {
-         Send(self,@UserCommandSetSafety,#value=value & CF_SAFETY_OFF);
-      }
-
-      if (value & CF_TEMPSAFE) <> (piPreferences & CF_TEMPSAFE)
-      {
-         Send(self,@UserCommandSetTempSafe,#value=value & CF_TEMPSAFE);
-      }
-
       if (value & CF_GROUPING) <> (piPreferences & CF_GROUPING)
       {
          Send(self,@UserCommandSetGrouping,#value=value & CF_GROUPING);
@@ -3071,16 +2656,6 @@ messages:
 
       Send(self,@SysMsgSendUser,#message_rsc=user_garbage_collecting_done);
 
-      // Let the user know whether safety is on or off.
-      if piPreferences & CF_SAFETY_OFF
-      {
-         Send(self,@MsgSendUser,#message_rsc=user_safety_off);
-      }
-      else
-      {
-         Send(self,@MsgSendUser,#message_rsc=user_safety_on);
-      }
-
       AddPacket(1,BP_UNWAIT);
       SendPacket(poSession);
 
@@ -3323,15 +2898,6 @@ messages:
       // Choose our own line color on minimap.
       if (what = self)
       {
-         if (piFlags & PFLAG_TEMPSAFE)
-         {
-            return MM_TEMPSAFE;
-         }
-         else if (piFlags & PFLAG_PERMA_NO_PVP)
-         {
-            return MM_NO_PVP;
-         }
-
          return MM_NONE;
       }
 
@@ -3383,22 +2949,8 @@ messages:
                return MM_PLAYER | MM_PLAYER_IS_ENEMY;
             }
 
-            // Player dot color.
-            if Send(what,@CheckPlayerFlag,#flag=PFLAG_TEMPSAFE)
-            {
-               // Light blue dot.
-               iFlags |= MM_TEMPSAFE;
-            }
-            else if Send(what,@CheckPlayerFlag,#flag=PFLAG_PERMA_NO_PVP)
-            {
-               // White dot.
-               iFlags |= MM_NO_PVP;
-            }
-            else
-            {
-               // Standard blue dot.
-               iFlags |= MM_PLAYER;
-            }
+            // Player dot color: standard blue.
+            iFlags |= MM_PLAYER;
 
             oOtherGuild = Send(what,@GetGuild);
             if poGuild <> $ AND oOtherGuild <> $
@@ -8766,30 +8318,6 @@ messages:
       // Count right now as the last time we moved.
       piLastMoveUpdateTime = GetTickCount();
       
-      // This is here because it has to be done before poOwner is changed.
-
-      // If newbie is entering a kill zone, warn him.  If he is leaving
-      // one, then tell him he's safe again.  Ignore during chaos night.
-
-      if NOT Send(SYS,@GetChaosNight)
-         AND (NOT (piFlags & PFLAG_PKILL_ENABLE)
-            OR piFlags & PFLAG_PERMA_NO_PVP)
-      {
-         if Send(what,@CheckRoomFlag,#flag=ROOM_KILL_ZONE)
-         {
-            if (poOwner = $
-               OR NOT Send(poOwner,@CheckRoomFlag,#flag=ROOM_KILL_ZONE))
-            {
-               Send(self,@MsgSendUser,#message_rsc=user_kill_zone);
-            }
-         }
-         else if (poOwner <> $
-            AND Send(poOwner,@CheckRoomFlag,#flag=ROOM_KILL_ZONE))
-         {
-            Send(self,@MsgSendUser,#message_rsc=user_angel_rejoins);
-         }
-      }
-
       // This is stuff that would be executed on propagation, but we gotta
       // execute this stuff before Sending new info to client
 
@@ -10918,14 +10446,6 @@ messages:
          iFlags = (iFlags & ~MOVEON_NO);
       }
 
-      // Angeled characters cannot block other players.
-      // Disabled for now because minions try to stand on top of them.
-      /*if NOT (piFlags & PFLAG_PKILL_ENABLE)
-         OR (piFlags & PFLAG_PERMA_NO_PVP)
-      {
-         iFlags = (iFlags & ~MOVEON_NO);
-      }*/
-
       return iFlags;
    }
 
@@ -11007,43 +10527,7 @@ messages:
       }
 
       // Send the appropriate flag to draw the name.
-      if piFlags & PFLAG_MURDERER
-      {
-         iFlags |= NC_KILLER;
-      }
-      else
-      {
-         if (piFlags & PFLAG_OUTLAW)
-         {
-            iFlags |= NC_OUTLAW;
-         }
-         else
-         {
-            iFlags |= NC_PLAYER;
-         }
-      }
-
-      return iFlags;
-   }
-
-   GetClientObjectType()
-   {
-      local iFlags;
-
-      iFlags = 0;
-
-      // Send the appropriate flag to draw the name.
-      if piFlags & PFLAG_MURDERER
-      {
-         iFlags |= OT_KILLER;
-      }
-      else
-      {
-         if (piFlags & PFLAG_OUTLAW)
-         {
-            iFlags |= OT_OUTLAW;
-         }
-      }
+      iFlags |= NC_PLAYER;
 
       return iFlags;
    }
@@ -11068,13 +10552,6 @@ messages:
    {
       piLastLoginTime = 0;
 
-      return;
-   }
-
-   SetSafety()
-   {
-      Send(self,@SetPlayerPreference,#flag=CF_SAFETY_OFF,#value=FALSE);
-      
       return;
    }
 
@@ -11166,16 +10643,6 @@ messages:
       return;
    }
 
-   IsMurderer()
-   {
-       if piFlags & PFLAG_MURDERER
-       {
-          return TRUE;
-       }
-          
-      return FALSE;
-   }
-  
    RemoveCurrentQuest(index=$)
    "Deletes a quest from the user's plActiveQuests."
    {

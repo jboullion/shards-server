@@ -78,13 +78,6 @@ messages:
          return FALSE;
       }
 
-      if (Send(who,@CheckPlayerFlag,#flag=PFLAG_PERMA_NO_PVP))
-      {
-         Send(who,@MsgSendUser,#message_rsc=spell_no_pvp_flag);
-
-         return FALSE;
-      }
-
       oGuild = Send(who,@GetGuild);
 
       if oGuild = $

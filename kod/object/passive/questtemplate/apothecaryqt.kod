@@ -93,7 +93,7 @@ properties:
    pbDisabled = TRUE
 
    piNumPlayers = 1
-   piPlayerRestrict = Q_PLAYER_NOTNEWBIE | Q_PLAYER_LAWFUL \
+   piPlayerRestrict = Q_PLAYER_NOTNEWBIE \
                       | Q_PLAYER_NOTTRIED_RECENTLY
    plSpecialRestrict = $
    piMaxPlayers = 10

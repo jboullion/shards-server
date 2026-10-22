@@ -217,12 +217,6 @@ messages:
             continue;
          }
 
-         if Send(each_obj,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-            OR Send(each_obj,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         {
-            continue;
-         }
-
          if Send(who,@AllowBattlerAttack,#victim=each_obj,#report=FALSE,#actual=FALSE)
             AND Send(each_obj,@AllowBattlerAttack,#victim=who,#report=FALSE,#actual=FALSE)
          {

@@ -63,12 +63,12 @@ messages:
       piMaxHoldTime = MaxHoldTime;
 
       // A list of monsters not affected by webbing
-      // Includes: Spiders, Bosses, Fliers, Xeos, and Revenants
+      // Includes: Spiders, Bosses, Fliers, Xeos, and Elementals
       plExcludedMonsters = [ &Spider, &SpiderBaby, &SpiderQueen, &DeathSpider,
                              &Lich, &LupoggKing, &Yeti, &Ghost,
                              &DragonFly, &DragonFlyQueen, &EvilFairy, &Fairy,
                              &DarkAngel, &Kriipa, &XeoAir, &XeoFire,
-                             &Revenant, &Elemental
+                             &Elemental
                            ];
      
       propagate;

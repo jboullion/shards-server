@@ -90,7 +90,7 @@ messages:
       }
 
       // Check if player should regain guardian angel from HP loss.
-      Send(poApply_target,@EvaluatePKstatus);
+      Send(poApply_target,@EvaluateNewbieStatus);
 
       Send(self,@Delete);
 

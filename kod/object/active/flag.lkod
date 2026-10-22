@@ -36,8 +36,6 @@ flag_failed_yours = de \
    "Dieses Gebiet wurde bereits im Namen Deiner Fraktion in Besitz genommen."
 flag_failed_not_soldier = de \
    "Nach den Gesetzen des Rates musst Du ein anerkannter Soldat Deiner Fraktion sein."
-flag_failed_angel = de \
-   "Dein Schutzengel erlaubt Dir nicht, Dich einzumischen."
 flag_failed_in_progress = de "%s%s kämpft bereits um dieses Gebiet."
 flag_failed_too_recent = de \
    "Nach den Gesetzen des Rates ist auf dieses Gebiet zu kurze Zeit zuvor "
@@ -96,8 +94,6 @@ flag_failed_yours = pt \
    "Este território já foi reivindicado em nome de sua facção."
 flag_failed_not_soldier = pt \
    "Pelas leis do Conselho, você deve ser um soldado reconhecido de sua facção."
-flag_failed_angel = pt \
-   "Seu anjo da guarda impede você de interferir aqui."
 flag_failed_in_progress = pt \
    "Uma reivindicação a este território feita por %s%s já está em andamento."
 flag_failed_too_recent = pt \

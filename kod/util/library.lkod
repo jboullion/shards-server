@@ -146,10 +146,6 @@ LM_haz_tomas = de \
 LM_haz_eric = de \
    "Der bester Barkeeper auf dieser Seite von Barloque! Ich habe gehört er "
    "sucht etwas..."
-LM_towns_nopvp = de \
-   "Wenn Du dich entscheiden willst, nicht an Kämpfen gegen andere Spieler "
-   "teilzunehmen, dann besuche den Tempel von Shal'ill im Norden von Marion "
-   "und sprich mit der Priesterin dort."
 LM_no_mana_nodes = de "Du bist noch mit keiner Mana Node verbunden."
 LM_mana_nodes = de "Dein Geist ist mit den folgenden Mana Nodes verbunden: %r."
 QM_missed_middle = de \
@@ -1011,7 +1007,6 @@ LM_haz_rodric = pt "Ouvi dizer que o velho tem uma missão para você."
 LM_haz_marcus = pt "Um bom homem! Um bom homem! Suas estalagens são um excelente lugar para se recuperar, caso você se encontre ferido."
 LM_haz_tomas = pt "Um guerreiro armado é sempre melhor do que um nu. Gaste o que tem em armas na loja do Tomas - você ganhará mais."
 LM_haz_eric = pt "O melhor barman deste lado de Barloque! Ouvi dizer que ele está procurando por algo..."
-LM_towns_nopvp = pt "Se você deseja sair do combate jogador contra jogador, visite o Templo de Shal'ille ao norte de Marion e fale com a sacerdotisa lá."
 LM_no_mana_nodes = pt "Você ainda não se conectou a nenhum nó de mana."
 LM_mana_nodes = pt "Sua aura está conectada a estes nós de mana: %r."
 QM_missed_middle = pt "O que é isso? Isso não faz sentido para mim. Você tem certeza de que foi ver %s%s e obteve a mensagem ~Ireal~n para mim?"

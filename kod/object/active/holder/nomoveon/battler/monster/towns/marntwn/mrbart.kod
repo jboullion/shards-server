@@ -68,13 +68,6 @@ messages:
 
    UserEntered(who=$)
    {
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         Send(self,@SetMood,#new_mood=piMood-3);
-
-         propagate;
-      }
-
       if Send(who,@GetHomeRoom) = RID_MAR_INN
       {
          Send(self,@SetMood,#new_mood=piMood+1);

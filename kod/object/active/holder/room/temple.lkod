@@ -1,9 +1,7 @@
 room_name_temple = de "Der Sha-Lill Tempel"
-temple_nopvp_sign_name = de "Enthaltung vom PvP"
 temple_open = de "Open"
 temple_close = de "Close"
 
 room_name_temple = pt "O Templo de Shal'ille"
-temple_nopvp_sign_name = pt "Abstenção de PvP"
 temple_open = pt "Abrir"
 temple_close = pt "Fechar"

@@ -41,11 +41,11 @@ resources:
    dm_pk_unlock = "Your PK status now acts as if you were a normal player."
 
    dm_pk_enable = \
-      "Currently, your PK status is ON, meaning that you can attack "
-      "other players at will."
+      "Currently, your PK status is ON, meaning you're past newbie protection "
+      "and can take part in the Faction War, guild wars and the like."
    dm_pk_disable = \
-      "Currently, your PK status is OFF, meaning you can not kill or "
-      "be killed by other players."
+      "Currently, your PK status is OFF, meaning you're under newbie "
+      "protection: a death costs you nothing, and you can't fight other players."
 
    dm_appeal_on = "You will now hear appeals."
    dm_appeal_off = "You will no longer hear appeals."
@@ -1335,14 +1335,14 @@ messages:
 
          Send(self,@GainHealth,#amount=piMax_health*100-piHealth,#precision=TRUE);
          Send(self,@GainMana,#amount=piMax_mana-piMana);
-         Send(self,@EvaluatePKStatus);
+         Send(self,@EvaluateNewbieStatus);
          Send(self,@PlayerIsIntriguing);
          Send(self,@NewVigor);
 
          return;
       }
 
-      // Allows setting their own PK/angel status.
+      // Allows setting their own PK (newbie protection) status.
       if (piDMFlags & DMFLAG_ALLOW_PKSTATUS_SET)
       {
          if StringEqual(string,dm_PK_enable_command)
@@ -1373,7 +1373,7 @@ messages:
          {
             Send(self,@PkillUnlock);
             Send(self,@MsgSendUser,#message_rsc=dm_pk_unlock);
-            Send(self,@EvaluatePKstatus);
+            Send(self,@EvaluateNewbieStatus);
             Post(self,@ReportCurrentPKstatus);
 
             return;
@@ -3002,7 +3002,6 @@ messages:
       Send(self,@AddSpell,#num=SID_DMHOLD,#iability=99);
       Send(self,@AddSpell,#num=SID_ENGRAVE,#iability=50);
       Send(self,@AddSpell,#num=SID_MORPH,#iability=99);
-      Send(self,@AddSpell,#num=SID_PARDON,#iability=99);
       Send(self,@AddSpell,#num=SID_SPELLBANE,#iability=100);
 
       return Send(SYS,@GetSuccessRsc);
@@ -3017,7 +3016,6 @@ messages:
       piDMFlags = DMFLAG_SET_ADMIN;
 
       Send(self,@AddSpell,#num=SID_ANONYMITY,#iability=99);
-      Send(self,@AddSpell,#num=SID_VILLIFY,#iability=99);
 
       return Send(SYS,@GetSuccessRsc);
    }

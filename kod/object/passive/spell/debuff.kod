@@ -76,7 +76,6 @@ messages:
 
       oTarget = First(lTargets);
       if NOT IsClass(oTarget,&Battler)
-         OR IsClass(oTarget,&Revenant)
       {
          if NOT bItemCast
          {

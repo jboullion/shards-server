@@ -172,7 +172,6 @@ monster_report_balance = de \
 Monster_Sweep_Reward = de \
    "Hmm... das sieht ein wenig sauberer aus, %s%s. Hier, nimm dies als Belohnung!"
 monster_default_attack = de "der Attacke"
-minion_trouble = de "Du bemerkst, dass dein Diener dir Ärger gebracht hat..."
 autolooted_all = de "Du plünderst die Leiche und findest %d %r."
 autolooted_all_no_money = de "Du plünderst die Leiche leer."
 autolooted_some = de \
@@ -377,8 +376,6 @@ monster_report_balance = pt \
 Monster_Sweep_Reward = pt \
    "Hmm... isso parece um pouco mais limpo. Aqui, leve isso como pagamento, %s%s."
 monster_default_attack = pt "ataque"
-minion_trouble = pt \
-   "Você sente que seu servo te colocou em apuros..."
 autolooted_all_no_money = pt "Você saqueia o corpo completamente."
 autolooted_some_no_money = pt "Você saqueia alguns dos itens do seu inimigo derrotado."
 autolooted_none = pt "Você não encontra nada facilmente saqueável em seu inimigo morto."

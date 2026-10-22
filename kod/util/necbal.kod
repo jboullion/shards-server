@@ -686,21 +686,7 @@ messages:
 
       if IsClass(victim,&User)
       {
-         if Send(victim,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-         {
-            iGain = iGain*(4+Send(victim,@GetUnjustifiedKills)/10);
-         }
-         else
-         {
-            if Send(victim,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-            {
-               iGain = iGain*3;
-            }
-            else
-            {
-               iGain = iGain*2;
-            }
-         }
+         iGain = iGain*2;
          iGain = (iGain * Send(victim,@GetBaseMaxHealth)) / 20;
       }
 

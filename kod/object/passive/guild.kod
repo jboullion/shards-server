@@ -1424,7 +1424,7 @@ messages:
             // Remove powers, reset poGuild
             Send(who,@ResetGuildStuff);
 
-            Send(who,@EvaluatePKstatus);
+            Send(who,@EvaluateNewbieStatus);
 
             // No joining a guild again for 4 hours.
             Send(who,@SetGuildRejoinTime,#delayMinutes=CANNOT_REJOIN_TIME);

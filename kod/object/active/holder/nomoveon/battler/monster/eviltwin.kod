@@ -34,9 +34,6 @@ resources:
 
    EvilTwin_delete =  "%s%s disappears into a puff of smoke."
 
-   EvilTwin_trouble = \
-      "You sense that a evil twin you summoned has gotten you "
-      "into some trouble..."
 
 classvars:
 
@@ -66,7 +63,6 @@ classvars:
    vrSound_miss = EvilTwin_sound_miss
    vrSound_aware = EvilTwin_sound_aware
    vrSound_death = EvilTwin_sound_death
-   vrMinion_trouble = EvilTwin_trouble
 
    viDefault_behavior = \
       AI_FIGHT_SINGLEMINDED | AI_FIGHT_MONSTERS \
@@ -947,8 +943,7 @@ messages:
    {
       // Trying to reduce the tendency of reflections to turn on themselves
       //  or their master.
-      if IsClass(what,&Revenant)
-         OR IsClass(what,&EvilTwin)
+      if IsClass(what,&EvilTwin)
       {
          return -2000;
       }

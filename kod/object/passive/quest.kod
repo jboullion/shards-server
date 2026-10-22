@@ -95,7 +95,7 @@ messages:
    {
       local iPlayerRestrict, oCurrentNPC, oQuestEngine, oQuest, oQuester,
             iRestrict, iKarma, lHistory, iHistory, iSucceed, iFail, iRecentTime,
-            iFaction, iPower, iTime, iR2, bDebug, oLich, i, bHasNegativeBoon,
+            iFaction, iPower, iTime, iR2, bDebug, oLich,
             oNecroGuild, oQuestTemplate;
 
       oQuestEngine = Send(SYS,@GetQuestEngine);
@@ -339,87 +339,6 @@ messages:
             return FALSE;
          }
 
-         if (iRestrict & Q_PLAYER_MURDERER)
-            AND (Send(quester_wannabe,@CheckPlayerFlag,
-                     #flag=PFLAG_MURDERER) <> PFLAG_MURDERER)
-         {
-            if bDebug
-            {
-               Debug("failed Q_PLAYER_MURDERER.");
-            }
-
-            return FALSE;
-         }
-
-         if (iRestrict & Q_PLAYER_NOTMURDERER)
-            AND (Send(quester_wannabe,@CheckPlayerFlag,
-                     #flag=PFLAG_MURDERER) = PFLAG_MURDERER)
-         {
-            if bDebug
-            {
-               Debug("failed Q_PLAYER_NOTMURDERER/Q_PLAYER_LAWFUL.");
-            }
-
-            return FALSE;
-         }
-
-         if (iRestrict & Q_PLAYER_OUTLAW)
-            AND (Send(quester_wannabe,@CheckPlayerFlag,
-                     #flag=PFLAG_OUTLAW) <> PFLAG_OUTLAW)
-         {
-            if bDebug
-            {
-               Debug("failed Q_PLAYER_OUTLAW.");
-            }
-
-            return FALSE;
-         }
-
-         if (iRestrict & Q_PLAYER_NOTOUTLAW)
-         {
-            if Send(SYS,@IsPKAllowed)
-            {
-               if (Send(quester_wannabe,@CheckPlayerFlag,
-                        #flag=PFLAG_OUTLAW) = PFLAG_OUTLAW)
-               {
-                  if bDebug
-                  {
-                     Debug("failed Q_PLAYER_NOTOUTLAW/Q_PLAYER_LAWFUL.");
-                  }
-
-                  return FALSE;
-               }
-            }
-            else
-            {
-               // Substitute for outlaw status in happyland
-               if Send(quester_wannabe,@IsEnchanted,#byClass=&Boon)
-               {
-                  bHasNegativeBoon = FALSE;
-                  foreach i in Send(quester_wannabe,@GetEnchantmentList)
-                  {
-                     if IsClass(Nth(i,2),&Boon)
-                     {
-                        if Nth(i,3) < 0
-                        {
-                           bHasNegativeBoon = TRUE;
-                           break;
-                        }
-                     }
-                  }
-                  if bHasNegativeBoon
-                  {
-                     if bDebug
-                     {
-                        Debug("failed Q_PLAYER_NOTOUTLAW/Q_PLAYER_LAWFUL ",
-                              "through happyland means (negative boon).");
-                     }
-
-                     return FALSE;
-                  }
-               }
-            }
-         }
       }
 
       oQuestTemplate = Send(oQuestEngine,@GetQuestTemplateObject,
@@ -554,17 +473,6 @@ messages:
          if bDebug
          {
             Debug("failed Q_PLAYER_GUILDMASTER.");
-         }
-
-         return FALSE;
-      }
-
-      if (iPlayerRestrict & Q_PLAYER_PVP_ENABLED)
-         AND Send(quester_wannabe,@CheckPlayerFlag,#flag=PFLAG_PERMA_NO_PVP)
-      {
-         if bDebug
-         {
-            Debug("failed Q_PLAYER_PVP_ENABLED.");
          }
 
          return FALSE;

@@ -33,81 +33,24 @@ resources:
    logoffghost_default_shield = rshield.bgf
 
    logoffghost_penalty_mail_Sender = "Your guardian angel"
-
-   logoffghost_noflatpenalty_mail = \
-      "Subject: Penalties for logging off in an unsafe area\n"
-      "You have suffered some penalties for logging off in an unsafe area:\n"
-      "You lost %q XP, %q items, %q spell points, and %q skill points."
-      "\n\n"
-      "In the future, it would be wise to log off in a safe area such as an "
-      "inn, an adventurer's hall, or the interior of your guild's hall."
-      "\n\n"
-      "Abandoning your body in an unsafe area weakens it, which may cause you "
-      "to suffer some of the effects of death: you could lose proficiency in "
-      "spells and skills, as well as loosening your grip on items in your "
-      "possession.  You have an 8 minute grace period (3 minutes for "
-      "murderers) after logoff before penalties are incurred, so if you "
-      "lose your connection involuntarily, simply reconnect within 8 minutes "
-      "and your character will be fine.  Every time you log off unsafely "
-      "in a short period of time, your body becomes progressively weaker "
-      "and as such will suffer more from being abandoned.  The first "
-      "time you logoff unsafely, you will suffer little or no penalties, "
-      "but once you have performed enough unsafe logoffs, the damage to "
-      "your body will be comparable to the losses incurred when your character "
-      "dies.  This penalty escalation recedes over time, so if "
-      "you don't log off unsafely too frequently, your character should "
-      "suffer only mild if any penalties.  You can also use the Phase spell "
-      "to simulate the effects of logging off while remaining in-game, but if "
-      "you do not Phase back to reality after the grace period, you will take "
-      "penalties as if you had logged off unsafely."
-      "\n\n"
-      "I recommend you do not use this as a tactic to avoid danger, since "
-      "it could work against you should your connection to the Meridian "
-      "become too unstable soon after."
-      "\n\n"
-      "  -- Your guardian angel"
-
-   logoffghost_penalty_mail = \
-      "Subject: Penalties for logging off in an unsafe area\n"
-      "You have suffered some penalties for logging off in an unsafe area:\n"
-      "You lost %q XP, %q items, %q spell points, and %q skill points."
-      "\n\n"
-      "In the future, it would be wise to log off in a safe area such as an "
-      "inn, an adventurer's hall, or the interior of your guild's hall."
-      "\n\n"
-      "Abandoning your body in an unsafe area weakens it, which may cause you "
-      "to suffer some of the effects of death: you could lose proficiency in "
-      "spells and skills, as well as loosening your grip on items in your "
-      "possession.  You have an 8 minute grace period (3 minutes for "
-      "murderers) after logoff before penalties are incurred, so if you "
-      "lose your connection involuntarily, simply reconnect within 8 minutes "
-      "and your character will be fine.  You can also use the Phase spell "
-      "to simulate the effects of logging off while remaining in-game, but if "
-      "you do not Phase back to reality after the grace period, you will take "
-      "penalties as if you had logged off unsafely."
-      "\n\n"
-      "I recommend you do not use this as a tactic to avoid danger, since "
-      "it could work against you should your connection to the Meridian "
-      "become too unstable soon after."
-      "\n\n"
-      "  -- Your guardian angel"
-
-   logoffghost_newbie_mail = "Subject: Logging off in an unsafe area\n"
+   logoffghost_returned_mail = "Subject: Logging off in an unsafe area\n"
       "You last logged off in an unsafe area, where the lines of connection "
-      "to the Meridian are weak.  I have managed to protect you from the harm "
-      "that usually would result from passing back through the Meridian in "
-      "such a place, but in the future it would be wise to log off in a safe "
-      "area such as an inn or an adventurer's hall (or your guild's hall, "
-      "when you have progressed enough to join a guild)."
+      "to the Meridian are weak, so I carried you back to a safe place."
       "\n\n"
-      "Abandoning your body in an unsafe area weakens it, which may cause "
-      "you to experience some effects of death: you could lose proficiency "
-      "in spells and skills, as well as lose your grip on items in your "
-      "possession.  You have an 8 minute grace period after logoff before "
-      "penalties are incurred, so if you lose your connection involuntarily, "
-      "simply reconnect within 8 minutes and your character will be fine."
+      "In the future, it would be wise to log off in a safe area such as an "
+      "inn, an adventurer's hall, or the interior of your guild's hall.  You "
+      "have an 8 minute grace period after logoff, so if you lose your "
+      "connection involuntarily, simply reconnect within 8 minutes and you'll "
+      "be where you left.  The Phase spell works the same way, if you don't "
+      "Phase back to reality within the grace period."
+      "\n\n"
+      "A soldier who leaves soon after a fight with an enemy soldier is counted "
+      "as fallen in the war."
       "\n\n"
       "  -- Your guardian angel"
+
+
+
 
    logoffghost_someone = "Someone"
 
@@ -164,10 +107,6 @@ properties:
    piOverlays = 8
 
    ptPenaltyTimer = $
-   psXPLost = $
-   psItemsLost = $
-   psSpellPointsLost = $
-   psSkillPointsLost = $
    piSoldierShieldOverlay = $
 
 messages:
@@ -270,17 +209,7 @@ messages:
 
       if Send(SYS,@GetLogoffPenaltyEnable)
       {
-         if Send(poGhostedPlayer,@CanPlayerPvP)
-         {
-            Send(self,@InflictPenalties);
-         }
-         else
-         {
-            Send(poGhostedPlayer,@ReceiveNestedMail,
-                 #from=logoffghost_penalty_mail_Sender,
-                 #dest_list=[poGhostedPlayer],
-                 #nest_list=[4,logoffghost_newbie_mail]);
-         }
+         Send(self,@InflictPenalties);
       }
 
       // Play a sound audible in the room
@@ -290,24 +219,10 @@ messages:
                #wave_rsc = logoffghost_poof_wav_rsc);
       }
 
-      // Send this person to the room's blink coordinates, or to their hometown
-      // if the Hometown Penalties setting is on and the player is not angeled.
-      // This helps get people out of continuous crash situations and mounting
-      // penalties. Hometown Penalties is intended to keep PvP players from
-      // being 'kept offline' by opponents.
-
-      if Send(poGhostedPlayer,@CanPlayerPvP)
-      {
-         if Send(SETTINGS_OBJECT,@ReturnToSafetyPenaltiesEnabled)
-         {
-            Send(poGhostedPlayer,@AdminGoToLastSafeRoom);
-         }
-         else
-         {
-            Send(poGhostedPlayer,@AdminGoToBlink);
-         }
-      }
-      else if Send(SETTINGS_OBJECT,@AngelReturnToSafetyPenaltiesEnabled)
+      // Send this person to the last safe room they visited if the Return to
+      // Safety setting is on, or else to the room's blink coordinates. This
+      // helps get people out of continuous crash situations.
+      if Send(SETTINGS_OBJECT,@ReturnToSafetyPenaltiesEnabled)
       {
          Send(poGhostedPlayer,@AdminGoToLastSafeRoom);
       }
@@ -336,33 +251,12 @@ messages:
       return;
    }
 
-   SendPenaltyInfo(iXPLost=0, iItemsLost=0, iSpellPtLost=0, iSkillPtLost=0)
+   SendPenaltyInfo(who=$)
    {
-      local rMail;
-
-      // Get the correct mail resource.
-      if Send(SETTINGS_OBJECT,@GetFlatPenaltiesEnable,
-            #flag=Send(poGhostedPlayer,@CheckPlayerFlag,#flag=PFLAG_MURDERER))
-      {
-         rMail = logoffghost_penalty_mail;
-      }
-      else
-      {
-         rMail = logoffghost_noflatpenalty_mail;
-      }
-
-      // Convert to strings for the mail.
-      psXPLost = Send(SYS,@IntToString,#num=iXPLost);
-      psItemsLost = Send(SYS,@IntToString,#num=iItemsLost);
-      psSpellPointsLost = Send(SYS,@IntToString,#num=iSpellPtLost);
-      psSkillPointsLost = Send(SYS,@IntToString,#num=iSkillPtLost);
-
-      // Send mail notifying user of penalties incurred
       Send(poGhostedPlayer,@ReceiveNestedMail,
            #from=logoffghost_penalty_mail_Sender,
            #dest_list=[poGhostedPlayer],
-           #nest_list=[4,rMail, 4,psXPLost, 4,psItemsLost, 4,psSpellPointsLost,
-                       4,psSkillPointsLost]);
+           #nest_list=[4,logoffghost_returned_mail]);
 
       return;
    }

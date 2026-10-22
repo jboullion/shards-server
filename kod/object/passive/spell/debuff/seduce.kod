@@ -106,8 +106,8 @@ messages:
       {
          if IsClass(who,&Player)
             AND NOT Send(Send(who,@GetOwner),@IsArena)
-            AND NOT Send(who,@CheckStatusAndSafety,#victim=oMaster,
-                        #report=TRUE,#minion=TRUE)
+            AND NOT Send(who,@CheckAttackStatus,#victim=oMaster,
+                        #report=TRUE)
          {
             return FALSE;
          }

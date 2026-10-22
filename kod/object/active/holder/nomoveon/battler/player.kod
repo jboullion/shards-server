@@ -73,8 +73,6 @@ constants:
    ADVANCE_TIMER_MAX =   1320000
    ADVANCEMENT_LIMIT =   10
 
-   PKPOINTER_TIME = 10*60*1000
-
    PLAYER_TRANSLATION_LEGS_MASK = 0xff
    PLAYER_TRANSLATION_LEGS_MUL = 1
    PLAYER_TRANSLATION_BODY_MASK = 0xff00
@@ -155,9 +153,12 @@ resources:
    player_improve_health_invigorate = \
       "~I~BYou feel invigorated by your success."
    player_spits = "You spit on the corpse of your unworthy foe."
-   player_regain_angel = \
-      "Due to your weakness, your protective guardian angel returns."
-   player_no_angel = "You suddenly feel more vulnerable."
+   player_newbie_over = \
+      "~IYou're no longer new to these lands: from now on a death breaks the "
+      "weapon and armour you wear, until a smith mends them."
+   player_newbie_again = \
+      "~IWeakened as you are, you're counted new to these lands again: a death "
+      "costs you nothing."
 
    player_join_faction = \
       "~IYour name is entered on the roll of membership for %s%s's political "
@@ -230,27 +231,16 @@ resources:
       "~IYour change of location disrupts Shal'ille's attempt to whisk "
       "you to safety."
 
-   player_temp_safe = \
-      "~I~BYou feel your guardian angel is near to you."
-   player_temp_safe_end = \
-      "~I~BYou feel your guardian angel has departed once more."
 
    player_improved = "~g~BYou have improved in the art of %s. It is now %i%."
    player_improved_wav_rsc = imp.ogg
-   player_aggressor = "Shal'ille frowns upon your unprovoked attack."
-   player_aggressor_minion = \
-      "Shal'ille frowns upon your unprovoked attack on %s%s's minion."
-   player_safety_caught = \
-      "Hey!  You almost hit %s%s!  Good thing your safety was on!"
-   player_safety_caught_minion = \
-      "Hey!  You almost hit %s%s's minion! Good thing your safety was on!"
    player_own_minion = \
       "You cannot attack your own minion!"
 
    player_safe_server = \
       "You are not allowed to attack other players in this world."
    player_no_enter = \
-      "Your guardian angel holds you back and prevents you from entering here."
+      "You are not yet experienced enough to enter here."
    player_assgame_soon = \
       "~kRoq tells you, \"~IA new Assassin's Circle shall be initiated "
       "shortly.\""
@@ -258,11 +248,6 @@ resources:
    player_tougher_wav_rsc = tougher.ogg
    player_missed_something_wave_rsc = swordmis.ogg
    player_killed_something = "You killed %s%s."
-   player_killed_player = \
-      "You have killed another player and have been branded a murderer."
-   player_wanted_now = "You are now wanted for the murder of %s%s."
-   player_haunted_on = "%s%s's violent death summons forth a revenant."
-   player_haunted_off = "The revenant is satisfied."
    
    player_training_inform = "You now have ~B%i~B training points!"
    player_reached_maxtraining = \
@@ -279,21 +264,11 @@ resources:
 
    player_health_gain_maxed = "Your health cannot increase any further."
 
-   player_cant_hit_optout = \
-      "You have opted not to participate in player versus player combat."
-   player_cant_hit_optout_minion = \
-      "This creature is the servant of another player - you have opted not "
-      "to participate in player versus player combat."
-   player_cant_hit_newbie = \
-      "You are not yet experienced enough to fight other players."
    player_cant_hit_newbie_minion = \
       "This creature is the servant of another player - you are not yet "
       "experienced enough to fight it."
    player_guardian_angel = \
       "A guardian angel whispers to you, \"You may not attack %s%s.\""
-   player_kill_zone = \
-      "Your guardian angel whispers to you, \"I cannot protect you here.\""
-   player_angel_rejoins = "Your guardian angel rejoins you."
    player_lose_node = "You lose your connection to the mana node in %s."
 
    player_hit_immunity =  "%s%s%s laughs off your pitiful blow."
@@ -383,7 +358,6 @@ resources:
    player_is_wearing = "%s is wearing %s%s.\n"
    player_donation_title = "Noble benefactor of Meridian in %q."
    player_donation_separator = ", "
-   player_is_justicar = "Elected Royal Justicar of the Meridian.\n"
    player_won_death_realm = "Has defeated King Far'Nohl of the Death Realm.\n"
 
    player_known_for_mastery = "Known far and wide for mastery of "
@@ -507,73 +481,8 @@ resources:
       "~rhelp ~b- opens our web-based help pages.  It will take a few "
       "seconds to load.\n"
 
-   player_safety_on_mail = \
-      "Your safety is currently on, meaning you cannot cast hostile spells or "
-      "attack innocent players."
-   player_safety_off_mail = \
-      "Your safety is currently off.  If you do not wish to attack innocent "
-      "players, I heartily recommend that you turn it on."
 
-   player_ready_to_kill = "Subject: Congratulations!\n"
-      "Your character has been deemed ready to take on the world without "
-      "my protection, meaning that you may now raise your sword against other "
-      "players if you so desire.  It is with a heavy heart that I take my "
-      "leave of you, but I trust that you will do fine without me."
-      "\n\n"
-      "You also have many other rights and responsibilities available to "
-      "you.  You can now join a guild with other friends.  Guilds are a good "
-      "way to gain protection from those that would do you harm.  Joining a "
-      "good guild will make the difference between merely surviving or "
-      "thriving in the world.  Guilds can also get into wars with other "
-      "guilds, so be careful that you don't make too many enemies."
-      "\n\n"
-      "I must warn you that engaging in lethal combat against other players "
-      "may soil your good name.  If you strike an innocent, or cast "
-      "a spell which harms him, you may be branded an outlaw, an onus which "
-      "only fades upon your death.  If you slay an innocent in cold blood, "
-      "you will be blacklisted as a murderer, and this is a weight upon your "
-      "soul which does not easily depart.  This puts you at risk:  since "
-      "murderers and outlaws are not innocents, one may attack them without "
-      "being named a murderer or an outlaw."
-      "\n\n"
-      "Also note that assisting an outlaw or murder by casting helpful spells "
-      "upon them will brand you an outlaw in the eyes of society.  You must "
-      "choose your friends and your enemies well!"
-      "\n\n"
-      "If you do not wish to engage in the unsavory practice of attacking "
-      "innocents or assisting the unlawful, it is heartily recommended that "
-      "you do not enable attacking innocents in your game preferences.  This "
-      "is also called your \"safety\" since it keeps you safe from being "
-      "outcast as an unlawful outlaw or murderer.  While your safety is on, "
-      "you are not permitted to either attack innocents or cast spells that "
-      "are hostile to them.  This can be crucial when one stray sword blow "
-      "can make you an outlaw.  However, rest assured that you will always be "
-      "permitted to strike outlaws and murderers, since it is crucial that "
-      "you always have the option of defending yourself from their "
-      "treacherous ways."
-      "\n\n"
-      "%s"
-      "\n\n"
-      "Finally, some last bits of advice as I depart.  Do not despair if "
-      "you are sent to the underworld by some monster or even another "
-      "player.  Death is part of the cycle, and learning to recover from "
-      "death is important.  Put some items away in the vault in Barloque for "
-      "times when you find yourself killed and unable to get items from your "
-      "corpse.  Also, ask politely for assistance and you will often find "
-      "someone willing to lend a helping hand.  Make some friends and you "
-      "will find that nothing is truly beyond your reach."
-      "\n\n"
-      "Have fun in Meridian!"
-      "\n\n"
-      "  -- Your guardian angel"
 
-   player_ready_to_guild = "Subject: Congratulations!\n"
-      "Your character has been deemed ready to take on the world without "
-      "my protection, meaning that you may now raise your sword with fellow "
-      "players and engage in guild politics.  It is with a heavy heart that I "
-      "take my leave of you, but I trust that you will do fine without me.\n\n"
-      "%s\n\n"
-      "  -- Your guardian angel"
 
    player_tutorial_mail = "Subject: You're doing well for yourself.\n"
       "It's nice to see that you seem to be doing well.  "
@@ -605,11 +514,8 @@ resources:
       "fleeting.  Vigor can be restored either through needed rest or a "
       "hearty meal."
       "\n\n"
-      "When you reach 50 health, I will no longer be able to protect you from "
-      "combat with other players.  If you do not wish to partake in player-"
-      "versus player combat, you can opt-out by visiting the Temple of "
-      "Shal'ille (north from the town of Marion) and following the directions "
-      "on the sign placed there."
+      "Until you reach 50 health, a death costs you nothing.  After that, a "
+      "death breaks the weapon and armour you wear, and a smith must mend them."
       "\n\n"
       "I congratulate you on your recent success.  I know the bards will sing "
       "of your future exploits."
@@ -626,11 +532,11 @@ resources:
       "as killing monsters.  We hope you feel at home in your new online "
       "community."
       "\n\n"
-      "I am your guardian angel, and thus I shall protect you from the spells "
-      "and swords of other players for a short time.  Use this time to "
-      "acquaint yourself with the world, and to gather your resources.  Know "
-      "you that the shops of the land are always safe zones, and the inns are "
-      "good places to rest and recover your strength."
+      "I am your guardian angel, and I shall watch over you while you are new "
+      "to these lands.  Use this time to acquaint yourself with the world, and "
+      "to gather your resources.  Know you that the shops of the land are "
+      "always safe zones, and the inns are good places to rest and recover "
+      "your strength."
       "\n\n"
       "Spells and skills will almost certainly be crucial to your success.  "
       "Note that a young warrior's skills are stronger than a inexperienced "
@@ -658,20 +564,16 @@ resources:
       "your allegiance to a city of your choosing and become a permanent "
       "citizen, with all of the attached benefits - and drawbacks."
       "\n\n"
-      "Death is unkind to you - avoid it!  A death can make you weaker, and "
-      "all of your possessions are left where you met your demise, where any "
-      "scavenger, human or otherwise, may take it as they please.  Best that "
-      "you join an ally on your travels that they may gather your valuables "
-      "should you meet such an unfortunate fate."
+      "Death is unkind to you - avoid it!  Once you are no longer new to these "
+      "lands, a death breaks the weapon and armour you wear, and a smith must "
+      "mend them."
       "\n\n"
       "Lastly, if you wish to leave this land for a bit, it is recommended to "
       "log off in a safe place, such as an Inn or Adventurer's Hall.  For "
       "brief exits from the game, you can use the spell Phase to disconnect "
       "you from this plane of existence, rendering you unable to be harmed.  "
-      "However if you Phase or log off without your guardian angel for longer "
-      "than 8 minutes for innocents (3 minutes for murderers), you will take "
-      "a penalty (dropping item(s) and losing skill and spell points) and be "
-      "sent back to the last safe location you visited."
+      "However if you Phase or log off in an unsafe place for longer than 8 "
+      "minutes, you will be sent back to the last safe location you visited."
       "\n\n"
       "We hope that you enjoy your stay in our land."
       "\n\n"
@@ -1126,13 +1028,6 @@ properties:
    // When attacking our own faction last cost renown (CheckFactionAttack)
    piOwnAttackTime = 0
 
-   piKill_count = 0
-   piKill_count_decay = 0
-   piJustified_kill_count = 0
-
-   // Last time the player murdered someone.
-   piTimeLastMurder = 0
-
    ptAttackTimer = $
 
    plHonor = $
@@ -1146,9 +1041,6 @@ properties:
 
    piLastDeathTime = 0
 
-   // Temp safe timer for giving players a period of safety after a death
-   ptTempSafe = $
-   
    // This keeps the duration of our Second Wind skill's "downtime"
    ptSecondWind = $
 
@@ -1259,15 +1151,6 @@ messages:
                #num=SKID_SECOND_WIND),#type=ENCHANTMENT_PLAYER);
       }
 
-      if ptTempSafe <> $
-      {
-         if (IsTimer(ptTempSafe))
-         {
-            DeleteTimer(ptTempSafe);
-         }
-         ptTempSafe = $;
-      }
-
       if ptCrystalizeManaSurgeTimer <> $
       {
          DeleteTimer(ptCrystalizeManaSurgeTimer);
@@ -1335,37 +1218,8 @@ messages:
    SetPlayerFlag(flag=0,value=FALSE,flagset=1)
    "This always requires the POSITIVE flag name."
    {
-      local ccond;
-
       if flagset = 1
       {
-         if (flag & PFLAG_PKILL_ENABLE) AND value
-         {
-            if (piFlags & PFLAG_PKILL_ENABLE)
-            {
-               return;
-            }
-            else
-            {
-               ccond = player_safety_off_mail;
-               if NOT Send(self,@CheckPlayerPreference,#flag=CF_SAFETY_OFF)
-               {
-                  ccond = player_safety_on_mail;
-               }
-
-               if Send(SYS,@IsPKAllowed)
-               {
-                  Send(self,@ReceiveNestedMail,#from=player_angel,
-                    #dest_list=[self],#nest_list=[4,player_ready_to_kill,4,ccond]);
-               }
-               else
-               {
-                  Send(self,@ReceiveNestedMail,#from=player_angel,
-                    #dest_list=[self],#nest_list=[4,player_ready_to_guild,4,ccond]);
-               }
-            }
-         }
-
          if NOT Value
          {
             piFlags = piFlags & ~flag;
@@ -1400,7 +1254,7 @@ messages:
 
       if (poOwner <> $)
          AND (flagset = 1)
-         AND (flag & (PFLAG_MURDERER | PFLAG_OUTLAW | PFLAG_INVISIBLE))
+         AND (flag & PFLAG_INVISIBLE)
       {
          // Tell room about change in case there are ramifications.
          Send(poOwner,@SomethingChanged,#what=self);
@@ -1443,7 +1297,7 @@ messages:
       return FALSE;
    }
 
-   // Player preference flags (e.g. safety, tempsafe etc.)
+   // Player preference flags (e.g. grouping, autoloot etc.)
    SetPlayerPreference(flag = 0, value = 0)
    {
       if value
@@ -1460,11 +1314,6 @@ messages:
 
    CheckPlayerPreference(flag = 0)
    {
-      if (flag = CF_SAFETY_OFF) AND NOT Send(SYS,@IsPKAllowed)
-      {
-         return FALSE;
-      }
-
       return (piPreferences & flag);
    }
 
@@ -1824,7 +1673,7 @@ messages:
 
    NewOwner(what = $)
    {
-      local i, iBasePhaseTime, iMaxHealth;
+      local i, iBasePhaseTime;
 
       Send(self,@ResetGainFlags);
 
@@ -1836,16 +1685,6 @@ messages:
       {
          // Don't set the "haven't moved" flag if we're in a safe area.
          Send(self,@SetPlayerFlag,#flag=PFLAG_MOVED_SINCE_ENTRY,#value=FALSE);
-
-         // Don't create the revenant if we're in a safe location.
-         if (piFlags & PFLAG_HAUNTED)
-         {
-            iMaxHealth = Send(self,@GetBaseMaxHealth);
-            Create(&Revenant,#target=self,#location=poOwner,
-                   #level=Bound((((iMaxHealth * 150) / 100)
-                              + (5 * piKill_Count_decay)),95,215),
-                   #diff=Bound(iMaxHealth / 10,4,9),#karmic=-piKarma / 100);
-         }
       }
 
       Send(self,@BreakTrance,#event=EVENT_NEWOWNER);
@@ -2223,16 +2062,8 @@ messages:
          AddPacket(4,system_blank_resource);
       }
 
-      obj = Send(SYS,@GetCaramo);
-      if (obj <> $
-         AND Send(obj,@GetJusticar) = self)
-      {
-         AddPacket(4, player_is_justicar);
-      }
-      else
-      {
-         AddPacket(4,system_blank_resource);
-      }
+      // The slot that once said we were the Justicar (retired with random PvP).
+      AddPacket(4,system_blank_resource);
 
       //
       // Add visible cargo types. The number of these doesn't really change,
@@ -2442,20 +2273,9 @@ messages:
          Send(self,@MsgSendUser,#message_rsc=player_assgame_soon);
       }
 
-      oObj = Send(SYS,@GetCaramo);
-      if oObj <> $
-      {
-         Send(oObj,@UserLogon,#who=self);
-      }
-
       if poGuild <> $
       {
          Send(poGuild,@SendUserMOTD,#who=self);
-      }
-
-      if ptTempSafe <> $
-      {
-         Send(self,@UnpauseTempSafe);
       }
 
       // Possibly start phase time regen.
@@ -2578,11 +2398,6 @@ messages:
       {
          DeleteTimer(ptReward_timer);
          ptReward_timer = $;
-      }
-
-      if (ptTempSafe <> $)
-      {
-         Send(self,@PauseTempSafe);
       }
 
       Send(self,@CancelRescue);
@@ -2915,9 +2730,6 @@ messages:
          Post(self,@MsgSendUser,#message_rsc=player_newbie_commands);
       }
 
-      // Reset their non-pvp flag if present.
-      piflags &= ~PFLAG_PERMA_NO_PVP;
-
       // Update stomach so it starts ticking down properly
       Send(self,@UpdateStomach);
 
@@ -2925,7 +2737,6 @@ messages:
       // friends can buff and heal them.
       piTimeAttackedPlayer = 0;
       piTimeAttackedByPlayer = 0;
-      piTimeLastMurder = 0;
 
       return;
    }
@@ -2992,22 +2803,13 @@ messages:
       piStomach = 0;
       piTimeLastStomachUpdate = 0;
 
-      piKill_count = 0;
-      piKill_count_decay = 0;
-      piJustified_kill_count = 0;
-
       Send(self,@ZeroMods);
 
       Send(self,@PlayerIsIntriguing);
 
-      Send(self,@SetPlayerFlag,#flag=PFLAG_MURDERER,#value=FALSE);
-      Send(self,@SetPlayerFlag,#flag=PFLAG_OUTLAW,#value=FALSE);
-      Send(self,@SetPlayerFlag,#flag=PFLAG_HAUNTED,#value=FALSE);
       Send(self,@SetPlayerFlag,#flag=PFLAG_PKILL_ENABLE,#value=FALSE);
       Send(self,@SetPlayerFlag,#flag=PFLAG_PKILL_LOCK,#value=FALSE);
       Send(self,@SetPlayerFlag,#flag=PFLAG_INTRIGUING,#value=FALSE);
-      Send(self,@SetPlayerFlag,#flag=PFLAG_TEMPSAFE,#value=FALSE);
-      Send(self,@SetPlayerFlag,#flag=PFLAG_PERMA_NO_PVP,#value=FALSE);
 
       // quit the guild, then be sure any guild commands are set to nil
       // important, keep this after the player flags part above.
@@ -3031,11 +2833,6 @@ messages:
       Send(&QuestX,@CancelQuester,#quester=self);
       Send(self,@ClearQuestHistory);
       Send(Send(SYS,@GetLore),@PlayerSuicides,#who=self);
-
-      if Send(SYS,@GetLastMurderer) = self
-      {
-         Send(SYS,@ClearLastMurderer);
-      }
 
       return;
    }
@@ -3184,11 +2981,10 @@ messages:
       return (length(plActive) + length(plPassive));
    }
 
-   DropItem(droppedItem=$, targetGhost=$, dropRoom=$, dropRow=0, dropCol=0,
+   DropItem(droppedItem=$, dropRoom=$, dropRow=0, dropCol=0,
             dropFineRow=32,dropFineCol=32,index=$, merge=TRUE)
    {
-      local oItem, oDropRoom, iDropRow, iDropCol, iDropFineRow, iDropFineCol,
-            oItemAtt;
+      local oItem, oDropRoom, iDropRow, iDropCol, iDropFineRow, iDropFineCol;
 
       if droppedItem <> $
       {
@@ -3207,33 +3003,21 @@ messages:
          return FALSE;
       }
 
-      if targetGhost = $
+      if dropRoom = $
       {
-         if dropRoom = $
-         {
-            oDropRoom = poOwner;
-            iDropRow = piRow;
-            iDropCol = piCol;
-            iDropFineRow = piFine_row;
-            iDropFineCol = piFine_col;
-         }
-         else
-         {
-            oDropRoom = dropRoom;
-            iDropRow = dropRow;
-            iDropCol = dropCol;
-            iDropFineRow = dropFineRow;
-            iDropFineCol = dropFineCol;
-         }
+         oDropRoom = poOwner;
+         iDropRow = piRow;
+         iDropCol = piCol;
+         iDropFineRow = piFine_row;
+         iDropFineCol = piFine_col;
       }
       else
       {
-         // This is the result of a logoff ghost penalty.
-         oDropRoom = Send(targetGhost,@GetOwner);
-         iDropRow = Send(targetGhost,@GetRow);
-         iDropCol = Send(targetGhost,@GetCol);
-         iDropFineRow = Send(targetGhost,@GetFineRow);
-         iDropFineCol = Send(targetGhost,@GetFineCol);
+         oDropRoom = dropRoom;
+         iDropRow = dropRow;
+         iDropCol = dropCol;
+         iDropFineRow = dropFineRow;
+         iDropFineCol = dropFineCol;
       }
 
       if Send(oItem,@ReqNewOwner,#what=oDropRoom)
@@ -3242,16 +3026,6 @@ messages:
       {
          if Send(oItem,@DropOnDeath)
          {
-            if targetGhost <> $
-            {
-               // Put the PK pointer attribute on the item to prevent
-               // mules from grabbing penalty drops from ghosts.
-               oItemAtt = Send(sys,@FindItemAttByNum,#num=IA_PKPOINTER);
-               Send(oItemAtt,@AddToItem,#oItem=oItem,
-                     #timer_duration=PKPOINTER_TIME,
-                     #state1=self);
-            }
-
             Send(oDropRoom,@NewHold,#what=oItem,#merge=merge,
                   #new_row=iDropRow,#new_col=iDropCol,
                   #fine_row=iDropFineRow,#fine_col=iDropFineCol);
@@ -4586,8 +4360,8 @@ messages:
          return FALSE;
       }
 
-      // Don't halo non-attackables in guild_pk_only zones (typically an
-      // unguilded outlaw). Necessary because it just looks confusing
+      // Don't halo non-attackables in guild_pk_only zones. Necessary because it
+      // just looks confusing
       if NOT actual
          AND NOT Send(oRoom,@AllowGuildAttack,#what=self,#victim=victim)
       {
@@ -4661,21 +4435,6 @@ messages:
          }
       }
 
-      // Check for temporary safety flag.
-      if IsClass(victim,&User)
-         AND ((piFlags & PFLAG_TEMPSAFE)
-            OR Send(victim,@CheckPlayerFlag,#flag=PFLAG_TEMPSAFE))
-      {
-         if report
-         {
-            Send(self,@MsgSendUser,#message_rsc=player_guardian_angel,
-                  #parm1=Send(victim,@GetDef),
-                  #parm2=Send(victim,@GetName));
-         }
-
-         return FALSE;
-      }
-
       // Can always attack mortal event characters.
       if IsClass(victim,&DM)
          AND Send(victim,@IsEventCharacter)
@@ -4724,16 +4483,8 @@ messages:
                {
                   if (report)
                   {
-                     if (piFlags & PFLAG_PERMA_NO_PVP)
-                     {
-                        Send(self,@MsgSendUser,
-                              #message_rsc=player_cant_hit_optout_minion);
-                     }
-                     else
-                     {
-                        Send(self,@MsgSendUser,
-                              #message_rsc=player_cant_hit_newbie_minion);
-                     }
+                     Send(self,@MsgSendUser,
+                           #message_rsc=player_cant_hit_newbie_minion);
                   }
 
                   return FALSE;
@@ -4762,7 +4513,7 @@ messages:
                return FALSE;
             }
 
-            // Check status and safety against the owner of the minion.
+            // Check the attack against the owner of the minion.
             if NOT IsClass(oRoom,&GuildHall)
             {
                if NOT Send(self,@AllowBattlerAttack,
@@ -4834,10 +4585,9 @@ messages:
          return TRUE;
       }
 
-      // Finally, check status and safety.
-      if NOT Send(self,@CheckStatusAndSafety,#victim=victim,
-                  #report=report,#actual=actual,#minion=minion,
-                  #stroke_obj=stroke_obj)
+      // Finally, check faction standing and the war.
+      if NOT Send(self,@CheckAttackStatus,#victim=victim,
+                  #report=report,#actual=actual,#stroke_obj=stroke_obj)
       {
          return FALSE;
       }
@@ -4854,10 +4604,9 @@ messages:
       return TRUE;
    }
 
-   CheckStatusAndSafety(victim=$,report=TRUE,actual=TRUE,minion=FALSE,
-                        stroke_obj=$)
-   "CF_SAFETY_OFF prevents accidental attacks. You can always successfully "
-   "hit a murderer or outlaw, though."
+   CheckAttackStatus(victim=$,report=TRUE,actual=TRUE,stroke_obj=$)
+   "The last checks on an attack AllowBattlerAttack let through: faction standing "
+   "(CheckFactionAttack), war regrouping, and the time of our last attack on a player."
    {
       local oEnemyGuild, oSoldierShield, oNecromancerAmulet, oHunterSword;
 
@@ -4924,8 +4673,7 @@ messages:
       }
 
       // Check for enemy guild or faction soldier fighting - If attacking a (mutual)
-      //  enemy, then they can whack on each other freely, without outlaw penalty
-      //  or faction loss.
+      //  enemy, then they can whack on each other freely, without faction loss.
       if (poGuild <> $
             AND oEnemyGuild <> $
             AND Send(poGuild,@IsMutualEnemy,#otherguild=oEnemyGuild))
@@ -4964,63 +4712,6 @@ messages:
          }
       }
 
-      // Check to see if we deserve to be an outlaw.
-      if NOT Send(victim,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-         AND NOT Send(victim,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-      {
-         if NOT Send(self,@CheckPlayerPreference,#flag=CF_SAFETY_OFF)
-         {
-            // If your opponent is not a murderer or outlaw, you must
-            // have your 'safety' off to attack anyone.
-            if report
-            {
-               if stroke_obj = $
-               {
-                  return FALSE;
-               }
-
-               if IsClass(self,&Guest)
-               {
-                  Send(self,@MsgSendUser,#message_rsc=player_guardian_angel,
-                       #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
-               }
-               else if minion
-               {
-                  Send(self,@MsgSendUser,#message_rsc=player_safety_caught_minion,
-                        #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
-               }
-               else
-               {
-                  Send(self,@MsgSendUser,#message_rsc=player_safety_caught,
-                        #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
-               }
-            }
-
-            return FALSE;
-         }
-         else
-         {
-            if NOT (piFlags & PFLAG_MURDERER)
-               AND NOT (piFlags & PFLAG_OUTLAW)
-               AND actual = TRUE
-            {
-               // attacking someone who is without fault is cause to
-               // gain the outlaw flag.
-               if minion
-               {
-                  Send(self,@MsgSendUser,#message_rsc=player_aggressor_minion,
-                        #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
-               }
-               else
-               {
-                  Send(self,@MsgSendUser,#message_rsc=player_aggressor);
-               }
-               Send(self,@SetPlayerFlag,#flag=PFLAG_OUTLAW,#value=TRUE);
-               Send(self,@EvaluatePKStatus,#dbug=TRUE);
-            }
-         }
-      }
-
       // Check for faction loss.  Handles appropriate conditions.
       if actual = TRUE
          AND NOT Send(self,@CheckFactionAttack,#what=victim,#report=report,
@@ -5041,8 +4732,8 @@ messages:
 
    CheckFactionAttack(what=$,stroke_obj=$,report=TRUE)
    "Checks if you are attacking something in the same faction as you are. "
-   "Boots you out of your faction if you attack an innocent or a monster. "
-   "Safety will catch a bad attack, however."
+   "Attacking our own faction costs renown, then our place in it; preying on a "
+   "newbie boots us."
    {
       local bBooted, rMessage;
 
@@ -5070,13 +4761,9 @@ messages:
       // own faction, you get busted!
       if (Send(what,@GetFaction) = piFaction)
       {
-         // Attacks vs. Outlaws, Murderers are not punishable by booting,
-         // so just return. Also, attacks vs. anonymous or morphed people
-         // are not punishable.
+         // Attacks vs. anonymous or morphed people are not punishable.
          if (IsClass(what,&User))
-            AND (Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-               OR Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-               OR Send(what,@CheckPlayerFlag,#flag=PFLAG_ANONYMOUS)
+            AND (Send(what,@CheckPlayerFlag,#flag=PFLAG_ANONYMOUS)
                OR Send(what,@CheckPlayerFlag,#flag=PFLAG_MORPHED))
          {
             return TRUE;
@@ -5086,11 +4773,11 @@ messages:
          rMessage = player_faction_attacked;
       }
 
-      // Preying on non-intriguing, white-named newbies boots ya, too.
+      // Preying on non-intriguing newbies boots ya, too. A council token carrier is
+      // fair game (MayAttackPlayer).
       if IsClass(what,&User)
          AND NOT Send(what,@PlayerIsIntriguing)
-         AND NOT (Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-            OR Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW))
+         AND NOT Send(what,@PossessesA,#class=&Token)
       {
          bBooted = TRUE;
          rMessage = player_non_intriguing_attacked;
@@ -5098,20 +4785,6 @@ messages:
 
       if bBooted
       {
-         // On sacred haven servers, let users attack their own faction
-         // soldiers to drop shield and faction regardless of safety.
-         if NOT Send(self,@CheckPlayerPreference,#flag=CF_SAFETY_OFF)
-            AND NOT (NOT Send(SYS,@IsPKAllowed) AND NOT IsClass(what,&User))
-         {
-            if report
-            {
-               Send(self,@MsgSendUser,#message_rsc=player_safety_caught,
-                    #parm1=Send(what,@GetDef),#parm2=Send(what,@GetName));
-            }
-
-            return FALSE;
-         }
-
          // Area effects (room enchants, radius enchants, EQ, ice nova) are too
          // hard to use if accidentally being in range of a factioned target can
          // cause you to lose faction/shield. Let these attacks succeed without
@@ -5935,11 +5608,7 @@ messages:
          AND IsClass(what,&Player)
       {
          // If we have more health than twice our max, no percent limit on damage.
-         // If we are outlaw or murderer, no percent limit on damage.
          if piHealth < (Send(self,@GetBaseMaxHealth) * 200)
-            AND ((NOT (piFlags & PFLAG_OUTLAW)
-               AND NOT (piFlags & PFLAG_MURDERER))
-               OR Send(SETTINGS_OBJECT,@DamageCapProtectionMurderersEnabled))
          {
             // Cap damage to 1/3 of max health (+2 so we "round up")
             iLimit = ((Send(self,@GetBaseMaxHealth) * 100)
@@ -6194,20 +5863,11 @@ messages:
    KilledSomething(what = $,use_weapon = $,stroke_obj = $)
    "Called when the player killed something."
    {
-      local bReflection, i, oSoldierShield, monstkarma, iChance, oEnemyGuild,
-            oVictimRoom, oObject, oHunterSword, oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1;
+      local i, oSoldierShield, oEnemyGuild, oVictimRoom, oObject, oHunterSword,
+            oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1;
 
       // If we killed someone or something, we did damage.
       Send(self,@SetPlayerFlag,#flag=PFLAG_DID_DAMAGE,#value=TRUE);
-
-         // Stop minions ruining our karma, they are kind of bloodthirsty
-         // and tend to kill indiscriminately (especially mobs)
-         bReflection = FALSE;
-         if use_weapon <> $
-            AND IsClass(use_weapon,&Monster)
-         {
-            bReflection = TRUE;
-         }
 
       // Send text message - a stroke may want to provide it's own.
       if NOT Send(what,@SayDyingWords,#what=self)
@@ -6292,43 +5952,16 @@ messages:
          {
             Send(Send(SYS,@GetStatistics),@PlayerKillsCounter);
 
-            if Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-               OR Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-            {
-               ++piJustified_kill_count;
-            }
-            else
-            {
-               ++piKill_count;
-               ++piKill_count_decay;
-            }
-
-            //if NOT bReflection
-            //   AND NOT Send(what,@IsIllusion)
-            //{
-            //   Send(self,@AddKarma,#amount=Send(self,@CalculateKarmaChangeFromKill,
-            //         #karma_killer=Send(self,@GetKarma),
-            //         #karma_victim=Send(what,@GetKarma)));
-            //}
-
-            if NOT Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-               AND NOT Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-               AND NOT Send(what,@CheckPlayerFlag,#flag=PFLAG_ANONYMOUS)
+            if NOT Send(what,@CheckPlayerFlag,#flag=PFLAG_ANONYMOUS)
                AND NOT Send(what,@CheckPlayerFlag,#flag=PFLAG_MORPHED)
                AND NOT IsClass(oVictimRoom,&GuildHall)
             {
-               // Attacked an innocent!
-
                // Check for enemy guild - If both guilds are enemies, then
-               // they can whack on each other freely, without murderer or
-               // faction penalty.
+               // they can whack on each other freely, without faction penalty.
                oEnemyGuild = Send(what,@GetGuild);
 
-               // Check for various murderer things if any are true:
-               // We're not in a guild, opponent wasn't in a guild, we're
-               // not in a mutual war
-               // AND if we're not a faction soldier, the opponent isn't an
-               // opposing faction soldier
+               // Outside a mutual guild war, and unless the victim was an
+               // opposing faction soldier, the kill may cost us faction.
                if (poGuild = $
                    OR oEnemyGuild = $
                    OR NOT Send(poGuild,@IsMutualEnemy,#otherguild=oEnemyGuild))
@@ -6345,60 +5978,10 @@ messages:
                   // Check to see if the attack was faction-based.
                   Send(self,@CheckFactionAttack,#what=what,
                         #stroke_obj=stroke_obj);
-
-                  // Apply penalties for someone NOT holding a token
-                  if Send(what,@FindUsing,#class=&Token) = $
-                  {
-                     if (piFlags & PFLAG_MURDERER)
-                     {
-                        Send(self,@MsgSendUser,#message_rsc=player_killed_player);
-                     }
-                     else
-                     {
-                        Send(self,@MsgSendUser,#message_rsc=player_wanted_now,
-                              #parm1=Send(what,@GetDef),#parm2=Send(what,@GetName));
-                        Send(self,@SetPlayerFlag,#flag=PFLAG_MURDERER,#value=TRUE);
-                        piTimeLastMurder = GetTime();
-                        Send(self,@SetPlayerFlag,#flag=PFLAG_OUTLAW,#value=FALSE);
-                        Send(self,@EvaluatePKStatus,#dbug=TRUE);
-                     }
-
-                     // Does the lucky murderer win a Revenant?
-                     // If it was an easy fight, lets haunt em more often than if
-                     // it was competitive (or the victim at least had a shot)
-                     // If were twice as strong as them, we get haunted.
-                     // If the victim was good, we get haunted.
-                     iChance = Send(self,@RevenantChance,#target=what);
-                     if (Random(1,100) < iChance) AND NOT Send(SYS,@GetChaosNight)
-                     {
-                        Send(self,@SetPlayerFlag,#flag=PFLAG_HAUNTED,#value=TRUE);
-                        if poOwner <> $
-                        {
-                           Send(self,@MsgSendUser,#message_rsc=player_haunted_on,
-                                 #parm1=Send(what,@GetCapDef),
-                                 #parm2=Send(what,@GetName,#Cap=TRUE));
-                           Create(&Revenant,#target=self,#location=poOwner,
-                                 #level=Bound((((Send(self,@GetBaseMaxHealth)*110)/100)+
-                                    (7*piKill_Count_decay)),95,180),
-                                 #diff=bound(Send(self,@GetBaseMaxHealth)/12,4,9),
-                                 #karmic=-piKarma/100);
-                        }
-                     }
-                  }
                }
             }
          }
       }
-
-      //if IsClass(what,&Monster)
-      //   AND NOT bReflection
-      //   AND NOT Send(what,@IsIllusion)
-      //{
-      //   Send(self,@AddKarma,#amount=Send(self,@CalculateKarmaChangeFromKill,
-      //         #karma_victim=Send(what,@GetKarma),
-      //         #karma_killer=Send(self,@GetKarma)),
-      //         #bIsMob=TRUE);
-      //}
 
       Send(what,@Killed,#what=self,#stroke_obj=stroke_obj);
       Send(self,@DrawXP);
@@ -6509,102 +6092,6 @@ messages:
       }
 
       return player_sound_female_ouch4;
-   }
-
-   RevenantChance(who=$,target=$)
-   {
-      local iMaxHealth, oChance, oGuild, iFaction, oSpell, oVictimRoom;
-
-      oVictimRoom = Send(target,@GetOwner);
-
-      if oVictimRoom = $
-         OR IsClass(oVictimRoom,&Guildhall)
-      {
-         return 0;
-      }
-
-      // PFLAG2_NOHAUNT is only settable by a guide or guardian. The last
-      // two checks prevent outlaw/murderer players from creating revenants.
-      if (piFlags2 & PFLAG2_NOHAUNT)
-         OR Send(target,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         OR Send(target,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         return 0;
-      }
-
-      oChance = 30;
-      oGuild = Send(target,@GetGuild);
-
-      if poGuild <> $ AND oGuild <> $
-      {
-         if poGuild = oGuild
-         {
-            oChance = oChance + 20;
-         }
-         else
-         {
-            if Send(poGuild,@IsMutualEnemy,#otherguild=oGuild)
-            {
-               return 0;
-            }
-            if Send(poGuild,@IsAlly,#otherguild=oGuild)
-            {
-               oChance = oChance + 10;
-            }
-            if Send(oGuild,@IsAlly,#otherguild=poGuild)
-            {
-               oChance = oChance + 10;
-            }
-            if Send(poGuild,@IsEnemy,#otherguild=oGuild)
-            {
-               oChance = oChance - 10;
-            }
-            if Send(oGuild,@IsEnemy,#otherguild=poGuild)
-            {
-               oChance = oChance - 10;
-            }
-         }
-      }
-
-      iFaction = Send(target,@GetFaction);
-      if piFaction <> FACTION_NEUTRAL AND iFaction <> FACTION_NEUTRAL
-      {
-         if piFaction <> iFaction
-         {
-            oChance = oChance - 5;
-         }
-         else
-         {
-            oChance = oChance + 15;
-         }
-      }
-      
-      // Our max health, bound to max HP
-      iMaxHealth = Send(self,@GetBaseMaxHealth);
-      // Punish them more if they beat up someone weaker than they are.
-      oChance = oChance + ((10 * iMaxHealth) / Send(target,@GetBaseMaxHealth));
-
-      // People with greater absolute Karma have a greater chance to produce
-      // a revenant.  Being a good person, in general, decreases your chance.
-      // Even if you are murderous scum.
-      //oChance = oChance + (Abs(Send(target,@GetKarma)-piKarma/100))/20;
-
-      // Punish them more if they walked away with more health.
-      oChance = oChance + bound(piHealth/(5 * iMaxHealth),0,20);
-
-      // Bind the number to a reasonable amount, then add in the penalty
-      // for being a repeat killer.
-      oChance = (bound(oChance,20,80) + (5*piKill_count_decay));
-
-      oSpell = Send(SYS,@FindSpellByNum,#num=SID_MARTYRS_BATTLEGROUND);
-      if Send(oVictimRoom,@IsEnchanted,#what=oSpell)
-      {
-         oChance = oChance +
-               (oChance * Send(oVictimRoom,@GetEnchantmentState,#what=oSpell) / 100);
-      }
-      oChance = Bound(oChance,40,95);
-
-      return oChance;
    }
 
    DoHitMessageSound(what = $,damage = 0,stroke_obj = $, use_weapon = $)
@@ -7951,77 +7438,6 @@ messages:
       return (iChange / (11 - swing_factor));
    }
 
-   CalculateKarmaChangeFromKill(karma_killer=0,karma_victim=0,bIsMob=FALSE)
-   {
-      local iChange, iSwing, oSpellDeathLink;
-
-      // No karma change in survival room. Mobs in this room *should*
-      // return 0 karma, but there are cases where it doesn't happen.
-      if poOwner <> $
-         AND IsClass(poOwner,&SurvivalRoom)
-      {
-         return 0;
-      }
-
-      // No karma changes from killing players during Frenzies.
-      // Also, no Karma change from event monsters: Xeos and admin-spawned.
-      if (Send(SYS,@GetChaosNight) AND NOT bIsMob)
-         OR karma_victim = $
-      {
-         return 0;
-      }
-
-      // No karma changes from killing neutral monsters.
-      if bIsMob AND karma_victim = NEUTRAL
-      {
-         return 0;
-      }
-
-      // Death link prevents karma changes
-      oSpellDeathLink = Send(SYS,@FindSpellByNum,#num=SID_DEATH_LINK);
-      if Send(self,@IsEnchanted,#what=oSpellDeathLink)
-      {
-         return 0;
-      }
-
-      // A kill is merely an act, like all other acts, with the
-      // strongest swing factor possible.  The karma of a kill
-      // is equal to the negative karma of the person who died -
-      // thus, killing someone with 100 karma is a -100 karma act.
-      if bIsMob
-      {
-         iSwing = Send(SETTINGS_OBJECT, @GetKillKarmaSwingMonster);
-      }
-      else
-      {
-         iSwing = Send(SETTINGS_OBJECT, @GetKillKarmaSwingPlayer);
-      }
-
-      // Okay, let's give them a break if they are moving towards
-      // neutrality, and they've just killed a monster.  This happens,
-      // for example, if a player with 20 karma kills a monster with
-      // -10.  It moves the player towards 10, but at a slower pace.
-
-      if bIsMob
-      {
-         if (karma_killer > 0) <> (karma_victim > 0)
-            AND (abs(karma_killer) > abs(karma_victim))
-         {
-            iSwing = Send(SETTINGS_OBJECT, @GetKillKarmaSwingNeutral);
-         }
-      }
-
-      iChange = Send(self,@CalculateKarmaChangeFromAct,#karma_doer = karma_killer,
-                     #karma_act = -(karma_victim),#swing_factor = iSwing);
-
-      if bIsMob
-      {
-         iChange = Bound(iChange,-150,150);
-      }
-
-      return iChange;
-   }
-
    //// Guild Command Stuff
 
    RemoveAllGuildCommands()
@@ -8064,7 +7480,7 @@ messages:
    "Sets the player's poGuild to be equal to the guild object."
    {
       poGuild = guild_obj;
-      Send(self,@EvaluatePKStatus,#dbug=TRUE);
+      Send(self,@EvaluateNewbieStatus);
 
       return;
    }
@@ -9497,7 +8913,7 @@ messages:
                   piMax_health,pibase_max_health);
          }
 
-         Send(self,@EvaluatePKStatus);
+         Send(self,@EvaluateNewbieStatus);
 
          if pbLogged_on
          {
@@ -9704,7 +9120,7 @@ messages:
 
    Killed(what = $, stroke_obj = $)
    {
-      local lItems,i, j, amount, oBody, oSoldierShield, bNo_drop_death, oItemAtt,
+      local lItems, i, oBody, oSoldierShield, bNo_drop_death, oItemAtt,
             oRoom, iRow, iCol, iFine_Row, iFine_Col, iAngle, oItem,
             iRoom, lInventoryContents, lBagContents, oSkull, oSword, oAmulet,
             oHunterSword, oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1,
@@ -9944,24 +9360,6 @@ messages:
          }
 
          // Lose the inventory.  It falls onto the corpse.
-         if (what = $) OR (NOT IsClass(what,&user))
-         {
-            oItemAtt = $;
-         }
-         else
-         {
-            oItemAtt = Send(SYS,@FindItemAttByNum,#num=IA_PKPOINTER);
-
-            if what <> $
-            {
-               // We've been killed by a player, so set the PKed flag for
-               // the temp safety angel to trigger later, provided we meet
-               // all the requirements. Check for not $ here - fastest way
-               // to implement this without performing another IsClass check.
-               piFlags = piFlags | PFLAG_KILLED_BY_PLAYER;
-            }
-         }
-
          lBagContents = Send(self,@GetBagContents);
          if lBagContents <> $
          {
@@ -9982,14 +9380,6 @@ messages:
                if Send(i,@DropOnDeath)
                   AND Send(oRoom,@ReqNewHold,#what=i,#new_row=iRow,#new_col=iCol)
                {
-                  if oItemAtt <> $
-                  {
-                     // We know this was a pk.  Only let PKillables pick up
-                     // the loot. Put the appropriate item attribute on it.
-                     Send(oItemAtt,@AddToItem,#oItem=i,
-                           #timer_duration=PKPOINTER_TIME,#state1=self);
-                  }
-
                   Send(oRoom,@NewHold,#what=i,#merge=FALSE,
                         #new_row=iRow,#new_col=iCol,
                         #fine_row=iFine_row,#fine_col=iFine_col);
@@ -10006,7 +9396,7 @@ messages:
             ptAdvancement = $;
          }
 
-         Post(self,@EvaluatePKStatus);
+         Post(self,@EvaluateNewbieStatus);
 
          // Let SoldierShields know we died. It handles itself as appropriate.
          oSoldierShield = Send(self,@FindUsing,#what=&SoldierShield);
@@ -10089,7 +9479,6 @@ messages:
 
       if piDeathCost > 0
          AND NOT (piFlags & PFLAG_TUTORIAL)
-         AND NOT (piFlags & PFLAG_MURDERER)
       {
          // Give an encouraging gmail and some mana to broadcast.
          Send(self,@ReceiveNestedMail,#from=player_angel,
@@ -10111,16 +9500,10 @@ messages:
    }
 
    ApplyDeathPenalties()
+   "Called as we leave the Underworld: the skill, spell and XP cost of a death with "
+   "piDeathCost (Killed). Only the Arena of Death charges one now."
    {
-      local iXPLoss, iAmount, i, bTempSafe;
-
-      bTempSafe = FALSE;
-
-      if (piFlags & PFLAG_KILLED_BY_PLAYER)
-      {
-         bTempSafe = TRUE;
-         piFlags = piFlags & ~PFLAG_KILLED_BY_PLAYER;
-      }
+      local iXPLoss, i;
 
       if (piflags & PFLAG_DEATH_RIFTING)
       {
@@ -10131,38 +9514,16 @@ messages:
 
       if Send(SYS,@GetChaosNight)
       {
-         // Remove any revenants.
-         Send(self,@SetPlayerFlag,#flag=PFLAG_HAUNTED,#value=FALSE);
-
          // Return out.  Don't apply death penalties during frenzies.
          return;
       }
 
       iXPLoss = 0;
 
-      // Lose your revenant, satisfied if you took a real death.
-      if piDeathCost >= Send(SETTINGS_OBJECT,@GetDefaultDeathCost)
-      {
-         // As an outlaw, justice was met by dying. But, not if it's a cheap death!
-         Send(self,@SetPlayerFlag,#flag=PFLAG_OUTLAW,#value=FALSE);
-         Post(self,@EvaluatePKStatus);
-
-         if (piFlags & PFLAG_HAUNTED)
-         {
-            if pbLogged_on
-            {
-               Send(self,@MsgSendUser,#message_rsc=player_haunted_off);
-            }
-
-            Send(self,@SetPlayerFlag,#flag=PFLAG_HAUNTED,#value=FALSE);
-         }
-      }
-
       // Only do this stuff if the cost of death is not zero.
       if piDeathCost > 0
       {
          if NOT (piFlags & PFLAG_TUTORIAL)
-            AND NOT (piFlags & PFLAG_MURDERER)
          {
             piDeathCost = piDeathCost / 3;
          }
@@ -10172,18 +9533,6 @@ messages:
             // Lose piDeathCost// of 20// of current level XP.
             iXPLoss = Bound((iXPLoss * piDeathCost) / 500,0,MAX_XP_DEATH_LOSS);
             Send(self,@AddXP,#iAmount=-iXPLoss);
-
-            // Under 100HP and killed by a player? Receive a temporary angel.
-            if bTempSafe
-               AND piBase_max_health <= 99
-               AND NOT ((piFlags & PFLAG_MURDERER)
-                  OR (piFlags & PFLAG_OUTLAW))
-               AND (piPreferences & CF_TEMPSAFE)
-               AND Send(self,@FindUsing,#class=&SoldierShield) = $
-               AND ptTempSafe = $
-            {
-               Post(self,@StartTempSafe);
-            }
          }
       }
       else
@@ -10213,17 +9562,6 @@ messages:
       }
 
       // Lose some skill or spell proficiency.
-
-      // Murderers get hit harder.
-      if (piFlags & PFLAG_MURDERER)
-      {
-         iAmount = -2;
-      }
-      else
-      {
-         iAmount = -1;
-      }
-
       foreach i in plSpells
       {
          if Send(self,@DecodeSpellAbility,#compound=i) > 5
@@ -10231,7 +9569,7 @@ messages:
             AND Random(1,100) < piDeathCost
          {
             Send(self,@ChangeSpellAbility,#spell_num=Send(self,@DecodeSpellNum,
-                  #compound=i),#amount=iAmount);
+                  #compound=i),#amount=-1);
          }
       }
 
@@ -10242,7 +9580,7 @@ messages:
             AND Random(1,100) < piDeathCost
          {
             Send(self,@ChangeSkillAbility,#skill_num=Send(self,@DecodeSpellNum,
-                  #compound=i),#amount=iAmount);
+                  #compound=i),#amount=-1);
          }
       }
 
@@ -12445,7 +11783,6 @@ messages:
 
       piStomach = 50;
       piTimeLastStomachUpdate = GetTime();
-      piKill_count_decay = Bound(piKill_count_decay,0,$);
 
       if plEnchantments <> $
       {
@@ -13134,12 +12471,13 @@ messages:
       return iTotalLearnPoints;
    }
 
-   EvaluatePKStatus(dbug=FALSE)
-   "This should always be run AFTER the player undergoes whatever changes "
-   "(i.e. quits a guild or drops below 30 health).  Also, take steps to ensure "
-   "it is not run immediately prior to death."
+   EvaluateNewbieStatus()
+   "Sets PFLAG_PKILL_ENABLE, the end of newbie protection, once our base health "
+   "reaches GetPKillEnableHP or we join a guild, and clears it if we fall back below "
+   "with no guild. Run it AFTER the change (a guild quit, a health loss), not just "
+   "before a death."
    {
-      local i, ass_game;
+      local ass_game;
 
       if (piFlags & PFLAG_PKILL_LOCK)
       {
@@ -13156,8 +12494,6 @@ messages:
       {
          if poGuild = $
             AND piBase_Max_health < Send(SETTINGS_OBJECT,@GetPKillEnableHP)
-            AND NOT (piFlags & PFLAG_MURDERER)
-            AND NOT (piFlags & PFLAG_OUTLAW)
          {
             ass_game = Send(SYS,@GetAssassinGame);
             if Send(ass_game,@IsCombatant,#who=self)
@@ -13167,7 +12503,7 @@ messages:
                      #who=self,#RemoveFromRecords=FALSE);
             }
 
-            Send(self,@MsgSendUser,#message_rsc=player_regain_angel);
+            Send(self,@MsgSendUser,#message_rsc=player_newbie_again);
             Send(self,@SetPlayerFlag,#flag=PFLAG_PKILL_ENABLE,#value=FALSE);
             Send(self,@PlayerIsIntriguing);
          }
@@ -13176,26 +12512,15 @@ messages:
       {
          if poGuild <> $
             OR piBase_Max_health >= Send(SETTINGS_OBJECT,@GetPKillEnableHP)
-            OR (piFlags & PFLAG_MURDERER)
-            OR (piFlags & PFLAG_OUTLAW)
          {
-            if Send(SYS,@IsPKAllowed)
-            {
-               // Happylanders don't get 'vulnerable' message.
-               Send(self,@MsgSendUser,#message_rsc=player_no_angel);
-            }
+            Send(self,@MsgSendUser,#message_rsc=player_newbie_over);
 
-            // Once you've become killable, you no longer get tutorial messages
-            // and bonuses.  You also lose your newbie string.
+            // Once you're past newbie protection, you no longer get tutorial
+            // messages and bonuses.  You also lose your newbie string.
             Send(self,@SetPlayerFlag,#flag=PFLAG_TUTORIAL,#value=TRUE);
             Send(self,@RemoveHonorString,#string=player_newbie_honor_string);
 
             Send(self,@SetPlayerFlag,#flag=PFLAG_PKILL_ENABLE,#value=TRUE);
-            if dbug = TRUE
-            {
-               Debug("Someone with less than 30 health managed to guild or "
-                     "outlaw",self);
-            }
          }
       }
 
@@ -13203,21 +12528,16 @@ messages:
    }
 
    CanPlayerPvP()
+   "Past newbie protection (PFLAG_PKILL_ENABLE), so we may take part in what PvP is "
+   "left: guild halls, guild wars, the Faction War, council tokens."
    {
-      return (piFlags & PFLAG_PKILL_ENABLE)
-         AND NOT (piFlags & PFLAG_PERMA_NO_PVP)
-         AND NOT (piFlags & PFLAG_TEMPSAFE);
+      return (piFlags & PFLAG_PKILL_ENABLE);
    }
 
    PKillEnable()
    "This will ALWAYS ignore the checks and ALWAYS sets the flag."
    "Made to be used ONLY from admin mode."
    {
-      if Send(SYS,@IsPKAllowed)
-      {
-         Send(self,@MsgSendUser,#message_rsc=player_no_angel);
-      }
-
       Send(self,@SetPlayerFlag,#flag=PFLAG_PKILL_ENABLE,#value=TRUE);
 
       return Send(SYS,@GetSuccessRsc);
@@ -13249,121 +12569,6 @@ messages:
       Send(self,@SetPlayerFlag,#flag=PFLAG_PKILL_LOCK,#value=FALSE);
 
       return Send(SYS,@GetSuccessRsc);
-   }
-
-   StartTempSafe()
-   {
-      local iTime;
-
-      // First, check if we're in a guild hall. Players can exploit this
-      // system by dying in a guild hall and using PoL or the UW node to
-      // teleport back to their bodies with temp safe activated, which would
-      // leave them unable to be killed and inside a hall. Teleport players
-      // from the guild hall to their hometown.
-      if poOwner <> $
-         AND IsClass(poOwner,&GuildHall)
-      {
-         Send(self,@AdminGotoSafety);
-      }
-
-      // This returns minutes, so convert to milliseconds.
-      iTime = Send(SETTINGS_OBJECT,@GetTempSafeTime);
-      iTime = iTime * 60 * 1000;
-
-      if ptTempSafe <> $
-      {
-         if (IsTimer(ptTempSafe))
-         {
-            DeleteTimer(ptTempSafe);
-         }
-      }
-      ptTempSafe = CreateTimer(self,@EndTempSafe,iTime);
-      piFlags = piFlags | PFLAG_TEMPSAFE;
-      Send(self,@MsgSendUser,#message_rsc=player_temp_safe);
-
-      return;
-   }
-
-   EndTempSafe()
-   {
-      piFlags = piFlags & ~PFLAG_TEMPSAFE;
-      if poOwner <> $
-      {
-         Send(self,@MsgSendUser,#message_rsc=player_temp_safe_end);
-         Send(poOwner,@SomethingChanged,#what=self);
-      }
-
-      ptTempSafe = $;
-
-      return;
-   }
-
-   PauseTempSafe()
-   {
-      local iTemp;
-
-      if (NOT IsTimer(ptTempSafe))
-      {
-         return;
-      }
-
-      iTemp = GetTimeRemaining(ptTempSafe);
-      DeleteTimer(ptTempSafe);
-      ptTempSafe = iTemp;
-
-      return;
-   }
-
-   UnpauseTempSafe()
-   {
-      if (ptTempSafe = $)
-      {
-         return;
-      }
-
-      if (NOT IsTimer(ptTempSafe))
-      {
-         ptTempSafe = CreateTimer(self,@EndTempSafe,ptTempSafe);
-      }
-
-      piFlags = piFlags | PFLAG_TEMPSAFE;
-      Send(self,@MsgSendUser,#message_rsc=player_temp_safe);
-
-      return;
-   }
-
-   SetPlayerPvPPermaOff()
-   "Called to switch the player to non-pvp mode."
-   {
-      local oShield;
-
-      piflags |= PFLAG_PERMA_NO_PVP;
-
-      // Drop shield if we have one.
-      oShield = Send(self,@FindUsing,#class=&SoldierShield);
-      if oShield <> $
-      {
-         Send(oShield,@LostFaction);
-      }
-
-      if (poOwner <> $)
-      {
-         Send(poOwner,@SomethingChanged,#what=self);
-      }
-
-      return;
-   }
-
-   SetPlayerPvPPermaOn()
-   {
-      piflags &= ~PFLAG_PERMA_NO_PVP;
-
-      if (poOwner <> $)
-      {
-         Send(poOwner,@SomethingChanged,#what=self);
-      }
-
-      return;
    }
 
    ResetFaction(faction = FACTION_NEUTRAL)
@@ -14299,34 +13504,6 @@ messages:
       return (piFlags & PFLAG_LOG);
    }
 
-   DecayPKillCount()
-   {
-      // 50// chance to reduce the kill count.  This is to eliminate
-      // the people who attempt to exploit this system for gain.
-      if Random(1,100) > 50
-      {
-         --piKill_count_decay;
-         piKill_count_decay = Bound(piKill_count_decay,0,$);
-      }
-
-      return;
-   }
-
-   GetUnjustifiedKills()
-   {
-      return piKill_count;
-   }
-
-   GetDecayedUnjustifiedKills()
-   {
-      return piKill_count_decay;
-   }
-
-   GetJustifiedKills()
-   {
-      return piJustified_kill_count;
-   }
-
    UserReqNewOwner(RID=0)
    {
       local oRoom;
@@ -15252,7 +14429,6 @@ messages:
       piTimeLastStomachUpdate = 0;
       piTimeAttackedPlayer = 0;
       piTimeAttackedByPlayer = 0;
-      piTimeLastMurder = 0;
 
       return;
    }
@@ -15671,7 +14847,6 @@ messages:
          OR oTarget = $
          OR oTarget = self
          OR NOT IsClass(oTarget,&Battler)
-         OR IsClass(oTarget,&Revenant)
       {
          return;
       }
@@ -15954,12 +15129,6 @@ messages:
 
    GetBasePhaseTime()
    {
-      if (piFlags & PFLAG_MURDERER)
-         OR (piFlags & PFLAG_OUTLAW)
-      {
-         return Send(SETTINGS_OBJECT,@GetOutlawMurdererLogPenGhostTime);
-      }
-
       return Send(SETTINGS_OBJECT,@GetLogPenGhostTime) + 160000;
    }
 
@@ -16092,11 +15261,6 @@ messages:
    "Users tell their client how long the lockout lasts (UC_PVP_UNTIL)."
    {
       return;
-   }
-
-   GetTimeLastMurder()
-   {
-      return piTimeLastMurder;
    }
 
    // Use this for when either phase or spectator do the same thing

@@ -36,16 +36,6 @@ messages:
       return;
    }
 
-   CheckPlayerPreference(flag=0)
-   {
-      if flag = CF_SAFETY_OFF
-      {
-         return FALSE;
-      }
-
-      propagate;
-   }
-
    SetRandomHomeroom()
    {
       //debug("setrandomhomeroom");

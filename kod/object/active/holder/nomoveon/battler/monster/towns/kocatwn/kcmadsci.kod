@@ -72,19 +72,7 @@ messages:
          Send(self,@SetMood,#new_mood=piMood+1);
       }
 
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         Send(self,@SetMood,#new_mood=piMood+1);
-
-         propagate;
-      }
-      else
-      {
-         if NOT Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         {
-            Send(self,@SetMood,#new_mood=piMood-1);
-         }
-      }
+      Send(self,@SetMood,#new_mood=piMood-1);
 
       //Post(who,@SomeoneSaid,#what=self,#string=KMadSci_entry_welcome,
       //      #type=SAY_RESOURCE);

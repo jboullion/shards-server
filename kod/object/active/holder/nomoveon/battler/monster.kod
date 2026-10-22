@@ -219,8 +219,6 @@ resources:
       "Hmm... that looks a bit cleaner.  Here, take this as payment, %s%s."
 
    monster_default_attack = "attack"
-   minion_trouble = \
-      "You sense your minion has gotten you into some trouble..."
 
    autolooted_all_no_money = "You loot the corpse clean."
    autolooted_some_no_money = "You loot some of the items from your fallen enemy."
@@ -367,7 +365,6 @@ classvars:
    vrNothing_for_sale2 = Lm_nothing_for_sale2
    vrMrcnt_too_costly = Lm_mrcnt_too_costly
    vrMonster_healing = Lm_monster_healing
-   vrMinion_trouble = minion_trouble
 
    vrLm_bnkr_balance                = Lm_bnkr_balance
    vrLm_bnkr_did_deposit            = Lm_bnkr_did_deposit
@@ -2127,7 +2124,7 @@ messages:
                       oRoomOverride=$)
     "Can this monster attack the victim? "
    {
-      local oRoom, bWasBad, lMinions;
+      local oRoom, lMinions;
 
       if isClass(self,&Reflection)
       {
@@ -2208,10 +2205,6 @@ messages:
       if poMaster <> $
          AND IsClass(poMaster,&Player)
       {
-         // Is the caster bad to start with? This is for flavor text.
-         bWasBad = (Send(poMaster,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-                    OR Send(poMaster,@CheckPlayerFlag,#flag=PFLAG_MURDERER));
-
          // Check the attack here. If it fails, Player's AllowBatterAttack
          // handles the message sent to the player.
          if NOT Send(poMaster,@AllowBattlerAttack,#victim=victim,
@@ -2225,15 +2218,6 @@ messages:
          if (lMinions <> $ AND FindListElem(lMinions,victim))
          {
             return FALSE;
-         }
-
-         // If they weren't bad and become bad, let them know.
-         if report
-            AND NOT bWasBad
-            AND (Send(poMaster,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-               OR Send(poMaster,@CheckPlayerFlag,#flag=PFLAG_MURDERER))
-         {
-            Send(poMaster,@MsgSendUser,#message_rsc=vrMinion_trouble);
          }
       }
 
@@ -3798,14 +3782,6 @@ messages:
          if IsClass(what,&Player)
             AND IsClass(poMaster,&Player)
          {
-            // If we killed an innocent, tell the master they're in trouble.
-            if (NOT Send(poMaster,@CheckPlayerFlag,#flag=PFLAG_MURDERER))
-               AND NOT (Send(what,@CheckPlayerFlag,#Flag=PFLAG_OUTLAW)
-                  OR Send(what,@CheckPlayerFlag,#Flag=PFLAG_MURDERER))
-            {
-               Send(poMaster,@MsgSendUser,#message_rsc=vrMinion_trouble);
-            }
-
             // Evil twins are dispelled by any player they kill.
             if IsClass(self,&EvilTwin)
             {
@@ -7042,7 +7018,6 @@ messages:
       if plControlledMinions = $
          OR oTarget = $
          OR NOT IsClass(oTarget,&Battler)
-         OR IsClass(oTarget,&Revenant)
       {
          return;
       }

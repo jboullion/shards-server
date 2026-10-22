@@ -10,25 +10,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 Villify is DMSpell
 
-// (sic-- it's supposed to be 'vilify'.)
+// Ours (no random PvP, 2026-10-21): this DM spell made a player an outlaw, or an
+// outlaw a murderer. Nobody is a murderer or an outlaw any more, so the spell is
+// retired: the system no longer creates it and no DM is given it. The class
+// stays, doing nothing, so a saved world that has one still loads.
 
 constants:
+
    include blakston.khd
 
 resources:
 
-   include villify.lkod
-
    villify_name_rsc = "vilify"
    villify_icon_rsc = light.bgf
-   villify_desc_rsc = "Accuses someone of being an outlaw or murderer."
-
-   villify_msg_DM = "You vilify %s."
-   villify_msg_target = "You have been vilified by %s."
-   villify_failed = "%s%s is already a murderer."
-   villify_unworthy = \
-      "You have been deemed unworthy to cast so powerful a spell, and "
-      "it has been stripped from you."
+   villify_desc_rsc = "Retired: there are no murderers or outlaws any more."
 
 classvars:
 
@@ -43,77 +38,9 @@ properties:
 
 messages:
 
-   GetNumSpellTargets()
-   {
-      return 1;
-   }
-
-   SuccessChance(who=$)
-   "If they are not a creator, then they do not get this spell off."
-   {
-      if Send(who,@PlayerIsImmortal,#gn=TRUE) <> 2
-         AND NOT Isclass(who,&Creator)
-      {
-         Send(who,@MsgSendUser,#message_rsc=villify_unworthy);
-         Send(who,@RemoveSpell,#num=viSpell_num);
-         Send(who,@ToCliStats,#group=3);
-
-         return FALSE;
-      }
-
-      return TRUE;
-   }
-
    CanPayCosts(who = $, lTargets = $)
    {
-      if NOT IsClass(First(lTargets),&User)
-      {
-         Send(who,@MsgSendUser,#message_rsc=villify_failed,
-               #parm1=Send(First(lTargets),@GetDef),
-               #parm2=Send(First(lTargets),@GetTrueName));
-
-         return FALSE;
-      }
-
-      propagate;
-   }
-
-   CastSpell(who = $, lTargets = $)
-   {
-      local i;
-
-      foreach i in lTargets
-      {
-         // already a murderer
-         if Send(i,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-         {
-            Send(who,@MsgSendUser,#message_rsc=villify_failed,
-                  #parm1=Send(i,@GetDef),#parm2=Send(i,@GetTrueName));
-
-            continue;
-         }
-
-         // from outlaw to murderer
-         if Send(i,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         {
-            Send(who,@MsgSendUser,#message_rsc=villify_msg_DM,#parm1=Send(i,@GetTrueName));
-            Send(i,@MsgSendUser,#message_rsc=villify_msg_target,#parm1=Send(who,@GetTrueName));
-            Send(i,@SetPlayerFlag,#flag=PFLAG_OUTLAW,#value=False);
-            Send(i,@SetPlayerFlag,#flag=PFLAG_MURDERER,#value=True);
-            Post(i,@EvaluatePKStatus);
-
-            continue;
-         }
-
-         // from lawful to outlaw
-         Send(who,@MsgSendUser,#message_rsc=villify_msg_DM,#parm1=Send(i,@GetTrueName));		
-         Send(i,@MsgSendUser,#message_rsc=villify_msg_target,#parm1=Send(who,@GetTrueName));
-         Send(i,@SetPlayerFlag,#flag=PFLAG_OUTLAW,#value=True);
-         Send(i,@SetPlayerFlag,#flag=PFLAG_MURDERER,#value=False);
-         Post(i,@EvaluatePKStatus);
-      }
-
-      propagate;
+      return FALSE;
    }
 
 end

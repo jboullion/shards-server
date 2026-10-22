@@ -169,19 +169,6 @@ user_someone_logoff = de "~B~U~k[###]~n %s hat das Spiel verlassen."
 user_guildmate_logon = de "~IBegrüße Dein Gildenmitglied %s!"
 user_guildmate_logoff = de \
    "~IDein Gildenmitglied %s hat sich gerade verabschiedet."
-user_safety_on = de \
-   "### Deine Sicherung ist ~B~gAKTIVIERT~n: Du kannst keine Unschuldigen "
-   "angreifen."
-user_safety_off = de \
-   "### Deine Sicherung ist ~B~rDEAKTIVIERT~n: Sei vorsichtig, Du kannst "
-   "jetzt andere Spieler verletzen!"
-user_temp_safe_on = de \
-   "~B~U~k[###]~n ~B~vDu bekommst einen temporären Schutzengel."
-user_temp_safe_off = de \
-   "~B~U~k[###]~n ~B~vDu bekommst nun nicht länger einen temporären Schutzengel "
-   "nach dem Tode."
-user_temp_safe_invalid = de \
-   "~B~U~k[###]~n ~B~vDein Schutzengel kann dich nicht weiter beschützen."
 user_grouping_on = de "~B~U~k[###]~n ~B~vDu nimmst nun an Gruppenbildungen teil."
 user_grouping_off = de \
    "~B~U~k[###]~n ~B~vDu nimmst absofort nicht mehr an Gruppenbildungen teil."
@@ -191,9 +178,6 @@ user_cant_suicide = de \
    "Du kannst Dich nicht selbst töten - das Leben ist einfach zu schön. Du "
    "musst die Führerschaft Deiner Gilde abgeben, bevor Du Dich umbringen "
    "kannst."
-user_cant_suicide_justicar = de \
-   "Es ist unwürdig für einen derart hohen Beamten, sich selbst das Leben "
-   "zu nehmen!"
 user_cant_suicide_yet = de \
    "Es sieht so aus, als ob Du nicht in der Lage wärst, Dir das Leben zu "
    "nehmen. Du fühlst, dass Dein Leben gerade erst begonnen hat."
@@ -255,9 +239,6 @@ user_did_appeal = de \
    "sicher beschäftigt. Du kannst jedoch versuchen, eine Gamemail zu schreiben.%q$0"
 user_appeal_squelched = de \
    "Die Möglichkeit eine Beschwerde zu schreiben wurde dir genommen."
-user_kill_zone = de \
-   "Dein Schutzengel flüstert Dir zu, \"Ich kann Dich hier nicht verteidigen.\""
-user_angel_rejoins = de "Dein Schutzengel kehrt zu Dir zurück."
 user_fumble = de "Du stolperst und verlierst Dein %s."
 user_wait_for_news_posting = de \
    "Du musst einen Moment warten, bevor Du wieder Nachrichten absenden kannst."
@@ -498,14 +479,8 @@ user_someone_logon = pt "~B~U~k[###]~n ~B~vPor favor, dê as boas-vindas a %s."
 user_someone_logoff = pt "~B~U~k[###]~n ~B~vAu revoir para %s."
 user_guildmate_logon = pt "~ISaudações ao seu companheiro de guilda %s!"
 user_guildmate_logoff = pt "~IO seu companheiro de guilda %s acabou de partir."
-user_safety_on = pt "~B~U~k[###]~n ~B~vSua segurança está agora ~I~gLIGADA~n~B: Você não pode mais atacar inocentes."
-user_safety_off = pt "~B~U~k[###]~n ~B~vSua segurança está agora ~B~rDESLIGADA~n~B: Tenha cuidado, agora você pode ferir aqueles ao seu redor."
-user_temp_safe_on = pt "~B~U~k[###]~n ~B~vVocê receberá um anjo da guarda temporário na morte."
-user_temp_safe_off = pt "~B~U~k[###]~n ~B~vVocê não receberá mais um anjo da guarda temporário na morte."
-user_temp_safe_invalid = pt "~B~U~k[###]~n ~B~vSeu anjo da guarda não pode mais protegê-lo."
 user_grouping_on = pt "~B~U~k[###]~n ~B~vAgora você se juntará aos grupos de construtores."
 user_cant_suicide = pt "Você simplesmente não consegue se matar porque tem muito a viver. Você deve renunciar ao cargo de liderança de sua guilda antes de poder cometer suicídio."
-user_cant_suicide_justicar = pt "Seria inadequado para um oficial tão graduado tirar a própria vida!"
 user_cant_suicide_yet = pt "Você não consegue se matar ainda, parece que acabou de começar esta vida. Espere um dia."
 user_cant_suicide_token = pt "Você não pode se matar agora, não quando é o guardião sagrado de um token Meridian!"
 user_cant_suicide_hp = pt "Você realizou muito até agora em seu tempo aqui, e não consegue engolir completamente a ideia de encerrar sua jornada agora. Se você tiver um bom motivo para suicidar, talvez um dos Deuses o ajude."
@@ -542,8 +517,6 @@ user_appeal = pt "%s apela, \"%q~n\""
 user_first_time_appeal = pt "~B~U~k[###]~n ~B~v%s acabou de entrar pela primeira vez."
 user_did_appeal = pt "Você apela, \"%q~n\""
 user_appeal_squelched = pt "Seus privilégios de apelação foram revogados."
-user_kill_zone = pt "Seu anjo da guarda sussurra para você: \"Não posso te defender aqui.\""
-user_angel_rejoins = pt "Seu anjo da guarda se junta a você novamente."
 user_fumble = pt "Você derruba seu %s ao tropeçar."
 user_wait_for_news_posting = pt "Você deve esperar um pouco antes de poder postar novamente em um globo de notícias."
 user_news_squelched = pt "Seus privilégios de postagem de notícias foram revogados."

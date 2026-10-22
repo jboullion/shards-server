@@ -408,8 +408,7 @@ messages:
    {
       local iNow, lUsers, oUser, iActiveUsers, lHealthBins, lManaBins, lStatBins,
          lMightCounts, lIntellectCounts, lStaminaCounts, lAgilityCounts, lMysticismCounts,
-         lAimCounts, lHealthCounts, lManaCounts, lBadKillBins, lBadKillCounts,
-         lGoodKillBins, lGoodKillCounts, iLastLoginTime, lFactionCounts, lFactionBins,
+         lAimCounts, lHealthCounts, lManaCounts, iLastLoginTime, lFactionCounts, lFactionBins,
          lGenderCounts, lGenderBins;
 
       iNow = GetTime();
@@ -430,11 +429,6 @@ messages:
       lHealthBins = [20, 29, 39, 49, 59, 69, 79, 89, 99, 109, 119, 129, 139, 149, 150];
       lManaCounts = $;
       lManaBins = [20, 29, 39, 49, 59, 69, 79, 89, 99, 109, 119, 129, 139, 149, 150];
-
-      lBadKillCounts = $;
-      lBadKillBins = [0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
-      lGoodKillCounts = $;
-      lGoodKillBins = [0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
 
       lGenderCounts = $;
       lGenderBins = [GENDER_NEUTER, GENDER_MALE, GENDER_FEMALE];
@@ -482,14 +476,6 @@ messages:
                Send(self, @AccumulateBin, #counts = lManaCounts, 
                     #value = Send(oUser, @GetMaxMana), #bins = lManaBins);
 
-            // Player kills, unjustified (bad), justified (good)
-            lBadKillCounts = 
-               Send(self, @AccumulateBin, #counts = lBadKillCounts, 
-                    #value = Send(oUser, @GetUnjustifiedKills), #bins = lBadKillBins);
-            lGoodKillCounts = 
-               Send(self, @AccumulateBin, #counts = lGoodKillCounts, 
-                    #value = Send(oUser, @GetJustifiedKills), #bins = lGoodKillBins);
-            
             // Faction
             lFactionCounts = 
                Send(self, @AccumulateBin, #counts = lFactionCounts, 
@@ -523,11 +509,6 @@ messages:
          #counts = lHealthCounts, #bins = lHealthBins);
       Send(self, @PrintBinCounts, #name = "Max mana", 
          #counts = lManaCounts, #bins = lManaBins);
-
-      Send(self, @PrintBinCounts, #name = "Player kills: justified", 
-         #counts = lGoodKillCounts, #bins = lGoodKillBins);
-      Send(self, @PrintBinCounts, #name = "Player kills: unjustified", 
-         #counts = lBadKillCounts, #bins = lBadKillBins);
 
       // Faction
       Send(self, @PrintBinCounts, #name = "Faction", 

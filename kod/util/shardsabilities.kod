@@ -76,7 +76,6 @@ resources:
    abil_vault_done = "A small portal whips into existence, pulling %s%s to your vault."
 
    abil_guild_cant = "You can't send %s%s to your guild hall's chest."
-   abil_guild_pvp = "You can't do that while you're sworn to peace."
    abil_guild_none = "You must be in a guild to do that."
    abil_guild_rank = "You aren't high enough in your guild to reach its chest."
    abil_guild_no_hall = "Your guild doesn't own a hall. Perhaps you should complain to your guild master."
@@ -770,13 +769,6 @@ messages:
       }
 
       // transference.kod CanPayCosts
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_PERMA_NO_PVP)
-      {
-         Send(who,@MsgSendUser,#message_rsc=abil_guild_pvp);
-
-         return;
-      }
-
       oGuild = Send(who,@GetGuild);
       if oGuild = $
       {

@@ -38,7 +38,6 @@ resources:
       "As you meet %s%s's terrible gaze you feel your limbs stiffen "
       "and freeze."
 
-   paralyze_no_soul = "You can't detect a soul in %s%s to turn to stone!"
 
    paralyze_sound= qparalyz.ogg
 
@@ -114,36 +113,28 @@ messages:
 
          // TODO: Make chance to paralyze based on if caster is facing opponent?
 
-         if IsClass(what,&Revenant)
+         if IsClass(what,&Player)
          {
-            Send(who,@MsgSendUser,#message_rsc=paralyze_no_soul,
-                  #parm1=Send(what,@GetDef),#parm2=Send(what,@GetName));
-         }
-         else
-         {
-            if IsClass(what,&Player)
+            oWeapon = Send(what,@GetWeapon);
+
+            // Ranged weapons don't always trigger the effect.
+            if oWeapon <> $
+               AND IsClass(oWeapon,&RangedWeapon)
+               AND Random(1,100) < 50
             {
-               oWeapon = Send(what,@GetWeapon);
-
-               // Ranged weapons don't always trigger the effect.
-               if oWeapon <> $
-                  AND IsClass(oWeapon,&RangedWeapon)
-                  AND Random(1,100) < 50
-               {
-                  // No effect.
-                  return defense_power;
-               }
-
-               Send(what,@MsgSendUser,#message_rsc=paralyze_target_on,
-                     #parm1=Send(who,@GetDef),#parm2=Send(who,@GetName));
+               // No effect.
+               return defense_power;
             }
 
-            Send(who,@MsgSendUser,#message_rsc=paralyze_caster,
-                  #parm1=Send(what,@GetCapDef),#parm2=Send(what,@GetName));
-
-            Send(oSpell,@DoSpell,#what=who,#oTarget=what,#iDuration=iDuration,
-                  #report=FALSE);
+            Send(what,@MsgSendUser,#message_rsc=paralyze_target_on,
+                  #parm1=Send(who,@GetDef),#parm2=Send(who,@GetName));
          }
+
+         Send(who,@MsgSendUser,#message_rsc=paralyze_caster,
+               #parm1=Send(what,@GetCapDef),#parm2=Send(what,@GetName));
+
+         Send(oSpell,@DoSpell,#what=who,#oTarget=what,#iDuration=iDuration,
+               #report=FALSE);
       }
 
       return defense_power;

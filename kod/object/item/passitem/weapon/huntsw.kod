@@ -255,10 +255,8 @@ messages:
       }
 
       // Don't let them pick it up unless they're worthy!
-      if (NOT ((Send(what,@GetKarma) > piKarmaWorthyThreshold)
-            AND (Send(what,@GetBaseMaxHealth) >= piHpWorthyThreshold)))
-         OR Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         OR Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
+      if NOT ((Send(what,@GetKarma) > piKarmaWorthyThreshold)
+            AND (Send(what,@GetBaseMaxHealth) >= piHpWorthyThreshold))
       {
          Send(what,@MsgSendUser,#message_rsc=HunterSword_holding_damage);
 
@@ -298,27 +296,9 @@ messages:
       if IsClass(what,&User)
          AND what = poOwner
       {
-         if Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-            OR Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
+         if ptHungerTimer=$
          {
-            if ptHungerTimer <> $
-            {
-               DeleteTimer(ptHungerTimer);
-               ptHungerTimer=$;
-            }
-            if ptHoldingDamage <> $
-            {
-               DeleteTimer(ptHoldingDamage);
-               ptHoldingDamage=$;
-            }
-            ptHoldingDamage = CreateTimer(self,@HoldingDamageTrigger,10);
-         }
-         else
-         {
-            if ptHungerTimer=$
-            {
-               Post(self,@HungerTrigger);
-            }
+            Post(self,@HungerTrigger);
          }
       }
 
@@ -467,19 +447,6 @@ messages:
          Post(Send(SYS,@GetNecromancerBalance),@PlaceSword,#what=self);
       }
 
-      if Send(poOwner,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         OR Send(poOwner,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         if ptHoldingDamage <> $
-         {
-            DeleteTimer(ptHoldingDamage);
-            ptHoldingDamage=$;
-         }
-         Send(self,@HoldingDamageTrigger);
-
-         return;
-      }
-
       ptHungerTimer = CreateTimer(self,@HungerTrigger,Send(Send(SYS,@GetNecromancerBalance),
                            @GetHungerInterval));
 
@@ -578,28 +545,11 @@ messages:
 
       if Send(poOwner,@GetKarma) > piKarmaWorthyThreshold
          AND Send(poOwner,@GetBaseMaxHealth) >= piHpWorthyThreshold
-         AND (NOT Send(poOwner,@CheckPlayerFlag,#flag=PFLAG_OUTLAW))
-         AND (NOT Send(poOwner,@CheckPlayerFlag,#flag=PFLAG_MURDERER))
       {
          return;
       }
       else
       {
-         if Send(poOwner,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-            OR Send(poOwner,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-         {
-            if ptHungerTimer <> $
-            {
-               DeleteTimer(ptHungerTimer);
-               ptHungerTimer=$;
-            }
-
-            Send(poOwner,@MsgSendUser,#message_rsc=HunterSword_lose_sword);
-            Send(Send(SYS,@GetNecromancerBalance),@PlaceSword,#what=self);
-
-            return;
-         }
-
          Send(poOwner,@MsgSendUser,#message_rsc=HunterSword_holding_damage_using);
 
          if Send(poOwner,@AssessDamage,#what=self,

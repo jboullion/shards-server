@@ -83,10 +83,9 @@
    OF_MAGIC_COLOUR_MASK = 0x07800000
 
    // Client preference flags (stored in piPreferences in Player)
-   // Default preferences - all on except safety (which is reverse)
-   CF_DEFAULT_PREF   = 0x007E
-   CF_SAFETY_OFF     = 0x0001
-   CF_TEMPSAFE       = 0x0002
+   // Default preferences - all on. 0x0001 (safety off) and 0x0002 (a temporary
+   // guardian angel on death) are retired with random PvP.
+   CF_DEFAULT_PREF   = 0x007C
    CF_GROUPING       = 0x0004
    CF_AUTOLOOT       = 0x0008
    CF_AUTOCOMBINE    = 0x0010
@@ -120,11 +119,9 @@
    MM_NPC                  = 0x00000040
    MM_MINION_OTHER         = 0x00000080
    MM_MINION_SELF          = 0x00000100
-   MM_TEMPSAFE             = 0x00000200
    MM_MINIBOSS             = 0x00000400
    MM_BOSS                 = 0x00000800
    MM_RARE_ITEM            = 0x00001000
-   MM_NO_PVP               = 0x00002000
    // Ours (Meridian Shards, docs/adr/0011-fast-travel.md 3): a fast travel portal, and one
    // this player hasn't attuned to yet (the client draws a gold "!" over it)
    MM_TRAVEL               = 0x00040000
@@ -227,7 +224,6 @@
    NC_PLAYER       = 0xFFFFFF   // Default, white name.
    NC_SHADOW       = 0x000000   // Set if name should be drawn black.
    NC_KILLER       = 0xFF0000   // Set if object is a killer.
-   NC_OUTLAW       = 0xFC9E00   // Set if object is an outlaw.
    NC_DM           = 0x00FFFF   // Set if object is a DM player.
    NC_CREATOR      = 0xFFFF00   // Set if object is a creator player.
    NC_SUPER        = 0x00FF00   // Set if object is a "super DM".
@@ -239,8 +235,8 @@
 
    // Object type enum. Used in the client for differentiating objects.
    OT_NONE         = 0   // Default, no type set.
-   OT_KILLER       = 1   // Set if object is a killer.
-   OT_OUTLAW       = 2   // Set if object is an outlaw.
+   // 1 and 2 were OT_KILLER and OT_OUTLAW (murderers' and outlaws' names),
+   // retired with random PvP.
    OT_DM           = 3   // Set if object is a DM player.
    OT_CREATOR      = 4   // Set if object is a creator player.
    OT_SUPER        = 5   // Set if object is a "super DM".
@@ -2231,7 +2227,7 @@
    IA_NEW_DESCRIPTION      = 14
    IA_APPEND_DESCRIPTION   = 15
    IA_QUEST_CARGO          = 16
-   IA_PKPOINTER            = 17
+   // 17 was IA_PKPOINTER (loot of a player kill), retired with random PvP.
    IA_BONDED               = 18
    IA_MADE                 = 19
    IA_MADE_TRANSCENDANT    = 20
@@ -2754,19 +2750,21 @@
    MAX_XP_DEATH_LOSS = 10000
 
    // First set of flags (in piFlags)
-   // A mask of flags that are unaffected by ResetPlayerFlagList
-   PFLAG_MASK              = 0x7423D7E
+   // A mask of flags that are unaffected by ResetPlayerFlagList. The bits of
+   // the flags retired with random PvP (murderer 0x2, temporary angel 0x4,
+   // outlaw 0x8, haunted 0x100, killed by a player 0x1000000, PvP opt-out
+   // 0x4000000) are left out, so an old character's are cleared.
+   PFLAG_MASK              = 0x2423C70
 
    PFLAG_INVISIBLE         = 0x0000001
-   PFLAG_MURDERER          = 0x0000002
-   PFLAG_TEMPSAFE          = 0x0000004
-   PFLAG_OUTLAW            = 0x0000008
    PFLAG_DID_DAMAGE        = 0x0000010
    PFLAG_TOOK_DAMAGE       = 0x0000020
    PFLAG_DODGED            = 0x0000040
    PFLAG_TRANCE            = 0x0000080
-   PFLAG_HAUNTED           = 0x0000100
    PFLAG_MANA_FOCUS        = 0x0000200
+   // Past newbie protection: base health of at least Settings.GetPKillEnableHP
+   // (50), or in a guild (Player.EvaluateNewbieStatus). Below it a death costs
+   // nothing, and the player can't take part in what PvP is left.
    PFLAG_PKILL_ENABLE      = 0x0000400
    PFLAG_TUTORIAL          = 0x0000800
    PFLAG_PKILL_LOCK        = 0x0001000
@@ -2783,13 +2781,11 @@
    // this player has moved since he's entered the room.
    PFLAG_MOVED_SINCE_ENTRY = 0x0400000
    PFLAG_PHASED            = 0x0800000
-   PFLAG_KILLED_BY_PLAYER  = 0x1000000
    PFLAG_DEATH_RIFTING     = 0x2000000
-   PFLAG_PERMA_NO_PVP      = 0x4000000
 
    // Second set of player flags (in piFlags2)
    // A mask of flags that are unaffected by ResetPlayerFlagList
-   PFLAG2_MASK             = 0x011F80
+   PFLAG2_MASK             = 0x011F00
 
    PFLAG2_HASTED           = 0x000001
    PFLAG2_DANCING          = 0x000002
@@ -2798,8 +2794,7 @@
    PFLAG2_DETECT_INVIS     = 0x000010
    PFLAG2_PARALYZED        = 0x000020
    PFLAG2_HUNTED           = 0x000040
-   // DM set only.  No chance of revenants.
-   PFLAG2_NOHAUNT          = 0x000080
+   // 0x000080 was PFLAG2_NOHAUNT (no revenants), retired with random PvP.
    PFLAG2_KOCATAN_DEATH    = 0x000100
    // Flags for squelching players.
    PFLAG2_SQUELCHED_TELLS  = 0x000200
@@ -3960,12 +3955,8 @@
 
    Q_PLAYER_NEWBIE            = 0x0100      // uses PFLAG_PKILL_ENABLE
    Q_PLAYER_NOTNEWBIE         = 0x0200      // uses PFLAG_PKILL_ENABLE
-   Q_PLAYER_MURDERER          = 0x0400
-   Q_PLAYER_NOTMURDERER       = 0x0800
-   Q_PLAYER_OUTLAW            = 0x1000
-   Q_PLAYER_NOTOUTLAW         = 0x2000
-   Q_PLAYER_LAWFUL            = 0x2800      // not murderer or outlaw
-   Q_PLAYER_KILL_MASK         = 0x3F00
+   // 0x0400-0x2000 were the murderer and outlaw restrictions, retired with random PvP.
+   Q_PLAYER_KILL_MASK         = 0x0300
 
    Q_PLAYER_NOTSUCCEEDED_RECENTLY   = 0x04000         // player has not done this quest successfully recently
    Q_PLAYER_NOTSUCCEEDED            = 0x08000         // player has not done this quest successfully before
@@ -3979,7 +3970,7 @@
    Q_PLAYER_GUILDMASTER          = 0x80000           // player is a guildmaster, and guild has colors
 
    // Does player have pvp enabled, i.e. not perma pvp off.
-   Q_PLAYER_PVP_ENABLED          = 0x100000
+   // 0x100000 was Q_PLAYER_PVP_ENABLED (not opted out of PvP), retired with random PvP.
 
    // quest player restrictions2
    //        used for restrictions which require parameter passing/setting
@@ -4040,11 +4031,11 @@
    QN_PRIZETYPE_PASS_PREVIOUS_SOURCE_NPC  = 0x0F      // Set dest npc -> current PreviousSourceNPC
    QN_PRIZETYPE_SCHEDULE_QUEST            = 0x10      // Schedule a quest of this type
    QN_PRIZETYPE_ESTABLISH_NECROGUILD      = 0x11      // Form the Order of Necromancers
-   QN_PRIZETYPE_OUTLAW                    = 0x12      // Make the player an outlaw
+   QN_PRIZETYPE_OUTLAW                    = 0x12      // A small stat penalty (once made the player an outlaw)
    QN_PRIZETYPE_NPC_RESPONSE              = 0x13      // Let the QuestTemplate give different responses for each NPC.
    QN_PRIZETYPE_TRAINING_POINTS           = 0x014      // Award training points.
    QN_PRIZETYPE_EXPERIENCE_POINTS         = 0x015      // Award "experience points" (gain chance).
-   QN_PRIZETYPE_NO_PVP_FLAG               = 0x016      // Switch the player's pvp off
+   // 0x016 was QN_PRIZETYPE_NO_PVP_FLAG (switch the player's PvP off), retired with random PvP.
 
    // Quest node prize statistic types
    QN_PRIZE_STAT_MIGHT    = 0x0

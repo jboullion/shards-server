@@ -1,10 +1,4 @@
 system_user_killed = de "~B~U~k[###]~n ~B~v%q ist gerade gestorben. %s%q war zu stark."
-system_user_killed_by_pker = de "~B~U~k[###]~n ~B~v%q ist kaltblütig umgebracht worden."
-system_user_killed_pker = de \
-   "~B~U~k[###]~n ~B~v%q ist als Mörder getötet worden! %s%q war im Kampf siegreich."
-system_user_killed_outlaw = de \
-   "~B~U~k[###]~n ~B~v%q war gesetzlos und ist ermordet worden. %s%q hat die gerechte Strafe "
-   "ausgeführt."
 system_killed_self = de \
    "~B~U~k[###]~n ~B~v%q ist durch eigene Dummheit an %s gestorben."
 system_user_killed_room = de \
@@ -159,12 +153,6 @@ system_guild_rsc = de "gilde"
 
 system_user_killed = pt \
       "~B~U~k[###]~n ~B~v%q acabou de ser morto por %s%q."
-system_user_killed_by_pker = pt \
-      "~B~U~k[###]~n ~B~v%q foi assassinado a sangue frio."
-system_user_killed_pker = pt \
-      "~B~U~k[###]~n ~B~vO notório assassino, %q, foi morto por %s%q."
-system_user_killed_outlaw = pt \
-      "~B~U~k[###]~n ~B~vO temido fora-da-lei, %q, acaba de encontrar a justiça nas mãos de %s%q."
 system_killed_self = pt \
       "~B~U~k[###]~n ~B~v%q acabou de ser morto pela própria tolice de %s."
 system_user_killed_room = pt \

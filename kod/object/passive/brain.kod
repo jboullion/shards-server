@@ -400,12 +400,10 @@ messages:
    SomethingKilled(mob=$, state=$, what=$, victim=$, use_weapon=$)
    "Effects of killing are handled in response to SomethingLeft and"
    "LastUserLeft.  Special cases handled here: "
-   "1. guards being activated by a murder of a white-name."
+   "1. guards being activated by one player killing another."
    "2. monster mourning the death of his master."
    {
       if IsClass(what,&User) AND IsClass(victim,&User)
-         AND NOT Send(victim,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         AND NOT Send(victim,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
          AND (Send(mob,@GetBehavior) & AI_FIGHT_MURDERERS)
       {
          if Send(self,@AttemptTargetSwitch,#what=what,#event=TS_MURDER,#mob=mob)
@@ -482,7 +480,6 @@ messages:
       oTarget = Send(mob,@GetTarget);
       if IsClass(oTarget,&User)
          AND Send(oTarget,@CheckPlayerFlag,#flag=PFLAG_INVISIBLE)
-         AND NOT IsClass(mob,&Revenant)
       {
          if Random(1,50) = 1
          {
@@ -1148,15 +1145,6 @@ messages:
          }
       }
 
-      if (behavior & AI_FIGHT_MURDERERS)
-      {
-         if IsClass(oApparentForm,&User)
-            AND Send(oApparentForm,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-         {
-            iHatred = (iHatred + 50 + Send(what,@GetUnjustifiedKills)*4);
-         }
-      }
-
       if (behavior & AI_FIGHT_WIZARD_KILLER)
       {
          if IsClass(oApparentForm,&Battler)
@@ -1275,11 +1263,6 @@ messages:
       }
 
       if NOT Send(what,@IsLikelyVictim)
-      {
-         return FALSE;
-      }
-
-      if IsClass(mob,&Revenant)
       {
          return FALSE;
       }

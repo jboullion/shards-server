@@ -60,18 +60,7 @@ messages:
 
    UserEntered(who=$)
    {
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-      {
-         Send(self,@SetMood,#new_mood=piMood+3);
-      }
-      else if Send(who,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         Send(self,@SetMood,#new_mood=piMood+3);
-      }
-      else
-      {
-         Send(self,@SetMood,#new_mood=piMood-3);
-      }
+      Send(self,@SetMood,#new_mood=piMood-3);
 
       if Send(who,@GetHomeRoom) = RID_BERG_INN
       {

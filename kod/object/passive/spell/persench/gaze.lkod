@@ -12,8 +12,6 @@ paralyze_caster = de \
 paralyze_target_on = de \
    "Als Du %s%ss schrecklichen Blick triffst, frieren all deine Gliedmaßen "
    "ein und Du bist gelähmt."
-paralyze_no_soul = de \
-   "Du kannst keine Seele in %s%s erkennen und sie in Stein verwandeln!"
 gaze_enchantment_rsc = de \
    "\n\nDein aktueller %s Zauber lähmt Gegner die dich angreifen für %i-%i "
    "Millisekunden.  Gegner mit Fernwaffen haben eine 50%% Chance dem Lähmen "
@@ -27,4 +25,3 @@ paralyze_off_rsc = pt "Seus olhos voltam ao normal."
 paralyze_already_enchanted_rsc = pt "Você já possui o olhar do basilisco."
 paralyze_caster = pt "%s%s encontra seu olhar e congela no lugar."
 paralyze_target_on = pt "Ao encontrar o terrível olhar de %s%s, você sente seus membros endurecerem e congelarem."
-paralyze_no_soul = pt "Você não consegue detectar uma alma em %s%s para transformar em pedra!"

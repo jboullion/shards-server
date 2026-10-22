@@ -148,22 +148,6 @@ messages:
          Send(self,@SetMood,#new_mood=piMood-2);
       }
 
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         Send(self,@SetMood,#new_mood=piMood-2);
-
-         // Don't welcome these guys.
-         propagate;
-      }
-
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-      {
-         Send(self,@SetMood,#new_mood=piMood-1);
-
-         // Don't welcome these guys.
-         propagate;
-      }
-
       Send(who,@SomeoneSaid,#what=self,
             #string=barloquevaultman_entry_welcome,
             #type=SAY_RESOURCE);

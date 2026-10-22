@@ -43,8 +43,8 @@ resources:
    radench_enter = "You enter a circle of magical effect maintained by %s%s."
    radench_leave = "You leave a circle of magical effect maintained by %s%s."
    radench_no_newbie = \
-      "Your guardian angel tells you, \"You are not ready to cast spells "
-      "which may hinder other players.\""
+      "You are not yet experienced enough to cast spells which may hinder "
+      "other players."
 
 classvars:
 
@@ -102,9 +102,9 @@ classvars:
    viAffectsCaster = TRUE       // Caster is affected by the spell
    viAffectsGuildmates = FALSE  // Guildmates of caster
    viAffectsAllies = FALSE      // Members of guilds allied with caster's guild
-   viAffectsEnemies = FALSE     // Hostile, can cause outlaw status
-   viAffectsInnocents = FALSE   // Unaffiliated white characters
-   viAffectsNewbies = FALSE     // Angeled characters
+   viAffectsEnemies = FALSE     // Hostile: those the caster may attack
+   viAffectsInnocents = FALSE   // Other players past newbie protection
+   viAffectsNewbies = FALSE     // Players still under newbie protection
 
 properties:
 
@@ -660,8 +660,6 @@ messages:
       if viAffectsInnocents
          AND IsClass(who,&User)
          AND Send(who,@CheckPlayerFlag,#flag=PFLAG_PKILL_ENABLE)
-         AND NOT Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         AND NOT Send(who,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
       {
          return TRUE;
       }

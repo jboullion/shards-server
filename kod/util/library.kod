@@ -116,9 +116,6 @@ resources:
    LM_haz_tomas = "An armed warrior is always better than a naked one.  Spend what you have on weaponry at Tomas' shop - you'll earn more."
    LM_haz_eric = "The finest barman this side of Barloque!  I've heard he seeks something..."
 
-   LM_towns_nopvp = \
-      "If you wish to opt-out of player versus player combat, visit the Temple "
-      "of Shal'ille to the north of Marion and speak to the priestess there."
 
    LM_no_mana_nodes = "You have not yet bonded with any mana nodes."
    LM_mana_nodes = "Your aura is connected with these mana nodes: %r."
@@ -1186,29 +1183,11 @@ messages:
    "action to be triggered, the incoming percentage must be greater or "
    "equal to the library percentage (so 0 is never, 100 is always, etc)"
    {
-      local bPvPOptOut;
-
       plRandomLib = $;
-
-      //bPvPOptOut = Send(SETTINGS_OBJECT,@PvPOptOutEnabled);
 
       plRandomLib = Cons([&CorNothTown,[
          [40,LIBRES_NOT_NEWBIE,[ LIBACT_RUMOR_TOKEN_LOC ]] 
       ]],plRandomLib);
-
-      if (bPvPOptOut)
-      {
-         // Append to CorNothTown.
-         Send(self,@AppendRandomLib,#element=[25,0,[ LIBACT_SAY, LM_towns_nopvp ]]);
-
-         plRandomLib = Cons([&JasperTown,[
-            [25,0,[ LIBACT_SAY, LM_towns_nopvp ]]
-         ]],plRandomLib);
-
-         plRandomLib = Cons([&MarionTown,[
-            [25,0,[ LIBACT_SAY, LM_towns_nopvp ]]
-         ]],plRandomLib);
-      }
 
       plRandomLib = Cons([&RazaTown,[
          [48,0,[ LIBACT_SAY, LM_haz_rand17 ]],
@@ -1229,12 +1208,6 @@ messages:
          [48,0,[ LIBACT_SAY, LM_haz_rand2 ]],
          [48,0,[ LIBACT_SAY, LM_haz_rand1 ]]
       ]],plRandomLib);
-
-      if (bPvPOptOut)
-      {
-         // Append to RazaTown.
-         Send(self,@AppendRandomLib,#element=[50,0,[ LIBACT_SAY, LM_towns_nopvp ]]);
-      }
 
        plRandomLib = Cons([&RazaBartender,[
          [48,0,[ LIBACT_SAY, LM_haz_rand_apoth1 ]],

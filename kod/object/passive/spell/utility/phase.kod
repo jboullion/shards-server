@@ -37,22 +37,10 @@ resources:
    Phase_penned_others = \
       "%s's grip on reality snaps, hurling %s violently away "
       "on magical currents!"
-   Phase_penned_others_item = \
-      "The violent currents seemed to have torn %s%s from %s's inventory."
    
    Phase_penned_wav_rsc = logoffghost_poof.ogg
    
-   Phase_lost_one_item = \
-      "You lost %s skill points, %s spell points, and %s%s."
-   Phase_lost_two_items = \
-      "You lost %s skill points, %s spell points, %s%s, and %s%s."
 
-   penalties_inflicted_one_item = \
-      "The torturous experience has cost you %i XP, one item, %i spell "
-      "points, and %i skill points."
-   penalties_inflicted_plural = \
-      "The torturous experience has cost you %i XP, %i items, %i spell "
-      "points, and %i skill points."
 
    no_phasing_in_safe_place_msg = \
       "This place of safety is anchored and calm, and you cannot "
@@ -347,26 +335,10 @@ messages:
       return;
    }
 
-   SendPenaltyInfo(who=$, iXPLost=0, iItemsLost=0, iSpellPtLost=0,
-                   iSkillPtLost=0)
+   SendPenaltyInfo(who=$)
+   "Ours (no random PvP): a Phase held too long costs nothing but the trip "
+   "(NotifyRoomPenalty), so there's nothing more to tell."
    {
-      if (who = $)
-      {
-         return;
-      }
-
-      if iItemsLost = 1
-      {
-         Send(who,@MsgSendUser,#message_rsc=penalties_inflicted_one_item,
-               #parm1=iXPLost,#parm2=iSpellPtLost,#parm3=iSkillPtLost);
-      }
-      else
-      {
-         Send(who,@MsgSendUser,#message_rsc=penalties_inflicted_plural,
-               #parm1=iXPLost,#parm2=iItemsLost,#parm3=iSpellPtLost,
-               #parm4=iSkillPtLost);
-      }
-
       return;
    }
 

@@ -114,11 +114,6 @@ messages:
 
    UserEntered(who=$)
    {
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-      {
-         Send(self,@SetMood,#new_mood=piMood-2);
-      }
-
       if Send(who,@GetHomeRoom) = RID_JAS_INN
       {
          Send(self,@SetMood,#new_mood=piMood+2);

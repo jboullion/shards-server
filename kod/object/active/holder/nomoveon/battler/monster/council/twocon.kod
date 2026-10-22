@@ -57,21 +57,6 @@ properties:
 
 messages:
 
-   UserEntered(who = $)
-   {
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-      {
-         Send(self,@SetMood,#new_mood=piMood-4);
-      }
-
-      if Send(who,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-      {
-         Send(self,@SetMood,#new_mood=piMood-2);
-      }
-
-      propagate;
-   }
-
    AffectMood(why=$,what=$)
    {
       if why = MOODMOD_ACCEPT_ITEM

@@ -46,11 +46,6 @@ resources:
    include system.lkod
 
    system_user_killed = "~B~U~k[###]~n ~B~v%q was just killed by %s%q."
-   system_user_killed_by_pker = "~B~U~k[###]~n ~B~v%q has been murdered in cold blood."
-   system_user_killed_pker = \
-      "~B~U~k[###]~n ~B~vThe notorious murderer, %q, has been killed by %s%q."
-   system_user_killed_outlaw = \
-      "~B~U~k[###]~n ~B~vThe feared outlaw, %q, has just met justice at %s%q's hands."
    system_killed_self = "~B~U~k[###]~n ~B~v%q was just slain by %s own folly."
    system_user_killed_room = \
       "~B~U~k[###]~n ~B~v%q has met an unfortunate end in %s."
@@ -465,7 +460,6 @@ properties:
 
    psTemp = $
 
-   pbDecay_counter = 0
 
    piLogoffPenaltyDecayCounter = 0
    // Players' LogoffPenaltyCounters decrement this often.
@@ -527,7 +521,6 @@ properties:
 
    pbRecycleUsersEnabled = FALSE
 
-   poLastMurderer = $
 
    // What's the current server number?  Must be set manually.
    // Currently used for admin gmail to flag message origin.
@@ -1774,7 +1767,7 @@ messages:
 
    UserKilled(what = $,killer = $, oRoom = $,stroke_obj = $, Sword = FALSE, Amulet = FALSE)
    {
-      local i, rMessage, bMurder, oSoldierShield, oToken, oGuild, oKillerGuild,
+      local i, rMessage, oSoldierShield, oToken, oGuild, oKillerGuild,
             param2, param3, param4, param5, param6, param7, type5, type7,
             war_string1, war_string2, oBook, oMaster, oKillingBlow;
 
@@ -1873,19 +1866,6 @@ messages:
       }
       else
       {
-         // Outlaw or murderer was killed?
-         if Send(what,@CheckPlayerFlag,#flag=PFLAG_OUTLAW)
-         {
-            rMessage = system_user_killed_outlaw;
-            // Parameters set by default
-         }
-
-         if Send(what,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-         {
-            rMessage = system_user_killed_pker;
-            // Parameters set by default
-         }
-
          if IsClass(killer,&User)
          {
             // Was this a soldier war death?
@@ -1949,21 +1929,6 @@ messages:
                // Get True name instead of normal name for Frenzy action.
                param3 = Send(killer,@GetTrueName);
             }
-
-            // If we have no other message, and killer is a murderer, and
-            //  attack wasn't made in a safe death location, then give the
-            //  mysterious murder message!
-            if rMessage = $
-               AND Send(killer,@CheckPlayerFlag,#flag=PFLAG_MURDERER)
-               AND NOT Send(Send(what,@GetOwner),@SafePlayerAttack)
-            {
-               rMessage = system_user_killed_by_pker;
-               poLastMurderer = killer;
-
-               // Nil out the values set by default.
-               param2 = $;
-               param3 = $;
-            }
          }
       }
 
@@ -2001,21 +1966,10 @@ messages:
    }
 
    GetLastMurderer()
+   "Ours (no random PvP): nobody can murder another player any more, so there's no "
+   "last murderer for Seance or a shrunken head to find."
    {
-      if findListElem(plUsers,poLastMurderer)
-      {
-         return poLastMurderer;
-      }
-
-      poLastMurderer = $;
-
-      return;
-   }
-
-   ClearLastMurderer()
-   {
-      poLastMurderer = $;
-      return;
+      return $;
    }
 
    GetSpells()
@@ -3525,7 +3479,6 @@ messages:
 	   Send(self,@CreateOneSpellIfNew,#num=SID_NODROP,#class=&NotDroppable);
 	   Send(self,@CreateOneSpellIfNew,#num=SID_ADDPETOITEM,#class=&AddPEtoItem);
 
-      Send(self,@CreateOneSpellIfNew,#num=SID_PARDON,#class=&Pardon);
       Send(self,@CreateOneSpellIfNew,#num=SID_BLESS,#class=&Bless);
       Send(self,@CreateOneSpellIfNew,#num=SID_MAGIC_SHIELD,#class=&MagicShield);
       Send(self,@CreateOneSpellIfNew,#num=SID_MEND,#class=&Mend);
@@ -3609,7 +3562,6 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_SWARMSPELL,#class=&SwarmSpell);
       Send(self,@CreateOneSpellIfNew,#num=SID_ARMAGEDDON,#class=&Armageddon);
 
-      Send(self,@CreateOneSpellIfNew,#num=SID_VILLIFY,#class=&Villify);
       Send(self,@CreateOneSpellIfNew,#num=SID_REVEAL,#class=&Reveal);
       Send(self,@CreateOneSpellIfNew,#num=SID_ANONYMITY,#class=&Anonymity);
       Send(self,@CreateOneSpellIfNew,#num=SID_REFLECTION,#class=&SummonReflection);
@@ -3789,7 +3741,6 @@ messages:
 	  Send(self,@CreateOneItemAttIfNew,#num=IA_NOTDROPPABLE,#class=&ItemAttNotDroppable);
 
       // Keep these last, it's called the most often
-      Send(self,@CreateOneItemAttIfNew,#num=IA_PKPOINTER,#class=&ItemAttPKPointer);
       Send(self,@CreateOneItemAttIfNew,#num=IA_CORPSEPOINTER,#Class=&ItemAttCorpsePointer);
 
       return;
@@ -4593,14 +4544,7 @@ messages:
          Send(self,@NewGameYear);
       }
 
-      ++pbDecay_counter;
       ++piLogoffPenaltyDecayCounter;
-      if pbDecay_counter >= 3
-      {
-         pbDecay_counter = 0;
-         SendList(plUsers,0,@DecayPKillCount);
-      }
-
       if piLogoffPenaltyDecayCounter >= piLogoffPenaltyDecayTime
       {
          piLogoffPenaltyDecayCounter = 0;
@@ -5150,13 +5094,6 @@ messages:
    GetGuilds()
    {
       return plGuilds;
-   }
-
-   SetSafety()
-   {
-      SendList(plUsers,0,@SetSafety);
-
-      return;
    }
 
    NewGuildHallToList(hall=$)
