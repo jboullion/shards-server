@@ -3622,7 +3622,6 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_SPIDER_WEB,#class=&SummonWeb);
       Send(self,@CreateOneSpellIfNew,#num=SID_JIG,#class=&Jig);
       Send(self,@CreateOneSpellIfNew,#num=SID_DEFLECT,#class=&Deflect);
-      Send(self,@CreateOneSpellIfNew,#num=SID_SHATTERLOCK,#class=&Shatterlock);
       Send(self,@CreateOneSpellIfNew,#num=SID_LIGHTNING_WALL,#class=&Lightningwall);
       Send(self,@CreateOneSpellIfNew,#num=SID_BRAMBLE_WALL,#class=&bramblewall);
       Send(self,@CreateOneSpellIfNew,#num=SID_POISON_FOG,#class=&SummonPoisonFog);
@@ -3757,7 +3756,6 @@ messages:
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_RENOUNCE,#class=&GuildRenounce);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_ROSTER,#class=&GuildRoster);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_ABDICATE,#class=&GuildAbdicate);
-      Send(self,@CreateOneGuildCommandIfNew,#num=GCID_VOTE,#class=&GuildVote);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_PEACE,#class=&GuildPeace);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_FORGE_ALLIANCE,#class=&GuildForgeAlliance);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_DECLARE_ENEMY,#class=&GuildDeclareEnemy);

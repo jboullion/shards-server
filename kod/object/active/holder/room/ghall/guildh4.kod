@@ -23,11 +23,6 @@ constants:
    NEXT_TIME = 1000
    RESET_TIME_LONG = 20000
 
-   // Values for light flickering
-   FLICKER_LOW = 80
-   FLICKER_HIGH = 220
-   FLICKER_NONE = 124
-
    include blakston.khd
 
 resources:
@@ -59,10 +54,6 @@ classvars:
    viFoyer_east = 30
    viFoyer_west = 21
 
-   viLever_row = 1
-   viLever_col = 25
-   viLever_fine_row = 32
-   viLever_fine_col =  0
 
    viInner_teleport_row = 18
    viInner_teleport_col = 16
@@ -87,7 +78,6 @@ properties:
    ptStorage = $
 
    plGuild_doors
-   ptLighting = $
 
 messages:
 
@@ -295,12 +285,6 @@ messages:
          ptStorage = $;
       }
 
-      if ptLighting <> $
-      {
-         DeleteTimer(ptLighting);
-         ptLighting = $;
-      }
-
       propagate;
    }
 
@@ -476,72 +460,6 @@ messages:
       plEdge_Exits = Cons([LEAVE_SOUTH, RID_JASPER, 73,36, ROTATE_180], plEdge_exits);
 
       return;
-   }
-
-   DefensesDown()
-   {
-      ptLighting = CreateTimer(self,@LightFlicker,1000);
-
-      propagate;
-   }
-
-   LightFlicker()
-   {
-      // Is the hall being raided?
-      if piStatus = 1
-      {
-         if piBaseLight = FLICKER_LOW
-         {
-            Send(self,@SetBaseLight,#amount=FLICKER_HIGH);
-         }
-         else
-         {
-            Send(self,@SetBaseLight,#amount=FLICKER_LOW);
-         }
-
-         ptLighting = CreateTimer(self,@LightFlicker,2000);
-      }
-      else
-      {
-         ptLighting = $;
-         Send(self,@DefensesUp);
-      }
-
-      return;
-   }
-
-   DefensesUp()
-   {
-      if ptLighting <> $
-      {
-         DeleteTimer(ptLighting);
-         ptLighting = $;
-      }
-
-      Send(self,@SetBaseLight,#amount=FLICKER_NONE);
-
-      propagate;
-   }
-
-   ClaimGuildHall()
-   {
-      Send(self,@DefensesUp);
-
-      propagate;
-   }
-
-   ResetGuildHall()
-   {
-      Send(self,@DefensesUp);
-
-      propagate;
-   }
-
-   ConquerTimer()
-   {
-      Send(self,@DefensesUp);
-
-      propagate;
    }
 
 end

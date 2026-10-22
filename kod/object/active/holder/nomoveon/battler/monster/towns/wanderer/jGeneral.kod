@@ -48,8 +48,6 @@ classvars:
 
 properties:
 
-   pbShatterlockAvailable = TRUE
-
 messages:
 
    UserEntered(who=$)
@@ -97,41 +95,7 @@ messages:
    }
 
    SetForSale()
-   {
-      if pbShatterlockAvailable
-      {
-         Send(self,@SetForSaleWithShatterlock);
-      }
-      else
-      {
-         Send(self,@SetForSaleNoShatterlock);
-      }
-
-      return;
-   }
-
-   SetForSaleWithShatterlock()
-   {
-      plFor_Sale = [ 
-         $,
-         [
-            SKID_BLOCK 
-         ],
-         [ 
-            SID_REVEAL,
-            SID_DISPEL_ILLUSION,
-            SID_HASTE,
-            SID_RESIST_POISON,
-            SID_GLOW_WEAPON,
-            SID_FREE_ACTION,
-            SID_SHATTERLOCK
-         ],
-      $];
-
-      return;
-   }
-
-   SetForSaleNoShatterlock()
+   "Ours (guild revamp): Shatterlock, which broke into guild halls, is gone."
    {
       plFor_Sale = [ 
          $,

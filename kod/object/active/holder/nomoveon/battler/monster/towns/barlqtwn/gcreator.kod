@@ -28,7 +28,7 @@ resources:
    GuildCreator_mailname_rsc = "Frular, the Guild Creator"
 
    GuildCreator_not_master = \
-      "Only the elite members of a guild may purchase a guild hall."
+      "Only the leader of a guild may lease a guild hall."
    GuildCreator_not_mature_yet = \
       "Thou cannot purchase a guild hall until thy guild hath been "
       "active for some time."
@@ -277,7 +277,8 @@ messages:
             return $;
          }
 
-         if Send(oGuild,@GetRank,#who=who) >= RANK_LIEUTENANT
+         // Ours (guild revamp): only the Leader leases the hall.
+         if Send(oGuild,@GetRank,#who=who) = RANK_MASTER
          {
             if Send(oGuild,@IsMature)
             {

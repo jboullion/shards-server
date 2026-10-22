@@ -149,10 +149,6 @@ classvars:
    viFoyer_west = 26
    viFoyer_east = 39
 
-   viLever_row = 11
-   viLever_col = 16
-   viLever_fine_row = 32
-   viLever_fine_col = 32
 
    viInner_teleport_row = 11
    viInner_teleport_col = 27
@@ -568,13 +564,6 @@ messages:
            #new_row=16,#new_col=26,#fine_row=0,#fine_col=16);
       Send(self,@NewHold,#what=Create(&Stool),
            #new_row=14,#new_col=26,#fine_row=16,#fine_col=16);
-
-      propagate;
-   }
-
-   DefensesDown()
-   {
-      Send(self,@SomethingWaveRoom,#what=poShield_Lever,#wave_rsc=guildh14_alarm1);
 
       propagate;
    }

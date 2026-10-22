@@ -862,7 +862,7 @@
 
    // Keep these up to date!
    RID_GUILDH_MIN = 701
-   RID_GUILDH_MAX = 716
+   RID_GUILDH_MAX = 720
 
    RID_ICE_CAVE1 = 750
 
@@ -2551,7 +2551,7 @@
    SID_SPIDER_WEB = 136
    SID_JIG = 137
    SID_DEFLECT = 138
-   SID_SHATTERLOCK = 139
+   SID_SHATTERLOCK = 139            // Retired (guild revamp): no breaking into halls.
    SID_LIGHTNING_WALL = 140
    SID_BRAMBLE_WALL = 141
    SID_FEIGN_DEATH = 142
@@ -3032,7 +3032,7 @@
    GCID_RENOUNCE = 0x04
    GCID_PROMOTE = 0x08
    GCID_DEMOTE = 0x10
-   GCID_VOTE = 0x20
+   GCID_VOTE = 0x20                 // Retired (guild revamp): no votes for leader.
    GCID_ABDICATE = 0x40
    GCID_ROSTER = 0x80
    GCID_FORGE_ALLIANCE = 0x100

@@ -151,8 +151,7 @@ messages:
           [ SKID_BLOCK ],
           [ SID_REVEAL,
           SID_DISPEL_ILLUSION, SID_HASTE, SID_RESIST_POISON,
-          SID_GLOW_WEAPON, SID_FREE_ACTION,
-          SID_SHATTERLOCK]];
+          SID_GLOW_WEAPON, SID_FREE_ACTION]];
       return;
    }
 

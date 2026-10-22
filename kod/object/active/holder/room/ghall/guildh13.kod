@@ -32,7 +32,6 @@ resources:
 
    guildh13_locked = "The door is firmly locked"
 
-   guildh13_gong = pdeath.ogg
    guildh13_ocean_sound = ocean.ogg
 
 classvars:
@@ -55,10 +54,6 @@ classvars:
    viFoyer2_south = 4    //inner elbow of L (inside is N and/or W of this point)
    viFoyer2_east = 4
 
-   viLever_row = 15
-   viLever_col = 17
-   viLever_fine_row = 24
-   viLever_fine_col = 40
 
    viInner_teleport_row = 5
    viInner_teleport_col = 28
@@ -342,14 +337,6 @@ messages:
       Send(self,@NewHold,#what=Create(&Chest),
             #new_row=13,#new_col=29,#fine_col=56,#fine_row=08,
             #new_angle=ANGLE_WEST);
-
-      propagate;
-   }
-
-   DefensesDown()
-   {
-      Send(self,@SomethingWaveRoom,#what=poShield_Lever,
-            #wave_rsc=guildh13_gong);
 
       propagate;
    }

@@ -19,10 +19,6 @@ constants:
 
    MAX_MEMBERS = 400         // Maximum number of people allowed in a guild.
 
-   THREE_PERSON_LIMIT = 240
-
-   MINIMUM_MEMBERS = 3
-
    RENT_BASE = 5
    RENT_SECRET = 10
 
@@ -52,15 +48,6 @@ resources:
    necguild_madame = "Initiate"
    necguild_apprentice = "Fledgling"
    necguild_apprenticette = "Fledgling"
-
-   necguild_threeperson_failing = \
-      "The Order of the Necromancers has fewer than 3 members.  If you do "
-      "not get your membership up to three in the next %i %s, my grip on this "
-      "plane of reality will slip and you will all perish along with me!"
-
-   necguild_threeperson_failed = \
-      "The Order of the Necromancers has been disbanded for "
-      "lack of membership."
 
    necguild_demotee = "~B%q has demoted you to the rank of %s!"
    necguild_demoter = "~BYou demote %q to the the rank of %s!"
@@ -107,8 +94,6 @@ resources:
       "I will slip back into the darkness, and you shall all follow me!~n~B\""
 
    necguild_new_hall = "~B%s is the new home of %s%q!"
-   necguild_hall_conquered = "~B%s, home of %s%q, has been conquered!"
-   necguild_hall_betrayed = "~B%s, home of %s%q, was betrayed from within!"
 
    necguild_cannot_rejoin = \
       "~BThis ex-member of the Order may not rejoin yet."
@@ -257,9 +242,6 @@ properties:
 
    ptMaintenance = $
 
-   // If the guild has less than three members for 24 hours in a row, delete it.
-   piThreePersonWarning = 0
-
    // These are stored only so that, if the guild goes while an
    // invitation is extended, the invitation disappears.
    plInvitations = $
@@ -345,7 +327,6 @@ messages:
       ptMaintenance = CreateTimer(self,@MaintenanceTimer,
                            Send(SYS,@GetMaintenanceDelay));
 
-      piThreePersonWarning = THREE_PERSON_LIMIT;
       psPassword = necguild_default_password;
 
       plFormerMembers = $;
@@ -361,76 +342,18 @@ messages:
    }
 
    MaintenanceTimer()
-   "Do five things here: "
-   "1) Check to be sure they have 3 members.  "
-   "2) Check for guild maturity.  "
-   "3) Check to ensure there is a guildmaster.  "
-   "4) Accrue rent.  "
-   "5) Check to see if former members of the guild can once more "
+   "Do three things here: "
+   "1) Check that the Order has an active leader (CheckSuccession).  "
+   "2) Accrue rent.  "
+   "3) Check to see if former members of the guild can once more "
    "rejoin the guild."
+   "Ours (guild revamp): the Order is never disbanded for having few members."
    {
-      local i, hourhours, timeleft, bPKServer;
+      local i, timeleft;
 
       ptMaintenance = $;
 
-      if Send(self,@GetGuildMaster) = $
-      {
-         // This should never happen!  This is just in as a failsafe, since
-         // some commands are guildmaster only!
-         Debug("Guild somehow ended up without a guildmaster!!!");
-
-         // CountVotes will choose whoever has the most political support.
-         Send(self,@CountVotes);
-      }
-
-      if Length(plMembers) < MINIMUM_MEMBERS
-      {
-         if piThreePersonWarning = 0
-         {
-            piThreePersonWarning = THREE_PERSON_LIMIT;
-         }
-         else
-         {
-            piThreePersonWarning = piThreePersonWarning - 1;
-         }
-         if piThreePersonWarning = 0
-         {
-            foreach i in plMembers
-            {
-               Post(First(i),@MsgSendUser,#message_rsc=necguild_threeperson_failed);
-            }
-            Send(&NecromancerAmulet,@OrderOfNecromancersDisbanded);
-            Send(self,@Delete);
-
-            return;
-         }
-         else
-         {
-            if (piThreePersonWarning % 40) = 0
-               OR ((piThreePersonWarning % 10) = 0
-                  AND piThreePersonWarning < 40)
-            {
-               if piThreePersonWarning = 10
-               {
-                  hourhours = necguild_hour_rsc;
-               }
-               else
-               {
-                  hourhours = necguild_hours_rsc;
-               }
-
-               foreach i in plMembers
-               {
-                  Post(First(i),@MsgSendUser,#message_rsc=necguild_threeperson_failing,
-                        #parm1=piThreePersonWarning/10,#parm2=hourhours);
-               }
-            }
-         }
-      }
-      else
-      {
-         piThreePersonWarning = 0;
-      }
+      Send(self,@CheckSuccession);
 
       Send(self,@AccrueRent);
       foreach i in plFormerMembers
@@ -603,14 +526,6 @@ messages:
       rent = Bound(rent,2,$);
 
       return (piRentDue * 5 / (rent * RENT_MAX_OVERDUE));
-   }
-
-   GuildHallConquered(name=$, betrayed = $, oConquerer = $)
-   {
-      Debug("Necromancer Guild Hall conquered! This shouldn't happen. ",
-            " Conquerer was ",oConquerer);
-
-      return;
    }
 
    NewGuildMaster(who=$, abdicate = FALSE)
@@ -807,19 +722,18 @@ messages:
 
       // Kick them out of the Order.
       Send(self,@RemoveFromGuild,#who=victim);
-      // If master, find a new one.
+      // If master, find a new one: the assassin, if one of the Order.
       if IsMaster
       {
          if Send(self,@IsMember,#who=killer)
             AND killer <> victim
          {
-            // Shift everyone's support to the assassin.
-            foreach i in plMembers
-            {
-               SetNth(i,3,killer);
-            }
+            Send(self,@NewGuildMaster,#who=killer);
          }
-         Send(self,@CountVotes);
+         else
+         {
+            Send(self,@CheckSuccession);
+         }
       }
 
       return;

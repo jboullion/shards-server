@@ -31,9 +31,13 @@ constants:
    MATURITY_SECRET = 60
    MATURITY_NONSECRET = 30
 
-   THREE_PERSON_LIMIT = 240    
+   // Ours (guild revamp, 2026-10-22): two members make a guild, and size
+   // never disbands one. Maturity counts down only with this many.
+   MINIMUM_MEMBERS = 2
 
-   MINIMUM_MEMBERS = 3
+   // A Leader not seen for this long (in seconds, 30 days) hands the guild to
+   // the highest-ranked active member (CheckSuccession). There are no votes.
+   LEADER_INACTIVE_SECS = 30 * 24 * 60 * 60
 
    RENT_BASE = 5
    RENT_SECRET = 10
@@ -60,8 +64,11 @@ resources:
    guild_icon_rsc = light.bgf
    guild_desc_rsc = "An organization of individuals with similar purposes."
 
-   guild_master = "Guildmaster"
-   guild_mistress = "Guildmistress"
+   // Ours (guild revamp): the default names of the five ranks, RANK_MASTER
+   // down to RANK_APPRENTICE; the leader is now a Commander. A guild can
+   // still name its own at creation.
+   guild_master = "Commander"
+   guild_mistress = "Commander"
    Guild_lieutenant_Male = "Lieutenant"
    Guild_lieutenant_female = "Lieutenant"
    guild_lord = "Lord"
@@ -72,14 +79,6 @@ resources:
    guild_apprenticette = "Apprentice"
 
    guild_newly_formed = "~BYour new guild has now been formed."
-
-   guild_threeperson_failing = \
-      "Your guild has fewer than 3 members.  If you do not get your "
-      "membership up to three in the next %i %s, your guild will be "
-      "disbanded."
-
-   guild_threeperson_failed = \
-      "Your guild has been disbanded for lack of membership."
 
    guild_welcome = "~BPlease welcome the newest member of %s%q, %s."
    guild_induct_already_guilded = "You are already the member of a guild."
@@ -112,24 +111,11 @@ resources:
    guild_demote_equal_higher = \
       "You can't demote someone who is equal or better to you in rank!"
 
-   guild_cant_vote_outsider = \
-      "You can't vote for %q%s, who does not belong to %s%q!"
-   guild_cant_vote_nonuser = "%s%s thanks you for your support.  Really."
-
-   guild_descension = "~BYou have been ousted as %q of %s%q!"
+   guild_descension = "~BYou are no longer %q of %s%q."
    guild_ascension = "~BCongratulations!  You are the new %q of %s%q!"
 
-   guild_reassure = "~B%s promises you continued political support."
-   guild_talking_to_self = \
-      "~BYou reassure yourself once again that you really do like yourself."
-   guild_support_withers = "~BYou can feel your political support wither."
-
-   guild_support_self = "~BYou decide to make your own bid to lead %s%q."
-   guild_support_other = "~BYou pledge your support to %q to lead %s%q."
-   guild_supported = "~B%s pledges to support you on your bid to lead %s%q."
-
    guild_new_master = "~BCongratulate %q, the new %q of %s%q!"
-   guild_abdicate = "~B%s has chosen to abdicate his position leading %s%q."
+   guild_abdicate = "~B%s has chosen to step down from leading %s%q."
 
    guild_allies_defunct = "~BYour honorable ally, %s%q, has disbanded."
    guild_enemies_defunct = "~BYour hated enemy, %s%q, has disbanded."
@@ -187,8 +173,7 @@ resources:
       "You can only sue for peace from one enemy at a time."
 
    guild_mature = \
-      "~B%s%q is now a mature guild, meaning it can now own and conquer "
-      "guild halls."
+      "~B%s%q is now a mature guild, and may now lease a guild hall."
 
    guild_hour_rsc = "hour"
    guild_hours_rsc = "hours"
@@ -201,8 +186,6 @@ resources:
 
    guild_new_hall = "~B%s is the new home of %s%q!"
    guild_abandon_hall = "~B%s is no longer the home of %s%q!"
-   guild_hall_conquered = "~B%s, home of %s%q, has been conquered!"
-   guild_hall_betrayed = "~B%s, home of %s%q, was betrayed from within!"
 
    guild_ranks_full = \
       "~BYou could not be accepted into %s%q because the ranks are "
@@ -226,48 +209,42 @@ resources:
    guild_creation_mail ="Subject: Your guild has been formed\n"
       "I congratulate you on the formation of %s%q!  "
       "However, there are some rules that you should know about.\n\n"
-      "MATURITY:  I will not allow just any guild to rent a hall.  You "
-      "must First prove your mettle out in the world.  I will inform "
-      "you when I feel your guild is mature.  Then (and only then) may "
-      "you rent a hall or conquer another guild's hall."
+      "MATURITY:  I will not allow just any guild to lease a hall.  You "
+      "must first prove your mettle out in the world, with at least two "
+      "members.  I will inform you when I feel your guild is mature."
       "\n\n"
-      "MEMBERSHIP:  I leave you to determine the details of your guild's "
-      "memberships, but if your guild does not have at least 3 members in "
-      "it, it is not worth my trouble to keep up the paperwork on it, and "
-      "I will disband the guild.  Thus, your First priority now should be "
-      "getting your guild up to three members."
+      "MEMBERSHIP:  Two members make a guild.  I will keep your charter "
+      "however few you are, but a guild of one cannot grow up."
       "\n\n"
       "INVITING NEW MEMBERS:  When you invite a potential member into the "
       "fold, an invitation is created in their inventory, which they may "
-      "then choose to accept or ignore.  An invitation will always be "
-      "created, even if someone may not join a guild for some reason.  A "
-      "player must be of reasonably high power before he may join a guild, "
-      "and may only be a member of one guild at a time."
+      "then choose to accept or ignore.  A player may only be a member of "
+      "one guild at a time."
       "\n\n"
       "RANKS:  You may promote people to different ranks, thus giving them "
-      "more power as well as more responsibility.  You may also keep "
-      "players at low ranks if you do not feel prepared to trust them.  "
-      "These are the ranks:\n"
-      "  +++ %q:  have no special abilities, other than to vote for the "
-      "leader of their choice.  They may not even open the outer doors of "
-      "their own guild hall.\n"
-      "  +++ %q:  only have the ability to vote.\n"
-      "  +++ %q:  have the ability to vote and invite new members into the "
-      "guild.\n"
-      "  +++ %q:  may vote, invite new members in, kick unruly members out, "
-      "promote or demote people of lower ranks than themselves, and form or "
-      "shatter alliances.  They may also rent a guild hall if their guild "
-      "is mature, and set the Guild Message of the Day by guild-sending 'set motd' or 'clear motd'.\n"
-      "  +++ %q:  has all powers associated with guilding, including the "
-      "right to disband the guild.\n\n"
+      "more power as well as more responsibility.  These are the ranks:\n"
+      "  +++ %q:  may speak with the guild, see its roster and leave it, but "
+      "may not yet open the outer doors of a guild hall.\n"
+      "  +++ %q:  may also open the outer doors of the guild's hall.\n"
+      "  +++ %q:  may also invite new members into the guild.\n"
+      "  +++ %q:  at most two.  They may also exile members, promote or "
+      "demote those below them, forge or end alliances, declare wars and "
+      "sue for peace, and set the Guild Message of the Day by guild-sending "
+      "'set motd' or 'clear motd'.\n"
+      "  +++ %q:  has every power, including leasing or abandoning a guild "
+      "hall, choosing the guild's colours and its hall's password, passing "
+      "on the leadership, and disbanding the guild.\n\n"
+      "LEADERSHIP:  The %q leads until they pass the title to another.  "
+      "Should they be gone from Meridian for thirty days, the title passes "
+      "to the highest-ranking member who is still about, the longest-serving "
+      "first."
+      "\n\n"
       "RENT:  It costs me time and money to keep up the paperwork involved "
       "with your charter, and thus I charge for the service.  Rent is accrued "
       "at a regular rate, and the rate of increase is affected by many "
       "factors, including the number of members in your guild and the number "
       "of enemies and allies you have declared.  The largest affector of rent "
-      "is whether or not you own a guild hall.  Guild halls can be quite "
-      "expensive, and so it is recommended that you wait until your guild has "
-      "several members First."
+      "is whether or not you lease a guild hall."
       "\n\n"
       "Incidentally, anyone in your guild can pay me rent owed.  However, to "
       "avoid confusion, it is recommended that you assign one person to "
@@ -279,104 +256,43 @@ resources:
       "  -- Frular, the Guild Administrator"
 
    guild_mature_mail = "Subject: Your guild is now mature\n"
-      "%s%q is now a mature guild, meaning that its members may now "
-      "own and conquer guild halls.\n\n"
-      "GUILD HALLS:  A guild may lay claim to a guild hall by purchasing "
-      "a lease from myself.  Guild halls offer their owners a handful of "
-      "perks, including a reasonably safe place to rest, a newsglobe for "
-      "guild news, a secret door guarded by a password that you set.  Guild "
-      "halls are also sanctuaries, where a player heals faster.\n\n"
-      "Guild halls are guarded by an outer door with a mystic defense "
-      "shield.  Only members of the owner guild may open a guild's outer "
-      "door.  However, once the door is open, anyone may enter.  The door "
-      "stays open for a very limited period of time."
+      "%s%q is now a mature guild, and its %q may now lease a guild hall "
+      "from me.\n\n"
+      "GUILD HALLS:  A guild hall is your guild's home.  It is a sanctuary, "
+      "where a player heals faster and may rest safely, with chests for your "
+      "belongings, a newsglobe for guild news, and a secret door guarded by "
+      "a password that you set.  No one may fight inside a guild hall, and "
+      "no one can take it from you."
       "\n\n"
-      "CONQUEST:  Each guild hall also has a mystic shield deactivator.  "
-      "If this deactivator is used, then the guild hall's defenses go down, "
-      "and anyone may open the hall's outer doors.  If the deactivator ever "
-      "stays down for ten minutes at a time, the guild hall is declared "
-      "'conquered'."
-      "\n\n"
-      "Only the guild that conquered a specific guild hall may rent it "
-      "afterwards.  However, you may only own one guild hall at a time, "
-      "meaning that the conquering guild must abandon their current hall to "
-      "get the new one.  After a period of one hour after being conquered, "
-      "the guild hall re-enters the open market, and anyone may rent it."
-      "\n\n"
-      "BETRAYAL AND MERCENARY CONQUEST:  If a guild hall is conquered by a "
-      "member of your own guild, then the guild is officially embarrassed.  "
-      "At that point, anyone other than the conquered guild may rent the "
-      "hall.  This limit lasts one hour."
+      "Only members of your guild, and of guilds allied with yours, may open "
+      "its outer door.  Anyone of rank '%q' may not open it yet, whichever "
+      "of those guilds they belong to.  The door stays open only a moment."
       "\n\n"
       "ALLIES:  If you declare a guild to be an ally, then they may enter "
       "your guild hall as if it were their own.  This measure of trust also "
       "lowers your guild's rent."
       "\n\n"
-      "ENEMIES:  If you declare a guild to be an enemy, then you will obtain "
-      "very immediate and detailed warning if they attempt to conquer your "
-      "guild.  Otherwise, you will get very fuzzy and somewhat delayed "
-      "information from your guild's mystic defenses.  Also, if two guilds "
-      "mutually declare war on each other, they enter a state of war as I "
-      "will describe in a moment.  This additional security and recognition "
-      "comes at the cost of additional rent."
-      "\n\n"
-      "WAR:  If you and declare a guild to be an enemy and that guild "
-      "likewise declares your guild as an enemy, you enter a state of war.  "
-      "This war is recognized by all the powers in Meridian; during such a "
-      "mutually declared war, either guild may attack the other without fear "
-      "of punishment from either the gods, the Justicar, or any lieges.  "
-      "Note that leaving a state of war is not immediate or without cost.  "
-      "You must wait a full Meridian day during which you must sue for peace "
-      "from the enemy guild yet can still be attacked under the rules of "
-      "war.  Should a guild sue for peace in a mutually declared war, I shall "
-      "deduct part of that guild's rent and give a share to the victorious "
-      "guild.  But, if an enemy sues for peace you must wait a day before "
-      "you can undeclare them as enemies, otherwise I will assume you wish "
-      "to end hostilities early, and both guilds will be penalized.  After "
-      "the delay, your status as non-enemies will be offically noted.  Please "
-      "note that you must have a considerable sum of rent prepaid to even "
-      "declare a guild an enemy in the First place.  This is to cover the "
-      "costs should that guild return the declaration and initiate a war."
-      "\n\n"
-      "LOW RANKS:  Anyone of rank '%q' may not open the outer doors of your "
-      "guild hall, regardless of if they are in your own guild or in an "
-      "ally's guild."
+      "WAR:  If you declare a guild to be an enemy and that guild likewise "
+      "declares yours, you are at war, and the members of either guild may "
+      "attack the other's outside the guild halls.  Leaving a war is neither "
+      "immediate nor free.  You must sue for peace and wait a full Meridian "
+      "day, during which you may still be attacked.  A guild that sues for "
+      "peace loses part of its prepaid rent, and a share goes to the victor.  "
+      "You must have a considerable sum of rent prepaid to declare a guild "
+      "an enemy in the first place, and enemies raise your rent."
       "\n\n"
       "Congratulations on your guild's coming of age.  I know you'll go far."
       "\n\n"
       "  -- Frular, the Guild Administrator"
 
-   guild_mature_happyland_mail = "Subject: Your guild is now mature\n"
-      "%s%q is now a mature guild, meaning that its members may now "
-      "own a guild hall.\n\n"
-      "A guild may lay claim to a guild hall by purchasing "
-      "a lease from myself.  Guild halls offer their owners a handful of "
-      "perks, including a reasonably safe place to rest, a newsglobe for "
-      "guild news, a secret door guarded by a password that you set.  Guild "
-      "halls are also sanctuaries, where a player heals faster."
-      "\n\n"
-      "Guild halls are guarded by an outer door with a mystic defense "
-      "shield.  Only members of the owner guild may open a guild's outer "
-      "door.  However, once the door is open, anyone may enter.  The door "
-      "stays open for a very limited period of time."
-      "\n\n"
-      "Note that while someone can sneak into your hall, they cannot conquer "
-      "it in this world.  This additional security is compensated by, how "
-      "shall we say, ENHANCED rent values."
-      "\n\n"
-      " -- Frular, the Guild Administrator."
-
-   guild_conquered_mail =  "Subject: Guild hall conquered\n"
-      "%s, home of %s%q, was conquered while you were away.\n\n"
-      "  -- Frular, the Guild Administrator"
    guild_disbanded_mail = "Subject: Guild disbanded\n"
       "Your guild, %s%q, was disbanded while you were away.\n\n"
       "  -- Frular, the Guild Administrator"
-   guild_deposed_mail = "Subject: Mutiny in the ranks\n"
-      "You were deposed as %q of %s%q while you were away.  "
+   guild_deposed_mail = "Subject: A new leader\n"
+      "You were replaced as %q of %s%q while you were away.  "
       "%q is the new %q.\n\n"
       "  -- Frular, the Guild Administrator"
-   guild_new_master_mail = "Subject: Mutiny in the ranks\n"
+   guild_new_master_mail = "Subject: A new leader\n"
       "There was a change in leadership while you were away.  "
       "%q is the new %q of %s%q.\n\n"
       "  -- Frular, the Guild Administrator"
@@ -439,7 +355,7 @@ properties:
    piMature = 0
 
    // This is a list of lists each representing a member, of the form:
-   //  [object ID, rank, member's current 'vote' (if guild votes for leader)]
+   //  [object ID, rank, old 'vote' (unused since votes went)], newest first.
    plMembers   = $
 
    piGuild_Hall = $
@@ -451,10 +367,6 @@ properties:
    pbSecret = FALSE
 
    ptMaintenance = $
-
-   // If a guild has less than three members for 24 hours in a row,
-   //  delete the guild.
-   piThreePersonWarning = 0
 
    // These are stored only so that, if the guild goes while an invitation is
    //  extended, the invitation disappears.
@@ -489,8 +401,6 @@ properties:
    piColor1 = XLAT_TO_GRAY
    piColor2 = XLAT_TO_GRAY
    piShield_shape = SHIELDSHAPE_DEFAULT
-
-   piLastGuildhallRaid = 0
 
    // Information for suing for peace from a mutual guild war.
    ptSuingForPeace = $
@@ -556,17 +466,14 @@ messages:
             #dest_list=[master],
             #nest_list=[4,guild_creation_mail,4,Send(self,@GetDef),
                         4,Send(self,@GetName),4,rApprentice_male,4,rSir,
-                        4,rLord,4,rLieutenant_male,4,rMaster]);
+                        4,rLord,4,rLieutenant_male,4,rMaster,4,rMaster]);
 
       ptMaintenance = CreateTimer(self,@MaintenanceTimer,
                                        Send(SYS,@GetMaintenanceDelay));
 
-      piThreePersonWarning = THREE_PERSON_LIMIT;
       psPassword = $;
 
       plFormerMembers = $;
-
-      piLastGuildhallRaid = 0;
 
       Send(SYS,@NewGuild,#what=self);
 
@@ -613,125 +520,37 @@ messages:
       return FALSE;
    }
 
-   GetLastGuildhallRaid()
-   {
-      return piLastGuildhallRaid;
-   }
-
-   SetLastGuildhallRaid(now=$)
-   {
-      if now = $
-      {
-         now = getTime();
-      }
-      
-      piLastGuildhallRaid = now;
-      
-      return;
-   }
-
    MaintenanceTimer()
-   "Do five things here: "
-   "1) Check to be sure they have 3 members."
+   "Do four things here: "
+   "1) Check that the guild has an active leader (CheckSuccession)."
    "2) Check for guild maturity."
-   "3) Check to ensure there is a guildmaster."
-   "4) Accrue rent."
-   "5) Check to see if former members of the guild can once more rejoin the "
+   "3) Accrue rent."
+   "4) Check to see if former members of the guild can once more rejoin the "
    "guild."
+   "Ours (guild revamp): a guild is never disbanded for having few members."
    {
-      local i, hourhours, timeleft, bPKServer;
+      local i, timeleft;
 
-      if Send(self,@GetGuildMaster) = $
-      {
-         // This should never happen!  This is just in as a failsafe, since
-         // some commands are guildmaster only!
-         Debug("MaintenanceTimer: Guild",vrName,"has no guildmaster!");
-
-         // CountVotes will choose whoever has the most political support.
-         Send(self,@CountVotes);
-      }
-
-      if Length(plMembers) < MINIMUM_MEMBERS
-      {
-         if piThreePersonWarning = 0
-         {
-            piThreePersonWarning = THREE_PERSON_LIMIT;
-         }
-         else
-         {
-            piThreePersonWarning = piThreePersonWarning - 1;
-         }
-         
-         if piThreePersonWarning = 0
-         {
-            foreach i in plMembers
-            {
-               Post(First(i),@MsgSendUser,
-                     #message_rsc=guild_threeperson_failed);
-            }
-
-            Send(self,@Delete,#timerdelete=FALSE);
-
-            return;
-         }
-         else
-         {
-            if (piThreePersonWarning % 40) = 0
-               OR ((piThreePersonWarning % 10) = 0
-                  AND piThreePersonWarning < 40)
-            {
-               if piThreePersonWarning = 10
-               {
-                  hourhours = guild_hour_rsc;
-               }
-               else
-               {
-                  hourhours = guild_hours_rsc;
-               }
-
-               foreach i in plMembers
-               {
-                  Post(First(i),@MsgSendUser,
-                        #message_rsc=guild_threeperson_failing,
-                        #parm1=piThreePersonWarning/10,#parm2=hourhours);
-               }
-            }
-         }
-      }
-      else
-      {
-         piThreePersonWarning = 0;
-      }
+      Send(self,@CheckSuccession);
 
       if piMature > 0
       {
-         if Length(plMembers) >= 3
+         if Length(plMembers) >= MINIMUM_MEMBERS
          {
             piMature = piMature - 1;
          }
 
          if piMature = 0
          {
-            bPKserver = Send(SYS,@IsPKAllowed);
             foreach i in plMembers
             {
-               if bPKserver
-               {
-                  Send(First(i),@ReceiveNestedMail,#from=guild_frular,
-                        #dest_list=[First(i)],
-                        #nest_list=[4,guild_mature_mail,
-                                    4,Send(self,@GetCapDef),
-                                    4,Send(self,@GetName),
-                                    4,prApprentice_male]);
-               }
-               else
-               {
-                  Send(First(i),@ReceiveNestedMail,#from=guild_frular,
-                        #dest_list=[First(i)],
-                        #nest_list=[4,guild_mature_happyland_mail,
-                                    4,Send(self,@GetCapDef),
-                                    4,Send(self,@GetName)]);
-               }
+               Send(First(i),@ReceiveNestedMail,#from=guild_frular,
+                     #dest_list=[First(i)],
+                     #nest_list=[4,guild_mature_mail,
+                                 4,Send(self,@GetCapDef),
+                                 4,Send(self,@GetName),
+                                 4,prMaster,
+                                 4,prApprentice_male]);
             }
          }
       }
@@ -1000,60 +819,6 @@ messages:
       {
          Send(self,@ResetPowers,#who=First(i),
               #rank=Send(self,@GetRank,#who=First(i)));
-      }
-
-      return;
-   }
-
-   GuildHallConquered(name=$,betrayed=$,oConquerer=$)
-   {
-      local i, j, members, conq_msg;
-
-      if betrayed = TRUE
-      {
-         Debug("Guild hall betrayed.");
-         conq_msg = guild_hall_betrayed;
-      }
-      else
-      {
-         Debug("guild hall just conquered.");
-         conq_msg = guild_hall_conquered;
-      }
-
-      foreach i in plMembers
-      {
-         Post(self,@ResetPowers,#who=First(i),
-               #rank=Send(self,@GetRank,#who=First(i)));
-         if NOT Send(First(i),@IsLoggedOn)
-         {
-            Send(First(i),@ReceiveNestedMail,#from=guild_frular,
-                  #dest_list=[First(i)],
-                  #nest_list=[4,guild_conquered_mail, 4,name,
-                              4,Send(self,@GetDef), 4,Send(self,@GetName)]);
-         }
-         else
-         {
-            Send(First(i),@MsgSendUser,#message_rsc=conq_msg,
-                  #parm1=name,#parm2=Send(self,@GetDef),
-                  #parm3=Send(self,@GetName));
-         }
-      }
-
-      psPassword = $;
-      piGuild_hall = $;
-
-      foreach j in plAllies
-      {
-         if j <> oConquerer
-         {
-            members = Send(j,@GetMemberList);
-            foreach i in Members
-            {
-               Send(First(i),@MsgSendUser,#message_rsc=conq_msg,
-                    #parm1=name,#parm2=Send(self,@GetDef),
-                    #parm3=Send(self,@GetName));
-            }
-         }
       }
 
       return;
@@ -1393,11 +1158,6 @@ messages:
                         plMembers);
       Send(self,@ResetPowers,#who=who,#rank=RANK_APPRENTICE);
 
-      if length(plMembers) >= MINIMUM_MEMBERS
-      {
-         piThreePersonWarning = 0;
-      }
-
       foreach i in plMembers
       {
          Send(First(i),@MsgSendUser,#message_rsc=guild_welcome,
@@ -1462,8 +1222,8 @@ messages:
 
    NewGuildMaster(who=$, abdicate = FALSE)
    "Other than creating a guild, this is the only way to have someone's "
-   "rank set to guildmaster.  Note that it will depose any current "
-   "guildmaster to the rank of normal peon, and reset votes to neutral (nil)!"
+   "rank set to guildmaster.  Note that it will move any current "
+   "guildmaster down to Trusted (RANK_LORD)."
    {
       local i, new_master, old_master;
 
@@ -1488,7 +1248,7 @@ messages:
          if Nth(i,2) = RANK_MASTER
          {
             old_master = First(i);
-            SetNth(i,2,RANK_SIR);
+            SetNth(i,2,RANK_LORD);
             if abdicate = FALSE
             {
                if NOT Send(First(i),@IsLoggedOn)
@@ -1512,7 +1272,7 @@ messages:
                         #parm2=Send(self,@GetDef),#parm3=Send(self,@GetName));
                }
             }
-            Send(self,@ResetPowers,#who=First(i),#rank=RANK_SIR);
+            Send(self,@ResetPowers,#who=First(i),#rank=RANK_LORD);
          }
 
          if First(i) = who
@@ -1792,177 +1552,77 @@ messages:
       return;
    }
 
-   Vote(who=$,candidate=$)
+   CheckSuccession()
+   "Ours (guild revamp, 2026-10-22), in place of votes. If the guild has no "
+   "Leader, or the Leader hasn't been on for LEADER_INACTIVE_SECS, the "
+   "highest-ranked active member leads instead, the longest-serving first. "
+   "Returns TRUE if the leadership changed."
    {
-      local i, bFound, j, oldvote, newleader;
+      local oLeader, oHeir;
 
-      if NOT Send(self,@ismember, #who=who)
+      oLeader = Send(self,@GetGuildMaster);
+      if oLeader <> $
+         AND Send(self,@IsActiveMember,#who=oLeader)
       {
-         Debug(who,Send(who,@GetTrueName)," voting in a guild that is not their own!");
-
          return FALSE;
       }
 
-      if NOT IsClass(candidate,&User)
-      {
-         Debug(who,Send(who,@GetTrueName)," guild voted for inanimate object ",
-               Send(candidate,@GetTrueName));
-         Send(who,@MsgSendUser,#message_rsc=guild_cant_vote_nonuser,
-               #parm1=Send(candidate,@GetCapDef),
-               #parm2=Send(candidate,@GetTrueName));
+      oHeir = Send(self,@ChooseSuccessor,#exclude=oLeader,#active_only=TRUE);
 
+      // A guild must always have a Leader, even if nobody's been about.
+      if oHeir = $
+         AND oLeader = $
+      {
+         oHeir = Send(self,@ChooseSuccessor,#active_only=FALSE);
       }
 
-      foreach i in plMembers
+      if oHeir = $
       {
-         if First(i) = candidate
-         {
-            foreach j in plMembers
-            {
-               if First(j) = who
-               {
-                  oldvote = Nth(j,3);
-                  if oldvote = candidate
-                  {
-                     if who = candidate
-                     {         
-                        Send(who,@MsgSendUser,
-                             #message_rsc=guild_talking_to_self,
-                             #parm1=Send(candidate,@GetName));
-
-                        return;
-                     }
-                     
-                     Send(candidate,@MsgSendUser,#message_rsc=guild_reassure,
-                          #parm1=Send(who,@GetTrueName));
-                          
-                     return;
-                  }
-
-                  SetNth(j,3,candidate);
-                  newleader = Send(self,@CountVotes);
-
-                  if candidate = who
-                  {
-                     Send(who,@MsgSendUser,#message_rsc= guild_support_self,
-                          #parm1=Send(self,@GetDef),
-                          #parm2=Send(self,@GetName));
-                     if oldvote <> $ AND oldvote <> who AND newleader = FALSE
-                     {
-                        Send(oldvote,@MsgSendUser,
-                             #message_rsc=guild_support_withers);
-                     }
-                  }
-                  else
-                  {
-                     Send(who,@MsgSendUser,#message_rsc=guild_support_other,
-                          #parm1=Send(candidate,@GetTrueName),
-                          #type1=STRING_RESOURCE,
-                          #parm2=Send(self,@GetDef),
-                          #parm3=Send(self,@GetName));
-                     Send(candidate,@MsgSendUser,#message_rsc=guild_supported,
-                          #parm1=Send(who,@GetTrueName),
-                          #parm2=Send(self,@GetDef),
-                          #parm3=Send(self,@GetName));
-                          
-                     if oldvote <> $ and oldvote <> who and newleader = FALSE
-                     {
-                        Send(oldvote,@MsgSendUser,
-                             #message_rsc=guild_support_withers);
-                     }
-                  }
-                  
-                  return;
-               }
-            }
-         }
+         return FALSE;
       }
 
-      Debug(who,Send(who,@GetTrueName)," is voting for someone outside guild ",
-            Send(self,@GetName),self);
-      Send(who,@MsgSendUser,#message_rsc=guild_cant_vote_outsider,
-            #parm1=Send(candidate,@GetDef),
-            #type2=STRING_RESOURCE,#parm2=Send(candidate,@GetTrueName),
-            #parm3=Send(self,@GetDef),#parm4=Send(self,@GetName));
+      Send(self,@NewGuildMaster,#who=oHeir);
 
-      return FALSE;
+      return TRUE;
    }
 
-   CountVotes()
-   "Note:  currently, all ties go to the oldest guild member."
+   ChooseSuccessor(exclude=$, active_only=TRUE)
+   "The highest-ranked member other than exclude. plMembers is newest first, "
+   "so on a tie the later (longer-serving) member wins."
    {
-      local winner, i, j, count, mostvotes, guildmaster;
+      local i, oHeir, iBest;
 
-      // This code is convoluted and slow, so initially, just check to see
-      // if current guildmaster still has the majority.
-
-      guildmaster = Send(self,@GetGuildmaster);
-
-      if guildmaster <> $
-      {
-         count = 0;
-         foreach i in plMembers
-         {
-            if Nth(i,3) = guildmaster
-            {
-               count = count + 1;
-            }
-         }
-         
-         if count > (length(plMembers)/2)
-         {
-            return FALSE;
-         }
-      }
-
-      // Guildmaster does not have the majority.  If guildmaster exists, he
-      // still retains leadership as long as no one else has a majority.
-      // Since there must always be a guildmaster, if there is no guildmaster,
-      // person with most votes is chosen.
-
-      mostvotes = -1;
-      winner = $;
+      oHeir = $;
+      iBest = 0;
       foreach i in plMembers
       {
-         count = 0;
-         foreach j in plMembers
+         if First(i) <> exclude
+            AND Nth(i,2) >= iBest
+            AND (NOT active_only
+                 OR Send(self,@IsActiveMember,#who=First(i)))
          {
-            if Nth(j,3) = First(i)
-            {
-               count = count + 1;
-            }
-         }
-         if count >= mostvotes
-         {
-            winner = First(i);
-            mostvotes = count;
+            oHeir = First(i);
+            iBest = Nth(i,2);
          }
       }
 
-      if winner <> $
-         AND mostvotes > (Length(plMembers) / 2)
-      {
-         Send(self,@NewGuildMaster,#who=winner);
+      return oHeir;
+   }
 
+   IsActiveMember(who=$)
+   "Logged on now, or within LEADER_INACTIVE_SECS."
+   {
+      if who = $
+      {
+         return FALSE;
+      }
+
+      if Send(who,@IsLoggedOn)
+      {
          return TRUE;
       }
-      else
-      {
-         if winner <> $
-            AND guildmaster = $
-         {
-            Debug("New guildmaster was declared because there was no old guildmaster!");
-            Send(self,@NewGuildMaster,#who=winner);
 
-            return TRUE;
-         }
-         else
-         {
-            return FALSE;
-         }
-      }
-
-      return FALSE;
+      return (GetTime() - Send(who,@GetLastLoginTime)) <= LEADER_INACTIVE_SECS;
    }
 
    DefunctGuild(what=$)

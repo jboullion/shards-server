@@ -2146,10 +2146,6 @@ messages:
             Send(self,@UserGuildCommand,#command_num=GCID_ABDICATE,
                   #oTarget=Nth(client_msg,2));
             return;
-         case UC_VOTE:
-            Send(self,@UserGuildCommand,#command_num=GCID_VOTE,
-                  #oTarget=Nth(client_msg,2));
-            return;
          case UC_SET_RANK:
             Send(self,@UserGuildCommand,#command_num=GCID_SET_RANK,
                   #oTarget=Nth(client_msg,2),#data=Nth(client_msg,3));
@@ -2294,9 +2290,12 @@ messages:
    {
       local iCost, oMoney;
 
+      // Ours (guild revamp): only the Leader leases the hall, whatever the
+      // client sends.
       if poGuild = $
          OR oHall = $
          OR sPassword = $
+         OR Send(poGuild,@GetRank,#who=self) <> RANK_MASTER
       {
          return;
       }
@@ -2361,6 +2360,15 @@ messages:
       if client_msg = $
       {
          return;
+      }
+
+      // Ours (guild revamp): the client's create window only opens at
+      // Frular (GuildCreator.GetForSale), so check again what he checks there.
+      if poGuild <> $
+         OR NOT Send(self,@CheckPlayerFlag,#flag=PFLAG_PKILL_ENABLE)
+         OR Send(poOwner,@FindHoldingActive,#class=&GuildCreator) = $
+      {
+         return FALSE;
       }
 
       oMoney = Send(self,@GetMoneyObject,#type=&Shillings);

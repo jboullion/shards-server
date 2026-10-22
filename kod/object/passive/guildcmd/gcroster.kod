@@ -39,7 +39,8 @@ classvars:
    viDefinite = ARTICLE_NONE
 
    viGuildcommand_num = GCID_ROSTER
-   viRank_needed = RANK_LORD
+   // Ours (guild revamp): every member may see the roster.
+   viRank_needed = RANK_APPRENTICE
 
 properties:
 

@@ -46,8 +46,6 @@ resources:
       "All access to the upper levels of the west tower is blocked by an iron "
       "gate.  It would not be wise to violate a lease with the Ko'catan army."
 
-   guildh12_gong = gong.ogg
-
    guildh12_lift_up_sound = stoneup2.ogg
    guildh12_lift_down_sound = stonedn2.ogg
 
@@ -68,10 +66,6 @@ classvars:
    viFoyer_west = 0
    viFoyer_east = 27
 
-   viLever_row = 7
-   viLever_col = 49
-   viLever_fine_row = 24
-   viLever_fine_col = 24
 
    viInner_teleport_row = 36
    viInner_teleport_col = 48
@@ -353,14 +347,6 @@ messages:
 
       Send(self,@NewHold,#what=Create(&KocatanLamp),
             #new_row=32,#new_col=46,#fine_col=24,#fine_row=24);
-
-      propagate;
-   }
-
-   DefensesDown()
-   {
-      Send(self,@SomethingWaveRoom,#what=poShield_Lever,
-            #wave_rsc=guildh12_gong);
 
       propagate;
    }

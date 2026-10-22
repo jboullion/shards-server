@@ -239,8 +239,7 @@ resources:
 
    player_safe_server = \
       "You are not allowed to attack other players in this world."
-   player_no_enter = \
-      "You are not yet experienced enough to enter here."
+   player_no_hall_pvp = "Nobody may fight inside a guild hall."
    player_assgame_soon = \
       "~kRoq tells you, \"~IA new Assassin's Circle shall be initiated "
       "shortly.\""
@@ -4514,16 +4513,13 @@ messages:
             }
 
             // Check the attack against the owner of the minion.
-            if NOT IsClass(oRoom,&GuildHall)
+            if NOT Send(self,@AllowBattlerAttack,
+                        #victim=Send(victim,@GetMaster),
+                        #use_weapon=use_weapon,#stroke_obj=stroke_obj,
+                        #report=report,#actual=actual,#minion=TRUE,
+                        #oRoomOverride=oRoom)
             {
-               if NOT Send(self,@AllowBattlerAttack,
-                           #victim=Send(victim,@GetMaster),
-                           #use_weapon=use_weapon,#stroke_obj=stroke_obj,
-                           #report=report,#actual=actual,#minion=TRUE,
-                           #oRoomOverride=oRoom)
-               {
-                  return FALSE;
-               }
+               return FALSE;
             }
          }
 
@@ -4560,14 +4556,27 @@ messages:
             return FALSE;
          }
 
+         // Ours (guild revamp, 2026-10-22): nobody fights inside a guild hall,
+         // guild wars included, now that halls can be open to visitors.
+         if victim <> self
+            AND NOT IsClass(victim,&DM)
+            AND IsClass(oRoom,&GuildHall)
+         {
+            if report
+            {
+               Send(self,@MsgSendUser,#message_rsc=player_no_hall_pvp);
+            }
+
+            return FALSE;
+         }
+
          // Ours (no random PvP, 2026-10-21): outside the arenas, chaos zones and
-         // Frenzies (let through above) and guild halls, one player may attack
-         // another only in the Faction War, a guild war, or over a council token
+         // Frenzies (let through above), one player may attack another only in
+         // the Faction War, a guild war, or over a council token
          // (MayAttackPlayer). The newbie and opt-out checks this replaced are
          // part of that: nobody is a target by default.
          if victim <> self
             AND NOT IsClass(victim,&DM)
-            AND NOT IsClass(oRoom,&GuildHall)
             AND NOT Send(self,@MayAttackPlayer,#victim=victim)
          {
             if report
@@ -4578,11 +4587,6 @@ messages:
 
             return FALSE;
          }
-      }
-
-      if IsClass(oRoom,&GuildHall)
-      {
-         return TRUE;
       }
 
       // Finally, check faction standing and the war.
@@ -13589,14 +13593,6 @@ messages:
       if oRoom = $
       {
          Debug("Got an invalid room!");
-         return FALSE;
-      }
-
-      if IsClass(oRoom,&GuildHall)
-         AND (NOT Send(self,@CanPlayerPvP))
-      {
-         Send(self,@MsgSendUser,#message_rsc=player_no_enter);
-
          return FALSE;
       }
 

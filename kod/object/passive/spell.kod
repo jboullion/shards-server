@@ -172,7 +172,7 @@ classvars:
 
    vrSucceed_wav = $
 
-   // viOutlaw: a hostile cast (Shatterlock, say), checked like an attack on
+   // viOutlaw: a hostile cast, checked like an attack on
    //  each target (CheckPlayerAttackCast). It once made the caster an outlaw.
    viOutlaw = FALSE
 

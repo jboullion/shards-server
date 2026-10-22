@@ -86,6 +86,8 @@ messages:
       if Send(oGuild,@GetGuildmaster) = who
       {
          Send(who,@MsgSendUser,#message_rsc=renounce_no_GMS);
+
+         return FALSE;
       }
 
       if IsClass(oGuild,&NecromancerGuild)

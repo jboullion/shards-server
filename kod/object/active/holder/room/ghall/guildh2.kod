@@ -51,10 +51,6 @@ classvars:
    viFoyer_east = 34
    viFoyer_west = 30
 
-   viLever_row = 21
-   viLever_col = 17
-   viLever_fine_row = 56
-   viLever_fine_col = 56
 
    viInner_teleport_row = 8
    viInner_teleport_col = 25
@@ -311,15 +307,6 @@ messages:
       return;
    }
 
-   OpenRaidDoor()
-   {
-      Send(self,@SomethingWaveRoom,#wave_rsc=guildhall2_sound);
-      Send(self,@SetSector,#sector=RAIDDOOR,#animation=ANIMATE_CEILING_LIFT,
-            #height=184,#speed=30);
-
-      return;
-   }
-
    CloseRaidDoor()
    {
       Send(self,@SomethingWaveRoom,#wave_rsc=guildhall2_sound);
@@ -327,20 +314,6 @@ messages:
             #height=104,#speed=30);
 
      return;
-   }
-
-   DefensesDown()
-   {
-      Send(self,@OpenRaidDoor);
-
-      propagate;
-   }
-
-   DefensesUp()
-   {
-      Send(self,@CloseRaidDoor);
-
-      propagate;
    }
 
    ClaimGuildHall()
@@ -351,13 +324,6 @@ messages:
    }
 
    ResetGuildHall()
-   {
-      Send(self,@CloseRaidDoor);
-
-      propagate;
-   }
-
-   ConquerTimer()
    {
       Send(self,@CloseRaidDoor);
 

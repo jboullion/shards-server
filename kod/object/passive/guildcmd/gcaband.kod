@@ -26,9 +26,6 @@ resources:
    guildabandon_necro_nak = \
       "~BYou have sworn a blood oath to your dark Queen.  You may not "
       "simply abandon her fortress."
-   guildabandon_not_while_under_attack = \
-      "You can't abandon your guild hall while it is under attack.  "
-      "Go and defend it!"
 
 classvars:
 
@@ -40,7 +37,8 @@ classvars:
    viDefinite = ARTICLE_NONE
 
    viGuildcommand_num = GCID_ABANDON_HALL
-   viRank_needed = RANK_LIEUTENANT
+   // Ours (guild revamp): only the Leader buys or gives up the hall.
+   viRank_needed = RANK_MASTER
 
    viNecro_enabled = FALSE
 
@@ -66,7 +64,7 @@ messages:
    DoCommand(who=$)
    "Give up guild hall."
    {
-      local oGuild, oHall, lMembers, i;
+      local oGuild;
 
       oGuild = Send(who,@GetGuild);
 
@@ -81,17 +79,6 @@ messages:
       if IsClass(oGuild,&NecromancerGuild)
       {
          Send(who,@MsgSendUser,#message_rsc=guildabandon_necro_nak);
-
-         return FALSE;
-      }
-
-      // If the guild hall is under attack, you can't abandon it
-      // (players were abusing this to avoid being conquered).
-      oHall = Send(oGuild, @GetGuildHall);
-      if oHall <> $
-         AND Send(oHall,@AreDefensesDown)
-      {
-         Send(who,@MsgSendUser,#message_rsc=guildabandon_not_while_under_attack);
 
          return FALSE;
       }

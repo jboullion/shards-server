@@ -43,10 +43,6 @@ classvars:
    viFoyer_west = 15
    viFoyer_east = 24
 
-   viLever_row = 16
-   viLever_col = 10
-   viLever_fine_row = 32
-   viLever_fine_col = 32
 
    viInner_teleport_row = 24
    viInner_teleport_col = 17

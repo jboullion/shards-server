@@ -53,10 +53,6 @@ classvars:
    viNews_finerow = 12
    viNews_finecol = 60
 
-   viLever_row = 11
-   viLever_col = 22
-   viLever_fine_row = 4
-   viLever_fine_col = 32
 
    viInner_teleport_row = 14
    viInner_teleport_col = 29

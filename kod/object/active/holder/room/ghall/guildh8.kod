@@ -53,10 +53,6 @@ classvars:
    viNews_finerow = 32
    viNews_finecol = 32
 
-   viLever_row = 4
-   viLever_col = 21
-   viLever_fine_row = 32
-   viLever_fine_col = 0
 
    viQuality = 3
 

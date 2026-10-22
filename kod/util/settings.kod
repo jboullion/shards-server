@@ -130,12 +130,6 @@ properties:
    // Guild hall settings
    //
 
-   // Are guild halls raidable?
-   pbGuildHallRaids = TRUE
-
-   // Wait one hour between raids by same guild.
-   piGuildHallRaidDelay = 3600 
-
    // If true, "hot plate" objects (in guild halls) notify players when they're stepped on.
    // This is used for debugging room creation.  It should normally be off.
    pbShowHotPlates = FALSE
@@ -447,16 +441,6 @@ messages:
    //
    // Guild hall settings
    //
-
-   GuildHallRaidsEnabled()
-   {
-      return pbGuildHallRaids;
-   }
-
-   GetGuildhallRaidDelay()
-   {
-      return piGuildHallRaidDelay;
-   }
 
    ShowHotPlates()
    {

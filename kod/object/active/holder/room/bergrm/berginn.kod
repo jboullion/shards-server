@@ -23,8 +23,8 @@ resources:
 
    berginn_music = bar2.ogg
    
-   news_berg_inn = "General News"
-   news_berg_inn_desc = "Find out what's going on around Meridian."
+   news_berg_inn = "Designers' News"
+   news_berg_inn_desc = "Check here for information from the game administrators."
 
 classvars:
 
@@ -65,7 +65,7 @@ messages:
 
       local oNews;
 
-      oNews = Create(&Newslink,#nid=NID_TOS_HALL,
+      oNews = Create(&Newslink,#nid=NID_ANNOUNCEMENTS,
                         #name=news_berg_inn,#desc=news_berg_inn_desc);
       Send(self,@NewHold,#what=oNews,#new_row=4,#new_col=13,
             #fine_row=12,#fine_col=32);
