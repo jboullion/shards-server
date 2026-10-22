@@ -418,6 +418,8 @@ properties:
    poCompanionBook = $
    // Ours: mock bouts in the arenas (util/arenabouts.kod), made on demand
    poArenaBouts = $
+   // Ours: the lieges' gifts to their champions (util/championgifts.kod), made on demand
+   poChampionGifts = $
    poCosmeticsBook = $
    // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
    poItemServiceBook = $
@@ -5311,6 +5313,17 @@ messages:
       }
 
       return poArenaBouts;
+   }
+
+   GetChampionGifts()
+   "Ours: the lieges' gifts to their champions (util/championgifts.kod), made on demand."
+   {
+      if poChampionGifts = $
+      {
+         poChampionGifts = Create(&ChampionGifts);
+      }
+
+      return poChampionGifts;
    }
 
    GetCosmeticsBook()

@@ -52,6 +52,27 @@ messages:
       return viFaction;
    }
 
+   SomeoneSaid(what = $,type = $,string = $)
+   "Ours: a Captain of ours who says 'champion' may be given our god's gift "
+   "(util/championgifts.kod)."
+   {
+      local oGifts;
+
+      if IsClass(what,&Player)
+         AND type = SAY_NORMAL
+      {
+         oGifts = Send(SYS,@GetChampionGifts);
+         if Send(oGifts,@IsTrigger,#string=string)
+         {
+            Send(oGifts,@AskForGift,#who=what,#liege=self);
+
+            return;
+         }
+      }
+
+      propagate;
+   }
+
    GotoHomeroom()
    {
       local room;

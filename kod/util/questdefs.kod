@@ -93,7 +93,7 @@ resources:
    qd_20_name = "The Ancient City of Brax"
    qd_20_s1 = "Find the Ancient City of Brax"
    qd_20_t1 = "Paddock"
-   qd_20_s2 = "Investigate the City of Brax"
+   qd_20_s2 = "Undead of Brax destroyed"
    qd_20_t2 = "Paddock"
    qd_30_name = "Aid in the War"
    qd_30_s1 = "Avar slain"
@@ -882,7 +882,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 108238661;
+      return 119957933;
    }
 
    GetQuests()
@@ -1006,8 +1006,8 @@ messages:
            $, $, $, $,
            [ [ 5, $, 1, 0, &TosInnKeeper, 0, qd_20_s1, [ 826 ], $, qd_20_t1,
                1, [ 500, 0, 0, $, $, $ ], $, $, 0 ],
-             [ 10, $, 1, 0, &TosInnKeeper, 0, qd_20_s2, $, $, qd_20_t2,
-               1, $, $, [ &HunterSword, &NecromancerAmulet ], 0 ] ],
+             [ 1, &Skeleton, 12, 2, &TosInnKeeper, 0, qd_20_s2, [ 826, 827, 828, 829, 830, 834 ], $, qd_20_t2,
+               0, $, $, $, 0 ] ],
            0, 0, $, 2000, 1, $, $, 0, $, $, $, $ ],
          // kocatan-avar-war
          [ 30, qd_30_name, &KocatanCaptainGood, 0, 80, 150, $,

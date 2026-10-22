@@ -20,7 +20,7 @@
   },
   "text": {
     "offer": "You've been to Castle Victoria and back, and still the dead walk. I've heard tell of something deeper in the mountains. Deep in the mountains lies an ancient city that was buried under the earth due to some sort of catastrophe. At an ancient place, its origin forgotten, find entrance to the underground city. Within lurks something timeless and evil that must be stopped if the undead threat in Meridian is to be curtailed.",
-    "complete": "You have made your choice in the eternal struggle."
+    "complete": "You have struck at the heart of the undead threat. The dead of Brax will not rest easy, but neither will their Queen."
   },
   "steps": [
     {
@@ -36,13 +36,20 @@
       }
     },
     {
-      "kind": "equip",
-      "items": [
-        "HunterSword",
-        "NecromancerAmulet"
+      "kind": "kill",
+      "target": "Skeleton",
+      "count": 12,
+      "rooms": [
+        "RID_NECROAREA1",
+        "RID_NECROAREA2",
+        "RID_NECROAREA3",
+        "RID_NECROAREA4",
+        "RID_NECROAREA5",
+        "RID_NECROAREA6"
       ],
-      "objective": "Investigate the City of Brax",
-      "brief": "This is it. This place holds the source of the undead threat plaguing the land. Waves of evil radiate through the very air. Remain wary as you proceed further. The undead horrors of Brax hold secrets of an evil beyond time. It may be a never-ending quest to understand and resist the threat, but learn everything you can about Brax and how its Queen doomed it to sink under the earth. In the end, you may be forced to make a choice: fight, or serve."
+      "inRooms": true,
+      "objective": "Undead of Brax destroyed",
+      "brief": "This is it. This place holds the source of the undead threat plaguing the land. Waves of evil radiate through the very air. Remain wary as you proceed further. The undead horrors of Brax hold secrets of an evil beyond time, and they serve a Queen who doomed this city to sink under the earth. Strike back at them: destroy the dead that walk her halls."
     }
   ],
   "rewards": {

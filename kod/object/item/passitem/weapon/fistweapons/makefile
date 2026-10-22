@@ -5,6 +5,6 @@
 !include $(TOPDIR)\common.mak
 
 DEPEND = ..\fistweapons.bof
-BOFS = brawlgloves.bof
+BOFS = brawlgloves.bof fistkraanan.bof
 
 !include $(KODDIR)\kod.mak

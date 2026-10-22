@@ -1,0 +1,324 @@
+// Ours (Meridian Shards, the faction revamp): the Champion's Gifts. One object,
+// SYS@GetChampionGifts, made on demand. A player of renown CHAMPION_RENOWN (a Captain) or
+// more, with at least CHAMPION_HEALTH base health, may say "champion" to their liege
+// (Factions.SomeoneSaid) and be given the liege's god's gift, one at a time:
+//
+//   Princess Kateriina (Shal'ille)  the Sword of the Hunt   (item/passitem/weapon/huntsw.kod)
+//   Duke Akardius (Qor)             the Amulet of the Three (item/actitem/necroam.kod)
+//   Jonas D'Accor (Kraanan)         the Fist of Kraanan     (weapon/fistweapons/fistkraanan.kod)
+//
+// Each gift hungers: every hour its bearer plays adds a point (piHunger, HUNGER_1 to HUNGER_5)
+// and kills feed it (FeedFor): enemy soldiers the most, then the troops of a rival liege, then
+// any monster by its difficulty, a third as much for a kill someone else made. A fed gift is
+// at its strongest and a starving one weakens, but it never hurts its bearer, can always be
+// taken off, doesn't break in a death and can't be dropped, given or stored. Left unfed past
+// GIFT_RETURN_HUNGER, or held by someone no longer in its liege's faction, it goes back to the
+// liege (GiftReturns), the first at a cost in renown, to be earned again.
+////////////////////////////////////////////////////////////////////////////////
+ChampionGifts is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   CHAMPION_RENOWN = 70
+   CHAMPION_HEALTH = 100
+
+   // How often a gift's hunger ticks: a minute, sixty to a point of piHunger
+   GIFT_HUNGER_TICK = 60000
+
+   // Hunger (hours of play unfed) past which a gift goes back to its liege, and the renown
+   // that costs
+   GIFT_RETURN_HUNGER = 12
+   GIFT_RETURN_RENOWN = -10
+
+   // Minutes of hunger a kill takes off: for each point of a monster's difficulty, for a
+   // rival liege's troop on top of that, and for an enemy soldier (a player of a rival faction)
+   FEED_PER_DIFFICULTY = 4
+   FEED_TROOP = 40
+   FEED_SOLDIER = 180
+
+resources:
+
+   champion_trigger = "champion"
+
+   champion_liege_princess = "Princess Kateriina"
+   champion_liege_duke = "Duke Akardius"
+   champion_liege_rebel = "Jonas D'Accor"
+
+   champion_not_yours = "You do not serve me, %s."
+   champion_need_renown = \
+      "Not yet, %s.  My gift is for those who have risen to Captain in my service.  Come back "
+      "when you have."
+   champion_need_health = \
+      "Your deeds are worthy, %s, but you are not yet hardy enough to bear my gift.  Return "
+      "when you are stronger."
+   champion_have_one = "You already bear my gift, %s.  Keep it fed."
+   champion_cant_hold = "You have no room to carry my gift, %s.  Make some, and return."
+
+   champion_gift_princess = \
+      "Shal'ille asked me to keep this blade for one who would hunt down the enemies of the "
+      "realm, %s, and you are that one.  Take the Sword of the Hunt.  It drinks the blood of "
+      "our foes; let it go thirsty and it will come back to me."
+   champion_gift_duke = \
+      "You have served me well, %s, and strength deserves its reward.  Qor's own darkness "
+      "shaped this.  Wear the Amulet of the Three and feed it on our enemies, or it will find "
+      "its way back to me."
+   champion_gift_rebel = \
+      "Kraanan strikes for the free, %s, and so do you.  Take the Fist of Kraanan.  It hungers "
+      "for battle; leave it idle too long and it will come home to me."
+
+   champion_gift_returns = \
+      "~IYour %s has gone too long unfed.  It slips from you and is gone, back to %s; you "
+      "must earn it again."
+   champion_gift_returns_faction = \
+      "~IYour %s will not serve one who has left %s's cause.  It slips from you and is gone."
+
+classvars:
+
+properties:
+
+messages:
+
+   GetHungerTick()
+   {
+      return GIFT_HUNGER_TICK;
+   }
+
+   GiftClass(faction = $)
+   "The gift a liege of faction gives."
+   {
+      if faction = FACTION_PRINCESS
+      {
+         return &HunterSword;
+      }
+
+      if faction = FACTION_DUKE
+      {
+         return &NecromancerAmulet;
+      }
+
+      if faction = FACTION_REBEL
+      {
+         return &FistOfKraanan;
+      }
+
+      return $;
+   }
+
+   GiftFaction(oItem = $)
+   "The faction whose liege gives gift."
+   {
+      if IsClass(oItem,&HunterSword)
+      {
+         return FACTION_PRINCESS;
+      }
+
+      if IsClass(oItem,&NecromancerAmulet)
+      {
+         return FACTION_DUKE;
+      }
+
+      if IsClass(oItem,&FistOfKraanan)
+      {
+         return FACTION_REBEL;
+      }
+
+      return FACTION_NEUTRAL;
+   }
+
+   LiegeName(faction = $)
+   {
+      if faction = FACTION_PRINCESS
+      {
+         return champion_liege_princess;
+      }
+
+      if faction = FACTION_DUKE
+      {
+         return champion_liege_duke;
+      }
+
+      return champion_liege_rebel;
+   }
+
+   IsTrigger(string = $)
+   {
+      return string <> $
+         AND StringContain(string,champion_trigger);
+   }
+
+   AskForGift(who = $, liege = $)
+   "who said 'champion' to liege: give them the gift if they've earned it, or say why not."
+   {
+      local iFaction, oClass, oGift, rGrant;
+
+      if who = $
+         OR liege = $
+         OR NOT IsClass(who,&Player)
+      {
+         return;
+      }
+
+      iFaction = Send(liege,@GetFaction);
+      oClass = Send(self,@GiftClass,#faction=iFaction);
+      if oClass = $
+      {
+         return;
+      }
+
+      if Send(who,@GetFaction) <> iFaction
+      {
+         Send(liege,@SayToOne,#target=who,#message_rsc=champion_not_yours,
+              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+
+         return;
+      }
+
+      if Send(who,@GetFactionRenown) < CHAMPION_RENOWN
+      {
+         Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_renown,
+              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+
+         return;
+      }
+
+      if Send(who,@GetBaseMaxHealth) < CHAMPION_HEALTH
+      {
+         Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_health,
+              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+
+         return;
+      }
+
+      if Send(who,@PossessesA,#class=oClass)
+      {
+         Send(liege,@SayToOne,#target=who,#message_rsc=champion_have_one,
+              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+
+         return;
+      }
+
+      oGift = Create(oClass);
+      if NOT Send(who,@ReqNewHold,#what=oGift)
+      {
+         Send(oGift,@Delete);
+         Send(liege,@SayToOne,#target=who,#message_rsc=champion_cant_hold,
+              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+
+         return;
+      }
+
+      rGrant = champion_gift_rebel;
+      if iFaction = FACTION_PRINCESS
+      {
+         rGrant = champion_gift_princess;
+      }
+      else if iFaction = FACTION_DUKE
+      {
+         rGrant = champion_gift_duke;
+      }
+
+      Send(liege,@SayToOne,#target=who,#message_rsc=rGrant,
+           #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+      Send(who,@NewHold,#what=oGift);
+
+      return;
+   }
+
+   FeedFor(oItem = $, killer = $, victim = $, bearer = $)
+   "Minutes of hunger victim's death takes off gift, borne by bearer: none for a player who "
+   "isn't an enemy soldier."
+   {
+      local iFeed, iFaction, iVictimFaction;
+
+      if oItem = $
+         OR victim = $
+         OR bearer = $
+         OR victim = bearer
+      {
+         return 0;
+      }
+
+      if NOT IsClass(victim,&Battler)
+      {
+         return 0;
+      }
+
+      iFaction = Send(self,@GiftFaction,#oItem=oItem);
+      iVictimFaction = Send(victim,@GetFaction);
+
+      if IsClass(victim,&Player)
+      {
+         if iVictimFaction = FACTION_NEUTRAL
+            OR iVictimFaction = iFaction
+         {
+            return 0;
+         }
+
+         iFeed = FEED_SOLDIER;
+      }
+      else if IsClass(victim,&Monster)
+      {
+         iFeed = FEED_PER_DIFFICULTY * Bound(Send(victim,@GetDifficulty),1,9);
+         if iVictimFaction <> FACTION_NEUTRAL
+            AND iVictimFaction <> iFaction
+         {
+            iFeed = iFeed + FEED_TROOP;
+         }
+      }
+      else
+      {
+         return 0;
+      }
+
+      if killer <> bearer
+      {
+         iFeed = iFeed / 3;
+      }
+
+      return iFeed;
+   }
+
+   KeepsGift(oItem = $, bearer = $)
+   "FALSE, after sending the gift back, if bearer has left its liege's faction."
+   {
+      local iFaction;
+
+      iFaction = Send(self,@GiftFaction,#oItem=oItem);
+      if Send(bearer,@GetFaction) = iFaction
+      {
+         return TRUE;
+      }
+
+      Send(bearer,@MsgSendUser,#message_rsc=champion_gift_returns_faction,
+           #parm1=Send(oItem,@GetName),
+           #parm2=Send(self,@LiegeName,#faction=iFaction));
+      Send(oItem,@Delete);
+
+      return FALSE;
+   }
+
+   IsStarved(hunger = 0)
+   {
+      return hunger > GIFT_RETURN_HUNGER;
+   }
+
+   GiftStarved(oItem = $, bearer = $)
+   "gift has gone unfed too long: it goes back to its liege, and bearer loses renown."
+   {
+      local iFaction;
+
+      iFaction = Send(self,@GiftFaction,#oItem=oItem);
+      Send(bearer,@MsgSendUser,#message_rsc=champion_gift_returns,
+           #parm1=Send(oItem,@GetName),
+           #parm2=Send(self,@LiegeName,#faction=iFaction));
+      Send(bearer,@AddFactionRenown,#amount=GIFT_RETURN_RENOWN);
+      Send(oItem,@Delete);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

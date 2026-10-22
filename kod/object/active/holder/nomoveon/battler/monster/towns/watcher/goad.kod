@@ -294,14 +294,10 @@ messages:
    }
 
    SetForSale()
+   "Ours: the Sword of the Hunt and the Amulet of the Three that the Goad once sold are now "
+   "lieges' gifts to their champions (util/championgifts.kod)."
    {
-      plFor_sale = [
-         [ 
-            Create(&HunterSword),
-            Create(&NecromancerAmulet)
-         ],$,
-         $,
-         $];
+      plFor_sale = $;
 
       return;
    }

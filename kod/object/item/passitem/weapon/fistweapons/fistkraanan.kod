@@ -1,0 +1,469 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+FistOfKraanan is FistWeapons
+
+// Ours (the faction revamp): Jonas D'Accor's Champion's Gift (util/championgifts.kod), the
+// rebels' answer to the Princess's Sword of the Hunt and the Duke's Amulet of the Three.
+// Gauntlets blessed by Kraanan the Fist that hunger for battle: kills feed them, fed they are
+// at their strongest (might, stamina, and harder, surer blows), starving they weaken but
+// never hurt their bearer, and left unfed too long they go back to Jonas. An active item
+// like the other two (GetObjectType), so they hear the kills in their bearer's room.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   FistOfKraanan_name_rsc = "Fist of Kraanan"
+   FistOfKraanan_icon_rsc = gauntlet.bgf
+   FistOfKraanan_desc_rsc = \
+      "Heavy gauntlets of dark iron, their knuckles bound in gold, each finger "
+      "graven with the clenched fist of Kraanan.  They are warm to the touch, "
+      "and seem to tighten eagerly around any hand that would strike a blow "
+      "for freedom.\n\n"
+      "Jonas D'Accor gives them to his champions.  They hunger for battle "
+      "against his enemies; fed, they are at their strongest."
+
+   FistOfKraanan_used = \
+      "As you pull on the Fist of Kraanan, the gauntlets close tight around "
+      "your hands and a battle-fury runs up your arms.  Somewhere beneath it "
+      "you feel a hunger: they want to fight."
+   FistOfKraanan_bound = \
+      "The Fist of Kraanan was given to you alone.  It will not leave you."
+
+   FistOfKraanan_hunger_1 = "Your gauntlets itch for a fight."
+   FistOfKraanan_hunger_2 = "Your gauntlets grow restless in the quiet."
+   FistOfKraanan_hunger_3 = \
+      "Your gauntlets hunger for battle against Jonas's enemies.  It is time "
+      "to fight."
+   FistOfKraanan_hunger_4 = \
+      "Your gauntlets hunger, and Kraanan's strength is draining from them.  "
+      "Fight soon."
+   FistOfKraanan_hunger_5 = \
+      "Your gauntlets are starving.  Unless they taste battle soon, they will "
+      "leave you and return to Jonas."
+
+   FistOfKraanan_hunger_assuaged = \
+      "Kraanan roars in your gauntlets at %s%s's fall, and their strength "
+      "floods into you."
+
+classvars:
+
+   viIndefinite = ARTICLE_THE
+
+   vrName = FistOfKraanan_name_rsc
+   vrIcon = FistOfKraanan_icon_rsc
+   vrDesc = FistOfKraanan_desc_rsc
+
+   viValue_average = 40000
+   viHits_init_min = 1000
+   viHits_init_max = 1000
+
+   viItem_type = ITEMTYPE_WEAPON | ITEMTYPE_SPECIAL
+
+properties:
+
+   piItem_flags = PT_GRAY_TO_GOLD
+
+   // What we've added to our bearer's stats: might, intellect, agility, aim, stamina,
+   // mysticism
+   plStatmods = $
+
+   piHunger = 0
+   piFineHunger = 0
+   ptHungerTimer = $
+
+   piDamageBonus = 8
+   piHitBonus = 125
+
+   piIndestructible = TRUE
+
+messages:
+
+   NewOwner(what = $)
+   {
+      // Remember, poOwner is still our old owner until we propagate all the way to object.
+      if ptHungerTimer <> $
+      {
+         DeleteTimer(ptHungerTimer);
+         ptHungerTimer = $;
+      }
+
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+      {
+         Send(self,@RestoreStats,#who=poOwner);
+      }
+
+      if what <> $
+         AND IsClass(what,&User)
+      {
+         ptHungerTimer = CreateTimer(self,@HungerTrigger,
+                                     Send(Send(SYS,@GetChampionGifts),@GetHungerTick));
+      }
+
+      propagate;
+   }
+
+   ReqNewOwner(what = $)
+   "Bound to the champion they were given to: they won't be dropped, given or stored."
+   {
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_bound);
+
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   NewUsed(what = $)
+   {
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_used);
+         Post(poOwner,@EquippedAnItem,#oItem=self);
+         Post(self,@AdjustStats);
+      }
+
+      propagate;
+   }
+
+   NewUnused(what = $)
+   {
+      Send(self,@RestoreStats);
+
+      propagate;
+   }
+
+   AdjustStats()
+   "While worn: up to +10 might, +6 stamina, +2 agility and aim, and -4 intellect and "
+   "mysticism when fed, with harder, surer blows; a third of that when starving."
+   {
+      local iModifier, iStatMod;
+
+      if poOwner = $
+         OR NOT IsClass(poOwner,&User)
+         OR NOT pbIn_use
+      {
+         return;
+      }
+
+      // 100 well fed (piHunger -HUNGER_5), 66 at 0, 33 at HUNGER_5 and beyond.
+      iModifier = Bound(66 - (34 * piHunger) / HUNGER_5,33,100);
+
+      if plStatmods = $
+      {
+         plStatmods = [0,0,0,0,0,0];
+      }
+
+      iStatMod = 105 * iModifier / 1000;
+      if (iStatMod - Nth(plStatmods,1)) <> 0
+      {
+         iStatMod = Send(poOwner,@AddMight,#points=(iStatMod - Nth(plStatmods,1)))
+                    + Nth(plStatmods,1);
+         SetNth(plStatmods,1,iStatMod);
+      }
+
+      iStatMod = 65 * iModifier / 1000;
+      if (iStatMod - Nth(plStatmods,5)) <> 0
+      {
+         iStatMod = Send(poOwner,@AddStamina,#points=(iStatMod - Nth(plStatmods,5)))
+                    + Nth(plStatmods,5);
+         SetNth(plStatmods,5,iStatMod);
+      }
+
+      iStatMod = 25 * iModifier / 1000;
+      if (iStatMod - Nth(plStatmods,3)) <> 0
+      {
+         iStatMod = Send(poOwner,@AddAgility,#points=(iStatMod - Nth(plStatmods,3)))
+                    + Nth(plStatmods,3);
+         SetNth(plStatmods,3,iStatMod);
+      }
+
+      iStatMod = 25 * iModifier / 1000;
+      if (iStatMod - Nth(plStatmods,4)) <> 0
+      {
+         iStatMod = Send(poOwner,@AddAim,#points=(iStatMod - Nth(plStatmods,4)))
+                    + Nth(plStatmods,4);
+         SetNth(plStatmods,4,iStatMod);
+      }
+
+      iStatMod = (-25 * iModifier / 1000) - 2;
+      if (iStatMod - Nth(plStatmods,2)) <> 0
+      {
+         iStatMod = Send(poOwner,@AddIntellect,#points=(iStatMod - Nth(plStatmods,2)))
+                    + Nth(plStatmods,2);
+         SetNth(plStatmods,2,iStatMod);
+      }
+
+      iStatMod = (-25 * iModifier / 1000) - 2;
+      if (iStatMod - Nth(plStatmods,6)) <> 0
+      {
+         iStatMod = Send(poOwner,@AddMysticism,#points=(iStatMod - Nth(plStatmods,6)))
+                    + Nth(plStatmods,6);
+         SetNth(plStatmods,6,iStatMod);
+      }
+
+      // Brawling gloves give 8 damage and 125 to hit; fed, the Fist gives up to 16 and 225.
+      piDamageBonus = 8 + (8 * iModifier) / 100;
+      piHitBonus = 125 + iModifier;
+
+      return;
+   }
+
+   RestoreStats(who = $)
+   {
+      if who = $
+      {
+         who = poOwner;
+      }
+
+      if plStatmods = $
+         OR who = $
+      {
+         plStatmods = $;
+
+         return;
+      }
+
+      Send(who,@AddIntellect,#points=(-Nth(plStatmods,2)));
+      Send(who,@AddMysticism,#points=(-Nth(plStatmods,6)));
+      Send(who,@AddMight,#points=(-Nth(plStatmods,1)));
+      Send(who,@AddAim,#points=(-Nth(plStatmods,4)));
+      Send(who,@AddStamina,#points=(-Nth(plStatmods,5)));
+      Send(who,@AddAgility,#points=(-Nth(plStatmods,3)));
+      plStatmods = $;
+
+      return;
+   }
+
+   HungerTrigger()
+   "Every minute its bearer plays: an hour adds a point of hunger. Starved, or in the "
+   "wrong faction, the gauntlets go back to Jonas."
+   {
+      local oGifts;
+
+      ptHungerTimer = $;
+
+      if poOwner = $
+         OR NOT IsClass(poOwner,&User)
+      {
+         return;
+      }
+
+      oGifts = Send(SYS,@GetChampionGifts);
+      ptHungerTimer = CreateTimer(self,@HungerTrigger,Send(oGifts,@GetHungerTick));
+
+      if NOT Send(poOwner,@IsLoggedOn)
+      {
+         return;
+      }
+
+      if NOT Send(oGifts,@KeepsGift,#oItem=self,#bearer=poOwner)
+      {
+         return;
+      }
+
+      piFineHunger = piFineHunger + 1;
+      if piFineHunger >= 60
+      {
+         piFineHunger = 0;
+         piHunger = piHunger + 1;
+      }
+
+      if Send(oGifts,@IsStarved,#hunger=piHunger)
+      {
+         Send(oGifts,@GiftStarved,#oItem=self,#bearer=poOwner);
+
+         return;
+      }
+
+      Send(self,@AdjustStats);
+
+      if piHunger > HUNGER_5
+      {
+         if (piFineHunger % 5) = 0
+         {
+            Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_hunger_5);
+         }
+      }
+      else if piHunger > HUNGER_4
+      {
+         if (piFineHunger % 10) = 0
+         {
+            Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_hunger_4);
+         }
+      }
+      else if piHunger > HUNGER_3
+      {
+         if (piFineHunger % 15) = 0
+         {
+            Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_hunger_3);
+         }
+      }
+      else if piHunger > HUNGER_2
+      {
+         if (piFineHunger % 30) = 0
+         {
+            Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_hunger_2);
+         }
+      }
+      else if piHunger > HUNGER_1
+      {
+         if piFineHunger = 0
+         {
+            Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_hunger_1);
+         }
+      }
+
+      return;
+   }
+
+   SomethingKilled(what = $,victim = $,use_weapon = $)
+   "A death in our bearer's room may feed us (ChampionGifts.FeedFor)."
+   {
+      local iGain, oRoom;
+
+      if poOwner = $
+         OR NOT IsClass(poOwner,&User)
+         OR victim = $
+         OR victim = poOwner
+      {
+         return;
+      }
+
+      // No feeding on an arena's mock fights.
+      oRoom = Send(poOwner,@GetOwner);
+      if oRoom <> $
+         AND Send(oRoom,@SafePlayerAttack)
+         AND Send(oRoom,@InPlay,#what=poOwner)
+      {
+         return;
+      }
+
+      iGain = Send(Send(SYS,@GetChampionGifts),@FeedFor,#oItem=self,#killer=what,
+                   #victim=victim,#bearer=poOwner);
+      if iGain > 0
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=FistOfKraanan_hunger_assuaged,
+              #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
+         Send(self,@SatisfyHunger,#amount=iGain);
+      }
+
+      return;
+   }
+
+   SatisfyHunger(amount = 0)
+   {
+      piFineHunger = piFineHunger - amount;
+      while piFineHunger < 0
+      {
+         piHunger = piHunger - 1;
+         piFineHunger = piFineHunger + 60;
+      }
+
+      // Can 'save up', but only to a point.
+      piHunger = Bound(piHunger,-HUNGER_5,$);
+      Send(self,@AdjustStats);
+
+      return;
+   }
+
+   Delete()
+   {
+      if ptHungerTimer <> $
+      {
+         DeleteTimer(ptHungerTimer);
+         ptHungerTimer = $;
+      }
+
+      Send(self,@RestoreStats);
+
+      propagate;
+   }
+
+   GetObjectType()
+   {
+      return ACTIVE;
+   }
+
+   CanBeStoredInVault()
+   {
+      return FALSE;
+   }
+
+   DestroyDisposable()
+   {
+      return;
+   }
+
+   WeaponHitTarget()
+   {
+      // Kraanan's gauntlets never wear down.
+      return;
+   }
+
+   SetMaxHits(number = $)
+   {
+      return;
+   }
+
+   SetHits(number = $)
+   {
+      return;
+   }
+
+   CanMend()
+   {
+      return FALSE;
+   }
+
+   CanWeaken()
+   {
+      return FALSE;
+   }
+
+   CanSwap()
+   {
+      return FALSE;
+   }
+
+   CanShatter()
+   {
+      return FALSE;
+   }
+
+   CanEnchant()
+   {
+      return FALSE;
+   }
+
+   CanBeGivenToNPC()
+   {
+      return FALSE;
+   }
+
+   ReqDMDelete()
+   {
+      return FALSE;
+   }
+
+   DropOnDeath()
+   {
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////
