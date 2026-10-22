@@ -302,8 +302,13 @@ messages:
          }
       }
 
+      if Send(self,@HallCommandSaid,#what=what,#type=type,#string=string)
+      {
+         return;
+      }
+
       if poGuild_Owner <> $
-         AND StringEqual(string,Send(poGuild_owner,@GetPassword))
+         AND Send(self,@IsSanctumWord,#what=what,#string=string)
          AND pbSecretDoorOpen = FALSE
          AND type <> SAY_EMOTE
       {

@@ -202,8 +202,6 @@ resources:
    guild_cannot_rejoin = "~BThis ex-member of your guild may not rejoin yet."   
    guild_you_cannot_rejoin = "~BYou may not rejoin your former guild yet."
 
-   guild_new_password = "~B%s's password has been changed."
-
    guild_frular = "Frular, the Guild Administrator"
 
    guild_creation_mail ="Subject: Your guild has been formed\n"
@@ -223,17 +221,18 @@ resources:
       "\n\n"
       "RANKS:  You may promote people to different ranks, thus giving them "
       "more power as well as more responsibility.  These are the ranks:\n"
-      "  +++ %q:  may speak with the guild, see its roster and leave it, but "
-      "may not yet open the outer doors of a guild hall.\n"
-      "  +++ %q:  may also open the outer doors of the guild's hall.\n"
-      "  +++ %q:  may also invite new members into the guild.\n"
+      "  +++ %q:  may speak with the guild, see its roster, enter its hall "
+      "and use the hall's common chest.\n"
+      "  +++ %q:  may also use the members' chest and carry a recall stone.\n"
+      "  +++ %q:  may also invite new members, open the hall's sanctum and "
+      "use its vault.\n"
       "  +++ %q:  at most two.  They may also exile members, promote or "
       "demote those below them, forge or end alliances, declare wars and "
-      "sue for peace, and set the Guild Message of the Day by guild-sending "
-      "'set motd' or 'clear motd'.\n"
+      "sue for peace, open or close the hall to visitors, and set the Guild "
+      "Message of the Day by guild-sending 'set motd' or 'clear motd'.\n"
       "  +++ %q:  has every power, including leasing or abandoning a guild "
-      "hall, choosing the guild's colours and its hall's password, passing "
-      "on the leadership, and disbanding the guild.\n\n"
+      "hall, choosing the guild's colours, passing on the leadership, and "
+      "disbanding the guild.\n\n"
       "LEADERSHIP:  The %q leads until they pass the title to another.  "
       "Should they be gone from Meridian for thirty days, the title passes "
       "to the highest-ranking member who is still about, the longest-serving "
@@ -259,14 +258,25 @@ resources:
       "%s%q is now a mature guild, and its %q may now lease a guild hall "
       "from me.\n\n"
       "GUILD HALLS:  A guild hall is your guild's home.  It is a sanctuary, "
-      "where a player heals faster and may rest safely, with chests for your "
-      "belongings, a newsglobe for guild news, and a secret door guarded by "
-      "a password that you set.  No one may fight inside a guild hall, and "
-      "no one can take it from you."
+      "where a player heals faster and may rest safely, with a newsglobe "
+      "for guild news.  No one may fight inside a guild hall, and no one can "
+      "take it from you."
       "\n\n"
-      "Only members of your guild, and of guilds allied with yours, may open "
-      "its outer door.  Anyone of rank '%q' may not open it yet, whichever "
-      "of those guilds they belong to.  The door stays open only a moment."
+      "CHESTS:  Every hall has a common chest for all your members, a "
+      "members' chest for rank '%q' and above, and a vault for rank '%q' and "
+      "above.  Only your own members may use them."
+      "\n\n"
+      "THE SANCTUM:  A member of rank '%q' or above who says \"open\" in the "
+      "hall opens its secret door."
+      "\n\n"
+      "VISITORS:  A hall starts closed to visitors.  Only your own members, "
+      "and members of allied guilds of rank '%q' and above, may open its "
+      "outer door.  A member of rank '%q' or above may say \"hall public\" "
+      "in the hall to let anyone in, and \"hall private\" to close it again."
+      "\n\n"
+      "RECALL STONES:  A member of rank '%q' or above may say \"recall "
+      "stone\" in the hall to take a stone that brings them back to it from "
+      "anywhere in Meridian."
       "\n\n"
       "ALLIES:  If you declare a guild to be an ally, then they may enter "
       "your guild hall as if it were their own.  This measure of trust also "
@@ -396,7 +406,6 @@ properties:
    piRentDue = 0
    piRentCounter = 0
 
-   psPassword = $
 
    piColor1 = XLAT_TO_GRAY
    piColor2 = XLAT_TO_GRAY
@@ -471,7 +480,6 @@ messages:
       ptMaintenance = CreateTimer(self,@MaintenanceTimer,
                                        Send(SYS,@GetMaintenanceDelay));
 
-      psPassword = $;
 
       plFormerMembers = $;
 
@@ -533,6 +541,16 @@ messages:
 
       Send(self,@CheckSuccession);
 
+      // Ours (guild revamp): a hall nobody uses goes back to Frular. The guild
+      // keeps its name, members and standing.
+      if piGuild_hall <> $
+         AND NOT Send(self,@HasActiveMember)
+      {
+         Debug("Guild",vrName,"lost its hall: no member active in",
+               "USER_INACTIVE_TIME");
+         Send(self,@AbandonGuildHall);
+      }
+
       if piMature > 0
       {
          if Length(plMembers) >= MINIMUM_MEMBERS
@@ -550,7 +568,8 @@ messages:
                                  4,Send(self,@GetCapDef),
                                  4,Send(self,@GetName),
                                  4,prMaster,
-                                 4,prApprentice_male]);
+                                 4,prSir,4,prLord,4,prLord,4,prSir,
+                                 4,prLieutenant_male,4,prSir]);
             }
          }
       }
@@ -733,19 +752,18 @@ messages:
       return piGuild_hall;
    }
 
-   SetGuildHall(RID=$, name = $, password = $)
+   SetGuildHall(RID=$, name = $)
    "Performs no checks - those checks are almost all done in ghall.kod."
    {
       local i,j, members;
 
-      if RID = $ or name = $ or password = $
+      if RID = $ or name = $
       {
          Debug("Invalid info sent to SetGuildHall!");
 
          return FALSE;
       }
 
-      psPassword = password;
       piGuild_hall = RID;
       foreach i in plMembers
       {
@@ -792,7 +810,6 @@ messages:
          return FALSE;
       }
 
-      psPassword = $;
 
       foreach i in plMembers
       {
@@ -822,23 +839,6 @@ messages:
       }
 
       return;
-   }
-
-   ChangePassword(password = $)
-   {
-      local oMaster;
-
-      psPassword = password;
-      oMaster = Send(self,@GetGuildMaster);
-      Send(oMaster,@MsgSendUser,#message_rsc=guild_new_password,
-           #parm1 = Send(Send(self,@GetGuildHall),@GetName));
-
-      return;
-   }
-
-   GetPassword()
-   {
-      return psPassword;
    }
 
    ReceiveMail(from = $, dest_list = $, perm_string = $)
@@ -1609,6 +1609,23 @@ messages:
       return oHeir;
    }
 
+   HasActiveMember()
+   "Has any member been on within USER_INACTIVE_TIME (User.IsUserInactive)?"
+   {
+      local i;
+
+      foreach i in plMembers
+      {
+         if Send(First(i),@IsLoggedOn)
+            OR NOT Send(First(i),@IsUserInactive)
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
    IsActiveMember(who=$)
    "Logged on now, or within LEADER_INACTIVE_SECS."
    {
@@ -2305,7 +2322,6 @@ messages:
       }
 
       piGuild_hall = $;
-      psPassword = $;
       psGuildMOTDstring = $;
       prSetMOTDrank = $;
       prSetMOTDname = $;

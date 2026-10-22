@@ -6,7 +6,7 @@
 
 DEPEND = ..\guildcmd.bof
 BOFS =  gcabdic.bof gcally.bof gcenemy.bof gcexile.bof \
-     gcinvite.bof gcnoally.bof gcnoenem.bof gcrennce.bof gcpword.bof\
+     gcinvite.bof gcnoally.bof gcnoenem.bof gcrennce.bof\
           gcroster.bof gcsetrnk.bof gcdisbnd.bof gcaband.bof
 
 !include $(KODDIR)\kod.mak

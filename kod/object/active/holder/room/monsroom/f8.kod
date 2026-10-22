@@ -217,9 +217,9 @@ messages:
             }
          }
       }
-      if (Send(oGuildHall,@GetGuildOwner) <> $)
-            AND (Send(oGuildHall,@GetGuildOwner) = Send(what,@GetGuild))
-            AND StringEqual(string,Send(oGuildHall,@GetPassword))
+      // Ours (guild revamp): "open", from anyone the hall would let in, in
+      // place of the guild's password.
+      if Send(oGuildHall,@IsDoorWord,#what=what,#string=string)
             AND Send(self,@inBalcony,#who=what) and (pbPasswordDoorUnlocked = FALSE)
             AND type <> SAY_EMOTE
       {

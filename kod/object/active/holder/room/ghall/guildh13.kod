@@ -183,8 +183,13 @@ messages:
          }
       }
 
+      if Send(self,@HallCommandSaid,#what=what,#type=type,#string=string)
+      {
+         return;
+      }
+
       if poGuild_owner <> $
-         AND StringEqual(string,Send(poGuild_owner,@GetPassword))
+         AND Send(self,@IsSanctumWord,#what=what,#string=string)
          AND NOT Send(self,@InFoyer,#who=what)
          AND type <> SAY_EMOTE
       {

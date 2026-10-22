@@ -224,7 +224,7 @@ messages:
       propagate;
    }
 
-   ReqUseGuildChest(who=$)
+   ReqUseGuildChest(who=$,oChest=$)
    {
       local oOwner;
 
@@ -257,7 +257,8 @@ messages:
       //      Send(who,@GetRow),Send(who,@GetCol),
       //      Send(who,@GetFineRow),Send(who,@GetFineCol));
 
-      return TRUE;
+      // Ours (guild revamp): the chest's rank still counts here.
+      return Send(self,@CanUseChest,#who=who,#oChest=oChest);
    }
 
 end

@@ -26,6 +26,11 @@ resources:
 
    storagebox_desc_rsc = "This is a place to store stuff."
 
+   // Ours (guild revamp): the three kinds of guild hall chest.
+   storagebox_common_chest = "common chest"
+   storagebox_members_chest = "members' chest"
+   storagebox_vault = "vault"
+
 classvars:
 
    vrName = storagebox_name_rsc
@@ -43,6 +48,10 @@ properties:
    pbLocked = FALSE
    ptClean = $
 
+   // Ours (guild revamp): in a guild hall, the lowest rank of the owner guild
+   // that may use this chest (GuildHall.AssignChestRanks); 0 elsewhere.
+   piGuildRank = 0
+
 messages:
 
    Constructor(bLocked=$)
@@ -59,6 +68,63 @@ messages:
    ReqNewOwner(what = $)
    {
       return FALSE;
+   }
+
+   SetGuildRank(rank=0)
+   {
+      piGuildRank = rank;
+
+      return;
+   }
+
+   GetGuildRank()
+   {
+      return piGuildRank;
+   }
+
+   GetGuildChestName()
+   {
+      if piGuildRank >= RANK_LORD
+      {
+         return storagebox_vault;
+      }
+
+      if piGuildRank = RANK_SIR
+      {
+         return storagebox_members_chest;
+      }
+
+      return storagebox_common_chest;
+   }
+
+   GetName()
+   {
+      if piGuildRank > 0
+      {
+         return Send(self,@GetGuildChestName);
+      }
+
+      propagate;
+   }
+
+   GetTrueName()
+   {
+      if piGuildRank > 0
+      {
+         return Send(self,@GetGuildChestName);
+      }
+
+      propagate;
+   }
+
+   GetApparentName()
+   {
+      if piGuildRank > 0
+      {
+         return Send(self,@GetGuildChestName);
+      }
+
+      propagate;
    }
 
    SendAnimation()
@@ -156,7 +222,7 @@ messages:
       }
 
       if IsClass(oTakerOwner,&GuildHall)
-         AND NOT Send(oTakerOwner,@ReqUseGuildChest,#who=taker)
+         AND NOT Send(oTakerOwner,@ReqUseGuildChest,#who=taker,#oChest=self)
       {
          return FALSE;
       }
@@ -203,7 +269,7 @@ messages:
 
       if IsClass(oWhoOwner,&GuildHall)
       {
-         return Send(oWhoOwner,@ReqUseGuildChest,#who=who);
+         return Send(oWhoOwner,@ReqUseGuildChest,#who=who,#oChest=self);
       }
 
       propagate;

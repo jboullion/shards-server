@@ -1,0 +1,310 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+////////////////////////////////////////////////////////////////////////////////
+GuildRecallStone is PassiveItem
+
+// Ours (guild revamp, ADR 0022 decision 11): a guild member of Sir rank or
+// above says "recall stone" in their hall (GuildHall.HallCommandSaid) and gets
+// one. Used anywhere, after five seconds it brings them back inside the hall
+// (GuildHall.RecallTo). The checks are fast travel's (ADR 0011): not in the PvP
+// lockout, no council token, not phased. Then it rests for half an hour. It
+// can't be dropped, given or stored, and it crumbles when its bearer leaves
+// the guild (Player.ResetGuildStuff).
+
+constants:
+
+   include blakston.khd
+
+   RECALL_DELAY_MS = 5000
+   RECALL_COOLDOWN_SECS = 30 * 60
+
+resources:
+
+   GuildRecallStone_name_rsc = "recall stone"
+   GuildRecallStone_icon_rsc = manacrys.bgf
+   GuildRecallStone_desc_rsc = \
+      "A smooth stone that hums with the wards of your guild's hall.  Use it "
+      "anywhere in Meridian to return to the hall; after each journey it "
+      "needs half an hour to gather its strength again.  It is bound to you "
+      "and to your guild: it cannot be dropped, given or stored, and it "
+      "crumbles if you leave the guild."
+
+   GuildRecallStone_bound = \
+      "The recall stone is bound to you.  It will not leave your hands."
+   GuildRecallStone_no_hall = \
+      "Your guild has no hall for the recall stone to bring you home to."
+   GuildRecallStone_rank = \
+      "Only the guild's %q rank and above may use a recall stone."
+   GuildRecallStone_in_hall = "You are already in your guild's hall."
+   GuildRecallStone_resting = \
+      "The recall stone is still gathering its strength.  It will be ready "
+      "in %i %s."
+   GuildRecallStone_minute = "minute"
+   GuildRecallStone_minutes = "minutes"
+   GuildRecallStone_pvp = \
+      "Your blood is still up from the fight.  The recall stone won't answer "
+      "you yet."
+   GuildRecallStone_token = \
+      "The recall stone will not carry you while you hold a council token."
+   GuildRecallStone_busy = "The recall stone is already drawing you home."
+   GuildRecallStone_start = \
+      "The recall stone grows warm in your hand, and the walls of %s begin "
+      "to take shape around you..."
+   GuildRecallStone_moved = "The recall stone's pull fades as you move on."
+
+classvars:
+
+   vrName = GuildRecallStone_name_rsc
+   vrIcon = GuildRecallStone_icon_rsc
+   vrDesc = GuildRecallStone_desc_rsc
+
+   viUse_type = ITEM_SINGLE_USE
+   viBulk = 5
+   viWeight = 5
+   viValue_average = 0
+
+properties:
+
+   // GetTime() of the last journey, for the half hour's rest.
+   piLastRecall = 0
+
+   // The journey under way, and the room it started from.
+   ptRecall = $
+   poRecallFrom = $
+
+messages:
+
+   Constructor(oGuild = $)
+   "Tinted in the guild's first colour, once it has chosen its colours."
+   {
+      local iColor;
+
+      iColor = XLAT_TO_PURPLE;
+      if oGuild <> $
+         AND Send(oGuild,@HasGuildColors)
+      {
+         iColor = Send(oGuild,@GetPrimaryGuildColor);
+      }
+
+      piItem_flags = Send(SYS,@EncodeTwoColorXLAT,#color1=iColor);
+
+      propagate;
+   }
+
+   ReqNewOwner(what = $)
+   "Bound to its bearer: it won't be dropped, given or stored."
+   {
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=GuildRecallStone_bound);
+
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   CanBeStoredInVault()
+   {
+      return FALSE;
+   }
+
+   CanBeGivenToNPC()
+   {
+      return FALSE;
+   }
+
+   DropOnDeath()
+   {
+      return FALSE;
+   }
+
+   ReqNewApply(what = $, apply_on = $)
+   {
+      return TRUE;
+   }
+
+   NewApplied(what = $, apply_on = $)
+   {
+      local oUser, oHall, iLeft, rUnit;
+
+      oUser = poOwner;
+      if NOT IsClass(oUser,&User)
+      {
+         return;
+      }
+
+      if ptRecall <> $
+      {
+         Send(oUser,@MsgSendUser,#message_rsc=GuildRecallStone_busy);
+
+         return;
+      }
+
+      oHall = Send(self,@GetHallFor,#who=oUser,#report=TRUE);
+      if oHall = $
+      {
+         return;
+      }
+
+      if Send(oUser,@GetOwner) = oHall
+         AND NOT Send(oHall,@InFoyer,#who=oUser)
+      {
+         Send(oUser,@MsgSendUser,#message_rsc=GuildRecallStone_in_hall);
+
+         return;
+      }
+
+      iLeft = piLastRecall + RECALL_COOLDOWN_SECS - GetTime();
+      if piLastRecall > 0
+         AND iLeft > 0
+      {
+         iLeft = (iLeft + 59) / 60;
+         rUnit = GuildRecallStone_minutes;
+         if iLeft = 1
+         {
+            rUnit = GuildRecallStone_minute;
+         }
+
+         Send(oUser,@MsgSendUser,#message_rsc=GuildRecallStone_resting,
+               #parm1=iLeft,#parm2=rUnit);
+
+         return;
+      }
+
+      if NOT Send(self,@MayTravel,#who=oUser,#report=TRUE)
+      {
+         return;
+      }
+
+      poRecallFrom = Send(oUser,@GetOwner);
+      ptRecall = CreateTimer(self,@RecallTimer,RECALL_DELAY_MS);
+      Send(oUser,@MsgSendUser,#message_rsc=GuildRecallStone_start,
+            #parm1=Send(oHall,@GetName));
+
+      return;
+   }
+
+   GetHallFor(who = $, report = FALSE)
+   "The bearer's guild hall, if they may be recalled to it."
+   {
+      local oGuild, oHall;
+
+      oGuild = Send(who,@GetGuild);
+      oHall = $;
+      if oGuild <> $
+      {
+         oHall = Send(oGuild,@GetGuildHall);
+      }
+
+      if oHall = $
+      {
+         if report
+         {
+            Send(who,@MsgSendUser,#message_rsc=GuildRecallStone_no_hall);
+         }
+
+         return $;
+      }
+
+      if Send(oGuild,@GetRank,#who=who) < RANK_SIR
+      {
+         if report
+         {
+            Send(who,@MsgSendUser,#message_rsc=GuildRecallStone_rank,
+                  #parm1=Send(oGuild,@GetRankName,#rank=RANK_SIR,
+                              #sex=Send(who,@GetGender)));
+         }
+
+         return $;
+      }
+
+      return oHall;
+   }
+
+   MayTravel(who = $, report = FALSE)
+   "Fast travel's checks (ADR 0011): the PvP lockout, a token, phasing."
+   {
+      if Send(who,@IsInPvP)
+      {
+         if report
+         {
+            Send(who,@MsgSendUser,#message_rsc=GuildRecallStone_pvp);
+         }
+
+         return FALSE;
+      }
+
+      if Send(who,@FindHolding,#class=&Token) <> $
+      {
+         if report
+         {
+            Send(who,@MsgSendUser,#message_rsc=GuildRecallStone_token);
+         }
+
+         return FALSE;
+      }
+
+      if Send(who,@IsInCannotInteractMode)
+      {
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
+   RecallTimer()
+   {
+      local oUser, oHall;
+
+      ptRecall = $;
+
+      oUser = poOwner;
+      if NOT IsClass(oUser,&User)
+         OR NOT Send(oUser,@IsLoggedOn)
+      {
+         return;
+      }
+
+      if Send(oUser,@GetOwner) <> poRecallFrom
+      {
+         Send(oUser,@MsgSendUser,#message_rsc=GuildRecallStone_moved);
+
+         return;
+      }
+
+      oHall = Send(self,@GetHallFor,#who=oUser,#report=TRUE);
+      if oHall = $
+         OR NOT Send(self,@MayTravel,#who=oUser,#report=TRUE)
+      {
+         return;
+      }
+
+      piLastRecall = GetTime();
+      Send(oHall,@RecallTo,#what=oUser);
+
+      return;
+   }
+
+   Delete()
+   {
+      if ptRecall <> $
+      {
+         DeleteTimer(ptRecall);
+         ptRecall = $;
+      }
+
+      poRecallFrom = $;
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

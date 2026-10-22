@@ -240,6 +240,8 @@ resources:
    player_safe_server = \
       "You are not allowed to attack other players in this world."
    player_no_hall_pvp = "Nobody may fight inside a guild hall."
+   player_recall_stone_crumbles = \
+      "Your recall stone crumbles to dust as you leave the guild."
    player_assgame_soon = \
       "~kRoq tells you, \"~IA new Assassin's Circle shall be initiated "
       "shortly.\""
@@ -7525,8 +7527,20 @@ messages:
    "This should never be called directly, except from 'RemoveFromGuild' in"
    "guild.kod!  Otherwise, the guild lists may not match with player's poGuild!"
    {
+      local oStone;
+
       poGuild = $;
       piGuild_commands = 0;
+
+      // Ours (guild revamp): a guild's recall stone crumbles when its bearer
+      // leaves.
+      oStone = Send(self,@FindHolding,#class=&GuildRecallStone);
+      if oStone <> $
+      {
+         Send(oStone,@Delete);
+         Send(self,@MsgSendUser,#message_rsc=player_recall_stone_crumbles);
+      }
+
       if poOwner <> $ AND Send(poOwner,@GetWatcher) <> $
       {
          Send(Send(poOwner,@GetWatcher),@PlayerQuitGuild,#who=self);

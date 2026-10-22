@@ -127,7 +127,6 @@ guild_cannot_rejoin = de \
    "~BDieses ehemalige Mitglied Deiner Gilde kann noch nicht wieder eintreten."
 guild_you_cannot_rejoin = de \
    "~BNoch kannst Du Deiner früheren Gilde nicht wieder beitreten."
-guild_new_password = de "~BDas Passwort der Halle %s wurde geändert."
 guild_frular = de "Frular, Verwalter aller Gilden"
 guild_disbanded_mail = de \
    "Betreff: Gilde aufgelöst\nDeine Gilde %s%q wurde während Deiner Abwesenheit "
@@ -240,7 +239,6 @@ guild_invitation_one = pt "Você só pode ter um convite pendente de cada vez."
 guild_invitation_one_inductee = pt "Alguém em sua guilda já enviou um convite para %s%s."
 guild_cannot_rejoin = pt "~BEste ex-membro de sua guilda não pode se reunir ainda."
 guild_you_cannot_rejoin = pt "~BVocê não pode se reunir à sua antiga guilda ainda."
-guild_new_password = pt "~BA senha de %s foi alterada."
 guild_frular = pt "Frular, o Administrador da Guilda"
 "%s%q agora é uma guilda madura, o que significa que seus membros agora "
 "podem possuir e conquistar salões de guilda.\n\n"

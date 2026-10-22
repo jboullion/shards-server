@@ -3042,7 +3042,7 @@
    GCID_SET_RANK = 0x1000
    GCID_DISBAND = 0x2000
    GCID_ABANDON_HALL = 0x4000
-   GCID_SET_PASSWORD = 0x8000
+   GCID_SET_PASSWORD = 0x8000       // Retired (guild revamp): Lords say open instead.
 
    // Factions
    SERVICE_GOLD_REWARD = 2500

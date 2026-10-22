@@ -324,6 +324,12 @@ messages:
    {
       local lObjCoords1;
 
+      // Ours (guild revamp): a common chest on the floor north of the two
+      // old ones, which become the members' chest and the vault
+      // (AssignChestRanks: the last chest made is the vault).
+      Send(self,@NewHold,#what=Create(&Chest),
+            #new_row=37,#new_col=47,#fine_row=32,#fine_col=32,
+            #new_angle=ANGLE_WEST);
       Send(self,@NewHold,#what=Create(&Chest),
             #new_row=39,#new_col=47,#fine_col=56,#fine_row=40,
             #new_angle=ANGLE_WEST);
@@ -382,8 +388,13 @@ messages:
          }
       }
 
+      if Send(self,@HallCommandSaid,#what=what,#type=type,#string=string)
+      {
+         return;
+      }
+
       if poGuild_Owner <> $
-         AND StringEqual(string,Send(poGuild_owner,@GetPassword))
+         AND Send(self,@IsSanctumWord,#what=what,#string=string)
          AND Send(self,@InZone,#who=what) = LEVEL_TWO
          AND ptSecret = $
          AND type <> SAY_EMOTE

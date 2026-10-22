@@ -2185,15 +2185,11 @@ messages:
             Send(self,@UserCommandClaimShield,#client_msg=client_msg);
             return;
          case UC_GUILD_RENT:
-            Send(self,@UserCommandGuildRent,#oHall=Nth(client_msg,2),
-                  #sPassword=Nth(client_msg,3));
+            // The client still sends a password; halls no longer have one.
+            Send(self,@UserCommandGuildRent,#oHall=Nth(client_msg,2));
             return;
          case UC_ABANDON_GUILD_HALL:
             Send(self,@UserGuildCommand,#command_num=GCID_ABANDON_HALL);
-            return;
-         case UC_GUILD_SET_PASSWORD:
-            Send(self,@UserGuildCommand,#command_num=GCID_SET_PASSWORD,
-                  #data=Nth(client_msg,2));
             return;
          case UC_CHANGE_URL:
             oWhat = Nth(client_msg,2);
@@ -2286,7 +2282,7 @@ messages:
       return;
    }
 
-   UserCommandGuildRent(oHall = $, sPassword = $)
+   UserCommandGuildRent(oHall = $)
    {
       local iCost, oMoney;
 
@@ -2294,7 +2290,6 @@ messages:
       // client sends.
       if poGuild = $
          OR oHall = $
-         OR sPassword = $
          OR Send(poGuild,@GetRank,#who=self) <> RANK_MASTER
       {
          return;
@@ -2310,8 +2305,7 @@ messages:
          return FALSE;
       }
 
-      if Send(oHall,@ClaimGuildHall,#oGuild=poGuild,#rep=self,
-               #password=sPassword)
+      if Send(oHall,@ClaimGuildHall,#oGuild=poGuild,#rep=self)
       {
           Send(oMoney,@SubtractNumber,#number=iCost);
       }
@@ -2449,7 +2443,7 @@ messages:
 
    UserGuildSendInfo()
    {
-      local i,lRank_names,lMembers,lHall;
+      local i,lRank_names,lMembers;
 
       if poGuild = $
       {
@@ -2458,15 +2452,8 @@ messages:
       }
 
       AddPacket(1,BP_USERCOMMAND, 1,UC_GUILDINFO, 6,Send(poGuild,@GetName));
-      lHall = Send(poGuild,@GetGuildHall);
-      if lHall <> $ AND Send(poGuild,@GetRank,#who=self) = RANK_MASTER
-      {
-         AddPacket(1,1, 6,Send(poGuild,@GetPassword));
-      }
-      else
-      {
-         AddPacket(1,0);
-      }
+      // Ours (guild revamp): halls have no password, so never send one.
+      AddPacket(1,0);
 
       AddPacket(4,piGuild_commands, 4,poGuild);
 
@@ -5646,6 +5633,14 @@ messages:
             Send(self,@MsgSendUser,#message_rsc=user_chest_too_far,
                   #parm1=Send(what,@GetDef),#parm2=Send(what,@GetName));
 
+            return;
+         }
+
+         // Ours (guild revamp): a guild hall chest shows its contents only to
+         // those who may use it (GuildHall.CanUseChest says why not).
+         if IsClass(poOwner,&GuildHall)
+            AND NOT Send(poOwner,@ReqUseGuildChest,#who=self,#oChest=what)
+         {
             return;
          }
       }

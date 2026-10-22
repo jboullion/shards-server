@@ -3763,7 +3763,6 @@ messages:
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_SET_RANK,#class=&GuildSetRank);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_DISBAND,#class=&GuildDisband);
       Send(self,@CreateOneGuildCommandIfNew,#num=GCID_ABANDON_HALL,#class=&GuildAbandon);
-      Send(self,@CreateOneGuildCommandIfNew,#num=GCID_SET_PASSWORD,#class=&GuildSetPassword);
 
       return;
    }

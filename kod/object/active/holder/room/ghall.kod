@@ -31,7 +31,31 @@ resources:
    guildhall_entered_legally = "Guild hall just entered legally."
    guildhall_muffled = "You hear muffled conversation."
 
-   guildhall_default_password = "aardvark"
+   // Ours (guild revamp, phase 1): what members say in their hall.
+   guildhall_open_word = "open"
+   guildhall_public_word = "hall public"
+   guildhall_private_word = "hall private"
+   guildhall_stone_word = "recall stone"
+
+   guildhall_now_public = \
+      "~B%s%s opens %s to visitors.  Anyone may now come through its door."
+   guildhall_now_private = \
+      "~B%s%s closes %s to visitors.  Only your guild and its allies may now "
+      "come through its door."
+   guildhall_already_public = "%s is already open to visitors."
+   guildhall_already_private = "%s is already closed to visitors."
+   guildhall_public_welcome = "%s, home of %s%q, is open to visitors."
+
+   guildhall_chest_not_member = \
+      "Only members of %s%q may use the chests in their hall."
+   guildhall_chest_rank = \
+      "Only the guild's %q rank and above may use the %s."
+
+   guildhall_stone_given = \
+      "You take a recall stone.  Use it anywhere to return to %s."
+   guildhall_stone_have = "You already carry a recall stone."
+   guildhall_stone_rank = \
+      "Only the guild's %q rank and above may carry a recall stone."
 
    guildhall_no_guild = \
       "You may not rent a guild hall unless you belong to a guild!"
@@ -41,8 +65,6 @@ resources:
       "You may not rent a new guild hall until you abandon your current guild "
       "hall!"
    guildhall_already_rented = "Your guild is already renting this guild hall!"
-
-   guildhall_new_password = "~B%s's password has been changed."
 
    guildhall_cant_open = \
       "%s's magic defenses prevent you from opening the outer door."
@@ -114,6 +136,11 @@ properties:
    piStatus = STATUS_UNOWNED
 
    pbSecretDoorOpen = FALSE
+
+   // Ours (guild revamp): a public hall lets anyone through its outer door.
+   // The owner's Lieutenants and Commander say "hall public" or "hall
+   // private" inside it. A newly leased hall starts private.
+   pbPublic = FALSE
 
    plGuild_doors = $
    prNewsball = $
@@ -195,7 +222,52 @@ messages:
       Send(self,@NewHold,#what=oNews,#new_row=viNews_row,#new_col=viNews_col,
             #fine_row=viNews_finerow,#fine_col=viNews_finecol);
 
+      // The subclass has made its chests by now.
+      Send(self,@AssignChestRanks);
+
       propagate;
+   }
+
+   AssignChestRanks()
+   "Ours (guild revamp): every hall chest belongs to a rank. The last chest "
+   "a hall makes is the Vault (Lords and up), the one before it the Members' "
+   "chest (Sirs and up), and the rest are Common (every member)."
+   {
+      local i, each_obj, lChests, iCount, iIndex, iRank;
+
+      lChests = $;
+      foreach i in plActive
+      {
+         each_obj = Send(self,@HolderExtractObject,#data=i);
+         if IsClass(each_obj,&StorageBox)
+         {
+            // plActive is newest first, so this keeps creation order.
+            lChests = Cons(each_obj,lChests);
+         }
+      }
+
+      iCount = Length(lChests);
+      iIndex = 0;
+      foreach each_obj in lChests
+      {
+         iIndex = iIndex + 1;
+         iRank = RANK_APPRENTICE;
+
+         if iCount >= 3 AND iIndex = iCount
+         {
+            iRank = RANK_LORD;
+         }
+
+         if (iCount >= 3 AND iIndex = iCount - 1)
+            OR (iCount = 2 AND iIndex = 2)
+         {
+            iRank = RANK_SIR;
+         }
+
+         Send(each_obj,@SetGuildRank,#rank=iRank);
+      }
+
+      return;
    }
 
    NewHold(what=$)
@@ -206,6 +278,15 @@ messages:
          // Post a message to be sure that it does this after
          // the guy's stats are correctly set.
          Post(self,@ValidEntry,#what=what);
+
+         if pbPublic
+            AND poGuild_owner <> $
+            AND Send(what,@GetGuild) <> poGuild_owner
+         {
+            Send(what,@MsgSendUser,#message_rsc=guildhall_public_welcome,
+                  #parm1=vrName,#parm2=Send(poGuild_owner,@GetDef),
+                  #parm3=Send(poGuild_owner,@GetName));
+         }
       }
 
       propagate;
@@ -244,7 +325,7 @@ messages:
       return TRUE;
    }
 
-   ClaimGuildHall(oGuild = $, rep = $,password = $)
+   ClaimGuildHall(oGuild = $, rep = $)
    {
       local i, thisGuild;
 
@@ -290,9 +371,9 @@ messages:
 
       piStatus = STATUS_OKAY;
       poGuild_Owner = oGuild;
+      pbPublic = FALSE;
 
-      Send(oGuild,@SetGuildHall,#RID=piRoom_num,#name=vrName,
-           #password=password);
+      Send(oGuild,@SetGuildHall,#RID=piRoom_num,#name=vrName);
 
       foreach i in plPassive
       {
@@ -326,6 +407,7 @@ messages:
 
       poGuild_owner = $;
       piStatus = STATUS_UNOWNED;
+      pbPublic = FALSE;
 
       foreach i in plPassive
       {
@@ -433,7 +515,7 @@ messages:
       propagate;
    }
 
-   ReqUseGuildChest(who=$)
+   ReqUseGuildChest(who=$,oChest=$)
    {
       if Send(self,@InFoyer,#who=who)
       {
@@ -446,7 +528,211 @@ messages:
          return FALSE;
       }
 
+      return Send(self,@CanUseChest,#who=who,#oChest=oChest);
+   }
+
+   CanUseChest(who=$,oChest=$)
+   "Ours (guild revamp): an owned hall's chests are the owner guild's, each "
+   "from its rank up (StorageBox.GetGuildRank); allies and visitors may not "
+   "use them."
+   {
+      local oGuild, iRank, iNeed;
+
+      if poGuild_owner = $
+         OR IsClass(who,&Admin)
+         OR NOT IsClass(who,&User)
+      {
+         return TRUE;
+      }
+
+      oGuild = Send(who,@GetGuild);
+      if oGuild <> poGuild_owner
+      {
+         Send(who,@MsgSendUser,#message_rsc=guildhall_chest_not_member,
+               #parm1=Send(poGuild_owner,@GetDef),
+               #parm2=Send(poGuild_owner,@GetName));
+
+         return FALSE;
+      }
+
+      iNeed = RANK_APPRENTICE;
+      if oChest <> $
+      {
+         iNeed = Bound(Send(oChest,@GetGuildRank),RANK_APPRENTICE,RANK_MASTER);
+      }
+
+      iRank = Send(oGuild,@GetRank,#who=who);
+      if iRank < iNeed
+      {
+         Send(who,@MsgSendUser,#message_rsc=guildhall_chest_rank,
+               #parm1=Send(oGuild,@GetRankName,#rank=iNeed,
+                           #sex=Send(who,@GetGender)),
+               #parm2=Send(oChest,@GetName));
+
+         return FALSE;
+      }
+
       return TRUE;
+   }
+
+   GetMemberRank(who=$)
+   "The rank who holds in the owner guild, or 0."
+   {
+      if poGuild_owner = $
+         OR who = $
+         OR NOT IsClass(who,&Player)
+         OR Send(who,@GetGuild) <> poGuild_owner
+      {
+         return 0;
+      }
+
+      return Send(poGuild_owner,@GetRank,#who=who);
+   }
+
+   IsSanctumWord(what=$,string=$)
+   "Ours (guild revamp): in place of the guild's password, a Lord or above "
+   "of the owner guild saying 'open' opens the hall's secret door. Each hall "
+   "still decides where it must be said."
+   {
+      return poGuild_owner <> $
+         AND StringEqual(string,guildhall_open_word)
+         AND Send(self,@GetMemberRank,#who=what) >= RANK_LORD;
+   }
+
+   IsDoorWord(what=$,string=$)
+   "An outer door opened by speech (the Den of Shadows' balcony): 'open', "
+   "from anyone this owned hall lets in."
+   {
+      return poGuild_owner <> $
+         AND StringEqual(string,guildhall_open_word)
+         AND Send(self,@CanEnter,#who=what);
+   }
+
+   HallCommandSaid(what=$,type=$,string=$)
+   "Ours (guild revamp): 'hall public' and 'hall private' (Lieutenants and "
+   "up) and 'recall stone' (Sirs and up), said by the owner's members. "
+   "Halls whose SomeoneSaid doesn't propagate call this themselves."
+   {
+      local iRank, oStone;
+
+      if poGuild_owner = $
+         OR type = SAY_EMOTE
+         OR NOT IsClass(what,&User)
+      {
+         return FALSE;
+      }
+
+      iRank = Send(self,@GetMemberRank,#who=what);
+      if iRank = 0
+      {
+         return FALSE;
+      }
+
+      if StringEqual(string,guildhall_public_word)
+         OR StringEqual(string,guildhall_private_word)
+      {
+         if iRank < RANK_LIEUTENANT
+         {
+            return FALSE;
+         }
+
+         Send(self,@SetPublic,#who=what,
+               #public=StringEqual(string,guildhall_public_word));
+
+         return TRUE;
+      }
+
+      if StringEqual(string,guildhall_stone_word)
+      {
+         if iRank < RANK_SIR
+         {
+            Send(what,@MsgSendUser,#message_rsc=guildhall_stone_rank,
+                  #parm1=Send(poGuild_owner,@GetRankName,#rank=RANK_SIR,
+                              #sex=Send(what,@GetGender)));
+
+            return TRUE;
+         }
+
+         if Send(what,@FindHolding,#class=&GuildRecallStone) <> $
+         {
+            Send(what,@MsgSendUser,#message_rsc=guildhall_stone_have);
+
+            return TRUE;
+         }
+
+         oStone = Create(&GuildRecallStone,#oGuild=poGuild_owner);
+         Send(what,@NewHold,#what=oStone);
+         Send(what,@MsgSendUser,#message_rsc=guildhall_stone_given,
+               #parm1=vrName);
+
+         return TRUE;
+      }
+
+      return FALSE;
+   }
+
+   SetPublic(who=$,public=TRUE)
+   {
+      local i, rMessage;
+
+      if (public AND pbPublic)
+         OR (NOT public AND NOT pbPublic)
+      {
+         if pbPublic
+         {
+            rMessage = guildhall_already_public;
+         }
+         else
+         {
+            rMessage = guildhall_already_private;
+         }
+
+         Send(who,@MsgSendUser,#message_rsc=rMessage,#parm1=vrName);
+
+         return;
+      }
+
+      pbPublic = public;
+
+      rMessage = guildhall_now_private;
+      if pbPublic
+      {
+         rMessage = guildhall_now_public;
+      }
+
+      foreach i in Send(poGuild_owner,@GetMemberList)
+      {
+         if Send(First(i),@IsLoggedOn)
+         {
+            Send(First(i),@MsgSendUser,#message_rsc=rMessage,
+                  #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName),
+                  #parm3=vrName);
+         }
+      }
+
+      return;
+   }
+
+   IsPublic()
+   {
+      return pbPublic;
+   }
+
+   RecallTo(what=$)
+   "Ours (guild revamp): the recall stone's arrival, inside the hall past "
+   "the foyer."
+   {
+      if viInner_teleport_row <> $ AND viInner_teleport_col <> $
+      {
+         Send(SYS,@UtilGoNearSquare,#what=what,#where=self,
+               #new_row=viInner_teleport_row,#new_col=viInner_teleport_col);
+
+         return;
+      }
+
+      Send(self,@Teleport,#what=what);
+
+      return;
    }
 
    SomeoneSaid(what = $,type = $,string = $,parm1 = $,parm2 = $,parm3 = $,
@@ -493,8 +779,12 @@ messages:
          }
       }
 
-      if poGuild_owner <> $
-         AND StringEqual(string,Send(poGuild_owner,@GetPassword))
+      if Send(self,@HallCommandSaid,#what=what,#type=type,#string=string)
+      {
+         return;
+      }
+
+      if Send(self,@IsSanctumWord,#what=what,#string=string)
          AND (Send(self,@InFoyer,#who=what) = vbChestInFoyer)
          AND NOT pbSecretDoorOpen
          AND type <> SAY_EMOTE
@@ -503,11 +793,6 @@ messages:
       }
 
       return;
-   }
-
-   GetPassword()
-   {
-      return Send(poGuild_owner,@GetPassword);
    }
 
    SomethingTryGo(what=$, row=$, col=$)
@@ -605,22 +890,31 @@ messages:
    }
 
    CanEnter(who=$)
-   "Only guild members and their allies can enter the guild, but not their "
-   "apprentices.  Also determines who can log off safely and remain inside "
-   "the guild hall."
+   "Ours (guild revamp): anyone, if the hall is unowned or public; otherwise "
+   "the owner guild at any rank, and allied guilds at Sir and up.  Also "
+   "determines who can log off safely and remain inside the guild hall."
    {
       local oGuild;
 
       if poGuild_owner = $
+         OR pbPublic
       {
          return TRUE;
       }
 
       oGuild = Send(who,@GetGuild);
+      if oGuild = $
+      {
+         return FALSE;
+      }
 
-      if (oGuild = poGuild_owner
-            OR Send(poGuild_owner,@IsAlly,#otherguild=oGuild))
-            AND Send(oGuild,@GetRank,#who=who) >= RANK_SIR
+      if oGuild = poGuild_owner
+      {
+         return TRUE;
+      }
+
+      if Send(poGuild_owner,@IsAlly,#otherguild=oGuild)
+         AND Send(oGuild,@GetRank,#who=who) >= RANK_SIR
       {
          return TRUE;
       }
