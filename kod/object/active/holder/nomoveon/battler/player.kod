@@ -7481,6 +7481,26 @@ messages:
    {
       poGuild = guild_obj;
       Send(self,@EvaluateNewbieStatus);
+      Post(self,@NameColorsChanged);
+
+      return;
+   }
+
+   NameColorsChanged()
+   "Ours: our guild or faction changed, so the colours other players see our name in, and "
+   "we see theirs in, may have too (User.NameColorFor)."
+   {
+      if poOwner = $
+         OR NOT pbLogged_on
+      {
+         return;
+      }
+
+      Send(poOwner,@SomethingChanged,#what=self);
+      if IsClass(self,&User)
+      {
+         Send(self,@ToCliRoomContents);
+      }
 
       return;
    }
@@ -7507,6 +7527,7 @@ messages:
       {
          Send(Send(poOwner,@GetWatcher),@PlayerQuitGuild,#who=self);
       }
+      Post(self,@NameColorsChanged);
 
       return;
    }
@@ -12593,6 +12614,7 @@ messages:
       if faction <> piFaction
       {
          Send(self,@ClearFactionRenown);
+         Post(self,@NameColorsChanged);
       }
 
       piFaction = faction;
@@ -12872,6 +12894,7 @@ messages:
       piFaction = new_faction;
       // Ours: a new member, or a defector, starts with no renown
       Send(self,@ClearFactionRenown);
+      Post(self,@NameColorsChanged);
       // The loyalty quests are QuestBook favours now (ADR 0009): nothing to schedule
       if piFaction = FACTION_PRINCESS
       {

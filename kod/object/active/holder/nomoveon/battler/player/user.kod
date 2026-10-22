@@ -1262,7 +1262,7 @@ messages:
                    4,Send(what,@GetObjectFlags),
                    1,Send(what,@GetDrawingEffects) & ~DRAWFX_INVISIBLE,
                    4,0, // minimapflags, don't need the value here.
-                   4,Send(what,@GetPlayerNameColor),
+                   4,Send(self,@NameColorFor,#what=what),
                    1,Send(what,@GetClientObjectType),
                    1,0); // MoveOn type, don't need it here.
          SendPacket(poSession);
@@ -2852,7 +2852,7 @@ messages:
       }
 
       AddPacket(4,iFlags, 1,iDrawingFlags, 4,iMinimapFlags,
-                4,Send(what,@GetPlayerNameColor),
+                4,Send(self,@NameColorFor,#what=what),
                 1,Send(what,@GetClientObjectType),
                 1,Send(what,@GetMoveOnType));
 
@@ -3148,7 +3148,7 @@ messages:
                    4,Send(i,@GetObjectFlags),
                    1,Send(i,@GetDrawingEffects) & ~DRAWFX_INVISIBLE,
                    4,0, // minimapflags, don't need the value here.
-                   4,Send(i,@GetPlayerNameColor),
+                   4,Send(self,@NameColorFor,#what=i),
                    1,Send(i,@GetClientObjectType),
                    1,0); // MoveOn type, don't need it here.
       }
@@ -10530,6 +10530,54 @@ messages:
       iFlags |= NC_PLAYER;
 
       return iFlags;
+   }
+
+   NameColorFor(what = $)
+   "Ours (2026-10-22): the colour we see what's name in. Another player in a guild ours "
+   "counts as an enemy is red (NC_GUILD_ENEMY), and one of a rival faction, while we're in "
+   "a faction, orange (NC_FACTION_ENEMY); a guildmate stays white whatever their faction. "
+   "Colours of their own (DMs, event characters, shadow form) and the anonymous and morphed "
+   "are left as they are."
+   {
+      local iColor, oGuild, iFaction;
+
+      iColor = Send(what,@GetPlayerNameColor);
+
+      if what = $
+         OR what = self
+         OR NOT IsClass(what,&User)
+         OR IsClass(what,&DM)
+         OR iColor <> NC_PLAYER
+         OR Send(what,@CheckPlayerFlag,#flag=PFLAG_ANONYMOUS)
+         OR Send(what,@CheckPlayerFlag,#flag=PFLAG_MORPHED)
+      {
+         return iColor;
+      }
+
+      oGuild = Send(what,@GetGuild);
+      if poGuild <> $
+         AND oGuild <> $
+      {
+         if oGuild = poGuild
+         {
+            return iColor;
+         }
+
+         if Send(poGuild,@IsEnemy,#otherguild=oGuild)
+         {
+            return NC_GUILD_ENEMY;
+         }
+      }
+
+      iFaction = Send(what,@GetFaction);
+      if piFaction <> FACTION_NEUTRAL
+         AND iFaction <> FACTION_NEUTRAL
+         AND iFaction <> piFaction
+      {
+         return NC_FACTION_ENEMY;
+      }
+
+      return iColor;
    }
 
    IsEventCharacter()
