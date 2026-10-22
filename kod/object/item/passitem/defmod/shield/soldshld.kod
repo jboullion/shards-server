@@ -289,7 +289,8 @@ messages:
          if oSoldierShield <> $
             AND Send(oSoldierShield,@GetFaction) <> viFaction
          {
-            Send(oSoldierShield,@AttackedByEnemy,#who=what);
+            // Ours: the enemy they remember is our owner (this said what, themselves)
+            Send(oSoldierShield,@AttackedByEnemy,#who=poOwner);
 
             return TRUE;
          }

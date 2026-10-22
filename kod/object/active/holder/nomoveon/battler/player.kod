@@ -212,6 +212,12 @@ resources:
    player_war_regrouping = \
       "%s%s is regrouping after a fall in battle. Let them recover first."
    player_war_regroup_over = "~IYou strike first, and are no longer regrouping."
+   player_no_random_pvp = \
+      "You can't attack %s%s. Players fight each other only in the arenas, in a "
+      "Frenzy, in the Faction War (soldiers of rival lieges), in guild wars, or over "
+      "a council token."
+   player_gear_broken_on_death = \
+      "~BYour weapon and armour are broken in the fall. A smith can mend them."
 
    player_cancel_rescue = \
       "~IYour aggression halts your attempt to escape from the "
@@ -4803,58 +4809,23 @@ messages:
             return FALSE;
          }
 
-         if NOT Send(oRoom,@CheckRoomFlag,#flag=ROOM_KILL_ZONE)
+         // Ours (no random PvP, 2026-10-21): outside the arenas, chaos zones and
+         // Frenzies (let through above) and guild halls, one player may attack
+         // another only in the Faction War, a guild war, or over a council token
+         // (MayAttackPlayer). The newbie and opt-out checks this replaced are
+         // part of that: nobody is a target by default.
+         if victim <> self
+            AND NOT IsClass(victim,&DM)
+            AND NOT IsClass(oRoom,&GuildHall)
+            AND NOT Send(self,@MayAttackPlayer,#victim=victim)
          {
-            if NOT Send(self,@CanPlayerPvP)
+            if report
             {
-               // A newbie (someone below GetPKillEnableHP) tried to attack
-               // another player! note that this does not affect murderers
-               // who have been knocked below this level by angry retributers.
-
-               if report
-                  AND victim <> self
-               {
-                  if Send(SYS,@IsPKAllowed)
-                  {
-                     if (piFlags & PFLAG_PERMA_NO_PVP)
-                     {
-                        Send(self,@MsgSendUser,#message_rsc=player_cant_hit_optout);
-                     }
-                     else
-                     {
-                        Send(self,@MsgSendUser,#message_rsc=player_cant_hit_newbie);
-                     }
-                  }
-                  else
-                  {
-                     Send(self,@MsgSendUser,#message_rsc=player_safe_server);
-                  }
-               }
-            
-               return FALSE;
+               Send(self,@MsgSendUser,#message_rsc=player_no_random_pvp,
+                    #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
             }
 
-            // Can attack non-pvpable players if they're holding a token.
-            if NOT Send(victim,@CanPlayerPvP)
-               AND NOT Send(victim,@PossessesA,#class=&Token)
-            {
-               // The target is a newbie. Murderers are perfectly attackable
-               if report
-               {
-                  if Send(SYS,@IsPKAllowed)
-                  {
-                     Send(self,@MsgSendUser,#message_rsc=player_guardian_angel,
-                           #parm1=Send(victim,@GetDef),
-                           #parm2=Send(victim,@GetName));
-                  }
-                  else
-                  {
-                     Send(self,@MsgSendUser,#message_rsc=player_safe_server);
-                  }
-               }
-
-               return FALSE;
-            }
+            return FALSE;
          }
       }
 
@@ -9737,9 +9708,10 @@ messages:
             oRoom, iRow, iCol, iFine_Row, iFine_Col, iAngle, oItem,
             iRoom, lInventoryContents, lBagContents, oSkull, oSword, oAmulet,
             oHunterSword, oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1,
-            bWarDeath;
+            bWarDeath, bBreakGear;
 
       bWarDeath = FALSE;
+      bBreakGear = FALSE;
 
       // If this player has created any evil twins, delete them.
       Send(self,@RemoveAllCreatedEvilTwins);
@@ -9881,6 +9853,16 @@ messages:
          // If we get to here and we are in an arena, check for item drop.
          bNo_drop_death = TRUE;
       }
+      else if NOT Send(poOwner,@IsArena)
+      {
+         // Ours (no random PvP, 2026-10-21): any other death, to a monster or in a
+         // guild war, drops nothing and costs no skill, spell or XP, as a war death
+         // doesn't; the weapon and armour we had on break instead. Only an arena
+         // that drops loot (the Arena of Death) still takes things.
+         bBreakGear = TRUE;
+         bNo_drop_death = TRUE;
+         piDeathCost = FALSE;
+      }
 
       // Currently, the following block is only for Necromancer Amulets
       // and Hunter Swords. This is placed before the token death check,
@@ -9943,6 +9925,13 @@ messages:
       if bWarDeath
       {
          Send(self,@WarDeath);
+      }
+      else if bBreakGear
+      {
+         if Send(self,@BreakWornGear) > 0
+         {
+            Send(self,@MsgSendUser,#message_rsc=player_gear_broken_on_death);
+         }
       }
 
       // Start losing stuff if applicable.
@@ -13606,9 +13595,10 @@ messages:
          return FALSE;
       }
 
-      if (piFlags & PFLAG_PKILL_ENABLE)
-         AND (Send(self,@PlayerIsHPIntrigue)
-              OR Send(self,@PlayerIsAdept))
+      // Ours (no random PvP): health or magic alone makes us worth the court's notice;
+      // it no longer needs the PvP flag.
+      if Send(self,@PlayerIsHPIntrigue)
+         OR Send(self,@PlayerIsAdept)
       {
          bIntrigue = PFLAG_INTRIGUING;
       }
@@ -14038,10 +14028,48 @@ messages:
       return FALSE;
    }
 
-   WarDeath()
-   "We fell in the Faction War (Killed): nothing drops, but the weapon and armour we had on "
-   "break (a smith mends them); no skill, spell or XP is lost (piDeathCost is 0). Enemy "
-   "soldiers leave us be while we regroup."
+   MayAttackPlayer(victim = $)
+   "Ours (no random PvP): one player may attack another, outside the arenas, chaos zones, "
+   "Frenzies and guild halls (AllowBattlerAttack), only in the Faction War (both wear "
+   "soldier shields of rival lieges), in a mutual guild war, or when we're in a faction "
+   "and the victim carries a council token for another (or none)."
+   {
+      local oShield, oGuild;
+
+      if victim = $
+         OR NOT IsClass(victim,&Player)
+      {
+         return FALSE;
+      }
+
+      oShield = GetListElemByClass(plUsing,&SoldierShield);
+      if oShield <> $
+         AND Send(oShield,@IsEnemyAttack,#what=victim)
+      {
+         return TRUE;
+      }
+
+      oGuild = Send(victim,@GetGuild);
+      if poGuild <> $
+         AND oGuild <> $
+         AND Send(poGuild,@IsMutualEnemy,#otherguild=oGuild)
+      {
+         return TRUE;
+      }
+
+      if piFaction <> FACTION_NEUTRAL
+         AND Send(victim,@GetFaction) <> piFaction
+         AND Send(victim,@PossessesA,#class=&Token)
+      {
+         return TRUE;
+      }
+
+      return FALSE;
+   }
+
+   BreakWornGear()
+   "Ours: a death breaks the weapon and armour we had on (a smith mends them; they keep "
+   "their magic) instead of dropping anything. Returns how many broke."
    {
       local i, lBreak;
 
@@ -14068,6 +14096,15 @@ messages:
          Send(self,@SomethingChanged,#what=i);
       }
 
+      return Length(lBreak);
+   }
+
+   WarDeath()
+   "We fell in the Faction War (Killed): nothing drops, but the weapon and armour we had on "
+   "break; no skill, spell or XP is lost (piDeathCost is 0). Enemy soldiers leave us be "
+   "while we regroup."
+   {
+      Send(self,@BreakWornGear);
       piWarDeaths = piWarDeaths + 1;
       piRegroupUntil = GetTime() + WAR_REGROUP_SECS;
       Send(self,@MsgSendUser,#message_rsc=player_war_death);
