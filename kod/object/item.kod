@@ -2037,6 +2037,66 @@ messages:
       return iShow * OF_MAGIC_SHOW_MUL + Bound(iColour,0,15) * OF_MAGIC_COLOUR_MUL;
    }
 
+   GetWornMagicFlags()
+   "Ours (phase 4): GetMagicShowFlags' bits, but only for a revealed tier: what our client's "
+   "ring round a wielded weapon needs (AddMagicMark, Player.ChangeWindowOverlay). 0 for none."
+   {
+      local iFlags;
+
+      iFlags = Send(self,@GetMagicShowFlags);
+      if (iFlags & OF_MAGIC_SHOW_MASK) / OF_MAGIC_SHOW_MUL < MAGIC_SHOW_SLIGHT
+      {
+         return 0;
+      }
+
+      return iFlags & (OF_MAGIC_SHOW_MASK | OF_MAGIC_COLOUR_MASK);
+   }
+
+   AddMagicMark()
+   "Ours (phase 4): ANIMATE_MAGIC before an overlay's colour, for a revealed magic weapon; "
+   "nothing for anything else."
+   {
+      local iFlags;
+
+      iFlags = Send(self,@GetWornMagicFlags);
+      if iFlags <> 0
+      {
+         AddPacket(1,ANIMATE_MAGIC, 1,iFlags / OF_MAGIC_SHOW_MUL);
+      }
+
+      return;
+   }
+
+   MagicLookChanged()
+   "Ours (phase 4): our revealed magic changed while we're worn: our wearer's figure and, "
+   "for a weapon, their first-person view are sent again, with the ring round it."
+   {
+      local oRoom;
+
+      if NOT pbIn_use
+         OR poOwner = $
+         OR NOT IsClass(poOwner,&Player)
+      {
+         return;
+      }
+
+      Send(self,@RefreshWindowOverlay);
+
+      oRoom = Send(poOwner,@GetOwner);
+      if oRoom <> $
+      {
+         Send(oRoom,@SomethingChanged,#what=poOwner);
+      }
+
+      return;
+   }
+
+   RefreshWindowOverlay()
+   "A weapon's first-person view is sent again (Weapon); other items have none."
+   {
+      return;
+   }
+
    GetMagicTierShown()
    "The tier, once revealed."
    {
@@ -2082,6 +2142,8 @@ messages:
       if bDone
       {
          Send(self,@UpdateMagicTint);
+         // Ours (phase 4): worn, the ring round it in hand shows at once
+         Send(self,@MagicLookChanged);
       }
 
       return bDone;

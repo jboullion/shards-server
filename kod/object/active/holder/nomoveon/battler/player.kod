@@ -10474,6 +10474,8 @@ messages:
    "to change it, such as for an attack.  Note--it's NOT verified that it's "
    "in plWindow_overlays."
    {
+      local iFlags;
+
       if pbLogged_on
       {
          AddPacket(1,BP_PLAYER_OVERLAY);
@@ -10482,7 +10484,15 @@ messages:
          AddPacket(4,Send(what,@GetWindowOverlay));
          AddPacket(4,Send(what,@GetName)); // useless field, used to make client parsing easier
          // Flags, drawing flags, minimapflags, namecolor, playertype, moveon type.
-         AddPacket(4,0, 1,0, 4,0, 4,0, 1,0, 1,0);
+         // Ours (the magic item revamp, phase 4): the flags carry a revealed magic weapon's
+         // OF_MAGIC_* bits, for the ring our client draws round it (Item.GetWornMagicFlags)
+         iFlags = 0;
+         if IsClass(what,&Item)
+         {
+            iFlags = Send(what,@GetWornMagicFlags);
+         }
+
+         AddPacket(4,iFlags, 1,0, 4,0, 4,0, 1,0, 1,0);
          Send(what,@SendWindowOverlayAnimation);
          Send(what,@SendWindowOverlayOverlays);
 

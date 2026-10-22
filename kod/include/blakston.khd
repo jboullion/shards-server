@@ -3141,6 +3141,10 @@
    // 6-11, the wearer's skin (blue ramp) in 12-15. A dye field is a palette ramp (bits 2-5,
    // ramp << 4) and a shade (bits 0-1: 0 undyed, 1 light, 2 full, 3 dark). Our client only.
    ANIMATE_DYE          = 11
+   // Ours (the magic item revamp, phase 4): before an overlay's colour, a byte: a revealed
+   // magic weapon's OF_MAGIC_SHOW and OF_MAGIC_COLOUR bits (shifted down by OF_MAGIC_SHOW_MUL),
+   // for the ring our client draws round it in hand (Item.AddMagicMark). Our client only.
+   ANIMATE_MAGIC        = 12
 
    DYE_SHADE_LIGHT = 1
    DYE_SHADE_FULL = 2

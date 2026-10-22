@@ -528,6 +528,19 @@ messages:
       return oBest;
    }
 
+   RefreshWindowOverlay()
+   "Ours (phase 4): Item.MagicLookChanged: our first-person view again, with its ring."
+   {
+      if vrWeapon_window_overlay <> $
+         AND poOwner <> $
+         AND IsClass(poOwner,&Player)
+      {
+         Send(poOwner,@ChangeWindowOverlay,#what=self);
+      }
+
+      return;
+   }
+
    GetMagicTierHitBonus()
    {
       local oWeapAtt;
@@ -998,6 +1011,8 @@ messages:
    {
       local iFlags;
 
+      // Ours (the magic item revamp, phase 4): the ring round a revealed magic weapon
+      Send(self,@AddMagicMark);
       Send(self,@AddColour);
 
       if iAnimation = PANM_WEAPON_ATTACK 

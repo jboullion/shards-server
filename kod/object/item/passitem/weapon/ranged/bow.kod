@@ -227,6 +227,8 @@ messages:
 
    SendSecondaryOverlayAnimation(iAnimation = $)
    {
+      // Ours (the magic item revamp, phase 4): the ring round a revealed magic bow
+      Send(self,@AddMagicMark);
       Send(self,@AddColour);
 
       if iAnimation <> $
@@ -249,6 +251,7 @@ messages:
 
    SendOverlayAnimation(ianimation = $)
    {
+      Send(self,@AddMagicMark);
       Send(self,@AddColour);
 
       if iAnimation <> $
