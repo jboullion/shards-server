@@ -9853,9 +9853,21 @@ messages:
       Send(self,@RemoveAllEnchantments,#report=FALSE);
       bNo_drop_death = FALSE;
 
+      // Ours (the faction revamp): a Faction War death drops nothing and costs no
+      // skill, spell or XP; WarDeath breaks the gear we had on instead. It comes
+      // before the newbie check, so it doesn't hang on the PvP flag; a Frenzy or an
+      // arena keeps its own rules.
+      if NOT Send(SYS,@GetChaosNight)
+         AND NOT Send(poOwner,@IsArena)
+         AND Send(self,@IsWarDeath,#what=what)
+      {
+         bWarDeath = TRUE;
+         bNo_drop_death = TRUE;
+         piDeathCost = FALSE;
+      }
       // Reign of Blood Frenzy death?  Newbie death?
       // Don't drop anything or take any penalties.
-      if Send(SYS,@GetChaosNight)
+      else if Send(SYS,@GetChaosNight)
          OR Send(self,@HasHonorString,#string=player_newbie_honor_string)
          OR (NOT (piFlags & PFLAG_PKILL_ENABLE)
             AND NOT Send(SETTINGS_OBJECT,@NewbiesDropLoot))
@@ -9868,14 +9880,6 @@ messages:
       {
          // If we get to here and we are in an arena, check for item drop.
          bNo_drop_death = TRUE;
-      }
-      else if Send(self,@IsWarDeath,#what=what)
-      {
-         // Ours (the faction revamp): a Faction War death drops nothing and costs no
-         // skill, spell or XP; WarDeath breaks the gear we had on instead.
-         bWarDeath = TRUE;
-         bNo_drop_death = TRUE;
-         piDeathCost = FALSE;
       }
 
       // Currently, the following block is only for Necromancer Amulets
