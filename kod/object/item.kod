@@ -121,6 +121,11 @@ classvars:
    // Ours (docs/adr/0012-cosmetics.md): which of its art's ramps a dye recolours
    viDyeRamp = DYE_RAMP_NONE
 
+   // Ours (the magic item revamp): its art's neutral part (the plain amulet's stone, the plain
+   // ring's band) is in the grey ramp, so revealed magic colours it with a palette translation
+   // (UpdateMagicTint, MagicGreysTranslation)
+   vbMagicGreys = FALSE
+
    // How much this item will help or hinder spell usage.
    viSpell_modifier = 0
 
@@ -3336,7 +3341,55 @@ messages:
          }
       }
 
+      if vbMagicGreys
+      {
+         Send(self,@UpdateMagicGreys);
+      }
+
       return;
+   }
+
+   UpdateMagicGreys()
+   "Ours: art with its neutral part in the grey ramp (vbMagicGreys): revealed, that part takes "
+   "the colour of the ring round the icon, through a palette translation."
+   {
+      local iFlags, iShow, iTranslation;
+
+      iTranslation = 0;
+      iFlags = Send(self,@GetMagicShowFlags);
+      iShow = (iFlags & OF_MAGIC_SHOW_MASK) / OF_MAGIC_SHOW_MUL;
+      if iShow >= MAGIC_SHOW_REVEALED
+      {
+         iTranslation = Send(self,@MagicGreysTranslation,
+                             #colour=(iFlags & OF_MAGIC_COLOUR_MASK) / OF_MAGIC_COLOUR_MUL);
+      }
+
+      if iTranslation <> Send(self,@GetPaletteTranslation)
+      {
+         Send(self,@SetPaletteTranslation,#translation=iTranslation);
+         if poOwner <> $
+         {
+            Send(poOwner,@SomethingChanged,#what=self);
+         }
+      }
+
+      return;
+   }
+
+   MagicGreysTranslation(colour = 0)
+   "A ring colour (MAGIC_COLOUR_*) as the grey ramp's palette translation; 0 leaves it grey."
+   {
+      if colour = MAGIC_COLOUR_CRIMSON { return PT_GRAY_TO_RED; }
+      if colour = MAGIC_COLOUR_BLUE { return PT_GRAY_TO_DBLUE; }
+      if colour = MAGIC_COLOUR_YELLOW { return PT_GRAY_TO_GOLD; }
+      if colour = MAGIC_COLOUR_TEAL { return PT_GRAY_TO_SKY; }
+      if colour = MAGIC_COLOUR_GREEN { return PT_GRAY_TO_BGREEN; }
+      if colour = MAGIC_COLOUR_VIOLET { return PT_GRAY_TO_PURPLE; }
+      if colour = MAGIC_COLOUR_GOLD { return PT_GRAY_TO_LGOLD; }
+      if colour = MAGIC_COLOUR_AMBER { return PT_GRAY_TO_ORANGE; }
+      if colour = MAGIC_COLOUR_ORANGE { return PT_GRAY_TO_LORANGE; }
+
+      return 0;
    }
 
    DyeChanged()

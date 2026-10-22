@@ -36,6 +36,9 @@ classvars:
 
    viValue_average = 100
 
+   // its band is in the grey ramp (iconforge recolour greys): revealed, it takes its magic's colour
+   vbMagicGreys = TRUE
+
 properties:
 
    vrName = plainring_name_rsc

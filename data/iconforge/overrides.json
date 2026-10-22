@@ -151,6 +151,7 @@
  "plainring.bgf": {
   "from": "ring1.bgf",
   "mode": "generate",
+  "recolour": "greys",
   "describe": "a simple solid band ring of polished silver-grey metal, one smooth unbroken band with no stone, no jewel and no setting, seen at a slight angle so the band's thickness shows, plain and unremarkable, no engraving and no glow"
  },
  "plainamulet.bgf": {
