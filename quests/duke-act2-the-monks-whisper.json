@@ -1,0 +1,50 @@
+{
+  "id": 301,
+  "key": "duke-act2-the-monks-whisper",
+  "name": "The Monk's Whisper",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 65,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke",
+    "renown": 25,
+    "quests": [
+      300
+    ]
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"Zuxana's shadows are useful, but I want eyes inside the Princess's court. The Monk of Riija trades in illusions and secrets. Take him my seal and my offer. Then thin out the Princess's scouts who have been mapping my borders.\"",
+    "progress": "The Monk of Riija keeps his temple past Ko'catan's ruins and the noble avars. The Princess's soldiers guard the flagpoles she holds.",
+    "complete": "Duke Akardius says, \"The monk accepts? Good. Every whisper in Barloque will reach me now. You have done well, Sergeant.\""
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "the Duke's sealed offer",
+      "turnin": {
+        "class": "RiijaMonk"
+      },
+      "objective": "Take the Duke's offer to the Monk of Riija"
+    },
+    {
+      "kind": "kill",
+      "target": "PrincessTroop",
+      "count": 8,
+      "objective": "The Princess's scouts slain",
+      "brief": "The monk has the offer. Now the Princess's scouts: eight of them."
+    }
+  ],
+  "rewards": {
+    "renown": 6,
+    "xpPoints": 1.25,
+    "shillings": 1500
+  }
+}

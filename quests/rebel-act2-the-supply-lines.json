@@ -1,0 +1,50 @@
+{
+  "id": 311,
+  "key": "rebel-act2-the-supply-lines",
+  "name": "Raid the Supply Lines",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 65,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel",
+    "renown": 25,
+    "quests": [
+      310
+    ]
+  },
+  "text": {
+    "offer": "Jonas D'Accor says, \"The Princess feeds her army off our grain. Hit her supply guards, eight of them. Then take an offering to Qerti'nya at Kraanan's temple. She blesses the blade of anyone who fights for the free.\"",
+    "progress": "The Princess's soldiers guard the flagpoles she holds. Priestess Qerti'nya keeps the Temple of Kraanan.",
+    "complete": "Priestess Qerti'nya lays her hand on your blade. \"Kraanan fights beside the free. Go, and strike hard.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "PrincessTroop",
+      "count": 8,
+      "objective": "The Princess's supply guards slain"
+    },
+    {
+      "kind": "collect",
+      "item": "OfferingKraanan",
+      "count": 1,
+      "turnin": {
+        "class": "KraananPriestess"
+      },
+      "objective": "Bring Qerti'nya an offering to Kraanan"
+    }
+  ],
+  "rewards": {
+    "renown": 6,
+    "xpPoints": 1.25,
+    "shillings": 1500
+  }
+}

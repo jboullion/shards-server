@@ -1103,13 +1103,9 @@ messages:
       {
          iSchool = send(theSpell,@GetSchool);
    
+         // Ours (the faction revamp): a liege's own two schools (IsFactionSchool)
          if (iFaction <> FACTION_NEUTRAL)
-            // TODO(design): Rebels' only spell bonus was for crafting spells.
-            AND (iFaction = FACTION_REBEL)
-                 OR ((iFaction = FACTION_DUKE)
-                     AND ((iSchool <> SS_QOR) AND (iSchool <> SS_RIIJA) AND (iSchool <> SS_KRAANAN)))
-                 OR ((iFaction = FACTION_PRINCESS)
-                     AND ((iSchool <> SS_SHALILLE) AND (iSchool <> SS_FAREN) AND (iSchool <> SS_JALA)))
+            AND NOT Send(self,@IsFactionSchool,#faction=iFaction,#school=iSchool)
          {
             return 0;
          }
@@ -1143,6 +1139,29 @@ messages:
       }
 
       return iBonus;
+   }
+
+   IsFactionSchool(faction = $,school = $)
+   "Ours (the faction revamp, ADR 0021): the two schools whose spells a liege's members cast "
+   "and learn better, the same as the liege's battle mages (util/factionwar.kod MageSchool): "
+   "the Duke Qor and Riija, the Princess Shal'ille and Faren, Jonas Kraanan and Jala."
+   {
+      if faction = FACTION_DUKE
+      {
+         return school = SS_QOR OR school = SS_RIIJA;
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         return school = SS_SHALILLE OR school = SS_FAREN;
+      }
+
+      if faction = FACTION_REBEL
+      {
+         return school = SS_KRAANAN OR school = SS_JALA;
+      }
+
+      return FALSE;
    }
 
   GetFactionPriceBonus(who=$, buying=TRUE)
@@ -1266,11 +1285,12 @@ messages:
             iSchool = send(theskill,@GetSchool);
          }
    
+         // Ours (the faction revamp): a liege's own two schools (IsFactionSchool); skills
+         //  (no school) only for Jonas's fighters, as before
          if (iFaction <> FACTION_NEUTRAL)
-            AND (((iFaction = FACTION_REBEL) AND (iSchool<>$))
-                  OR ((iFaction = FACTION_DUKE) AND ((iSchool <> SS_QOR) AND (iSchool <> SS_RIIJA) AND (iSchool <> SS_KRAANAN)))
-                  OR ((iFaction = FACTION_PRINCESS)
-                      AND ((iSchool <> SS_SHALILLE) AND (iSchool <> SS_FAREN) AND (iSchool <> SS_JALA))))
+            AND ((iSchool = $ AND iFaction <> FACTION_REBEL)
+                 OR (iSchool <> $
+                     AND NOT Send(self,@IsFactionSchool,#faction=iFaction,#school=iSchool)))
          {
             return 0;
          }

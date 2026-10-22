@@ -1,0 +1,41 @@
+{
+  "id": 314,
+  "key": "rebel-act5-storm-the-keep",
+  "name": "Storm the Keep",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 105,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel",
+    "renown": 70,
+    "quests": [
+      313
+    ]
+  },
+  "text": {
+    "offer": "Jonas D'Accor says, \"Akardius is the worst of them, and Blackstone Keep is his fist. We break it, and the rest of the lords will think twice. Say march to me when you're ready, and every rebel in Jasper will follow you to Tos.\"",
+    "progress": "Say \"march\" to your liege when you are ready. The army gathers at one of the city's outlying flagpoles two minutes later and fights when you arrive. If you never come, the siege fails.",
+    "complete": "Jonas D'Accor says, \"We broke the Duke's walls! Jasper will sing about this for a hundred years, Champion.\""
+  },
+  "steps": [
+    {
+      "kind": "siege",
+      "against": "duke",
+      "objective": "Win the siege of Tos",
+      "brief": "Say \"march\" to your liege when you are ready. The army gathers at one of the city's outlying flagpoles two minutes later and fights when you arrive. If you never come, the siege fails."
+    }
+  ],
+  "rewards": {
+    "renown": 15,
+    "xpPoints": 3,
+    "shillings": 10000
+  }
+}

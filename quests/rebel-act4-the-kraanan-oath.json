@@ -1,0 +1,48 @@
+{
+  "id": 313,
+  "key": "rebel-act4-the-kraanan-oath",
+  "name": "The Kraanan Oath",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel",
+    "renown": 45,
+    "quests": [
+      312
+    ]
+  },
+  "text": {
+    "offer": "Jonas D'Accor says, \"Every lord in Meridian keeps knights to remind us who's in charge. Unhorse ten of them. Then go to Qerti'nya and swear Kraanan's oath: free men, fighting for free men.\"",
+    "progress": "The knights ride the old roads. Priestess Qerti'nya keeps the Temple of Kraanan.",
+    "complete": "Priestess Qerti'nya takes your oath. \"Jonas will call you Captain now. When you have risen to the rank, ask him for Kraanan's own gift: say champion.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "KnightA",
+      "count": 10,
+      "objective": "The lords' knights slain"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KraananPriestess"
+      },
+      "objective": "Swear Kraanan's oath before Qerti'nya"
+    }
+  ],
+  "rewards": {
+    "renown": 10,
+    "xpPoints": 2,
+    "shillings": 4000
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": 312,
+  "key": "rebel-act3-hold-the-crossroads",
+  "name": "Hold the Crossroads",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel",
+    "renown": 35,
+    "quests": [
+      311
+    ]
+  },
+  "text": {
+    "offer": "Jonas D'Accor says, \"Lords think they own the land because they plant flags on it. Fine. Win a battle with my people, then plant one of ours.\"",
+    "progress": "The lieges' battles are called across the realm every few hours. Wear your soldier's shield and join one for Jonas; then claim a flagpole next to land he holds, with his flag from the tavern.",
+    "complete": "Jonas D'Accor says, \"Ha! Look at that flag fly. The lords are going to hate this.\""
+  },
+  "steps": [
+    {
+      "kind": "battle",
+      "win": true,
+      "objective": "Win a battle for Jonas"
+    },
+    {
+      "kind": "claim",
+      "objective": "Claim a flagpole for Jonas"
+    }
+  ],
+  "rewards": {
+    "renown": 8,
+    "xpPoints": 1.5,
+    "shillings": 2500
+  }
+}

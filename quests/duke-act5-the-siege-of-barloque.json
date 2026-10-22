@@ -1,0 +1,41 @@
+{
+  "id": 304,
+  "key": "duke-act5-the-siege-of-barloque",
+  "name": "The Siege of Barloque",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 105,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke",
+    "renown": 70,
+    "quests": [
+      303
+    ]
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"The Princess hides behind Barloque's walls and calls herself the heir. Let us see how her walls hold. Say march to me when you are ready, and my army will meet you before her gates. Break her defenders, and Barloque will know who rules.\"",
+    "progress": "Say \"march\" to your liege when you are ready. The army gathers at one of the city's outlying flagpoles two minutes later and fights when you arrive. If you never come, the siege fails.",
+    "complete": "Duke Akardius says, \"Her walls cracked and her soldiers ran. Tos drinks to you tonight, Champion.\""
+  },
+  "steps": [
+    {
+      "kind": "siege",
+      "against": "princess",
+      "objective": "Win the siege of Barloque",
+      "brief": "Say \"march\" to your liege when you are ready. The army gathers at one of the city's outlying flagpoles two minutes later and fights when you arrive. If you never come, the siege fails."
+    }
+  ],
+  "rewards": {
+    "renown": 15,
+    "xpPoints": 3,
+    "shillings": 10000
+  }
+}

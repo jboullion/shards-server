@@ -148,6 +148,12 @@ constants:
    // Ours: claiming a flagpole for one's faction in the territory game (Flagpole.ClaimAttempt);
    // any pole counts
    QK_CLAIM = 21
+   // Ours (the faction revamp's campaigns): fighting in one of the lieges' battles for one's
+   // faction (util/factionwar.kod; an amount of 1 counts only a battle won), and winning the
+   // story siege on a rival's capital (the amount is the faction besieged; saying "march" to
+   // one's liege on this step calls it: FactionWar.StartSiege)
+   QK_BATTLE = 22
+   QK_SIEGE = 23
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -1800,10 +1806,17 @@ messages:
          return num >= Nth(step,QBS_AMOUNT);
       }
 
-      // arena: what is TRUE for a bout won
+      // arena, battle: what is TRUE for a bout or battle won
       if Nth(step,QBS_KIND) = QK_ARENA
+         OR Nth(step,QBS_KIND) = QK_BATTLE
       {
          return Nth(step,QBS_AMOUNT) = 0 OR what;
+      }
+
+      // siege: won, against the faction the step names (num)
+      if Nth(step,QBS_KIND) = QK_SIEGE
+      {
+         return what AND (Nth(step,QBS_AMOUNT) = 0 OR Nth(step,QBS_AMOUNT) = num);
       }
 
       if Nth(step,QBS_KIND) = QK_STASH
@@ -1873,6 +1886,51 @@ messages:
       Send(self,@ActionDone,#who=who,#kind=QK_CLAIM);
 
       return;
+   }
+
+   BattleDone(who = $,won = FALSE)
+   "FactionWar.Resolve: who stood in a lieges' battle, on the winning side or not (QK_BATTLE)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_BATTLE,#what=won);
+
+      return;
+   }
+
+   SiegeDone(who = $,won = FALSE,against = 0)
+   "FactionWar.Resolve: who stood in a story siege on against's capital (QK_SIEGE)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_SIEGE,#what=won,#num=against);
+
+      return;
+   }
+
+   SiegeAgainst(who = $)
+   "The faction a siege step who is on would besiege (its amount), or $ if they're on none "
+   "(Factions.SomeoneSaid, 'march')."
+   {
+      local i, lQuest, lStep;
+
+      if NOT IsClass(who,&User)
+      {
+         return $;
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $
+               AND Nth(lStep,QBS_KIND) = QK_SIEGE
+               AND Nth(i,QBL_COUNT) = 0
+            {
+               return Nth(lStep,QBS_AMOUNT);
+            }
+         }
+      }
+
+      return $;
    }
 
    AbilityTrained(who = $,ability = $)

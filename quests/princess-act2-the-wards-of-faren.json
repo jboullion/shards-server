@@ -1,0 +1,51 @@
+{
+  "id": 306,
+  "key": "princess-act2-the-wards-of-faren",
+  "name": "The Wards of Faren",
+  "tier": "main",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 65,
+    "max": 150
+  },
+  "requires": {
+    "faction": "princess",
+    "renown": 25,
+    "quests": [
+      305
+    ]
+  },
+  "text": {
+    "offer": "Princess Kateriina says, \"Jonas's rebels strike at Barloque by night. Priestess Tenuv'vyal can raise elemental wards on my walls, but she needs blue dragon scales to bind them. Bring her two. Then make the rebels pay for their raids.\"",
+    "progress": "Priestess Tenuv'vyal keeps the Temple of Faren in the Badlands. Jonas's soldiers guard the flagpoles he holds.",
+    "complete": "Princess Kateriina says, \"The wards burn bright on my walls tonight. Thank you, Sergeant.\""
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "BlueDragonScale",
+      "count": 2,
+      "turnin": {
+        "class": "FarenPriestess"
+      },
+      "objective": "Bring Tenuv'vyal blue dragon scales"
+    },
+    {
+      "kind": "kill",
+      "target": "RebelTroop",
+      "count": 8,
+      "objective": "Jonas's raiders slain",
+      "brief": "The wards are bound. Now the raiders themselves: eight of Jonas's soldiers."
+    }
+  ],
+  "rewards": {
+    "renown": 6,
+    "xpPoints": 1.25,
+    "shillings": 1500
+  }
+}

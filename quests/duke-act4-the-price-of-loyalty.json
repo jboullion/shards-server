@@ -1,0 +1,51 @@
+{
+  "id": 303,
+  "key": "duke-act4-the-price-of-loyalty",
+  "name": "The Price of Loyalty",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke",
+    "renown": 45,
+    "quests": [
+      302
+    ]
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"Qor gives nothing for free, and nor do I. Zuxana asks an offering for the darkness she lends my soldiers: bring her one. And Jonas has bought swords. The bandit captains on the roads take his coin. Kill three of them.\"",
+    "progress": "Zuxana takes an offering to Qor. The bandit captains lead their gangs in the hills.",
+    "complete": "Duke Akardius says, \"Then you have paid the price, and I name you one of my Captains in truth. When you have risen to the rank, ask me for my gift: say champion.\""
+  },
+  "steps": [
+    {
+      "kind": "collect",
+      "item": "OfferingQor",
+      "count": 1,
+      "turnin": {
+        "class": "QorPriestess"
+      },
+      "objective": "Bring Zuxana an offering to Qor"
+    },
+    {
+      "kind": "kill",
+      "target": "BanditCaptain",
+      "count": 3,
+      "objective": "Bandit captains in Jonas's pay slain",
+      "brief": "Zuxana is satisfied. Now Jonas's hired swords: three bandit captains."
+    }
+  ],
+  "rewards": {
+    "renown": 10,
+    "xpPoints": 2,
+    "shillings": 4000
+  }
+}

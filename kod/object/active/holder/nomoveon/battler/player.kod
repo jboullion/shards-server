@@ -12863,6 +12863,8 @@ messages:
          }
 
          piFaction = FACTION_NEUTRAL;
+         // Ours (the faction revamp): no faction, no renown (as ResetFaction)
+         Send(self,@ClearFactionRenown);
          Send(oParl,@UpdateEffects,#who=self);
          Send(oParl,@MovetoFaction,#who=self,#faction=FACTION_NEUTRAL);
          Send(self,@ReceiveNestedMail,#from=intrigue_ambassador,

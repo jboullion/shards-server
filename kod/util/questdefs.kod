@@ -867,6 +867,77 @@ resources:
    qd_285_t2 = "Jonas D'Accor"
    qd_285_s3 = "Claim a flagpole for your faction"
    qd_285_t3 = "Jonas D'Accor"
+   qd_300_name = "The Roads of Tos"
+   qd_300_s1 = "Jonas's soldiers slain"
+   qd_300_t1 = "Duke Akardius"
+   qd_300_s2 = "Speak to Priestess Zuxana"
+   qd_300_t2 = "Priestess Zuxana"
+   qd_301_name = "The Monk's Whisper"
+   qd_301_s1 = "Take the Duke's offer to the Monk of Riija"
+   qd_301_p1 = "the Duke's sealed offer"
+   qd_301_t1 = "Monk of Riija"
+   qd_301_s2 = "The Princess's scouts slain"
+   qd_301_t2 = "Duke Akardius"
+   qd_302_name = "Ground for Blackstone"
+   qd_302_s1 = "Win a battle for the Duke"
+   qd_302_t1 = "Duke Akardius"
+   qd_302_s2 = "Claim a flagpole for the Duke"
+   qd_302_t2 = "Duke Akardius"
+   qd_303_name = "The Price of Loyalty"
+   qd_303_s1 = "Bring Zuxana an offering to Qor"
+   qd_303_t1 = "Priestess Zuxana"
+   qd_303_s2 = "Bandit captains in Jonas's pay slain"
+   qd_303_t2 = "Duke Akardius"
+   qd_304_name = "The Siege of Barloque"
+   qd_304_s1 = "Win the siege of Barloque"
+   qd_304_t1 = "Duke Akardius"
+   qd_305_name = "The Wounded Road"
+   qd_305_s1 = "The Duke's raiders slain"
+   qd_305_t1 = "Princess Kateriina"
+   qd_305_s2 = "Speak to Priestess Xiana"
+   qd_305_t2 = "Priestess Xiana"
+   qd_306_name = "The Wards of Faren"
+   qd_306_s1 = "Bring Tenuv'vyal blue dragon scales"
+   qd_306_t1 = "Priestess Tenuv'vyal"
+   qd_306_s2 = "Jonas's raiders slain"
+   qd_306_t2 = "Princess Kateriina"
+   qd_307_name = "Holding the Line"
+   qd_307_s1 = "Win a battle for the Princess"
+   qd_307_t1 = "Princess Kateriina"
+   qd_307_s2 = "Claim a flagpole for the Princess"
+   qd_307_t2 = "Princess Kateriina"
+   qd_308_name = "The Envoy's Return"
+   qd_308_s1 = "Take the treaty to the captain in Ko'catan"
+   qd_308_p1 = "the Princess's treaty"
+   qd_308_t1 = "Cital ko'Manca"
+   qd_308_s2 = "Avars on the jungle paths slain"
+   qd_308_t2 = "Princess Kateriina"
+   qd_309_name = "The Siege of Tos"
+   qd_309_s1 = "Win the siege of Tos"
+   qd_309_t1 = "Princess Kateriina"
+   qd_310_name = "Songs in the Tavern"
+   qd_310_s1 = "The Duke's tax men slain"
+   qd_310_t1 = "Jonas D'Accor"
+   qd_310_s2 = "Speak to Priestess Themala"
+   qd_310_t2 = "Priestess Themala"
+   qd_311_name = "Raid the Supply Lines"
+   qd_311_s1 = "The Princess's supply guards slain"
+   qd_311_t1 = "Jonas D'Accor"
+   qd_311_s2 = "Bring Qerti'nya an offering to Kraanan"
+   qd_311_t2 = "Priestess Qerti'nya"
+   qd_312_name = "Hold the Crossroads"
+   qd_312_s1 = "Win a battle for Jonas"
+   qd_312_t1 = "Jonas D'Accor"
+   qd_312_s2 = "Claim a flagpole for Jonas"
+   qd_312_t2 = "Jonas D'Accor"
+   qd_313_name = "The Kraanan Oath"
+   qd_313_s1 = "The lords' knights slain"
+   qd_313_t1 = "Jonas D'Accor"
+   qd_313_s2 = "Swear Kraanan's oath before Qerti'nya"
+   qd_313_t2 = "Priestess Qerti'nya"
+   qd_314_name = "Storm the Keep"
+   qd_314_s1 = "Win the siege of Tos"
+   qd_314_t1 = "Jonas D'Accor"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -882,7 +953,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 131876276;
+      return 67105239;
    }
 
    GetQuests()
@@ -2316,7 +2387,123 @@ messages:
                1, $, $, $, 0 ],
              [ 21, $, 1, 0, &RebelLiege, 0, qd_285_s3, $, $, qd_285_t3,
                1, $, $, $, 0 ] ],
-           3721, 500, $, 300, 1, 3, $, 0, [ [ 4, 3 ], [ 5, 1 ] ], $, $, $ ]
+           3721, 500, $, 300, 1, 3, $, 0, [ [ 4, 3 ], [ 5, 1 ] ], $, $, $ ],
+         // duke-act1-the-roads-of-tos
+         [ 300, qd_300_name, &DukeLiege, 0, 55, 150, [ 77 ],
+           $, $, $, $,
+           [ [ 1, &RebelTroop, 6, 0, &DukeLiege, 0, qd_300_s1, $, $, qd_300_t1,
+               0, $, $, $, 0 ],
+             [ 3, $, 1, 0, &QorPriestess, 0, qd_300_s2, $, $, qd_300_t2,
+               0, $, $, $, 0 ] ],
+           3136, 1000, $, 0, 1, 1, $, 0, [ [ 4, 5 ] ], $, $, 10 ],
+         // duke-act2-the-monks-whisper
+         [ 301, qd_301_name, &DukeLiege, 0, 65, 150, [ 300 ],
+           $, $, $, $,
+           [ [ 4, $, 1, 0, &RiijaMonk, 0, qd_301_s1, $, qd_301_p1, qd_301_t1,
+               0, $, $, $, 0 ],
+             [ 1, &PrincessTroop, 8, 0, &DukeLiege, 0, qd_301_s2, $, $, qd_301_t2,
+               0, $, $, $, 0 ] ],
+           5445, 1500, $, 0, 1, 1, $, 0, [ [ 4, 6 ] ], $, $, 25 ],
+         // duke-act3-ground-for-blackstone
+         [ 302, qd_302_name, &DukeLiege, 0, 80, 150, [ 301 ],
+           $, $, $, $,
+           [ [ 22, $, 1, 0, &DukeLiege, 0, qd_302_s1, $, $, qd_302_t1,
+               1, $, $, $, 1 ],
+             [ 21, $, 1, 0, &DukeLiege, 0, qd_302_s2, $, $, qd_302_t2,
+               1, $, $, $, 0 ] ],
+           9842, 2500, $, 0, 1, 1, $, 0, [ [ 4, 8 ] ], $, $, 35 ],
+         // duke-act4-the-price-of-loyalty
+         [ 303, qd_303_name, &DukeLiege, 0, 95, 150, [ 302 ],
+           $, $, $, $,
+           [ [ 2, &OfferingQor, 1, 0, &QorPriestess, 0, qd_303_s1, $, $, qd_303_t1,
+               0, $, $, $, 0 ],
+             [ 1, &BanditCaptain, 3, 0, &DukeLiege, 0, qd_303_s2, $, $, qd_303_t2,
+               0, $, $, $, 0 ] ],
+           18432, 4000, $, 0, 1, 1, $, 0, [ [ 4, 10 ] ], $, $, 45 ],
+         // duke-act5-the-siege-of-barloque
+         [ 304, qd_304_name, &DukeLiege, 0, 105, 150, [ 303 ],
+           $, $, $, $,
+           [ [ 23, $, 1, 0, &DukeLiege, 0, qd_304_s1, $, $, qd_304_t1,
+               1, $, $, $, 2 ] ],
+           33708, 10000, $, 0, 1, 1, $, 0, [ [ 4, 15 ] ], $, $, 70 ],
+         // princess-act1-the-wounded-road
+         [ 305, qd_305_name, &PrincessLiege, 0, 55, 150, [ 76 ],
+           $, $, $, $,
+           [ [ 1, &DukeTroop, 6, 0, &PrincessLiege, 0, qd_305_s1, $, $, qd_305_t1,
+               0, $, $, $, 0 ],
+             [ 3, $, 1, 0, &ShalillePriestess, 0, qd_305_s2, $, $, qd_305_t2,
+               0, $, $, $, 0 ] ],
+           3136, 1000, $, 0, 1, 2, $, 0, [ [ 4, 5 ] ], $, $, 10 ],
+         // princess-act2-the-wards-of-faren
+         [ 306, qd_306_name, &PrincessLiege, 0, 65, 150, [ 305 ],
+           $, $, $, $,
+           [ [ 2, &BlueDragonScale, 2, 0, &FarenPriestess, 0, qd_306_s1, $, $, qd_306_t1,
+               0, $, $, $, 0 ],
+             [ 1, &RebelTroop, 8, 0, &PrincessLiege, 0, qd_306_s2, $, $, qd_306_t2,
+               0, $, $, $, 0 ] ],
+           5445, 1500, $, 0, 1, 2, $, 0, [ [ 4, 6 ] ], $, $, 25 ],
+         // princess-act3-holding-the-line
+         [ 307, qd_307_name, &PrincessLiege, 0, 80, 150, [ 306 ],
+           $, $, $, $,
+           [ [ 22, $, 1, 0, &PrincessLiege, 0, qd_307_s1, $, $, qd_307_t1,
+               1, $, $, $, 1 ],
+             [ 21, $, 1, 0, &PrincessLiege, 0, qd_307_s2, $, $, qd_307_t2,
+               1, $, $, $, 0 ] ],
+           9842, 2500, $, 0, 1, 2, $, 0, [ [ 4, 8 ] ], $, $, 35 ],
+         // princess-act4-the-envoys-return
+         [ 308, qd_308_name, &PrincessLiege, 0, 95, 150, [ 307 ],
+           $, $, $, $,
+           [ [ 4, $, 1, 0, &KocatanCaptainGood, 0, qd_308_s1, $, qd_308_p1, qd_308_t1,
+               0, $, $, $, 0 ],
+             [ 1, &Avar, 10, 0, &PrincessLiege, 0, qd_308_s2, $, $, qd_308_t2,
+               0, $, $, $, 0 ] ],
+           18432, 4000, $, 0, 1, 2, $, 0, [ [ 4, 10 ] ], $, $, 45 ],
+         // princess-act5-the-siege-of-tos
+         [ 309, qd_309_name, &PrincessLiege, 0, 105, 150, [ 308 ],
+           $, $, $, $,
+           [ [ 23, $, 1, 0, &PrincessLiege, 0, qd_309_s1, $, $, qd_309_t1,
+               1, $, $, $, 1 ] ],
+           33708, 10000, $, 0, 1, 2, $, 0, [ [ 4, 15 ] ], $, $, 70 ]
+         ],
+         [
+         // rebel-act1-songs-in-the-tavern
+         [ 310, qd_310_name, &RebelLiege, 0, 55, 150, [ 78 ],
+           $, $, $, $,
+           [ [ 1, &DukeTroop, 6, 0, &RebelLiege, 0, qd_310_s1, $, $, qd_310_t1,
+               0, $, $, $, 0 ],
+             [ 3, $, 1, 0, &JalaPriestess, 0, qd_310_s2, $, $, qd_310_t2,
+               0, $, $, $, 0 ] ],
+           3136, 1000, $, 0, 1, 3, $, 0, [ [ 4, 5 ] ], $, $, 10 ],
+         // rebel-act2-the-supply-lines
+         [ 311, qd_311_name, &RebelLiege, 0, 65, 150, [ 310 ],
+           $, $, $, $,
+           [ [ 1, &PrincessTroop, 8, 0, &RebelLiege, 0, qd_311_s1, $, $, qd_311_t1,
+               0, $, $, $, 0 ],
+             [ 2, &OfferingKraanan, 1, 0, &KraananPriestess, 0, qd_311_s2, $, $, qd_311_t2,
+               0, $, $, $, 0 ] ],
+           5445, 1500, $, 0, 1, 3, $, 0, [ [ 4, 6 ] ], $, $, 25 ],
+         // rebel-act3-hold-the-crossroads
+         [ 312, qd_312_name, &RebelLiege, 0, 80, 150, [ 311 ],
+           $, $, $, $,
+           [ [ 22, $, 1, 0, &RebelLiege, 0, qd_312_s1, $, $, qd_312_t1,
+               1, $, $, $, 1 ],
+             [ 21, $, 1, 0, &RebelLiege, 0, qd_312_s2, $, $, qd_312_t2,
+               1, $, $, $, 0 ] ],
+           9842, 2500, $, 0, 1, 3, $, 0, [ [ 4, 8 ] ], $, $, 35 ],
+         // rebel-act4-the-kraanan-oath
+         [ 313, qd_313_name, &RebelLiege, 0, 95, 150, [ 312 ],
+           $, $, $, $,
+           [ [ 1, &KnightA, 10, 0, &RebelLiege, 0, qd_313_s1, $, $, qd_313_t1,
+               0, $, $, $, 0 ],
+             [ 3, $, 1, 0, &KraananPriestess, 0, qd_313_s2, $, $, qd_313_t2,
+               0, $, $, $, 0 ] ],
+           18432, 4000, $, 0, 1, 3, $, 0, [ [ 4, 10 ] ], $, $, 45 ],
+         // rebel-act5-storm-the-keep
+         [ 314, qd_314_name, &RebelLiege, 0, 105, 150, [ 313 ],
+           $, $, $, $,
+           [ [ 23, $, 1, 0, &RebelLiege, 0, qd_314_s1, $, $, qd_314_t1,
+               1, $, $, $, 1 ] ],
+           33708, 10000, $, 0, 1, 3, $, 0, [ [ 4, 15 ] ], $, $, 70 ]
          ]
       ];
    }

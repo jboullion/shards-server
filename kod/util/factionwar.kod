@@ -50,6 +50,9 @@ constants:
 
    HISTORY_MAX = 10
 
+   // A story siege (StartSiege) gathers this many minutes after it's called
+   SIEGE_MUSTER_MINUTES = 2
+
 resources:
 
    fw_muster = \
@@ -68,6 +71,16 @@ resources:
       "~IThe day is lost, but your liege remembers who stood at %s.  %i shillings for your "
       "trouble."
    fw_effort = "~IYour work strengthens %s's next battle."
+
+   fw_siege_muster = \
+      "~B~k[Battle]~n ~B%s leads %s's army against %s, before the walls of %s!  The siege "
+      "begins in %i minutes."
+   fw_siege_called = "~IYour liege's army will be waiting for you at %s.  Lead it there."
+   fw_siege_busy = \
+      "~IThe armies are already in the field.  Your liege will march when this battle is done."
+   fw_siege_no_target = "~IThere are no walls of that enemy left to besiege."
+   fw_siege_won = \
+      "~B~k[Celebration]~n ~BThe siege at %s is won!  %s celebrates in %s."
 
 classvars:
 
@@ -90,6 +103,9 @@ properties:
    piAttacker = FACTION_NEUTRAL
    piDefender = FACTION_NEUTRAL
    pbOpenGround = FALSE
+   // A story siege (StartSiege): the player who called it
+   pbSiege = FALSE
+   poSiegeLeader = $
    piDeadline = 0
    pbSpawned = FALSE
    // Where the attackers gather: [ row, col ] (SpawnArmies), or $
@@ -244,14 +260,14 @@ messages:
       return Send(Send(SYS,@GetParliament),@GetFactionLiegeName,#faction=faction);
    }
 
-   Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $)
+   Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $,parm5 = $)
    {
       local i;
 
       foreach i in Send(SYS,@GetUsersLoggedOn)
       {
          Send(i,@MsgSendUser,#message_rsc=rsc,#parm1=parm1,#parm2=parm2,#parm3=parm3,
-              #parm4=parm4);
+              #parm4=parm4,#parm5=parm5);
       }
 
       return;
@@ -501,6 +517,91 @@ messages:
       }
 
       ptStage = CreateTimer(self,@OpenBattle,Bound(piMusterMinutes,0,60) * 60000 + 1);
+
+      return TRUE;
+   }
+
+   StartSiege(who = $,against = $)
+   "Ours (the faction revamp's campaigns): who, on their campaign's siege step, said 'march' "
+   "to their liege (Factions.SomeoneSaid): their liege's army besieges a capture point of "
+   "against's capital after SIEGE_MUSTER_MINUTES. It takes no pole (Resolve); won, it counts "
+   "for the step (QuestBook.SiegeDone) and the capital celebrates. Nobody leading it, it "
+   "fails. The regular schedule stays as it was."
+   {
+      local iFaction, oTG, iRID, lTargets, oRoom, oFlag;
+
+      iFaction = Send(who,@GetFaction);
+      if piState <> STATE_NONE
+      {
+         Send(who,@MsgSendUser,#message_rsc=fw_siege_busy);
+
+         return FALSE;
+      }
+
+      if against = $
+         OR against = iFaction
+         OR against <= FACTION_NEUTRAL
+         OR against > FACTION_NORMAL_MAX
+         OR iFaction = FACTION_NEUTRAL
+      {
+         return FALSE;
+      }
+
+      oTG = Send(SYS,@GetTerritoryGame);
+      lTargets = $;
+      if oTG <> $
+      {
+         foreach iRID in Send(oTG,@GetFlagRIDs)
+         {
+            if Send(oTG,@IsHometownFlag,#RID=iRID,#faction=against)
+            {
+               oRoom = Send(SYS,@FindRoomByNum,#num=iRID);
+               if oRoom <> $
+               {
+                  oFlag = Send(oRoom,@FindHoldingActive,#class=&Flagpole);
+                  if oFlag <> $
+                     AND Send(oFlag,@IsClaimable)
+                  {
+                     lTargets = Cons(iRID,lTargets);
+                  }
+               }
+            }
+         }
+      }
+
+      if lTargets = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=fw_siege_no_target);
+
+         return FALSE;
+      }
+
+      iRID = Nth(lTargets,Random(1,Length(lTargets)));
+      poRoom = Send(SYS,@FindRoomByNum,#num=iRID);
+      poFlag = Send(poRoom,@FindHoldingActive,#class=&Flagpole);
+      piAttacker = iFaction;
+      piDefender = against;
+      pbOpenGround = FALSE;
+      pbSpawned = FALSE;
+      plParticipants = $;
+      plAttackArmy = $;
+      plDefendArmy = $;
+      poAttackCaptain = $;
+      poDefendCaptain = $;
+      pbSiege = TRUE;
+      poSiegeLeader = who;
+      piState = STATE_MUSTER;
+
+      Send(self,@Announce,#rsc=fw_siege_muster,#parm1=Send(who,@GetName),
+           #parm2=Send(self,@LiegeName,#faction=iFaction),
+           #parm3=Send(self,@LiegeName,#faction=against),
+           #parm4=Send(Send(SYS,@FindRoomByNum,
+                            #num=Send(Send(self,@GetWorld),@Capital,#faction=against)),
+                       @GetName),
+           #parm5=SIEGE_MUSTER_MINUTES);
+      Send(who,@MsgSendUser,#message_rsc=fw_siege_called,#parm1=Send(poRoom,@GetName));
+
+      ptStage = CreateTimer(self,@OpenBattle,SIEGE_MUSTER_MINUTES * 60000);
 
       return TRUE;
    }
@@ -1049,6 +1150,15 @@ messages:
    {
       local iChance, iA, iD;
 
+      // A siege nobody led fails
+      if pbSiege
+         AND NOT pbSpawned
+      {
+         Send(self,@Resolve,#winner=piDefender,#how=HOW_UNWATCHED);
+
+         return;
+      }
+
       if pbSpawned
       {
          iA = Send(self,@ArmyHealth,#army=plAttackArmy);
@@ -1130,8 +1240,10 @@ messages:
          iLoser = piAttacker;
       }
 
-      // The winner takes the pole: SetFaction recounts the land and the lieges' power.
-      if poFlag <> $
+      // The winner takes the pole: SetFaction recounts the land and the lieges' power. A
+      //  story siege (StartSiege) breaks the walls but takes no pole.
+      if NOT pbSiege
+         AND poFlag <> $
          AND Send(poFlag,@GetFaction) <> winner
       {
          Send(poFlag,@SetFaction,#faction=winner);
@@ -1162,6 +1274,14 @@ messages:
             continue;
          }
 
+         // The campaigns' battle and siege steps (util/questbook.kod)
+         Send(Send(SYS,@GetQuestBook),@BattleDone,#who=oWho,#won=(iFaction = winner));
+         if pbSiege
+         {
+            Send(Send(SYS,@GetQuestBook),@SiegeDone,#who=oWho,#won=(iFaction = winner),
+                 #against=piDefender);
+         }
+
          if iFaction = winner
          {
             Send(oWho,@NoteBattle,#won=TRUE);
@@ -1180,8 +1300,19 @@ messages:
          }
       }
 
-      // A run of wins is celebrated (FactionWorld.BattleWon)
+      // A run of wins is celebrated (FactionWorld.BattleWon), and so is a siege won
       Send(Send(self,@GetWorld),@BattleWon,#winner=winner,#loser=iLoser);
+      if pbSiege
+         AND winner = piAttacker
+      {
+         Send(self,@Announce,#rsc=fw_siege_won,#parm1=Send(oRoom,@GetName),
+              #parm2=Send(self,@LiegeName,#faction=winner),
+              #parm3=Send(Send(SYS,@FindRoomByNum,
+                               #num=Send(Send(self,@GetWorld),@Capital,#faction=winner)),
+                          @GetName));
+         Send(Send(self,@GetWorld),@Celebrate,#faction=winner,
+              #places=[ Send(Send(self,@GetWorld),@Capital,#faction=winner) ]);
+      }
 
       // Both sides' war effort is spent.
       if plWarEffort <> $
@@ -1213,7 +1344,15 @@ messages:
       piAttacker = FACTION_NEUTRAL;
       piDefender = FACTION_NEUTRAL;
 
-      Send(self,@ScheduleNext);
+      // A siege leaves the regular schedule as it was
+      if NOT pbSiege
+         OR ptNext = $
+      {
+         Send(self,@ScheduleNext);
+      }
+
+      pbSiege = FALSE;
+      poSiegeLeader = $;
 
       return;
    }

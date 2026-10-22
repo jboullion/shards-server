@@ -1,0 +1,48 @@
+{
+  "id": 310,
+  "key": "rebel-act1-songs-in-the-tavern",
+  "name": "Songs in the Tavern",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 55,
+    "max": 150
+  },
+  "requires": {
+    "faction": "rebel",
+    "renown": 10,
+    "quests": [
+      78
+    ]
+  },
+  "text": {
+    "offer": "Jonas D'Accor says, \"The Duke's tax men bleed Jasper dry. Six of them won't be collecting anything any more - see to it. Then find Priestess Themala, of Jala. A rebellion needs songs more than swords, and she knows every song worth singing.\"",
+    "progress": "The Duke's soldiers guard the flagpoles he holds. Luisane d'Ile, Berg's merchant, knows where to find Themala.",
+    "complete": "Priestess Themala laughs and strums a chord. \"Tell Jonas I'll write him a song the whole of Meridian will sing. Songs are hard to hang.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DukeTroop",
+      "count": 6,
+      "objective": "The Duke's tax men slain"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "JalaPriestess"
+      },
+      "objective": "Speak to Priestess Themala"
+    }
+  ],
+  "rewards": {
+    "renown": 5,
+    "xpPoints": 1,
+    "shillings": 1000
+  }
+}

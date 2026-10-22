@@ -1,0 +1,50 @@
+{
+  "id": 308,
+  "key": "princess-act4-the-envoys-return",
+  "name": "The Envoy's Return",
+  "tier": "main",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 95,
+    "max": 150
+  },
+  "requires": {
+    "faction": "princess",
+    "renown": 45,
+    "quests": [
+      307
+    ]
+  },
+  "text": {
+    "offer": "Princess Kateriina says, \"Ko'catan's captain has read my letters; now he must sign. Take him the treaty. He will want proof the crown can keep its friends safe, so clear the avars from the jungle paths while you are there.\"",
+    "progress": "The captain keeps the watch in Ko'catan. The avars roam the jungle beyond.",
+    "complete": "Princess Kateriina says, \"Ko'catan stands with the crown. With their ships behind us, I name you one of my Captains. When you have risen to the rank, ask me for my gift: say champion.\""
+  },
+  "steps": [
+    {
+      "kind": "deliver",
+      "parcel": "the Princess's treaty",
+      "turnin": {
+        "class": "KocatanCaptainGood"
+      },
+      "objective": "Take the treaty to the captain in Ko'catan"
+    },
+    {
+      "kind": "kill",
+      "target": "Avar",
+      "count": 10,
+      "objective": "Avars on the jungle paths slain",
+      "brief": "The captain will sign once the jungle paths are safe: ten avars."
+    }
+  ],
+  "rewards": {
+    "renown": 10,
+    "xpPoints": 2,
+    "shillings": 4000
+  }
+}

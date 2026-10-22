@@ -1,0 +1,48 @@
+{
+  "id": 300,
+  "key": "duke-act1-the-roads-of-tos",
+  "name": "The Roads of Tos",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 55,
+    "max": 150
+  },
+  "requires": {
+    "faction": "duke",
+    "renown": 10,
+    "quests": [
+      77
+    ]
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"Jonas's agitators walk my roads as if they owned them, whispering to my farmers. Find his soldiers in the field and cut them down - six will do for a start. Then go to Priestess Zuxana at the Temple of Qor. She reads in the dark what Jonas plans next.\"",
+    "progress": "Jonas's soldiers guard the flagpoles his rebels hold. The Temple of Qor's door opens in the Cragged Mountains or under the shadow of the Sentinel.",
+    "complete": "Priestess Zuxana smiles thinly. \"The Duke's hound. The shadows tell me Jonas has friends inside Barloque's walls, and that the Princess pays them. Tell Akardius the enemy of his enemy is still his enemy.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "RebelTroop",
+      "count": 6,
+      "objective": "Jonas's soldiers slain"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "QorPriestess"
+      },
+      "objective": "Speak to Priestess Zuxana"
+    }
+  ],
+  "rewards": {
+    "renown": 5,
+    "xpPoints": 1,
+    "shillings": 1000
+  }
+}

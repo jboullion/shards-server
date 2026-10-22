@@ -14,6 +14,12 @@ constants:
 
    include blakston.khd
 
+resources:
+
+   factions_march_trigger = "march"
+   factions_march_not_yet = "Not yet.  When I need you to lead my army, I will tell you."
+   factions_march_go = "Then go.  My army will be waiting for you.  Do not keep it waiting long."
+
 classvars:
 
    viDefinite = ARTICLE_NONE
@@ -57,7 +63,7 @@ messages:
    "(util/championgifts.kod); one of ours who says 'ledger' hears our best soldiers "
    "(util/factionworld.kod)."
    {
-      local oGifts, oWorld;
+      local oGifts, oWorld, iAgainst;
 
       if IsClass(what,&Player)
          AND type = SAY_NORMAL
@@ -75,6 +81,24 @@ messages:
             AND Send(what,@GetFaction) = viFaction
          {
             Send(oWorld,@ReadLedger,#who=what,#liege=self);
+
+            return;
+         }
+
+         // The campaign's siege (util/questbook.kod QK_SIEGE): one of ours on that step
+         //  says "march" and our army goes (FactionWar.StartSiege)
+         if StringEqual(string,factions_march_trigger)
+            AND Send(what,@GetFaction) = viFaction
+         {
+            iAgainst = Send(Send(SYS,@GetQuestBook),@SiegeAgainst,#who=what);
+            if iAgainst = $
+            {
+               Send(self,@SayToOne,#target=what,#message_rsc=factions_march_not_yet);
+            }
+            else if Send(Send(SYS,@GetFactionWar),@StartSiege,#who=what,#against=iAgainst)
+            {
+               Send(self,@SayToOne,#target=what,#message_rsc=factions_march_go);
+            }
 
             return;
          }

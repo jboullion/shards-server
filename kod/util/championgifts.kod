@@ -25,6 +25,12 @@ constants:
    CHAMPION_RENOWN = 70
    CHAMPION_HEALTH = 100
 
+   // Ours (the faction revamp's campaigns, ADR 0021): the gift waits on each liege's fourth
+   // act (quests/duke-the-price-of-loyalty.json and the others)
+   CAMPAIGN_ACT4_DUKE = 303
+   CAMPAIGN_ACT4_PRINCESS = 308
+   CAMPAIGN_ACT4_REBEL = 313
+
    // How often a gift's hunger ticks: a minute, sixty to a point of piHunger
    GIFT_HUNGER_TICK = 60000
 
@@ -55,6 +61,9 @@ resources:
       "Your deeds are worthy, %s, but you are not yet hardy enough to bear my gift.  Return "
       "when you are stronger."
    champion_have_one = "You already bear my gift, %s.  Keep it fed."
+   champion_need_campaign = \
+      "Rank alone does not earn my gift, %s.  See my war through with me first: there is "
+      "work I have kept for my Captains.  Ask me for it."
    champion_cant_hold = "You have no room to carry my gift, %s.  Make some, and return."
 
    champion_gift_princess = \
@@ -143,6 +152,21 @@ messages:
       return champion_liege_rebel;
    }
 
+   CampaignAct4(faction = $)
+   {
+      if faction = FACTION_PRINCESS
+      {
+         return CAMPAIGN_ACT4_PRINCESS;
+      }
+
+      if faction = FACTION_DUKE
+      {
+         return CAMPAIGN_ACT4_DUKE;
+      }
+
+      return CAMPAIGN_ACT4_REBEL;
+   }
+
    IsTrigger(string = $)
    {
       return string <> $
@@ -187,6 +211,16 @@ messages:
       if Send(who,@GetBaseMaxHealth) < CHAMPION_HEALTH
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_health,
+              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+
+         return;
+      }
+
+      // Ours: the campaign's fourth act first (ADR 0021)
+      if Send(Send(SYS,@GetQuestBook),@DoneEntry,#who=who,
+              #id=Send(self,@CampaignAct4,#faction=iFaction)) = $
+      {
+         Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_campaign,
               #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
 
          return;
