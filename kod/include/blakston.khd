@@ -225,7 +225,7 @@
    NC_SHADOW       = 0x000000   // Set if name should be drawn black.
    NC_KILLER       = 0xFF0000   // Set if object is a killer.
    // Ours (2026-10-22): the red and orange that once marked murderers and outlaws now
-   // mark, to each viewer, a player of a guild theirs counts as an enemy and a player of a
+   // mark, to each viewer, a player of a guild theirs is at war with and a player of a
    // rival faction (User.NameColorFor).
    NC_GUILD_ENEMY  = 0xFF0000
    NC_FACTION_ENEMY = 0xFC9E00

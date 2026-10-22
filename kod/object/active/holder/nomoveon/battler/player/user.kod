@@ -10533,9 +10533,10 @@ messages:
    }
 
    NameColorFor(what = $)
-   "Ours (2026-10-22): the colour we see what's name in. Another player in a guild ours "
-   "counts as an enemy is red (NC_GUILD_ENEMY), and one of a rival faction, while we're in "
-   "a faction, orange (NC_FACTION_ENEMY); a guildmate stays white whatever their faction. "
+   "Ours (2026-10-22): the colour we see what's name in. Another player in a guild ours is "
+   "at war with (IsMutualEnemy) is red (NC_GUILD_ENEMY), and one of a rival faction, while "
+   "we're in a faction, orange (NC_FACTION_ENEMY); a guildmate stays white whatever their "
+   "faction. "
    "Colours of their own (DMs, event characters, shadow form) and the anonymous and morphed "
    "are left as they are."
    {
@@ -10563,7 +10564,7 @@ messages:
             return iColor;
          }
 
-         if Send(poGuild,@IsEnemy,#otherguild=oGuild)
+         if Send(poGuild,@IsMutualEnemy,#otherguild=oGuild)
          {
             return NC_GUILD_ENEMY;
          }
