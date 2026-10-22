@@ -195,7 +195,7 @@ messages:
       if Send(who,@GetFaction) <> iFaction
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_not_yours,
-              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+              #parm1=Send(who,@GetName));
 
          return;
       }
@@ -203,7 +203,7 @@ messages:
       if Send(who,@GetFactionRenown) < CHAMPION_RENOWN
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_renown,
-              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+              #parm1=Send(who,@GetName));
 
          return;
       }
@@ -211,7 +211,7 @@ messages:
       if Send(who,@GetBaseMaxHealth) < CHAMPION_HEALTH
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_health,
-              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+              #parm1=Send(who,@GetName));
 
          return;
       }
@@ -221,7 +221,7 @@ messages:
               #id=Send(self,@CampaignAct4,#faction=iFaction)) = $
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_campaign,
-              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+              #parm1=Send(who,@GetName));
 
          return;
       }
@@ -229,7 +229,7 @@ messages:
       if Send(who,@PossessesA,#class=oClass)
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_have_one,
-              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+              #parm1=Send(who,@GetName));
 
          return;
       }
@@ -239,7 +239,7 @@ messages:
       {
          Send(oGift,@Delete);
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_cant_hold,
-              #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+              #parm1=Send(who,@GetName));
 
          return;
       }
@@ -255,7 +255,7 @@ messages:
       }
 
       Send(liege,@SayToOne,#target=who,#message_rsc=rGrant,
-           #parm1=Send(who,@GetName),#type1=STRING_RESOURCE);
+           #parm1=Send(who,@GetName));
       Send(who,@NewHold,#what=oGift);
 
       return;

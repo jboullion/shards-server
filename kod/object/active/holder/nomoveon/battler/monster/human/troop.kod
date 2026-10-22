@@ -488,8 +488,10 @@ messages:
 
          iFaction = Send(oShield,@GetFaction);
 
+         // One just come to the field has a moment to find their army (FactionWar.InGrace)
          return iFaction <> viFaction
-                AND Send(poBattle,@IsBattleSide,#faction=iFaction);
+                AND Send(poBattle,@IsBattleSide,#faction=iFaction)
+                AND NOT Send(poBattle,@InGrace,#who=what);
       }
 
       return FALSE;
@@ -599,6 +601,9 @@ messages:
 
             return FALSE;
          }
+
+         // Striking first ends one's grace
+         Send(poBattle,@EndGrace,#who=who);
       }
 
       propagate;

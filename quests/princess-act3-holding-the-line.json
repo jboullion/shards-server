@@ -22,7 +22,7 @@
   },
   "text": {
     "offer": "Princess Kateriina says, \"My soldiers fight better when they see someone worth following. Stand with them in the next battle and win it. Then raise my flag over a field of the realm.\"",
-    "progress": "The lieges' battles are called across the realm every few hours. Wear your soldier's shield and join one for the Princess; then claim a flagpole next to land she holds, with her flag from her castle.",
+    "progress": "The lieges' battles are called across the realm every few hours. Wear your soldier's shield and join one for the Princess; then claim a flagpole next to land she holds, with her flag from her castle. Then return to the Princess.",
     "complete": "Princess Kateriina says, \"Every flag raised in my name is a promise kept. The people are watching you.\""
   },
   "steps": [
@@ -33,6 +33,7 @@
     },
     {
       "kind": "claim",
+      "auto": false,
       "objective": "Claim a flagpole for the Princess"
     }
   ],

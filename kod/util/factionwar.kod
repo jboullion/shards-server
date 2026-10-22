@@ -50,17 +50,23 @@ constants:
 
    HISTORY_MAX = 10
 
+   // A soldier who reaches a fought battle: this long before the enemy will turn on them,
+   //  while their own army forms up round them (NoteParticipants)
+   GRACE_SECONDS = 8
+
    // A story siege (StartSiege) gathers this many minutes after it's called
    SIEGE_MUSTER_MINUTES = 2
 
 resources:
 
    fw_muster = \
-      "~B~k[Battle]~n ~B%s marches on %s, held by %s!  The armies meet there in %i "
-      "minutes.  Soldiers of either liege, take up your shields."
+      "~B~k[Battle]~n ~B%s marches on %s, held by %s!  The armies meet there in %i %s.  "
+      "Soldiers of either liege, take up your shields."
    fw_muster_open = \
       "~B~k[Battle]~n ~B%s and %s both march on %s, which no liege holds.  The armies meet "
-      "there in %i minutes.  Soldiers of either liege, take up your shields."
+      "there in %i %s.  Soldiers of either liege, take up your shields."
+   fw_minute = "minute"
+   fw_minutes = "minutes"
    fw_begin = "~B~k[Battle]~n ~BThe armies of %s and %s clash at %s!"
    fw_won_field = "~B~k[Battle]~n ~B%s carries the field at %s.  The day is theirs."
    fw_won_time = \
@@ -78,6 +84,8 @@ resources:
    fw_siege_called = "~IYour liege's army will be waiting for you at %s.  Lead it there."
    fw_siege_busy = \
       "~IThe armies are already in the field.  Your liege will march when this battle is done."
+   fw_rally =       "~IYour liege's soldiers close ranks round you.  You have a moment to find your place in "
+      "the line."
    fw_siege_no_target = "~IThere are no walls of that enemy left to besiege."
    fw_siege_won = \
       "~B~k[Celebration]~n ~BThe siege at %s is won!  %s celebrates in %s."
@@ -108,8 +116,9 @@ properties:
    poSiegeLeader = $
    piDeadline = 0
    pbSpawned = FALSE
-   // Where the attackers gather: [ row, col ] (SpawnArmies), or $
+   // Where each army gathers: [ row, col ] (SpawnArmies), or $ (the defenders: the pole)
    plAttackAnchor = $
+   plDefendAnchor = $
 
    // The armies' troops, and their captains (FALSE once fallen)
    plAttackArmy = $
@@ -122,7 +131,7 @@ properties:
    pbAttackGuarded = TRUE
    pbDefendGuarded = TRUE
 
-   // The soldiers who stood in the battle: [ player, faction ]
+   // The soldiers who stood in the battle: [ player, faction, grace until ]
    plParticipants = $
 
    // War effort: [ Duke, Princess, Rebels ]
@@ -258,6 +267,16 @@ messages:
    LiegeName(faction = $)
    {
       return Send(Send(SYS,@GetParliament),@GetFactionLiegeName,#faction=faction);
+   }
+
+   MinutesWord(minutes = 0)
+   {
+      if minutes = 1
+      {
+         return fw_minute;
+      }
+
+      return fw_minutes;
    }
 
    Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $,parm5 = $)
@@ -506,14 +525,16 @@ messages:
          Send(self,@Announce,#rsc=fw_muster_open,
               #parm1=Send(self,@LiegeName,#faction=piAttacker),
               #parm2=Send(self,@LiegeName,#faction=piDefender),
-              #parm3=Send(poRoom,@GetName),#parm4=piMusterMinutes);
+              #parm3=Send(poRoom,@GetName),#parm4=piMusterMinutes,
+              #parm5=Send(self,@MinutesWord,#minutes=piMusterMinutes));
       }
       else
       {
          Send(self,@Announce,#rsc=fw_muster,
               #parm1=Send(self,@LiegeName,#faction=piAttacker),
               #parm2=Send(poRoom,@GetName),
-              #parm3=Send(self,@LiegeName,#faction=piDefender),#parm4=piMusterMinutes);
+              #parm3=Send(self,@LiegeName,#faction=piDefender),#parm4=piMusterMinutes,
+              #parm5=Send(self,@MinutesWord,#minutes=piMusterMinutes));
       }
 
       ptStage = CreateTimer(self,@OpenBattle,Bound(piMusterMinutes,0,60) * 60000 + 1);
@@ -729,13 +750,15 @@ messages:
 
    SpawnArmies()
    "Both armies take the field: the defenders round the pole, the attackers round the room's "
-   "spawning place farthest from it."
+   "spawning place farthest from it; but the army of the soldier who came gathers round them, "
+   "so nobody walks in alone against the other side."
    {
-      local i, iBest, iDist, iFlagRow, iFlagCol;
+      local i, iBest, iDist, iFlagRow, iFlagCol, oFirst;
 
       pbSpawned = TRUE;
 
       plAttackAnchor = $;
+      plDefendAnchor = $;
       if poFlag <> $
          AND IsClass(poRoom,&MonsterRoom)
       {
@@ -751,6 +774,26 @@ messages:
                iBest = iDist;
                plAttackAnchor = [ First(i), Nth(i,2) ];
             }
+         }
+      }
+
+      // Whoever came (in grace now) has their own army round them
+      Send(self,@NoteParticipants);
+      oFirst = $;
+      foreach i in plParticipants
+      {
+         oFirst = i;
+      }
+
+      if oFirst <> $
+      {
+         if Nth(oFirst,2) = piAttacker
+         {
+            plAttackAnchor = [ Send(First(oFirst),@GetRow), Send(First(oFirst),@GetCol) ];
+         }
+         else
+         {
+            plDefendAnchor = [ Send(First(oFirst),@GetRow), Send(First(oFirst),@GetCol) ];
          }
       }
 
@@ -912,7 +955,12 @@ messages:
       iAnchorRow = $;
       if bHome
       {
-         if poFlag <> $
+         if plDefendAnchor <> $
+         {
+            iAnchorRow = First(plDefendAnchor);
+            iAnchorCol = Nth(plDefendAnchor,2);
+         }
+         else if poFlag <> $
          {
             iAnchorRow = Send(poFlag,@GetRow);
             iAnchorCol = Send(poFlag,@GetCol);
@@ -1089,8 +1137,42 @@ messages:
 
          if NOT bKnown
          {
-            plParticipants = Cons([ oThing, iFaction ],plParticipants);
+            plParticipants = Cons([ oThing, iFaction, GetTime() + GRACE_SECONDS ],
+                                  plParticipants);
             Send(oThing,@EndRegrouping,#report=FALSE);
+            Send(oThing,@MsgSendUser,#message_rsc=fw_rally);
+         }
+      }
+
+      return;
+   }
+
+   InGrace(who = $)
+   "A soldier just come to the field, whom the enemy leaves alone for a moment."
+   {
+      local i;
+
+      foreach i in plParticipants
+      {
+         if First(i) = who
+         {
+            return GetTime() < Nth(i,3);
+         }
+      }
+
+      return FALSE;
+   }
+
+   EndGrace(who = $)
+   "They struck first (FactionTroop.CanMonsterFight): no more grace."
+   {
+      local i;
+
+      foreach i in plParticipants
+      {
+         if First(i) = who
+         {
+            SetNth(i,3,0);
          }
       }
 

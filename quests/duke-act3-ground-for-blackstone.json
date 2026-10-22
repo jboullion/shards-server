@@ -22,7 +22,7 @@
   },
   "text": {
     "offer": "Duke Akardius says, \"Words win nothing on their own. When my army next marches, march with it and see that it wins. Then raise my flag over some field of the realm with your own hands.\"",
-    "progress": "The lieges' battles are called across the realm every few hours. Wear your soldier's shield and join one for the Duke; then claim a flagpole next to land he holds, with his flag from Blackstone Keep.",
+    "progress": "The lieges' battles are called across the realm every few hours. Wear your soldier's shield and join one for the Duke; then claim a flagpole next to land he holds, with his flag from Blackstone Keep. Then return to the Duke.",
     "complete": "Duke Akardius says, \"That is how a realm is won: a field at a time. Blackstone will remember your name.\""
   },
   "steps": [
@@ -33,6 +33,7 @@
     },
     {
       "kind": "claim",
+      "auto": false,
       "objective": "Claim a flagpole for the Duke"
     }
   ],
