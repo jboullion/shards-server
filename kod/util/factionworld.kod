@@ -1,0 +1,997 @@
+// Ours (Meridian Shards, the faction revamp's phase 3; docs/adr/0021): the world answers the
+// lieges' war. One object, FactionWar.GetWorld, made on demand (FactionWar.NewGameHour keeps
+// it in step every game hour).
+//
+//   Celebrations  A liege who takes a town (TerritoryGame.RecalcTownFlags -> TownChanged), or
+//                 wins WIN_STREAK battles running (BattleWon), celebrates for CELEBRATE_MINUTES
+//                 in their capital and the town won: their standards go up round the town pole,
+//                 their soldiers make merry there (FactionTroop.SetDuty, DUTY_REVELLER), a
+//                 fanfare sounds, members who come get a day's boon of the liege's stat, and
+//                 merchants there sell to members for CELEBRATE_DISCOUNT percent less.
+//   Mourning      A liege who loses a town lowers the flags of their capital to half-staff for
+//                 MOURN_MINUTES, and laments it in their hall.
+//   Occupation    A town's liege posts SENTRIES guards at its pole (DUTY_SENTRY; SyncSentries),
+//                 and its merchants sell to that liege's members for OCCUPY_DISCOUNT percent
+//                 less (GetPriceBonus, from Parliament.GetFactionPriceBonus).
+//   The ledger    A member who says "ledger" to their liege hears the best of their soldiers
+//                 (ReadLedger).
+//
+// plCelebrations: [ faction, until (GetTime), rooms, revellers, standards, boon given to ]
+// plSentries:     [ town RID, faction, guards ]
+////////////////////////////////////////////////////////////////////////////////
+FactionWorld is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+
+   CELEBRATE_MINUTES = 60
+   MOURN_MINUTES = 120
+   WIN_STREAK = 3
+   REVELLERS = 4
+   STANDARDS = 3
+   SENTRIES = 2
+   CELEBRATE_DISCOUNT = 10
+   OCCUPY_DISCOUNT = 10
+   BOON_AMOUNT = 5
+   TICK_MS = 15000
+   LEDGER_SIZE = 10
+
+   // FactionTroop.SetDuty (troop.kod has the same)
+   DUTY_REVELLER = 1
+   DUTY_SENTRY = 2
+
+resources:
+
+   fw_celebrate_town = \
+      "~B~k[Celebration]~n ~B%s has taken %s!  %s's people celebrate in the streets of %s and %s."
+   fw_celebrate_streak = \
+      "~B~k[Celebration]~n ~B%s's armies have won %i battles running!  %s celebrates in %s."
+   fw_celebrate_over = "~IThe celebrations for %s in %s draw to a close."
+   fw_celebrate_boon = "~IThe celebrations for your liege lift your spirits."
+   fw_mourn = \
+      "~B~k[War]~n ~B%s has fallen to %s.  The flags of %s fly at half-staff."
+
+   fw_cheer_duke1 = "For the Duke!  For Blackstone!"
+   fw_cheer_duke2 = "Order and strength!  Long live Akardius!"
+   fw_cheer_duke3 = "Raise a cup to the Duke's soldiers!"
+   fw_cheer_princess1 = "Long live the Princess!"
+   fw_cheer_princess2 = "For Kateriina and the crown!"
+   fw_cheer_princess3 = "The rightful heir has won the day!"
+   fw_cheer_rebel1 = "Jonas!  Jonas!  Jonas!"
+   fw_cheer_rebel2 = "Free men won today!"
+   fw_cheer_rebel3 = "Drink, friends, the lords can wait!"
+
+   fw_lament_duke = "~IAkardius grips the arms of his throne.  \"%s will be mine again.\""
+   fw_lament_princess = "~IKateriina lowers her eyes.  \"We will win back %s.  We must.\""
+   fw_lament_rebel = "~IJonas slams his tankard down.  \"They took %s.  Not for long.\""
+
+   fw_standard_duke_name = "standard of Duke Akardius"
+   fw_standard_princess_name = "standard of Princess Kateriina"
+   fw_standard_rebel_name = "standard of Jonas D'Accor"
+   fw_standard_duke_icon = flagdinv.bgf
+   fw_standard_princess_icon = flagpinv.bgf
+   fw_standard_rebel_icon = flagjinv.bgf
+   fw_standard_desc = "Raised for the celebrations, this standard snaps in the wind."
+   fanfare_sound = fanfare1.ogg
+
+   fw_ledger_trigger = "ledger"
+   fw_ledger_head = "~I%s opens the war ledger.  \"These have served me best.\""
+   fw_ledger_line = "~I%i. %s, %s: %i soldiers bested, %i battles won of %i."
+   fw_ledger_empty = "~I%s closes the war ledger.  \"None of my soldiers have fought yet.\""
+
+classvars:
+
+properties:
+
+   plCelebrations = $
+   plSentries = $
+   // Battles won running: [ Duke, Princess, Rebels ]
+   plStreak = $
+   ptTick = $
+
+messages:
+
+   Constructor()
+   {
+      plStreak = [ 0, 0, 0 ];
+
+      return;
+   }
+
+   Delete()
+   {
+      local i;
+
+      if ptTick <> $
+      {
+         DeleteTimer(ptTick);
+         ptTick = $;
+      }
+
+      foreach i in plCelebrations
+      {
+         Send(self,@EndCelebration,#celebration=i,#report=FALSE);
+      }
+
+      plCelebrations = $;
+
+      return;
+   }
+
+   NewGameHour()
+   {
+      Send(self,@SyncSentries);
+
+      if plCelebrations <> $
+         AND ptTick = $
+      {
+         ptTick = CreateTimer(self,@Tick,TICK_MS);
+      }
+
+      return;
+   }
+
+   //// The towns
+
+   TownList()
+   "[ town RID, its rooms' class ] for each town with a pole."
+   {
+      return [ [ RID_TOS, &TosRoom ], [ RID_BAR_NORTH, &BarloqueRoom ],
+               [ RID_JASWEST, &JasperRoom ], [ RID_MARION, &MarionRoom ],
+               [ RID_CORNOTH, &CorNothRoom ], [ RID_RAZA, &RazaRoom ] ];
+   }
+
+   Capital(faction = $)
+   {
+      if faction = FACTION_DUKE
+      {
+         return RID_TOS;
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         return RID_BAR_NORTH;
+      }
+
+      if faction = FACTION_REBEL
+      {
+         return RID_JASWEST;
+      }
+
+      return $;
+   }
+
+   TownPole(rid = $)
+   {
+      local oRoom;
+
+      oRoom = Send(SYS,@FindRoomByNum,#num=rid);
+      if oRoom = $
+      {
+         return $;
+      }
+
+      return Send(oRoom,@FindHoldingActive,#class=&Flagpole);
+   }
+
+   TownOwner(rid = $)
+   {
+      local oPole;
+
+      oPole = Send(self,@TownPole,#rid=rid);
+      if oPole = $
+      {
+         return FACTION_NEUTRAL;
+      }
+
+      return Send(oPole,@GetFaction);
+   }
+
+   TownOf(where = $)
+   "The town RID a room is part of (its class: a tavern in Tos is a TosRoom), or $."
+   {
+      local i;
+
+      if where = $
+      {
+         return $;
+      }
+
+      foreach i in Send(self,@TownList)
+      {
+         if IsClass(where,Nth(i,2))
+         {
+            return First(i);
+         }
+      }
+
+      return $;
+   }
+
+   LiegeName(faction = $)
+   {
+      return Send(Send(SYS,@GetParliament),@GetFactionLiegeName,#faction=faction);
+   }
+
+   RoomName(rid = $)
+   {
+      return Send(Send(SYS,@FindRoomByNum,#num=rid),@GetName);
+   }
+
+   Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $,parm5 = $)
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         Send(i,@MsgSendUser,#message_rsc=rsc,#parm1=parm1,#parm2=parm2,#parm3=parm3,
+              #parm4=parm4,#parm5=parm5);
+      }
+
+      return;
+   }
+
+   //// What happens
+
+   TownChanged(town = $,from = FACTION_NEUTRAL,to = FACTION_NEUTRAL)
+   "A town's pole changed hands (TerritoryGame.RecalcTownFlags)."
+   {
+      local iCapital;
+
+      if town = $
+         OR from = to
+      {
+         return;
+      }
+
+      if from <> FACTION_NEUTRAL
+      {
+         Send(self,@EndCelebrationIn,#faction=from,#town=town);
+         Send(self,@Mourn,#faction=from,#town=town,#victor=to);
+      }
+
+      if to <> FACTION_NEUTRAL
+      {
+         iCapital = Send(self,@Capital,#faction=to);
+         Send(self,@Announce,#rsc=fw_celebrate_town,
+              #parm1=Send(self,@LiegeName,#faction=to),#parm2=Send(self,@RoomName,#rid=town),
+              #parm3=Send(self,@LiegeName,#faction=to),
+              #parm4=Send(self,@RoomName,#rid=iCapital),#parm5=Send(self,@RoomName,#rid=town));
+         Send(self,@Celebrate,#faction=to,#places=[ iCapital, town ]);
+      }
+
+      Send(self,@SyncSentries);
+
+      return;
+   }
+
+   BattleWon(winner = $,loser = $)
+   "From FactionWar.Resolve: a run of WIN_STREAK wins is celebrated in the capital."
+   {
+      local iCapital;
+
+      if plStreak = $
+      {
+         plStreak = [ 0, 0, 0 ];
+      }
+
+      if loser > FACTION_NEUTRAL AND loser <= FACTION_NORMAL_MAX
+      {
+         SetNth(plStreak,loser,0);
+      }
+
+      if winner <= FACTION_NEUTRAL OR winner > FACTION_NORMAL_MAX
+      {
+         return;
+      }
+
+      SetNth(plStreak,winner,Nth(plStreak,winner) + 1);
+      if Nth(plStreak,winner) >= WIN_STREAK
+      {
+         SetNth(plStreak,winner,0);
+         iCapital = Send(self,@Capital,#faction=winner);
+         Send(self,@Announce,#rsc=fw_celebrate_streak,
+              #parm1=Send(self,@LiegeName,#faction=winner),#parm2=WIN_STREAK,
+              #parm3=Send(self,@LiegeName,#faction=winner),
+              #parm4=Send(self,@RoomName,#rid=iCapital));
+         Send(self,@Celebrate,#faction=winner,#places=[ iCapital ]);
+      }
+
+      return;
+   }
+
+   Mourn(faction = $,town = $,victor = $)
+   "faction lost town: its capital's flags go to half-staff, and its liege laments it."
+   {
+      local iCapital, oTG, lRIDs, i, oPole, oLiege, rLament;
+
+      iCapital = Send(self,@Capital,#faction=faction);
+      if iCapital = $
+      {
+         return;
+      }
+
+      Send(self,@Announce,#rsc=fw_mourn,#parm1=Send(self,@RoomName,#rid=town),
+           #parm2=Send(self,@LiegeName,#faction=victor),
+           #parm3=Send(self,@RoomName,#rid=iCapital));
+
+      // The capital's own pole, and its capture points' poles
+      oTG = Send(SYS,@GetTerritoryGame);
+      lRIDs = [ iCapital ];
+      if oTG <> $
+      {
+         foreach i in Send(oTG,@GetFlagRIDs)
+         {
+            if Send(oTG,@IsHometownFlag,#RID=i,#faction=faction)
+            {
+               lRIDs = Cons(i,lRIDs);
+            }
+         }
+      }
+
+      foreach i in lRIDs
+      {
+         oPole = Send(self,@TownPole,#rid=i);
+         if oPole <> $
+         {
+            Send(oPole,@HalfStaff,#duration=MOURN_MINUTES * 60000);
+         }
+      }
+
+      oLiege = Send(Send(SYS,@GetParliament),@GetLiege,#faction=faction);
+      if oLiege <> $
+         AND Send(oLiege,@GetOwner) <> $
+      {
+         rLament = fw_lament_rebel;
+         if faction = FACTION_DUKE
+         {
+            rLament = fw_lament_duke;
+         }
+         else if faction = FACTION_PRINCESS
+         {
+            rLament = fw_lament_princess;
+         }
+
+         foreach i in Send(Send(oLiege,@GetOwner),@GetHolderActive)
+         {
+            if IsClass(First(i),&User)
+            {
+               Send(First(i),@MsgSendUser,#message_rsc=rLament,
+                    #parm1=Send(self,@RoomName,#rid=town));
+            }
+         }
+      }
+
+      return;
+   }
+
+   //// Celebrations
+
+   FindCelebration(faction = $)
+   {
+      local i;
+
+      foreach i in plCelebrations
+      {
+         if First(i) = faction
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   Celebrate(faction = $,places = $)
+   "faction celebrates in places (town RIDs) for CELEBRATE_MINUTES; a celebration already going "
+   "is lengthened and spreads to the new towns."
+   {
+      local lCeleb, iRID, oRoom, lRooms, lRevellers, lStandards, i, oThing;
+
+      if faction <= FACTION_NEUTRAL OR faction > FACTION_NORMAL_MAX
+      {
+         return;
+      }
+
+      lCeleb = Send(self,@FindCelebration,#faction=faction);
+      if lCeleb = $
+      {
+         lCeleb = [ faction, 0, $, $, $, $ ];
+         plCelebrations = Cons(lCeleb,plCelebrations);
+      }
+
+      SetNth(lCeleb,2,GetTime() + CELEBRATE_MINUTES * 60);
+
+      foreach iRID in places
+      {
+         oRoom = Send(SYS,@FindRoomByNum,#num=iRID);
+         if oRoom = $
+            OR FindListElem(Nth(lCeleb,3),oRoom)
+         {
+            continue;
+         }
+
+         SetNth(lCeleb,3,Cons(oRoom,Nth(lCeleb,3)));
+
+         lRevellers = Nth(lCeleb,4);
+         i = 0;
+         while i < REVELLERS
+         {
+            i = i + 1;
+            oThing = Create(Send(Send(SYS,@GetFactionWar),@TroopClass,#faction=faction));
+            Send(oThing,@SetDuty,#duty=DUTY_REVELLER);
+            if Send(self,@PlaceNearPole,#where=oRoom,#what=oThing,#spread=5,#bMob=TRUE)
+            {
+               lRevellers = Cons(oThing,lRevellers);
+            }
+         }
+
+         SetNth(lCeleb,4,lRevellers);
+
+         lStandards = Nth(lCeleb,5);
+         i = 0;
+         while i < STANDARDS
+         {
+            i = i + 1;
+            oThing = Send(self,@MakeStandard,#faction=faction);
+            if Send(self,@PlaceNearPole,#where=oRoom,#what=oThing,#spread=3,#bMob=FALSE)
+            {
+               lStandards = Cons(oThing,lStandards);
+            }
+         }
+
+         SetNth(lCeleb,5,lStandards);
+
+         oThing = Send(self,@TownPole,#rid=iRID);
+         if oThing <> $
+         {
+            Send(oRoom,@SomethingWaveRoom,#what=oThing,#wave_rsc=fanfare_sound);
+         }
+      }
+
+      if ptTick = $
+      {
+         ptTick = CreateTimer(self,@Tick,TICK_MS);
+      }
+
+      return;
+   }
+
+   MakeStandard(faction = $)
+   {
+      local rName, rIcon;
+
+      rName = fw_standard_rebel_name;
+      rIcon = fw_standard_rebel_icon;
+      if faction = FACTION_DUKE
+      {
+         rName = fw_standard_duke_name;
+         rIcon = fw_standard_duke_icon;
+      }
+      else if faction = FACTION_PRINCESS
+      {
+         rName = fw_standard_princess_name;
+         rIcon = fw_standard_princess_icon;
+      }
+
+      return Create(&OrnamentalObject,#rName=rName,#rIcon=rIcon,#rDesc=fw_standard_desc);
+   }
+
+   PlaceNearPole(where = $,what = $,spread = 3,bMob = FALSE)
+   "Put what in room near its pole (anywhere if there's no room there). Returns whether it "
+   "was placed; if not, it's deleted."
+   {
+      local oPole, iTry, iRow, iCol;
+
+      oPole = Send(where,@FindHoldingActive,#class=&Flagpole);
+      if oPole <> $
+      {
+         iTry = 0;
+         while iTry < 10
+         {
+            iTry = iTry + 1;
+            iRow = Send(oPole,@GetRow) + Random(-spread,spread);
+            iCol = Send(oPole,@GetCol) + Random(-spread,spread);
+            if iRow > 0 AND iCol > 0
+               AND (iRow <> Send(oPole,@GetRow) OR iCol <> Send(oPole,@GetCol))
+               AND Send(where,@ReqNewHold,#what=what,#new_row=iRow,#new_col=iCol)
+               AND (NOT bMob
+                    OR Send(where,@ReqSomethingMoved,#what=what,#new_row=iRow,#new_col=iCol))
+            {
+               Send(where,@NewHold,#what=what,#new_row=iRow,#new_col=iCol);
+
+               return TRUE;
+            }
+         }
+      }
+
+      if bMob
+      {
+         return Send(where,@GenerateMonster,#oMonster=what,#bRandom=TRUE);
+      }
+
+      Send(what,@Delete);
+
+      return FALSE;
+   }
+
+   Tick()
+   "Revellers cheer, members who've come get their boon, and celebrations end in time."
+   {
+      local i, lEnded, oRoom;
+
+      ptTick = $;
+      lEnded = $;
+
+      foreach i in plCelebrations
+      {
+         if GetTime() >= Nth(i,2)
+         {
+            lEnded = Cons(i,lEnded);
+
+            continue;
+         }
+
+         Send(self,@Cheer,#celebration=i);
+
+         foreach oRoom in Nth(i,3)
+         {
+            Send(self,@GiveBoons,#celebration=i,#where=oRoom);
+         }
+      }
+
+      foreach i in lEnded
+      {
+         Send(self,@EndCelebration,#celebration=i);
+      }
+
+      if plCelebrations <> $
+      {
+         ptTick = CreateTimer(self,@Tick,TICK_MS);
+      }
+
+      return;
+   }
+
+   Cheer(celebration = $)
+   {
+      local lRevellers, oReveller, iFaction, lLines;
+
+      lRevellers = Nth(celebration,4);
+      if lRevellers = $
+         OR Random(1,3) <> 1
+      {
+         return;
+      }
+
+      oReveller = Nth(lRevellers,Random(1,Length(lRevellers)));
+      if NOT IsObject(oReveller)
+         OR Send(oReveller,@GetOwner) = $
+      {
+         return;
+      }
+
+      iFaction = First(celebration);
+      lLines = [ fw_cheer_rebel1, fw_cheer_rebel2, fw_cheer_rebel3 ];
+      if iFaction = FACTION_DUKE
+      {
+         lLines = [ fw_cheer_duke1, fw_cheer_duke2, fw_cheer_duke3 ];
+      }
+      else if iFaction = FACTION_PRINCESS
+      {
+         lLines = [ fw_cheer_princess1, fw_cheer_princess2, fw_cheer_princess3 ];
+      }
+
+      Send(Send(oReveller,@GetOwner),@SomeoneSaid,#what=oReveller,#type=SAY_RESOURCE,
+           #string=Nth(lLines,Random(1,Length(lLines))));
+
+      return;
+   }
+
+   BoonSpell(faction = $)
+   "The liege's stat: the Duke's intellect, the Princess's agility, Jonas's might."
+   {
+      if faction = FACTION_DUKE
+      {
+         return Send(SYS,@FindSpellByNum,#num=SID_INTELLECT_BOON);
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         return Send(SYS,@FindSpellByNum,#num=SID_AGILITY_BOON);
+      }
+
+      return Send(SYS,@FindSpellByNum,#num=SID_STRENGTH_BOON);
+   }
+
+   GiveBoons(celebration = $,where = $)
+   {
+      local i, oWho, oSpell, iFaction;
+
+      iFaction = First(celebration);
+      oSpell = $;
+      foreach i in Send(where,@GetHolderActive)
+      {
+         oWho = First(i);
+         if NOT IsClass(oWho,&User)
+            OR Send(oWho,@GetFaction) <> iFaction
+            OR FindListElem(Nth(celebration,6),oWho)
+         {
+            continue;
+         }
+
+         if oSpell = $
+         {
+            oSpell = Send(self,@BoonSpell,#faction=iFaction);
+         }
+
+         SetNth(celebration,6,Cons(oWho,Nth(celebration,6)));
+         if oSpell <> $
+         {
+            Send(oSpell,@AddBoon,#target=oWho,#days=1,#amount=BOON_AMOUNT);
+         }
+
+         Send(oWho,@MsgSendUser,#message_rsc=fw_celebrate_boon);
+      }
+
+      return;
+   }
+
+   EndCelebration(celebration = $,report = TRUE)
+   {
+      local i, oRoom;
+
+      if FindListElem(plCelebrations,celebration)
+      {
+         plCelebrations = DelListElem(plCelebrations,celebration);
+      }
+
+      foreach i in Nth(celebration,4)
+      {
+         if IsObject(i)
+         {
+            Send(i,@Delete);
+         }
+      }
+
+      foreach i in Nth(celebration,5)
+      {
+         if IsObject(i)
+         {
+            Send(i,@Delete);
+         }
+      }
+
+      if report
+      {
+         foreach oRoom in Nth(celebration,3)
+         {
+            Send(self,@Announce,#rsc=fw_celebrate_over,
+                 #parm1=Send(self,@LiegeName,#faction=First(celebration)),
+                 #parm2=Send(oRoom,@GetName));
+         }
+      }
+
+      return;
+   }
+
+   EndAllCelebrations()
+   "For the admin: every celebration ends now."
+   {
+      local i, lAll;
+
+      lAll = plCelebrations;
+      foreach i in lAll
+      {
+         Send(self,@EndCelebration,#celebration=i,#report=FALSE);
+      }
+
+      plCelebrations = $;
+
+      return;
+   }
+
+   RaiseFlags()
+   "For the admin: every flag at half-staff goes back up."
+   {
+      local i, oTG, oPole;
+
+      oTG = Send(SYS,@GetTerritoryGame);
+      if oTG = $
+      {
+         return;
+      }
+
+      foreach i in Send(oTG,@GetFlagRIDs)
+      {
+         oPole = Send(self,@TownPole,#rid=i);
+         if oPole <> $
+         {
+            Send(oPole,@HalfStaff,#duration=1);
+         }
+      }
+
+      return;
+   }
+
+   EndCelebrationIn(faction = $,town = $)
+   "faction lost town: its revellers and standards there go (the rest of its celebration "
+   "goes on, if any)."
+   {
+      local lCeleb, oRoom, oThing, i, lKeep;
+
+      lCeleb = Send(self,@FindCelebration,#faction=faction);
+      oRoom = Send(SYS,@FindRoomByNum,#num=town);
+      if lCeleb = $
+         OR oRoom = $
+         OR NOT FindListElem(Nth(lCeleb,3),oRoom)
+      {
+         return;
+      }
+
+      SetNth(lCeleb,3,DelListElem(Nth(lCeleb,3),oRoom));
+
+      // Its revellers (4) and standards (5) in that town
+      foreach i in [ 4, 5 ]
+      {
+         lKeep = $;
+         foreach oThing in Nth(lCeleb,i)
+         {
+            if IsObject(oThing)
+               AND Send(oThing,@GetOwner) = oRoom
+            {
+               Send(oThing,@Delete);
+            }
+            else
+            {
+               lKeep = Cons(oThing,lKeep);
+            }
+         }
+
+         SetNth(lCeleb,i,lKeep);
+      }
+
+      if Nth(lCeleb,3) = $
+      {
+         Send(self,@EndCelebration,#celebration=lCeleb,#report=FALSE);
+      }
+
+      return;
+   }
+
+   IsCelebrating(faction = $,town = $)
+   {
+      local lCeleb, oRoom;
+
+      lCeleb = Send(self,@FindCelebration,#faction=faction);
+      if lCeleb = $
+      {
+         return FALSE;
+      }
+
+      foreach oRoom in Nth(lCeleb,3)
+      {
+         if Send(oRoom,@GetRoomNum) = town
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   //// Occupation
+
+   SyncSentries()
+   "Each town's liege has SENTRIES guards at its pole; a town nobody holds has none."
+   {
+      local lTown, iRID, iOwner, lPosted, i, lGuards, oRoom, oGuard, lKeep;
+
+      lKeep = $;
+      foreach lTown in Send(self,@TownList)
+      {
+         iRID = First(lTown);
+         iOwner = Send(self,@TownOwner,#rid=iRID);
+
+         lPosted = $;
+         foreach i in plSentries
+         {
+            if First(i) = iRID
+            {
+               lPosted = i;
+            }
+         }
+
+         if lPosted <> $
+            AND Nth(lPosted,2) = iOwner
+         {
+            lKeep = Cons(lPosted,lKeep);
+
+            continue;
+         }
+
+         // Change of guard
+         if lPosted <> $
+         {
+            foreach oGuard in Nth(lPosted,3)
+            {
+               if IsObject(oGuard)
+               {
+                  Send(oGuard,@Delete);
+               }
+            }
+         }
+
+         if iOwner = FACTION_NEUTRAL
+         {
+            continue;
+         }
+
+         oRoom = Send(SYS,@FindRoomByNum,#num=iRID);
+         if oRoom = $
+         {
+            continue;
+         }
+
+         lGuards = $;
+         i = 0;
+         while i < SENTRIES
+         {
+            i = i + 1;
+            oGuard = Create(Send(Send(SYS,@GetFactionWar),@TroopClass,#faction=iOwner));
+            Send(oGuard,@SetDuty,#duty=DUTY_SENTRY);
+            if Send(self,@PlaceNearPole,#where=oRoom,#what=oGuard,#spread=2,#bMob=TRUE)
+            {
+               lGuards = Cons(oGuard,lGuards);
+            }
+         }
+
+         lKeep = Cons([ iRID, iOwner, lGuards ],lKeep);
+      }
+
+      plSentries = lKeep;
+
+      return;
+   }
+
+   GetPriceBonus(who = $)
+   "Percent off for who at a merchant in their room: OCCUPY_DISCOUNT in a town their liege "
+   "holds, and CELEBRATE_DISCOUNT more where their liege celebrates (Parliament."
+   "GetFactionPriceBonus)."
+   {
+      local iFaction, iTown, iBonus;
+
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         return 0;
+      }
+
+      iFaction = Send(who,@GetFaction);
+      if iFaction = FACTION_NEUTRAL
+      {
+         return 0;
+      }
+
+      iTown = Send(self,@TownOf,#where=Send(who,@GetOwner));
+      if iTown = $
+      {
+         return 0;
+      }
+
+      iBonus = 0;
+      if Send(self,@TownOwner,#rid=iTown) = iFaction
+      {
+         iBonus = OCCUPY_DISCOUNT;
+      }
+
+      if Send(self,@IsCelebrating,#faction=iFaction,#town=iTown)
+      {
+         iBonus = iBonus + CELEBRATE_DISCOUNT;
+      }
+
+      return iBonus;
+   }
+
+   //// The ledger
+
+   IsLedgerTrigger(string = $)
+   {
+      return string <> $
+             AND StringEqual(string,fw_ledger_trigger);
+   }
+
+   LedgerScore(who = $)
+   {
+      local lRecord;
+
+      lRecord = Send(who,@GetWarRecord);
+
+      return First(lRecord) + 3 * Nth(lRecord,4) + Nth(lRecord,3);
+   }
+
+   ReadLedger(who = $,liege = $)
+   "who said 'ledger' to their liege: the LEDGER_SIZE best of the liege's soldiers."
+   {
+      local iFaction, i, j, lBest, iScore, lNew, bPlaced, lRecord, iPlace;
+
+      iFaction = Send(liege,@GetFaction);
+      if Send(who,@GetFaction) <> iFaction
+      {
+         return;
+      }
+
+      // The best LEDGER_SIZE, best first: [ score, player ]
+      lBest = $;
+      foreach i in Send(SYS,@GetUsers)
+      {
+         if NOT IsClass(i,&Player)
+            OR IsClass(i,&DM)
+            OR Send(i,@GetFaction) <> iFaction
+         {
+            continue;
+         }
+
+         iScore = Send(self,@LedgerScore,#who=i);
+         if iScore <= 0
+         {
+            continue;
+         }
+
+         lNew = $;
+         bPlaced = FALSE;
+         foreach j in lBest
+         {
+            if NOT bPlaced AND iScore > First(j)
+            {
+               lNew = Cons([ iScore, i ],lNew);
+               bPlaced = TRUE;
+            }
+
+            lNew = Cons(j,lNew);
+         }
+
+         if NOT bPlaced
+         {
+            lNew = Cons([ iScore, i ],lNew);
+         }
+
+         // lNew is backwards; turn it round, keeping the best LEDGER_SIZE
+         lBest = $;
+         foreach j in lNew
+         {
+            lBest = Cons(j,lBest);
+         }
+
+         while Length(lBest) > LEDGER_SIZE
+         {
+            lBest = DelListElem(lBest,Last(lBest));
+         }
+      }
+
+      if lBest = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=fw_ledger_empty,
+              #parm1=Send(liege,@GetName));
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=fw_ledger_head,#parm1=Send(liege,@GetName));
+      iPlace = 0;
+      foreach j in lBest
+      {
+         iPlace = iPlace + 1;
+         i = Nth(j,2);
+         lRecord = Send(i,@GetWarRecord);
+         Send(who,@MsgSendUser,#message_rsc=fw_ledger_line,#parm1=iPlace,
+              #parm2=Send(i,@GetName),#parm3=Send(i,@GetRenownRankName),
+              #parm4=First(lRecord),#parm5=Nth(lRecord,4),#parm6=Nth(lRecord,3));
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

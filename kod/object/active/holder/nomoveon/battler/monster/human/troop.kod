@@ -24,6 +24,12 @@ constants:
    BATTLE_ARCHER_RANGE = 320
    BATTLE_MAGE_RANGE = 192
 
+   // Ours (the faction revamp's phase 3, util/factionworld.kod): a troop on duty in a town,
+   // not fighting (SetDuty); factionworld.kod has the same
+   DUTY_NONE = 0
+   DUTY_REVELLER = 1
+   DUTY_SENTRY = 2
+
 resources:
 
    include troop.lkod
@@ -83,6 +89,8 @@ properties:
    // Ours: the battle we fight in (util/factionwar.kod), and what we are in it
    poBattle = $
    piBattleRole = BATTLE_ROLE_NONE
+   // Ours: a town duty (SetDuty): a celebration's reveller, or a sentry at the town's pole
+   piDuty = DUTY_NONE
 
 messages:
 
@@ -487,8 +495,37 @@ messages:
       return FALSE;
    }
 
+   SetDuty(duty = DUTY_NONE)
+   "A town duty for one of the liege's troops (util/factionworld.kod): a reveller wanders "
+   "and cheers, a sentry stands at the town's pole. Neither fights or can be fought."
+   {
+      piDuty = duty;
+      Send(self,@ResetBehaviorFlags);
+
+      return;
+   }
+
+   GetDuty()
+   {
+      return piDuty;
+   }
+
    TweakBehavior()
    {
+      if piDuty = DUTY_REVELLER
+      {
+         piBehavior = AI_NPC | AI_NOFIGHT;
+
+         return;
+      }
+
+      if piDuty = DUTY_SENTRY
+      {
+         piBehavior = AI_NPC | AI_NOFIGHT | AI_NOMOVE;
+
+         return;
+      }
+
       if poBattle <> $
       {
          // The other army is monsters: we fight them too (SpecialHatredBehavior keeps it

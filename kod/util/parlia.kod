@@ -1161,18 +1161,29 @@ messages:
       }
 
       iFaction = send(who,@GetFaction);
-      if (iFaction <> FACTION_PRINCESS)
-      {
-         return 100;
-      }
 
-      iBonus = 5;
-	 
+      // Ours (the faction revamp's phase 3): members pay less in a town their liege holds,
+      //  and less again while it celebrates there (util/factionworld.kod). Only when buying.
+      iBonus = 0;
       if buying
       {
-         iBonus = -iBonus;
+         iBonus = Send(Send(Send(SYS,@GetFactionWar),@GetWorld),@GetPriceBonus,#who=who);
       }
-      
+
+      if (iFaction <> FACTION_PRINCESS)
+      {
+         return 100 - iBonus;
+      }
+
+      if buying
+      {
+         iBonus = -(iBonus + 5);
+      }
+      else
+      {
+         iBonus = 5;
+      }
+
       if Random(0,100) = 0
       {
          Post(who,@MsgSendUser,#message_rsc=parliament_price_up,

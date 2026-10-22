@@ -115,6 +115,9 @@ properties:
    // The last battles: [ GetTime(), rid, attacker, defender, winner, how ]
    plHistory = $
 
+   // How the world answers the war (util/factionworld.kod), made on demand
+   poWorld = $
+
 messages:
 
    Constructor()
@@ -122,7 +125,7 @@ messages:
       plWarEffort = [ 0, 0, 0 ];
       Send(self,@ScheduleNext);
 
-      propagate;
+      return;
    }
 
    Delete()
@@ -135,17 +138,40 @@ messages:
          ptNext = $;
       }
 
-      propagate;
+      return;
    }
 
    NewGameHour()
-   "From System.NewGameHour: keeps the schedule going if it was ever lost."
+   "From System.NewGameHour: keeps the schedule going if it was ever lost, and the world in "
+   "step (FactionWorld.NewGameHour)."
    {
       if piState = STATE_NONE
          AND ptNext = $
       {
          Send(self,@ScheduleNext);
       }
+
+      Send(Send(self,@GetWorld),@NewGameHour);
+
+      return;
+   }
+
+   GetWorld()
+   "The world's answers to the war: celebrations, mourning, occupation, the ledger "
+   "(util/factionworld.kod)."
+   {
+      if poWorld = $
+      {
+         poWorld = Create(&FactionWorld);
+      }
+
+      return poWorld;
+   }
+
+   TownChanged(town = $,from = FACTION_NEUTRAL,to = FACTION_NEUTRAL)
+   "From TerritoryGame.RecalcTownFlags: passed on to the world."
+   {
+      Send(Send(self,@GetWorld),@TownChanged,#town=town,#from=from,#to=to);
 
       return;
    }
@@ -1153,6 +1179,9 @@ messages:
                  #parm2=FOUGHT_SHILLINGS);
          }
       }
+
+      // A run of wins is celebrated (FactionWorld.BattleWon)
+      Send(Send(self,@GetWorld),@BattleWon,#winner=winner,#loser=iLoser);
 
       // Both sides' war effort is spent.
       if plWarEffort <> $

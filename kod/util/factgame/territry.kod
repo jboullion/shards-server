@@ -590,7 +590,7 @@ messages:
 
    RecalcTownFlags(report=TRUE)
    {
-      local lRIDs, iRID, oRoom, oFlagpole, lFlagCounts, iFaction;
+      local lRIDs, iRID, oRoom, oFlagpole, lFlagCounts, iFaction, iOldFaction;
 
       foreach lRIDs in [plTosRIDs, plMarionRIDs, plJasperRIDs, plCorNothRIDs, plBarloqueRIDs, plRazaRIDs]
       {
@@ -620,10 +620,16 @@ messages:
                oFlagpole = Send(oRoom,@FindHoldingActive,#class=&FlagPole);
                if Send(oFlagPole,@GetFaction) <> (iFaction-1)
                {
+                  iOldFaction = Send(oFlagPole,@GetFaction);
                   Send(oFlagPole,@SetFaction,#faction=(iFaction-1));
                   if report
                   {
                      Send(self,@SendBonusTownMessage,#faction=(iFaction-1),#town=lRIDs);
+
+                     // Ours (the faction revamp's phase 3): the town celebrates or mourns
+                     //  (util/factionworld.kod)
+                     Send(Send(SYS,@GetFactionWar),@TownChanged,#town=First(lRIDs),
+                          #from=iOldFaction,#to=(iFaction-1));
                   }
                }
             }
