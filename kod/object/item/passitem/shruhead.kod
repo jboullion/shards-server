@@ -671,7 +671,7 @@ messages:
             Send(self,@BabbleBizarre);
             break;
          default:
-            Send(self,@BabbleMurderer);
+            Send(self,@BabbleEnemy);
             break;
       }
 
@@ -705,23 +705,27 @@ messages:
       return;
    }
 
-   BabbleMurderer()
+   BabbleEnemy()
+   "Ours (no random PvP): the head once told where the last murderer was. Now, held "
+   "by a player, it gives away one of their enemies, a member of a guild theirs is at "
+   "war with or of a rival faction (Player.GetRevealableEnemies)."
    {
-      local iNum, oKiller, oLocation;
+      local oKiller, oLocation, lEnemies;
 
-      oKiller = Send(SYS,@GetLastMurderer);
-      if oKiller = $
+      if poOwner = $
+         OR NOT IsClass(poOwner,&Player)
       {
          return;
       }
 
-      oLocation = Send(oKiller,@GetOwner);
-      if oLocation = $
+      lEnemies = Send(poOwner,@GetRevealableEnemies);
+      if lEnemies = $
       {
-         iNum = Send(oKiller,@GetSaveRoom);
-         oLocation = Send(SYS,@FindRoomByNum,#num=iNum);
+         return;
       }
 
+      oKiller = Nth(lEnemies,Random(1,Length(lEnemies)));
+      oLocation = Send(oKiller,@GetOwner);
       if oLocation = $
       {
          return;

@@ -1965,13 +1965,6 @@ messages:
       return;
    }
 
-   GetLastMurderer()
-   "Ours (no random PvP): nobody can murder another player any more, so there's no "
-   "last murderer for Seance or a shrunken head to find."
-   {
-      return $;
-   }
-
    GetSpells()
    {
       return plSpells;

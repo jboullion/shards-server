@@ -24,16 +24,16 @@ resources:
    Seance_icon_rsc = iseance.bgf
    Seance_desc_rsc = \
       "Shal'ille's magic allows communication with the spirit world to reveal "
-      "the location of the last person to slay an innocent.  "
-      "Requires herbs to cast."
+      "where one of your enemies can be found: a member of a guild yours is at "
+      "war with, or of a rival faction.  Requires herbs to cast."
 
-   Seance_No_Murderer_rsc = "There is no murderer to be hunted."
+   Seance_No_Enemy_rsc = "The spirits know of no enemy of yours abroad in the lands."
    Seance_I_See_You_rsc = "You sense that someone is aware of your whereabouts."
    Seance_Cloaked_Target_rsc = "Qor's dark magic has diverted an enemy's attention."
    Seance_casting_rsc = "You appeal to Shal'ille for knowledge of %s%s's whereabouts."
    Seance_Target_Location_rsc = "You sense that %s%s can be found somewhere around %s."
 
-   seance_spell_intro_rsc = "Shal'ille Lv. 1: Gives a chance of knowing the location of the last person to have committed murder."
+   seance_spell_intro_rsc = "Shal'ille Lv. 1: Gives a chance of knowing where an enemy of your guild or faction can be found."
 
    Seance_sound = sseance.ogg
 
@@ -75,41 +75,63 @@ messages:
    }
 
    CanPayCosts(who = $, lTargets = $)
+   "Ours (no random PvP): there are no murderers to hunt any more, so the spirits "
+   "give away an enemy instead (Player.GetRevealableEnemies)."
    {
-      local oKiller;
-   
-      oKiller = send(SYS,@GetLastMurderer);
-
-      if oKiller = $ OR (NOT send(oKiller,@IsLoggedOn))
-         OR (isClass(oKiller,&DM) AND NOT send(oKiller,@IsHuntable))
-      { 
-         send(who,@MsgSendUser,#message_rsc=Seance_No_Murderer_rsc);
+      if NOT IsClass(who,&Player)
+         OR Send(who,@GetRevealableEnemies) = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=Seance_No_Enemy_rsc);
 
          return FALSE;
-      }  
+      }
 
       propagate;
    }
 
    CastSpell(who = $, lTargets = $, iSpellPower=0)
    {
-      local i, oKiller,iValue,lRoomlist,oSpell,oRoom,oLocation,rLocationName;
+      local i, oKiller, iValue, oSpell, oRoom, oLocation, rLocationName, lEnemies,
+            lState;
 
-      oKiller = send(SYS,@GetLastMurderer);
       iValue = send(self,@GetSeanceStrength,#iSpellpower=iSpellPower,#who=who);
 
-      oLocation = send(oKiller,@GetOwner);
-      if oLocation <> $
-      {
-         rLocationName = Send(oLocation,@GetName);
-      }
-
+      // A misled caster keeps hearing the same false place for the same enemy
+      // while the enchantment lasts: its state is [enemy, false place].
+      lState = $;
       if Send(who,@IsEnchanted,#what=self)
       {
-         rlocationName = Send(who,@GetEnchantedState,#what=self);
+         lState = Send(who,@GetEnchantedState,#what=self);
+         if NOT IsList(lState)
+            OR NOT Send(First(lState),@IsLoggedOn)
+         {
+            lState = $;
+         }
+      }
+
+      if lState <> $
+      {
+         oKiller = First(lState);
+         rLocationName = Nth(lState,2);
       }
       else
       {
+         lEnemies = Send(who,@GetRevealableEnemies);
+         if lEnemies = $
+         {
+            Send(who,@MsgSendUser,#message_rsc=Seance_No_Enemy_rsc);
+
+            propagate;
+         }
+
+         oKiller = Nth(lEnemies,Random(1,Length(lEnemies)));
+
+         oLocation = send(oKiller,@GetOwner);
+         if oLocation <> $
+         {
+            rLocationName = Send(oLocation,@GetName);
+         }
+
          oSpell = send(SYS,@FindSpellByNum,#Num=SID_CLOAK);
          
          if (send(oKiller,@IsEnchanted,#what=oSpell))
@@ -132,7 +154,11 @@ messages:
             // Enchant the caster with the "false" room so it repeats.
             oRoom = send(oSpell,@GetWrongRoom);                            
             rLocationName = Send(oRoom,@GetName);
-            Send(who,@StartEnchantment,#what=self,#state=rLocationName,
+            if Send(who,@IsEnchanted,#what=self)
+            {
+               Send(who,@RemoveEnchantment,#what=self,#report=FALSE);
+            }
+            Send(who,@StartEnchantment,#what=self,#state=[oKiller,rLocationName],
                  #time=Send(self,@GetDuration,#spellpower=ispellpower,#who=who),
                  #iSpellPower=iSpellPower,#lastcall=TRUE,#addicon=FALSE);
 

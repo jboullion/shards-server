@@ -13233,6 +13233,40 @@ messages:
       return FALSE;
    }
 
+   GetRevealableEnemies()
+   "Ours: the players a Seance or a shrunken head may give away to us. Those logged on "
+   "who belong to a guild ours is at war with (IsMutualEnemy), or to a rival faction "
+   "when we're in one. A DM who can't be hunted is left out."
+   {
+      local i, lEnemies, oGuild, iFaction;
+
+      lEnemies = $;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         if i = self
+            OR (IsClass(i,&DM) AND NOT Send(i,@IsHuntable))
+         {
+            continue;
+         }
+
+         oGuild = Send(i,@GetGuild);
+         iFaction = Send(i,@GetFaction);
+
+         if (poGuild <> $
+               AND oGuild <> $
+               AND Send(poGuild,@IsMutualEnemy,#otherguild=oGuild))
+            OR (piFaction <> FACTION_NEUTRAL
+               AND iFaction <> FACTION_NEUTRAL
+               AND iFaction <> piFaction)
+         {
+            lEnemies = Cons(i,lEnemies);
+         }
+      }
+
+      return lEnemies;
+   }
+
    MayAttackPlayer(victim = $)
    "Ours (no random PvP): one player may attack another, outside the arenas, chaos zones, "
    "Frenzies and guild halls (AllowBattlerAttack), only in the Faction War (both wear "
