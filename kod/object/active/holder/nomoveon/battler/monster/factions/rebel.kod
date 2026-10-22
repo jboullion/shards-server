@@ -130,7 +130,7 @@ messages:
          }
 
          if (Send(Send(SYS,@GetParliament),@GetPower,
-                  #faction=FACTION_REBEL) > FACTION_STRONGLY_IN)
+                  #faction=FACTION_REBEL) = FACTION_STRONGLY_IN)
             AND Send(who,@GetFaction) <> FACTION_REBEL
          {
             temp_rsc=RebelLiege_toopowered_rsc;

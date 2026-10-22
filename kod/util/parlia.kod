@@ -490,7 +490,7 @@ messages:
       //                  but boils down to (Total Points * Balance Factor)/100. Since you don't
       //                  gain power past having twice the balance, 2b is max.  Decrement by halves.
 
-      if neutral
+      if bNeutral
       {
          iBalance = (piTotalPowerPoints * (100 - (3 * piBalanceFactor)))/100;
       }

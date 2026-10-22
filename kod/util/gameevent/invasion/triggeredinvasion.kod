@@ -241,8 +241,6 @@ messages:
       Send(oRoom,@SetRoomBackground,#background=poOriginal);
       Send(oRoom,@BackgroundChanged);
 
-      Send(EVENTENGINE_OBJECT,@ReschedualEvent);
-
       return;
    }
 

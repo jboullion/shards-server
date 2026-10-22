@@ -26,22 +26,19 @@ classvars:
 
 properties:
 
-   plRandomEvents = $
    plActiveEvents = $
    piActiveEventsFlagHi = 0
    piActiveEventsFlagLo = 0
    ptMaintenance = $
    piMaintenanceInterval = 1000
 
-   ptInvasionTimer = $
-
 messages:
 
+   // No event starts on its own: server-wide events are faction-driven, and
+   // the invasions are started by hand.
    Constructor()
    {
       Send(self,@Recreate);
-
-      ptInvasionTimer = CreateTimer(self,@StartEnvasion,(2*60*60*1000));
 
       return;
    }
@@ -73,14 +70,6 @@ messages:
       {
          Send(i,@Recreate);
       }
-
-      plRandomEvents = $;
-
-      Debug("Creating Events");
-      plRandomEvents = Cons(&RatInvasion,plRandomEvents);
-      plRandomEvents = Cons(&OrcInvasion,plRandomEvents);
-      plRandomEvents = Cons(&SpiderInvasion,plRandomEvents);
-      plRandomEvents = Cons(&SkeletonInvasion,plRandomEvents);
 
       return;
    }
@@ -898,22 +887,6 @@ messages:
                                     #parm13=1,
                                     #parm14=1,
                                     #parm15=1);
-
-      return;
-   }
-   
-   StartEnvasion()
-   {
-      ptInvasionTimer = $;
-
-      Send(SYS,@StartEvent,#event_type=&TriggeredInvasion);
-
-      return;
-   }
-
-   ReschedualEvent()
-   {
-      ptInvasionTimer = CreateTimer(self,@StartEnvasion,(2*60*60*1000));
 
       return;
    }

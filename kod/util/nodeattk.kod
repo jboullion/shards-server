@@ -66,8 +66,9 @@ classvars:
 
 properties:
 
-   // Are there node attacks?
-   pbAttackEnabled = TRUE
+   // Are there node attacks?  Off: server-wide events are faction-driven.
+   // A DM can still turn them on with SetAttacks.
+   pbAttackEnabled = FALSE
    // Base number of Meridian days to use when figuring frequency of attacks.
    piAttackFrequency = 24
    // The number of Xeochicatl spawned during an attack.
