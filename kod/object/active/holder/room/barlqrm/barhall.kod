@@ -24,8 +24,8 @@ resources:
 
    barhall_music = main.ogg
 
-   news_bar_hall = "General News"
-   News_bar_hall_desc = "Find out the latest gossip around Meridian."
+   news_bar_hall = "Guild Recruitment"
+   News_bar_hall_desc = "Guilds looking for members post their notices here, one each.  Anyone may read them."
 
 classvars:
 
@@ -66,7 +66,7 @@ messages:
    {
       local oNews;
 
-      oNews = Create(&Newslink,#nid=NID_TOS_HALL,
+      oNews = Create(&Newslink,#nid=NID_GUILD_RECRUIT,
              #name=news_bar_hall,#desc=news_bar_hall_desc);
       Send(self,@NewHold,#what=oNews,#new_row=2,#new_col=8,#fine_row=0,#fine_col=0);
 

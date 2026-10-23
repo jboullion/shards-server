@@ -1,6 +1,4 @@
 room_name_marhall = de "Gemeinschaftshalle von Marion"
-news_mar_hall = de "Allgemeine Nachrichten"
-News_mar_hall_desc = de "Sieh mal, was die Leute in Meridian so reden."
 MarHall_factionflag_book = de "Die Kunst der Gebietseroberung"
 MarHall_factionflag_text = de \
    "Eine Abhandlung über die Regeln von Grenzkonflikten.\n "
@@ -84,8 +82,6 @@ MarHall_factionflag_text = de \
    "Veteran der Armee des Herzogs,Ratsmitglied."
 
 room_name_marhall = pt "O Salão dos Aventureiros de Marion"
-news_mar_hall = pt "Notícias Gerais"
-news_mar_hall_desc = pt "Veja o que as pessoas estão dizendo ao redor de Meridian."
 MarHall_factionflag_book = pt "Tática Territorial"
 MarHall_factionflag_text = pt "Un tratado sobre las reglas de conflicto de fronteras\n"
 "-Cylill, Consejero y Veterano del ejército del Duque.\n"

@@ -1,0 +1,244 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+NewsRecruiting is News
+
+// Ours (guild revamp, ADR 0022 decisions 23 and 24): the Guild Recruitment
+// board (NID_GUILD_RECRUIT). The adventurers' hall in Tos holds it and the
+// other adventurers' halls link to it. Anyone may read it. A guild's
+// Lieutenants and Commander may post, and the guild keeps one notice: a new
+// one replaces the old (plGuildNotices). Each notice is read with the guild's
+// facts on top, as they are now (GetNewsBody), and it goes when the guild does
+// (Guild.Delete).
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   newsrecruit_led_by = "Led by "
+   newsrecruit_members = ".  Members: "
+   newsrecruit_hall = ".  Hall: "
+   newsrecruit_open = " (open to visitors)"
+   newsrecruit_no_hall = ".  No hall yet"
+   newsrecruit_prestige = ".  Prestige: "
+   newsrecruit_end = "."
+   newsrecruit_space = " "
+   newsrecruit_title_join = ": "
+   newsrecruit_break = "\n\n"
+   newsrecruit_posted = \
+      "~BYour guild's notice is up on the Guild Recruitment board, in place "
+      "of any it had before."
+
+classvars:
+
+properties:
+
+   // [guild, message number] for each guild's notice.
+   plGuildNotices = $
+
+messages:
+
+   GetNewsPermission(what = $)
+   {
+      local oGuild;
+
+      if IsClass(what,&DM)
+      {
+         return NEWS_PERMISSION_READ_WRITE;
+      }
+
+      oGuild = Send(what,@GetGuild);
+      if oGuild <> $
+         AND Send(oGuild,@GetRank,#who=what) >= RANK_LIEUTENANT
+      {
+         return NEWS_PERMISSION_READ_WRITE;
+      }
+
+      return NEWS_PERMISSION_READ;
+   }
+
+   PostNews(what = $,title = $,body = $)
+   "News.PostNews, keeping one notice per guild and titling it with the "
+   "guild's name."
+   {
+      local oGuild, iMessage_num;
+
+      if NOT (Send(self,@GetNewsPermission,#what=what) & NEWS_PERMISSION_WRITE)
+      {
+         Debug("ALERT!  Player ",Send(what,@GetTrueName),what,
+               " tried to write to the recruiting board without permission.");
+
+         return;
+      }
+
+      oGuild = Send(what,@GetGuild);
+      if oGuild <> $
+      {
+         Send(self,@RemoveGuildNotice,#oGuild=oGuild);
+      }
+
+      Send(self,@ClearSpaceToPost);
+      iMessage_num = piNext_num;
+      piNext_num = piNext_num + 1;
+
+      title = Send(SYS,@CleanseString,#string=title);
+      body = Send(SYS,@CleanseString,#string=body);
+
+      if oGuild <> $
+      {
+         ClearTempString();
+         AppendTempString(Send(oGuild,@GetCapDef));
+         AppendTempString(Send(oGuild,@GetName));
+         if title <> $
+         {
+            if StringLength(title) > 0
+            {
+               AppendTempString(newsrecruit_title_join);
+               AppendTempString(title);
+            }
+         }
+         title = SetString($,GetTempString());
+
+         plGuildNotices = Cons([oGuild,iMessage_num],plGuildNotices);
+         Send(what,@MsgSendUser,#message_rsc=newsrecruit_posted);
+      }
+
+      plMessages = Cons([iMessage_num,what,GetTime(),title,body],plMessages);
+
+      return;
+   }
+
+   GetNoticeGuild(num = $)
+   {
+      local i;
+
+      foreach i in plGuildNotices
+      {
+         if Nth(i,2) = num
+         {
+            return First(i);
+         }
+      }
+
+      return $;
+   }
+
+   GetNewsBody(num = $)
+   "The notice with its guild's facts as they are now on top."
+   {
+      local i, sBody, oGuild, oLeader, oHall, iCount;
+
+      sBody = $;
+      foreach i in plMessages
+      {
+         if First(i) = num
+         {
+            sBody = Nth(i,5);
+         }
+      }
+
+      oGuild = Send(self,@GetNoticeGuild,#num=num);
+      if sBody = $
+         OR oGuild = $
+      {
+         return sBody;
+      }
+
+      ClearTempString();
+
+      oLeader = Send(oGuild,@GetGuildMaster);
+      if oLeader <> $
+      {
+         AppendTempString(newsrecruit_led_by);
+         AppendTempString(Send(oGuild,@GetRankName,#rank=RANK_MASTER,
+                               #sex=Send(oLeader,@GetGender)));
+         AppendTempString(newsrecruit_space);
+         AppendTempString(Send(oLeader,@GetTrueName));
+      }
+
+      iCount = Length(Send(oGuild,@GetMemberList));
+      AppendTempString(newsrecruit_members);
+      AppendTempString(iCount);
+
+      oHall = Send(oGuild,@GetGuildHall);
+      if oHall <> $
+      {
+         AppendTempString(newsrecruit_hall);
+         AppendTempString(Send(oHall,@GetName));
+         if Send(oHall,@IsPublic)
+         {
+            AppendTempString(newsrecruit_open);
+         }
+      }
+      else
+      {
+         AppendTempString(newsrecruit_no_hall);
+      }
+
+      AppendTempString(newsrecruit_prestige);
+      AppendTempString(Send(oGuild,@GetPrestige));
+      AppendTempString(newsrecruit_end);
+      AppendTempString(newsrecruit_break);
+      AppendTempString(sBody);
+
+      return SetString($,GetTempString());
+   }
+
+   RemoveGuildNotice(oGuild = $)
+   "Takes down the guild's notice, if it has one (a new one, or the guild "
+   "going: Guild.Delete)."
+   {
+      local i, iNumber;
+
+      iNumber = $;
+      foreach i in plGuildNotices
+      {
+         if First(i) = oGuild
+         {
+            iNumber = Nth(i,2);
+         }
+      }
+
+      // DeleteMail forgets the notice's guild too.
+      if iNumber <> $
+      {
+         Send(self,@DeleteMail,#number=iNumber);
+      }
+
+      return;
+   }
+
+   DeleteMail(number = $)
+   "Forgets the guild a deleted notice belonged to."
+   {
+      local i;
+
+      foreach i in plGuildNotices
+      {
+         if Nth(i,2) = number
+         {
+            plGuildNotices = DelListElem(plGuildNotices,i);
+         }
+      }
+
+      propagate;
+   }
+
+   DeleteAllMessages()
+   {
+      plGuildNotices = $;
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

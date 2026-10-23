@@ -290,6 +290,10 @@ resources:
       "outer door.  A member of rank '%q' or above may say \"hall public\" "
       "in the hall to let anyone in, and \"hall private\" to close it again."
       "\n\n"
+      "RECRUITING:  A member of rank '%q' or above may post a notice for "
+      "your guild on the Guild Recruitment board, in any adventurers' hall.  "
+      "Your guild keeps one: a new notice replaces the old."
+      "\n\n"
       "RECALL STONES:  A member of rank '%q' or above may say \"recall "
       "stone\" in the hall to take a stone that brings them back to it from "
       "anywhere in Meridian."
@@ -588,7 +592,8 @@ messages:
                                  4,Send(self,@GetName),
                                  4,prMaster,
                                  4,prSir,4,prLord,4,prLord,4,prSir,
-                                 4,prLieutenant_male,4,prSir]);
+                                 4,prLieutenant_male,4,prLieutenant_male,
+                                 4,prSir]);
             }
          }
       }
@@ -2431,11 +2436,18 @@ messages:
    "Since the timer may delete the object, TimerDelete checks to be sure "
    "the timer isn't already gone (getting rid of an error message)."
    {
-      local i;
+      local i, oBoard;
 
       if piGuild_hall <> $
       {
          Send(Send(self,@GetGuildHall),@ResetGuildHall);
+      }
+
+      // Ours (guild revamp): the guild's recruiting notice goes with it.
+      oBoard = Send(SYS,@FindNewsByNum,#num=NID_GUILD_RECRUIT);
+      if oBoard <> $
+      {
+         Send(oBoard,@RemoveGuildNotice,#oGuild=self);
       }
 
       piGuild_hall = $;

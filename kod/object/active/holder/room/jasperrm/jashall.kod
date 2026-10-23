@@ -21,8 +21,8 @@ resources:
    room_jasperhall = jashall.roo
    room_name_Jasperhall = "Adventurer's Hall of Jasper"
 
-   news_jas_hall = "General News"
-   news_jas_hall_desc = "Find out what's going on around Meridian."
+   news_jas_hall = "Guild Recruitment"
+   news_jas_hall_desc = "Guilds looking for members post their notices here, one each.  Anyone may read them."
 
    jashall_music = main.ogg
 
@@ -61,7 +61,7 @@ messages:
    {
       local oNews;
 
-      oNews = Create(&Newslink,#nid=NID_TOS_HALL,
+      oNews = Create(&Newslink,#nid=NID_GUILD_RECRUIT,
                      #name=news_jas_hall,#desc=news_jas_hall_desc);
       Send(self,@NewHold,#what=oNews,#new_row=7,#new_col=7);
 

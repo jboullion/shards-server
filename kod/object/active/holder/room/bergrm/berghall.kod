@@ -23,8 +23,8 @@ resources:
 
    berghall_music = main.ogg
    
-   news_berg_hall = "General News"
-   news_berg_hall_desc = "Find out what's going on around Meridian."
+   news_berg_hall = "Guild Recruitment"
+   news_berg_hall_desc = "Guilds looking for members post their notices here, one each.  Anyone may read them."
 
 classvars:
 
@@ -70,9 +70,9 @@ messages:
 
       local oNews;
 
-      // Ours (2026-10-22): the hall's globe is the general board, as in the
-      // other adventurers' halls; the inn has the announcements.
-      oNews = Create(&NewsLink,#nid=NID_TOS_HALL,
+      // Ours (guild revamp): the hall's globe is the Guild Recruitment board,
+      // as in the other adventurers' halls; the inn has the announcements.
+      oNews = Create(&NewsLink,#nid=NID_GUILD_RECRUIT,
                         #name=news_berg_hall,#desc=news_berg_hall_desc);
       Send(self,@NewHold,#what=oNews,#new_row=4,#new_col=5,
             #fine_row=24,#fine_col=48);

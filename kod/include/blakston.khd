@@ -503,9 +503,11 @@
    //  their own NID.
 
    // Adventurer's Hall Newsglobes
-   //  The Tos hall globe is now the general adventurer's globe, used by all
-   //  every adventurer's hall.
+   //  The Tos hall globe was the general adventurer's globe, used by every
+   //  adventurer's hall. Retired by the guild revamp (ADR 0022 decision 25):
+   //  the halls now share the Guild Recruitment board (NewsRecruiting).
    NID_TOS_HALL = 20
+   NID_GUILD_RECRUIT = 21
 
    // News Permissions
    NEWS_PERMISSION_NONE = 0x00
