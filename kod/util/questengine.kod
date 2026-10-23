@@ -565,9 +565,6 @@ messages:
       // QST_ID_WARLETTER
       Create(&WarLetterQuest);
 
-      // QST_ID_ESTABLISH_NECROGUILD
-      Create(&NecroGuildQuest);
-
       // QST_ID_POTION_ID
       Create(&IdentifyPotionQuest);
       // QST_ID_WAND_ID

@@ -35,9 +35,6 @@ resources:
       "%s%q's ranks are full, and may not take new members."
    guildinvitation_cannot_rejoin = \
       "~BThis player may not rejoin your guild's ranks at this time."
-   guildinvitation_necro_no_amulet = \
-      "~BOnly a necromancer may join the Order!  This player is only fit for "
-      "consumption."
 
 classvars:
 
@@ -101,14 +98,6 @@ messages:
       {
          Send(who,@MsgSendUser,#message_rsc=guildinvitation_guild_full,
                #parm1=Send(newGuild,@GetCapDef),#parm2=Send(newGuild,@GetName));
-
-         return FALSE;
-      }
-
-      if IsClass(newGuild,&NecromancerGuild)
-         AND NOT Send(otarget,@IsUsingA,#class=&NecromancerAmulet)
-      {
-         Send(who,@MsgSendUser,#message_rsc=guildinvitation_necro_no_amulet);
 
          return FALSE;
       }

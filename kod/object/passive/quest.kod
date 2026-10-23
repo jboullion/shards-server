@@ -95,8 +95,7 @@ messages:
    {
       local iPlayerRestrict, oCurrentNPC, oQuestEngine, oQuest, oQuester,
             iRestrict, iKarma, lHistory, iHistory, iSucceed, iFail, iRecentTime,
-            iFaction, iPower, iTime, iR2, bDebug, oLich,
-            oNecroGuild, oQuestTemplate;
+            iFaction, iPower, iTime, iR2, bDebug, oQuestTemplate;
 
       oQuestEngine = Send(SYS,@GetQuestEngine);
       iPlayerRestrict = Send(oQuestEngine,@GetQuestPlayerRestrictions,
@@ -614,54 +613,6 @@ messages:
                if bDebug
                {
                   Debug("failed Q_R2_HAS_HEALTH_LEVEL.");
-               }
-
-               return FALSE;
-            }
-         }
-
-         if First(iR2) = Q_R2_NUM_AMULETS
-         {
-            if Send(Send(SYS,@GetNecromancerBalance),
-                     @GetNumAmulets) < Nth(iR2, 2)
-            {
-               if bDebug
-               {
-                  Debug("failed Q_R2_NUM_AMULETS.");
-               }
-
-               return FALSE;
-            }
-
-            if Send(quester_wannabe,@GetGuild) <> $
-            {
-               if bDebug
-               {
-                  Debug("failed Q_R2_NUM_AMULETS. - guilded");
-               }
-
-               return FALSE;
-            }
-
-            //oLich = Send(Send(SYS,@FindRoomByNum,#num=RID_INNERSAN),
-            //              @FindHoldingActive,#class=&DeadLich);
-            //if oLich = $ or Send(oLich,@GetNumAmulets) < Nth(iR2, 2) {
-            //   if bDebug { Debug("failed Q_R2_NUM_AMULETS."); }
-            //   return FALSE;
-            //}
-         }
-
-         if First(iR2) = Q_R2_NECRO_GUILD_ACTIVE
-         {
-            oNecroGuild = Send(Send(SYS,@GetNecromancerBalance),@GetNecroGuild);
-            if (oNecroGuild = $
-                  AND Nth(iR2,2) > 0)
-               OR (oNecroGuild <> $
-                  AND Nth(iR2,2) < 1)
-            {
-               if bDebug
-               {
-                  Debug("failed Q_R2_NECRO_GUILD_ACTIVE.");
                }
 
                return FALSE;

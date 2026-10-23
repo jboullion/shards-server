@@ -106,7 +106,8 @@ constants:
    // Special rewards: [ kind, its number ] (tools/quests/validate.ts SPECIAL)
    QRW_JOIN = 1
    QRW_INSIGNIA = 2
-   QRW_NECRO_GUILD = 3
+   // 3 was QRW_NECRO_GUILD, the Order of Necromancers' founding (retired by the
+   // guild revamp, ADR 0022 decision 27)
    // Ours (the faction revamp): renown with the player's faction, its number the amount
    QRW_RENOWN = 4
    // Ours (the faction revamp's battles): war effort for the player's faction's next battle
@@ -1424,7 +1425,7 @@ messages:
    "The rewards that aren't things: joining a faction, a sign on a guild shield, the necromancer guild, "
    "renown."
    {
-      local oShield, oLich;
+      local oShield;
 
       if kind = QRW_JOIN
       {
@@ -1463,23 +1464,6 @@ messages:
 
          Send(oShield,@ChangeGuildInsignia,#Insignia=num);
          Send(who,@MsgSendUser,#message_rsc=quest_reward_insignia);
-
-         return;
-      }
-
-      if kind = QRW_NECRO_GUILD
-      {
-         // The dead Lich raises the Lich and deletes itself: posted, after the hand-in's done
-         oLich = Send(Send(SYS,@FindRoomByNum,#num=RID_INNERSAN),@FindHoldingActive,
-                      #class=&DeadLich);
-         if oLich <> $
-         {
-            Post(oLich,@EstablishNecromancerGuild,#master=who);
-         }
-         else
-         {
-            Debug("QuestBook: no dead Lich to raise the necromancer guild for",who);
-         }
 
          return;
       }

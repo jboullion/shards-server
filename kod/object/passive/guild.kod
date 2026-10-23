@@ -460,11 +460,6 @@ messages:
                rApprentice_Female = guild_apprenticette
               )
    {
-      if IsClass(self,&NecromancerGuild)
-      {
-         propagate;
-      }
-
       vrName = guildname;
 
       // Text names for guild ranks.
@@ -516,9 +511,7 @@ messages:
 
    ResetPowers(who=$,rank = 0)
    {
-      local i, lGuildCommands, bIsNecro;
-
-      bIsNecro = IsClass(self,&NecromancerGuild);
+      local i, lGuildCommands;
 
       if who = $ or rank = 0
       {
@@ -532,7 +525,7 @@ messages:
 
          foreach i in lGuildCommands
          {
-            Send(i,@ResetCommand,#who=who,#rank=rank,#necro=bIsNecro); 
+            Send(i,@ResetCommand,#who=who,#rank=rank);
          }
       }
       
@@ -2462,7 +2455,6 @@ messages:
       foreach i in plMembers
       {
          if NOT Send(First(i),@IsLoggedOn)
-            AND NOT IsClass(self,&NecromancerGuild)
          {
             Send(First(i),@ReceiveNestedMail,#from=guild_frular,
                   #dest_list=[First(i)],

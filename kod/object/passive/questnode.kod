@@ -1205,7 +1205,7 @@ messages:
    {
       local i, iPrizeStat, iPrizeType, cPrizeClass, oPrize, iAmount, iSchool, iDays,
             oBoon, iBoonNum, iPrizeBoon, iPrizeFaction, oQuestEngine, oQuester,
-            oLich, oNewLich, oQuestTemplate;
+            oQuestTemplate;
 
       if prize = $
          OR recipients = $
@@ -1570,36 +1570,6 @@ messages:
          return;
       }
 
-      if iPrizeType = QN_PRIZETYPE_ESTABLISH_NECROGUILD
-      {
-         // format for a prize entry of this type:
-         //     [ QN_PRIZETYPE_ESTABLISH_NECROGUILD ]
-
-         oLich = Send(Send(SYS,@FindRoomByNum,#num=RID_INNERSAN),
-                        @FindHoldingActive,#class=&DeadLich);
-         if oLich <> $
-         {
-            // Swap destination NPC to the actual Lich. This changes the
-            // origin of the success message, since the raised Lich should
-            // be saying it.
-            oNewLich = Send(oLich,@GetLich);
-            if oNewLich <> $
-            {
-               Send(poDestNPC,@RemoveQuestNodeFromActiveList,#node=self);
-               poDestNPC = oNewLich;
-               Send(poDestNPC,@AddQuestNodeToActiveList,#node=self);
-            }
-
-            Send(oLich,@EstablishNecromancerGuild,#master=First(recipients));
-         }
-         else
-         {
-            Debug("QN_PRIZETYPE_ESTABLISH_NECROGUILD: no lich!");
-         }
-
-         return;
-      }
-   
       if iPrizeType = QN_PRIZETYPE_CURSE
       {
          // format for a prize entry of this type:

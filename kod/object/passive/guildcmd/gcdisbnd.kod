@@ -25,10 +25,6 @@ resources:
    guilddisband_disband_master = "~BYou disband %s%q."
    guilddisband_disband_users = "~BYour guild has been disbanded by %s%s."
 
-   guilddisband_necro_nak = \
-      "~BThe Order of the Necromancers is bound by a blood oath.  "
-      "It cannot simply be disbanded."
-
 classvars:
 
    vrName = guilddisband_name_rsc
@@ -40,7 +36,6 @@ classvars:
 
    viGuildcommand_num = GCID_DISBAND
    viRank_needed = RANK_MASTER
-   viNecro_enabled = FALSE
 
 properties:
 
@@ -57,14 +52,6 @@ messages:
       local oGuild,i,oUser;
 
       oGuild = Send(who,@GetGuild);
-
-      // Can't disband the necromancer guild
-      if IsClass(oGuild,&NecromancerGuild)
-      {
-         Send(who,@MsgSendUser,#message_rsc=guilddisband_necro_nak);
-
-         return FALSE;
-      }
 
       // Tell people the guild is going away
       foreach i in Send(oGuild,@GetMemberList)

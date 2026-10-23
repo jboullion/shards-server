@@ -23,9 +23,6 @@ resources:
    guildabandon_desc_text_rsc = \
       "Use this command to quit your guild.  You never liked them anyway.  "
       "Guildmasters must transfer their title before using this command."
-   guildabandon_necro_nak = \
-      "~BYou have sworn a blood oath to your dark Queen.  You may not "
-      "simply abandon her fortress."
 
 classvars:
 
@@ -40,7 +37,6 @@ classvars:
    // Ours (guild revamp): only the Leader buys or gives up the hall.
    viRank_needed = RANK_MASTER
 
-   viNecro_enabled = FALSE
 
 properties:
 
@@ -71,14 +67,6 @@ messages:
       if oGuild = $
       {
          Debug("someone who belongs to no guild is using the Abandon command!");
-
-         return FALSE;
-      }
-
-      // Can't abandon the necromancer's guild hall.
-      if IsClass(oGuild,&NecromancerGuild)
-      {
-         Send(who,@MsgSendUser,#message_rsc=guildabandon_necro_nak);
 
          return FALSE;
       }

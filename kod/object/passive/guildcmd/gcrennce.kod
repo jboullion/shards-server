@@ -29,10 +29,6 @@ resources:
    renounce_ties_renouncer = "~BYou renounce your ties to %s%q."
    renounce_ties_others = "~B%s%s renounces all ties to %s%q!"
 
-   guildrenounce_necro_nak = \
-      "~BYou have sworn a blood oath to The Order of the Necromancers.  "
-      "Death is your only way out."
-
 classvars:
 
    vrName = guildrenounce_name_rsc
@@ -86,13 +82,6 @@ messages:
       if Send(oGuild,@GetGuildmaster) = who
       {
          Send(who,@MsgSendUser,#message_rsc=renounce_no_GMS);
-
-         return FALSE;
-      }
-
-      if IsClass(oGuild,&NecromancerGuild)
-      {
-         Send(who,@MsgSendUser,#message_rsc=guildrenounce_necro_nak);
 
          return FALSE;
       }

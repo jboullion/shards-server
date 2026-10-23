@@ -58,9 +58,6 @@ resources:
    system_user_killed_shield = "~B~U~k[###]~n ~B~v%q was bested by faction rival %s%q."
    system_user_killed_guild = \
       "~B~U~k[###]~n ~B~v%q of %s%q has been slaughtered by %s%q of %s%q in guild combat."
-   system_user_killed_AO3 = \
-      "~B~U~k[###]~n ~B~vThe necromancer %q has been defeated by the hunter %s%q."
-   system_user_killed_SOTH = "~B~U~k[###]~n ~B~vThe hunter %q has been defeated by the necromancer %s%q."
       
    guildwar_kill_title1 = " has slaughtered "
    guildwar_kill_body1 = "Let it be known that "
@@ -428,7 +425,6 @@ properties:
    poItemServiceBook = $
    // Ours: training, and the item abilities that were utility spells (util/shardsabilities.kod)
    poShardsAbilities = $
-   poNecromancerBalance = $
    poTokenGame = $
    poTerritoryGame = $
    poNodeAttack = $
@@ -573,7 +569,6 @@ messages:
 
       Send(self,@ResetRetiredNames);
 
-      Send(self,@RecreateNecromancerBalance);
       Send(self,@CreateUserTable);
       Send(self,@CreateRoomTable);
       Send(self,@CreateSpellTable);
@@ -689,7 +684,6 @@ messages:
       // Ours: the utility spells our client does as abilities now, taken back (docs/adr/0016)
       Send(self,@RetireUtilitySpells);
 
-      Send(self,@RecreateNecromancerBalance);
       Send(self,@RecreateClearQuests);
       Send(self,@CreateAllBanksIfNew);
       Send(self,@CreateAllVaultsIfNew);
@@ -1774,7 +1768,7 @@ messages:
       return $;
    }
 
-   UserKilled(what = $,killer = $, oRoom = $,stroke_obj = $, Sword = FALSE, Amulet = FALSE)
+   UserKilled(what = $,killer = $, oRoom = $,stroke_obj = $)
    {
       local i, rMessage, oSoldierShield, oToken, oGuild, oKillerGuild,
             param2, param3, param4, param5, param6, param7, type5, type7,
@@ -1804,17 +1798,6 @@ messages:
       {
          // Could be a war kill.  Check for it.
          Send(Send(SYS,@GetWarEvent),@RecordWarKill,#who=killer,#victim=what);
-
-         Send(poNecromancerBalance,@IncrementPKCounter);
-         if Send(killer,@IsUsingA,#class=&NecromancerAmulet)
-         {
-            Send(poNecromancerBalance,@IncrementNKCounter);
-         }
-
-         if (Send(killer,@FindHoldingActive,#class=&HunterSword) <> $)
-         {
-            Send(poNecromancerBalance,@IncrementHKCounter);
-         }
 
           // PvP flag set to TRUE.
          RecordStat(STAT_PLAYERDEATH,Send(what,@GetTrueName),
@@ -1938,19 +1921,6 @@ messages:
                // Get True name instead of normal name for Frenzy action.
                param3 = Send(killer,@GetTrueName);
             }
-         }
-      }
-
-      if IsClass(killer,&User)
-      {
-         if Sword
-         {
-            rMessage = system_user_killed_SOTH;
-         }
-
-         if Amulet
-         {
-            rMessage = system_user_killed_AO3;
          }
       }
 
@@ -5514,24 +5484,6 @@ messages:
       return TRUE;
    }
 
-   GetNecromancerBalance()
-   {
-      return poNecromancerBalance;
-   }
-
-   RecreateNecromancerBalance()
-   {
-      if poNecromancerBalance <> $
-      {
-         Send(poNecromancerBalance,@Recreate);
-      }
-      else
-      {
-         poNecromancerBalance = Create(&NecromancerBalance);
-      }
-
-      return TRUE;
-   }
 
    GetTerritoryGame()
    {

@@ -39,10 +39,6 @@ resources:
    exile_to_exiled = "~B%s has expelled you from the ranks of %s%q!"
    exile_to_others = "~B%s has exiled %q from the ranks of %s%q!"
 
-   guildexile_necro_nak = \
-      "~BEvery member of The Order is bound by a blood oath.  The only way "
-      "out is death."
-
 classvars:
 
    vrName = guildexile_name_rsc
@@ -55,7 +51,6 @@ classvars:
    viGuildcommand_num = GCID_EXILE
    viRank_needed = RANK_LIEUTENANT
 
-   viNecro_enabled = FALSE
 
 properties:
 
@@ -110,13 +105,6 @@ messages:
       if Send(myGuild,@GetRank,#who=who) <= Send(myGuild,@GetRank,#who=oTarget)
       {
          Send(who,@MsgSendUser,#message_rsc=exile_cant_too_high);
-
-         return FALSE;
-      }
-
-      if IsClass(myGuild,&NecromancerGuild)
-      {
-         Send(who,@MsgSendUser,#message_rsc=guildexile_necro_nak);
 
          return FALSE;
       }

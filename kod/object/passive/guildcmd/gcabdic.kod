@@ -36,10 +36,6 @@ resources:
       "to you!"
    abdicate_to_abdicator = "~BYou anoint %q the new leader of %s%q."
 
-   abdicate_necro_nak = \
-      "~BYou have taken a blood oath as Master of the Order.  "
-      "You may not simply abdicate!"
-
 classvars:
 
    vrName = GuildAbdicate_name_rsc
@@ -51,7 +47,6 @@ classvars:
 
    viGuildcommand_num = GCID_ABDICATE
    viRank_needed = RANK_MASTER
-   viNecro_enabled = FALSE
 
 properties:
 
@@ -66,13 +61,6 @@ messages:
    "Kicks the target out of the guild!"
    {
       local yourGuild, myguild, i, lmembers;
-
-      if IsClass(Send(who,@GetGuild),&NecromancerGuild)
-      {
-         Send(who,@MsgSendUser,#message_rsc=abdicate_necro_nak);
-
-         return FALSE;
-      }
 
       if NOT IsClass(oTarget,&Player)
       {

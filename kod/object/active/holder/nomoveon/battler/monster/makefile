@@ -13,7 +13,7 @@ BOFS  = ant.bof centip.bof cow.bof ent.bof fairy.bof fungbst.bof ghost.bof \
         priestes.bof evfairy.bof lupogg.bof tester.bof traindum.bof avar.bof avchief.bof \
         avshaman.bof reflectn.bof guard.bof orccave.bof orcboss.bof shadowb.bof \
         orcwiza.bof dfly.bof dflyq.bof lupking.bof kriipa.bof bossbody.bof \
-        stntroll.bof snowrat.bof lich.bof deadlich.bof duskrat.bof thrasher.bof \
+        stntroll.bof snowrat.bof lich.bof duskrat.bof thrasher.bof \
         nrthlwrm.bof bramble.bof eviltwin.bof dethspid.bof grdworm.bof human.bof \
         xeochctl.bof dflypet.bof dangel.bof mollusk.bof specmum.bof \
         evilent.bof wolf.bof chupacabra.bof minotaur.bof \

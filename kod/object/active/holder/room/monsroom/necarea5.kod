@@ -28,8 +28,6 @@ resources:
       "The large stone doors are firmly stuck, probably by mounds of rubble on "
       "the other side."
 
-   necroarea5_guildwarning = "Your amulet vibrates gently for a moment."
-
 classvars:
 
    vrName = room_name_Necropolis5
@@ -135,39 +133,6 @@ messages:
 
       propagate;
    }
-
-   //NewHold(what=$)
-   //{
-   //   local oNecroGuild,lMembers,oNecro,iChance;
-//
-   //   if IsClass(what,&User) AND NOT IsClass(what,&dm)
-   //   {
-   //      oNecroGuild = $; //send(send(SYS,@FindRoomByNum,#num=RID_INNERSAN),@GetGuildOwner);
-   //      if oNecroGuild <> $
-   //      {
-   //         if NOT send(what,@IsUsingA,#Class=&NecromancerAmulet)
-   //         {
-   //            iChance = 10;
-   //            if send(what,@FindHoldingActive,#class=&HunterSword) <> $
-   //            {
-   //               iChance = iChance/2;
-   //            }
-//
-   //            if random(1,iChance) = 1
-   //            {
-   //               lMembers = send(oNecroGuild,@GetMemberList);
-   //               oNecro = First(nth(lMembers,random(1,length(lMembers))));
-   //               if send(oNecro,@isLoggedOn)
-   //               {
-   //                  Send(oNecro,@MsgSendUser,#message_rsc=necroarea5_guildwarning);
-   //               }
-   //            }
-   //         }
-   //      }
-   //   }
-//
-   //   propagate;
-   //}
 
    IsInMainRoom(who=$)
    {

@@ -4619,7 +4619,7 @@ messages:
    "The last checks on an attack AllowBattlerAttack let through: faction standing "
    "(CheckFactionAttack), war regrouping, and the time of our last attack on a player."
    {
-      local oEnemyGuild, oSoldierShield, oNecromancerAmulet, oHunterSword;
+      local oEnemyGuild, oSoldierShield;
 
       // Don't care about monsters.
       // And, free attacks on token holders.
@@ -4699,28 +4699,6 @@ messages:
          }
 
          return TRUE;
-      }
-
-      oNecromancerAmulet = Send(self,@FindHoldingActive,#class=&NecromancerAmulet);
-      oHunterSword = Send(victim,@FindHoldingActive,#class=&HunterSword);
-
-      if oNecromancerAmulet <> $
-      {
-         if oHunterSword <> $
-         {
-            return TRUE;
-         }
-      }
-
-      oNecromancerAmulet = Send(victim,@FindHoldingActive,#class=&NecromancerAmulet);
-      oHunterSword = Send(self,@FindHoldingActive,#class=&HunterSword);
-
-      if oHunterSword <> $
-      {
-         if oNecromancerAmulet <> $
-         {
-            return TRUE;
-         }
       }
 
       // Check for faction loss.  Handles appropriate conditions.
@@ -5874,8 +5852,7 @@ messages:
    KilledSomething(what = $,use_weapon = $,stroke_obj = $)
    "Called when the player killed something."
    {
-      local i, oSoldierShield, oEnemyGuild, oVictimRoom, oObject, oHunterSword,
-            oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1;
+      local i, oSoldierShield, oEnemyGuild, oVictimRoom, oObject;
 
       // If we killed someone or something, we did damage.
       Send(self,@SetPlayerFlag,#flag=PFLAG_DID_DAMAGE,#value=TRUE);
@@ -5917,22 +5894,6 @@ messages:
          }
 
          Send(poOwner,@SomethingKilled,#what=self,#victim=what);
-      }
-
-      if IsClass(what,&User)
-      {
-         oNecromancerAmulet = Send(self,@FindHoldingActive,#class=&NecromancerAmulet);
-         oHunterSword = Send(self,@FindHoldingActive,#class=&HunterSword);
-         oNecromancerAmulet1 = Send(what,@FindHoldingActive,#class=&NecromancerAmulet);
-         oHunterSword1 = Send(what,@FindHoldingActive,#class=&HunterSword);
-
-         if (oNecromancerAmulet <> $ AND oHunterSword1 <> $)
-             OR (oHunterSword <> $ AND oNecromancerAmulet1 <> $)
-         {
-            Send(what,@Killed,#what=self,#stroke_obj=stroke_obj,#use_weapon=use_weapon);
-
-            return;
-         }
       }
 
       // Let our shield know we killed something.
@@ -9216,8 +9177,7 @@ messages:
    {
       local lItems, i, oBody, oSoldierShield, bNo_drop_death, oItemAtt,
             oRoom, iRow, iCol, iFine_Row, iFine_Col, iAngle, oItem,
-            iRoom, lInventoryContents, lBagContents, oSkull, oSword, oAmulet,
-            oHunterSword, oNecromancerAmulet, oHunterSword1, oNecromancerAmulet1,
+            iRoom, lInventoryContents, lBagContents, oSkull,
             bWarDeath, bBreakGear;
 
       bWarDeath = FALSE;
@@ -9286,12 +9246,6 @@ messages:
       }
       else
       {
-         if NOT Send(self,@IsUsingA,#class=&NecromancerAmulet)
-         {
-            Debug("Player died while offline, but not a necromancer: ",
-                  Send(self,@GetName));
-         }
-
          iRoom = Send(self,@GetSaveRoom);
          oRoom = Send(SYS,@FindRoomByNum,#num=iRoom);
          iRow = Send(self,@GetSaveRow);
@@ -9389,25 +9343,9 @@ messages:
       }
 
       
-      oNecromancerAmulet = Send(self,@FindHoldingActive,#class=&NecromancerAmulet);
-      oHunterSword = Send(self,@FindHoldingActive,#class=&HunterSword);
-      oNecromancerAmulet1 = Send(what,@FindHoldingActive,#class=&NecromancerAmulet);
-      oHunterSword1 = Send(what,@FindHoldingActive,#class=&HunterSword);
-
-      if (oNecromancerAmulet <> $ AND oHunterSword1 <> $)
-      {
-         oAmulet = TRUE;
-      }
-      
-      if (oHunterSword <> $ AND oNecromancerAmulet1 <> $)
-      {
-         oSword = TRUE;
-      }
-
       // Record-keeping. Keep this before the token check,
       // so we can give proper message.
-      Send(SYS,@UserKilled,#what=self,#killer=what,#oRoom=oRoom,#stroke_obj=stroke_obj,
-                           #Sword=oSword,#Amulet=oAmulet);
+      Send(SYS,@UserKilled,#what=self,#killer=what,#oRoom=oRoom,#stroke_obj=stroke_obj);
       Send(Send(SYS,@GetStatistics),@PlayerDiedCounter);
 
       // Token death?

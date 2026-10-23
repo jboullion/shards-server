@@ -531,13 +531,6 @@ messages:
       return;
    }
 
-   OrderOfNecromancersDisbanded()
-   "The Order of Necromancers (guild/necguild.kod) tells every amulet when it disbands. "
-   "Its members once died of it; now they just carry on."
-   {
-      return;
-   }
-
    Delete()
    {
       if ptHungerTimer <> $

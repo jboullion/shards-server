@@ -30,8 +30,6 @@ resources:
    LichMaze_door_sound = necmaze.ogg
    LichMaze_loop = necloop2.ogg
 
-   LichMaze_guildwarning = "Your amulet vibrates for a moment, startling you."
-
 classvars:
 
    vrName = LichMaze_room_name
@@ -196,39 +194,6 @@ messages:
       
       return;
    }
-
-   //NewHold(what=$)
-   //{
-   //   local oNecroGuild,lMembers,oNecro,iChance;
-//
-   //   if IsClass(what,&User) AND NOT IsClass(what,&dm)
-   //   {
-   //      oNecroGuild = $; //Send(Send(SYS,@FindRoomByNum,#num=RID_INNERSAN),@GetGuildOwner);
-   //      if oNecroGuild <> $
-   //      {
-   //         if not Send(what,@IsUsingA,#Class=&NecromancerAmulet)
-   //         {
-   //            iChance = 4;
-   //            if (Send(what,@FindHoldingActive,#class=&HunterSword)<>$)
-   //            {
-   //               iChance = iChance/2;
-   //            }
-//
-   //            if random(1,iChance) = 1
-   //            {
-   //               lMembers = Send(oNecroGuild,@GetMemberList);
-   //               oNecro = First(Nth(lMembers,random(1,length(lMembers))));
-   //               if Send(oNecro,@IsLoggedOn)
-   //               {
-   //                  Send(oNecro,@MsgSendUser,#message_rsc=lichmaze_guildwarning);
-   //               }
-   //            }
-   //         }
-   //      }
-   //   }
-//
-   //   propagate;
-   //}
 
    Delete()
    {
