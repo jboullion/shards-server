@@ -1812,6 +1812,15 @@ messages:
       //  so this goes here.  Monsters shouldn't need to overwrite
       //  ResetBehaviorFlags, but they are encouraged to overwrite
       //  TweakBehavior.  see monster\dflyq.kod.
+      // Ours (guild revamp): a Fallen Hall's garrison attacks everyone, not
+      //  only the players its kind would, and never through the hall's walls
+      //  (SetGarrisonStrength).
+      if piGarrisonLevel <> $
+      {
+         piBehavior |= AI_FIGHT_AGGRESSIVE;
+         piBehavior &= ~AI_FIGHT_THROUGH_WALLS;
+      }
+
       Send(self,@TweakBehavior);
 
       return;
@@ -5598,6 +5607,9 @@ messages:
       piMax_hit_points = Bound(hp,1,$);
       piHit_points = piMax_hit_points * 100;
       pbDontDispose = TRUE;
+
+      // Aggressive to everyone (ResetBehaviorFlags).
+      Send(self,@ResetBehaviorFlags);
 
       return;
    }

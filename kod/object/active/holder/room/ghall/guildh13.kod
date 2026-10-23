@@ -37,6 +37,10 @@ resources:
    room_guildh13 = guildh13.roo
 
    guildh13_locked = "The door is firmly locked"
+   guildh13_sanctum_opens = \
+      "~BWith the last of the hall's guard fallen, the hidden wall on the "
+      "hall's south side stirs.  Say \"open\" beside it to pass into the "
+      "Order's sanctum, where %s%s waits."
    guildh13_wall_shut = \
       "The wall does not stir.  The Order's sanctum stays sealed while the "
       "hall's guard stands."
@@ -52,6 +56,8 @@ classvars:
 
    viInner_teleport_row = 5
    viInner_teleport_col = 28
+
+   vrSanctum_opens = guildh13_sanctum_opens
 
    viGarrison_level = 185
    viBoss_level = 200
@@ -153,17 +159,17 @@ messages:
       propagate;
    }
 
-   SomeoneSaid(what=$,type=$,string=$,parm1=$,parm2=$,parm3=$,
-            parm4=$,parm5=$,parm6=$,parm7=$,parm8=$)
+   InSanctum(row=$,col=$)
    {
-      if IsClass(what,&Player)
-         AND type <> SAY_EMOTE
-         AND Send(self,@IsOpenWord,#string=string)
-      {
-         Send(self,@WalkThroughSecretWall,#who=what);
-      }
+      return row >= 10 AND row <= 13 AND col >= 24 AND col <= 29;
+   }
 
-      propagate;
+   SanctumWordSaid(who=$)
+   "No door here: \"open\" said beside the wall takes one through it."
+   {
+      Send(self,@WalkThroughSecretWall,#who=who);
+
+      return;
    }
 
    WalkThroughSecretWall(who=$)

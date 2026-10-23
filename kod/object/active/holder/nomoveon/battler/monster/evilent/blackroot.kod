@@ -1,0 +1,48 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+OldBlackroot is EvilEnt
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Old Blackroot, the
+// grove's eldest tree, which the Friends of the Forest tended until the Order
+// of Necromancers poisoned its roots. The Fallen Hall boss of guildh11: the
+// hall sets its strength (Monster.SetGarrisonStrength) and gives it its prize.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   OldBlackroot_name_rsc = "Old Blackroot"
+   OldBlackroot_desc_rsc = \
+      "The Friends of the Forest built their hall around this tree, the "
+      "eldest of the grove.  The Order of Necromancers poured death into its "
+      "roots, and now its bark is black and weeping, and its branches reach "
+      "for anything that lives."
+   OldBlackroot_dead_name_rsc = "the stump of Old Blackroot"
+
+classvars:
+
+   vrName = OldBlackroot_name_rsc
+   vrDesc = OldBlackroot_desc_rsc
+   vrDead_name = OldBlackroot_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 2000
+   viCashmax = 3500
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

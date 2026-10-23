@@ -21,7 +21,9 @@ FallenHall is MonsterRoom
 //                  carries the prize, a magic item (GetPrizeSeed).
 //   STATE_HELD     the main hall's guard stands.
 //   STATE_SANCTUM  the main hall's guard has fallen, and the hall's old secret
-//                  door lets anyone through (subclass: OpenSanctum).
+//                  door opens and stays open until the reset (the subclass's
+//                  OpenSanctum and CloseSanctum). "open" said in the hall
+//                  before then says it's sealed (SanctumWordSaid).
 //   STATE_CLEARED  the boss has fallen. Each guild with a member there who
 //                  struck it gains BOSS_PRESTIGE.
 //
@@ -54,13 +56,15 @@ resources:
    fallenhall_sanctum_held = \
       "~BThe Order's sanctum lies beyond, behind the hall's old secret "
       "door.  It will not open while the hall's guard stands."
+   fallenhall_sanctum_shut = \
+      "The hall's old secret door does not stir.  The Order's sanctum stays "
+      "sealed while the hall's guard stands."
    fallenhall_cleared = \
       "~BThe Order's dead lie where they fell.  It will hold %s again with "
       "the new day."
    fallenhall_sanctum_opens = \
       "~BWith the last of the hall's guard fallen, the hall's old secret door "
-      "stirs.  Say \"open\" beside it to pass into the Order's sanctum, "
-      "where %s%s waits."
+      "opens on the Order's sanctum, where %s%s waits."
    fallenhall_boss_slain = \
       "~B%s%s has fallen, and %s is free of the Order until the new day."
    fallenhall_prestige = \
@@ -87,8 +91,13 @@ classvars:
    // The prize's difficulty, 1 to 10 (TreasureType.GenerateItemAtt).
    viPrize_seed = 8
 
+   // Told to everyone in the hall as the sanctum opens (%s%s, the boss).
+   vrSanctum_opens = fallenhall_sanctum_opens
+
    vrEntrancedoor_open_sound = fallenhall_entrancedoor_open_sound
    vrEntrancedoor_close_sound = fallenhall_entrancedoor_close_sound
+   vrSecretdoor_open_sound = fallenhall_entrancedoor_open_sound
+   vrSecretdoor_close_sound = fallenhall_entrancedoor_close_sound
 
 properties:
 
@@ -308,7 +317,7 @@ messages:
       if poBoss <> $
       {
          SendListByClass(plActive,1,&User,@MsgSendUser,
-               #message_rsc=fallenhall_sanctum_opens,
+               #message_rsc=vrSanctum_opens,
                #parm1=Send(poBoss,@GetDef),#parm2=Send(poBoss,@GetName));
       }
 
@@ -316,7 +325,7 @@ messages:
    }
 
    OpenSanctum()
-   "Subclass: the sanctum's door now lets anyone through."
+   "Subclass: the sanctum's door opens, and stays open until CloseSanctum."
    {
       return;
    }
@@ -444,6 +453,15 @@ messages:
          return;
       }
 
+      // Back from logging off in the sanctum after a reset: not beside a
+      // fresh boss behind a sealed door.
+      if NOT Send(self,@IsSanctumOpen)
+         AND Send(self,@InSanctum,#row=Send(who,@GetRow),
+                  #col=Send(who,@GetCol))
+      {
+         Send(self,@Teleport,#what=who);
+      }
+
       if piState = STATE_CLEARED
       {
          Send(who,@MsgSendUser,#message_rsc=fallenhall_cleared,
@@ -462,6 +480,12 @@ messages:
       return;
    }
 
+   InSanctum(row = $,col = $)
+   "Subclass: is this square in the sanctum?"
+   {
+      return FALSE;
+   }
+
    IsSanctumOpen()
    {
       return piState = STATE_SANCTUM
@@ -472,6 +496,57 @@ messages:
    {
       return string <> $
          AND StringEqual(string,fallenhall_open_word);
+   }
+
+   SomeoneSaid(what = $,type = $,string = $,parm1 = $,parm2 = $,parm3 = $,
+               parm4 = $,parm5 = $,parm6 = $,parm7 = $,parm8 = $)
+   {
+      if IsClass(what,&Player)
+         AND type <> SAY_EMOTE
+         AND Send(self,@IsOpenWord,#string=string)
+      {
+         Post(self,@SanctumWordSaid,#who=what);
+      }
+
+      propagate;
+   }
+
+   SanctumWordSaid(who = $)
+   "A player said \"open\" in the hall: the secret door opens once the "
+   "hall's guard has fallen."
+   {
+      if who = $
+         OR Send(who,@GetOwner) <> self
+      {
+         return;
+      }
+
+      if NOT Send(self,@IsSanctumOpen)
+      {
+         Send(who,@MsgSendUser,#message_rsc=fallenhall_sanctum_shut);
+
+         return;
+      }
+
+      // Open already; this does no harm, and opens it should anything
+      // have shut it.
+      Send(self,@OpenSanctum);
+
+      return;
+   }
+
+   OpenSecretDoorSound()
+   {
+      Send(self,@SomethingWaveRoom,#wave_rsc=vrSecretdoor_open_sound);
+
+      return;
+   }
+
+   CloseSecretDoorSound()
+   {
+      Send(self,@SomethingWaveRoom,#wave_rsc=vrSecretdoor_close_sound);
+
+      return;
    }
 
    //// The outer doors: they open for anyone.
@@ -528,10 +603,14 @@ messages:
          lDoor = plEntrance;
       }
 
+      // FindUsersInArea finds monsters too; only players are put back.
       lFound = Send(self,@FindUsersInArea,#lArea=lDoor);
       foreach i in lFound
       {
-         Send(self,@Teleport,#what=i);
+         if IsClass(i,&User)
+         {
+            Send(self,@Teleport,#what=i);
+         }
       }
 
       ptEntrance = $;
@@ -555,6 +634,15 @@ messages:
 
    //// What other rooms ask a guild hall
 
+   IsMoveOK(old_row = 1,old_col = 1,old_fine_row = 1,old_fine_col = 1,
+            new_row = 1,new_col = 1,new_fine_row = 1,new_fine_col = 1,
+            who = $)
+   "User.UserMove asks every room in the guild halls' numbers; the doors "
+   "here open for anyone."
+   {
+      return TRUE;
+   }
+
    CanEnter(who = $)
    {
       return TRUE;
@@ -566,8 +654,10 @@ messages:
    }
 
    IsDoorWord(what = $,string = $)
+   "The Den of Shadows' balcony door (F8): \"open\", once the sanctum is."
    {
-      return Send(self,@IsOpenWord,#string=string);
+      return Send(self,@IsOpenWord,#string=string)
+         AND Send(self,@IsSanctumOpen);
    }
 
    CanHavePlayerPortal()

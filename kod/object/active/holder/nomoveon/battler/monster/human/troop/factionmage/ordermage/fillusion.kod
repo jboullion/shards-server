@@ -1,0 +1,48 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+FallenIllusionist is OrderMage
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Mistress Ysolde, the
+// Order of Necromancers' illusionist, who learned Riija's arts in the Den of
+// Shadows. The Fallen Hall boss of guildh3: the hall sets its strength
+// (Monster.SetGarrisonStrength) and gives it its prize.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   FallenIllusionist_name_rsc = "Mistress Ysolde"
+   FallenIllusionist_desc_rsc = \
+      "Ysolde came to the Den of Shadows to learn its guild's illusions, "
+      "and stayed to betray it to the Order of Necromancers.  Shadows cling "
+      "to her robes, and it is hard to tell which of her is really there."
+   FallenIllusionist_dead_name_rsc = "the body of Mistress Ysolde"
+
+classvars:
+
+   vrName = FallenIllusionist_name_rsc
+   vrDesc = FallenIllusionist_desc_rsc
+   vrDead_name = FallenIllusionist_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 2000
+   viCashmax = 3000
+   viSchool = SS_RIIJA
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

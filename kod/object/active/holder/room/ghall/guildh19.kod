@@ -8,7 +8,15 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////
-GuildHall19 is GuildHall
+GuildHall19 is FallenHall
+
+// Ours (guild revamp, ADR 0022 decision 16): the Order of Necromancers holds
+// the Wetland Fortress, the top of the ladder, with the swamp's thrashers
+// beside its soldiers and mages. Lieutenant Morvaine, the highest of Queen
+// Venya'cyr's lieutenants, waits in the sanctum off the north-east corner,
+// behind the floor at (5,28-29) (sector 6), which sinks for good once the
+// main hall's guard has fallen. The inner doors still open for players as
+// they always did; the garrison waits behind them.
 
 constants:
 
@@ -19,13 +27,7 @@ constants:
    INNER_SE_DOOR = 5
    SECRET_DOOR = 6
 
-   GH19_FOYER_C = 1
-   GH19_FOYER_W = 2
-
    RESET_TIME = 10000
-   SECRET_DELAY = 10000
-
-   STATUS_OKAY = 3
 
    include blakston.khd
 
@@ -53,27 +55,16 @@ classvars:
    viTeleport_row = 8
    viTeleport_col = 18
 
-   viNews_row = 7
-   viNews_col = 26
-   viNews_finerow = 32
-   viNews_finecol = 32
-
-
    viInner_teleport_row = 7
    viInner_teleport_col = 24
 
-   viHellPortal_row = 16
-   viHellPortal_col = 23
-   viHellPortal_angle = ANGLE_NORTH
+   viTerrain_type = TERRAIN_CASTLE
 
-   viPublicChest_row = 8
-   viPublicChest_col = 18
-   viPublicChest_angle = ANGLE_WEST
-
-   viQuality = 6
-
-   viTerrain_type = TERRAIN_CASTLE | TERRAIN_GUILDHALL
-   viSeconds_til_close = 15
+   viGarrison_level = 200
+   viBoss_level = 215
+   viBoss_hp_percent = 500
+   viBoss_damage_percent = 90
+   viPrize_seed = 10
 
    vbIsExpansionRoom = TRUE
 
@@ -89,15 +80,13 @@ properties:
    ptInnerNDoor = $
    ptInnerSDoor = $
    ptInnerSEDoor = $
-   ptSecretDoor = $
    plFoyerCDoor = $
    plFoyerWDoor = $
 
 messages:
 
    Constructor()
-   "These mark the exterior door of the guild, which is only openable by "
-   "a guild member or an allied guild member."
+   "These mark the hall's two outer doors."
    {
       plGuild_doors = [ [8,9], [6,3] ];
       //plInternal_Guild_doors =  [ [8, 8, 0], [6, 4, 1] ];
@@ -110,89 +99,8 @@ messages:
       propagate;
    }
 
-   IsMoveOK(old_row = 1, old_col = 1, old_fine_row = 1, old_fine_col = 1,
-            new_row = 1, new_col = 1, new_fine_row = 1, new_fine_col = 1,
-            who = $)
-   {
-      // Hardcoded movement check, prevent hacking into hall.
-      // Basic requirement door must not be open
-      if ptFoyerCDoor = $
-         AND ptFoyerWDoor = $
-      {
-         if Send(self,@InFoyer,#iRow=old_row,#iCol=old_col)
-         {
-            // We're in the foyer. Check if we're trying to move into the hall.
-            if NOT Send(self,@InFoyer,#iRow=new_row,#iCol=new_col)
-            {
-               // Bad player! Fail the attempt.
-               Debug("ALERT!",Send(who,@GetTrueName),who,
-                     "tried to move through closed Guild Hall door ",
-                     Send(self,@GetName)," from ",old_row,old_col,old_fine_row,
-                     old_fine_col," to ",new_row,new_col,new_fine_row,
-                     new_fine_col,". Last door opening was ",
-                     GetTime() - Send(self,@GetDoorTimeStamp),
-                     " seconds ago.");
-               return FALSE;
-            }
-         }
-      }
-
-      return TRUE;
-   }
-
-
-   InFoyer(who=$,iRow=$,iCol=$, iFineRow=$, iFineCol=$)
-   "Due to the multiple foyers in this guild hall, we return which "
-   "foyer 'who' is currently in.  Returns FALSE if not in foyer, a positive "
-   "integer otherwise."
-   {
-      if who <> $
-      {
-         if Send(who,@GetOwner) <> self
-         {
-            return FALSE;
-         }
-
-         iRow = Send(who,@GetRow);
-         iCol = Send(who,@GetCol);
-         iFineRow = Send(who, @GetFineRow);
-         iFineCol = Send(who, @GetFineCol);
-      }
-
-      if (iRow >= 6 AND iRow < 9) AND (iCol >= 9 AND iCol <= 19)
-      {
-         return GH19_FOYER_C;
-      }
-
-      if (iRow >= 2) AND (iRow <= 8) AND (iCol >= 2 AND iCol < 4)
-      {
-         return GH19_FOYER_W;
-      }
-
-      return FALSE;
-   }
-
-//   InFoyer(who=$)
-//   {
-//      return Send(who,@GetSectorIDAtObject) = FOYER_SECTOR_ID;
-//   }
-
-   ValidEntry(what=$)
-   {
-
-      if Send(self,@InFoyer,#who=what)
-      {
-         // Since we have multiple foyers, let people enter the appropriate foyer
-         return;
-      }
-
-      // Superclass teleports people to the One True Foyer(tm) if they enter
-      // (or log on) inside when they're not normally allowed to enter.
-      propagate;
-   }
-
    SomethingTryGo(what=$,row=$,col=$)
-   "Opens the guild outer doors, but only if you're a guildmember!"
+   "Opens whichever door is tried, for anyone."
    {
       local i, count;
 
@@ -201,21 +109,9 @@ messages:
       {
          if row = First(i) AND col = Nth(i,2)
          {
-            // check to see if the doors should open
-            if piStatus = STATUS_OKAY
-               AND NOT Send(self,@CanEnter,#who=what)
-            {
-               // Send a message saying 'only members and their allies may enter.' 
-               Send(what,@MsgSendUser,#message_rsc=guildhall_cant_open,#parm1=vrName);
+            Send(self,@OpenEntranceDoor,#doorNum=count);
 
-               return TRUE;
-            }
-            else
-            {
-               Send(self,@OpenEntranceDoor,#doorNum=count);
-
-               return TRUE;
-            }
+            return TRUE;
          }
 
          count = count + 1;
@@ -369,25 +265,43 @@ messages:
       return;
    }
 
-   OpenSecretDoor()
+   GetGarrison()
    {
-      if ptSecretDoor = $
-      {
-         Send(self,@SetSector,#sector=SECRET_DOOR,#animation=ANIMATE_FLOOR_LIFT,
-               #height=896,#speed=16);
-         Send(self,@OpenSecretDoorSound);
-         ptSecretDoor = CreateTimer(self,@CloseSecretDoor,SECRET_DELAY);
-      }
+      return [ [ &Thrasher, 4, 6, FALLEN_ROLE_HALL ],
+               [ &Thrasher, 3, 17, FALLEN_ROLE_HALL ],
+               [ &Thrasher, 6, 24, FALLEN_ROLE_HALL ],
+               [ &Thrasher, 11, 12, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 10, 6, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 2, 29, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 11, 23, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 3, 12, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 8, 20, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 9, 24, FALLEN_ROLE_HALL ],
+               [ &Thrasher, 7, 29, FALLEN_ROLE_SANCTUM ],
+               [ &Thrasher, 8, 28, FALLEN_ROLE_SANCTUM ],
+               [ &FallenLieutenant, 10, 29, FALLEN_ROLE_BOSS ]
+             ];
+   }
+
+   InSanctum(row=$,col=$)
+   {
+      return row >= 6 AND row <= 11 AND col >= 28;
+   }
+
+   OpenSanctum()
+   "The floor at (5,28-29) sinks, and stays down until the reset."
+   {
+      Send(self,@SetSector,#sector=SECRET_DOOR,#animation=ANIMATE_FLOOR_LIFT,
+            #height=896,#speed=16);
+      Send(self,@OpenSecretDoorSound);
 
       return;
    }
 
-   CloseSecretDoor()
+   CloseSanctum()
    {
-      ptSecretDoor = $;
       Send(self,@SetSector,#sector=SECRET_DOOR,#animation=ANIMATE_FLOOR_LIFT,
             #height=984,#speed=16);
-      Send(self,@CloseSecretDoorSound);
 
       return;
    }
@@ -440,26 +354,11 @@ messages:
       Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_POTPLANT),
            #new_row=14,#new_col=26,#fine_row=16,#fine_col=48,#new_angle=ANGLE_EAST);
 
-
-      //Chests
-      Send(self,@NewHold,#what=Create(&WoodenBox),
-            #new_row=11,#new_col=28,#fine_row=0,#fine_col=0,
-            #new_angle=ANGLE_SOUTH);
-      Send(self,@NewHold,#what=Create(&WoodenBox),
-            #new_row=11,#new_col=30,#fine_row=0,#fine_col=0,
-            #new_angle=ANGLE_WEST);
-
       propagate;
    }
 
    Delete()
    {
-      if ptSecretDoor <> $
-      {
-         DeleteTimer(ptSecretDoor);
-         ptSecretDoor = $;
-      }
-
       if ptFoyerCDoor <> $
       {
          DeleteTimer(ptFoyerCDoor);

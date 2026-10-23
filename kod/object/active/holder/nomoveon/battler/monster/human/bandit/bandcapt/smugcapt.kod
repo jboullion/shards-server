@@ -1,0 +1,49 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+SmugglerCaptain is BanditCaptain
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Captain Vesk, who runs
+// the Order of Necromancers' relics out of the Abandoned Warehouse. The
+// Fallen Hall boss of guildh9: the hall sets its strength
+// (Monster.SetGarrisonStrength) and gives it its prize. He doesn't flee.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   SmugglerCaptain_name_rsc = "Captain Vesk"
+   SmugglerCaptain_desc_rsc = \
+      "Vesk once smuggled spices through the Ports of Barloque.  Now he "
+      "smuggles stranger things for the Order of Necromancers: bones, bound "
+      "spirits, and crates that whisper.  He is paid well, and he means to "
+      "live to spend it."
+   SmugglerCaptain_dead_name_rsc = "the body of Captain Vesk"
+
+classvars:
+
+   vrName = SmugglerCaptain_name_rsc
+   vrDesc = SmugglerCaptain_desc_rsc
+   vrDead_name = SmugglerCaptain_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 3500
+   viCashmax = 5000
+   viWimpy = 0
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

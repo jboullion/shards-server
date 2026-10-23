@@ -8,7 +8,14 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////
-GuildHall3 is Guildhall
+GuildHall3 is FallenHall
+
+// Ours (guild revamp, ADR 0022 decision 16): the Order of Necromancers holds
+// the Den of Shadows, the ladder's first rung: its soldiers, its
+// illusionists (Riija's casters) and shadowbeasts. Mistress Ysolde waits in
+// the sanctum, the south hall and chest room beyond the bridge (sector 2),
+// which sinks for good once the main hall's guard has fallen. F8's balcony
+// door into the sanctum opens only then too (IsSanctumOpen).
 
 constants:
 
@@ -36,26 +43,16 @@ classvars:
 
    vrName = room_name_guildhall3
 
-   viNews_row = 6
-   viNews_col = 16
-   viNews_finerow = 48
-   viNews_finecol = 48
-
    viTeleport_row = 5
    viTeleport_col = 4
 
-   viFoyer_north = 1
-   viFoyer_south = 8
-   viFoyer_west = 1
-   viFoyer_east = 7
+   viTerrain_type = TERRAIN_CAVES | TERRAIN_RIVER
 
-
-   viInner_teleport_row = 12
-   viInner_teleport_col = 16
-
-   viQuality = 8
-   viTerrain_type = TERRAIN_CAVES | TERRAIN_GUILDHALL | TERRAIN_RIVER
-   viSeconds_til_close = 16
+   viGarrison_level = 90
+   viBoss_level = 105
+   viBoss_hp_percent = 500
+   viBoss_damage_percent = 90
+   viPrize_seed = 5
 
 properties:
 
@@ -64,8 +61,6 @@ properties:
 
    piBaseLight = LIGHT_NICE
 
-   ptEntrance = $
-   ptBridge = $
 
 messages:
 
@@ -80,21 +75,29 @@ messages:
       propagate;
    }
 
-   Delete()
+   GetGarrison()
    {
-      if ptBridge <> $
-      {
-         DeleteTimer(ptBridge);
-         ptBridge=$;
-      }
+      return [ [ &OrderSoldier, 4, 14, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 10, 16, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 13, 12, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 17, 8, FALLEN_ROLE_HALL ],
+               [ &OrderIllusionist, 5, 16, FALLEN_ROLE_HALL ],
+               [ &OrderIllusionist, 12, 8, FALLEN_ROLE_HALL ],
+               [ &OrderIllusionist, 18, 10, FALLEN_ROLE_HALL ],
+               [ &Shadowbeast, 10, 11, FALLEN_ROLE_HALL ],
+               [ &Shadowbeast, 15, 10, FALLEN_ROLE_HALL ],
+               [ &Shadowbeast, 16, 12, FALLEN_ROLE_HALL ],
+               [ &OrderIllusionist, 27, 10, FALLEN_ROLE_SANCTUM ],
+               [ &OrderIllusionist, 27, 15, FALLEN_ROLE_SANCTUM ],
+               [ &FallenIllusionist, 28, 12, FALLEN_ROLE_BOSS ]
+             ];
+   }
 
-      if ptEntrance <> $
-      {
-         DeleteTimer(ptEntrance);
-         ptEntrance = $;
-      }
-
-      propagate;
+   InSanctum(row=$,col=$)
+   "The south hall and chest room, and the east corridor beside the hall."
+   {
+      return (row >= 21 AND col <= 19)
+         OR (col >= 20 AND row >= 5 AND row <= 22);
    }
 
    CreateStandardExits()
@@ -147,25 +150,20 @@ messages:
       propagate;
    }
 
-   OpenSecretDoor()
+   OpenSanctum()
+   "The bridge sinks, and stays down until the reset."
    {
-      if ptBridge = $
-      {
-         Send(self,@SetSector,#sector=BRIDGE,#animation=ANIMATE_FLOOR_LIFT,
-               #height=BRIDGE_LOW,#speed=16);
-         ptBridge=CreateTimer(self,@CloseSecretDoor,LIFT_DELAY);
-         Send(self,@OpenSecretDoorSound);
-      }
+      Send(self,@SetSector,#sector=BRIDGE,#animation=ANIMATE_FLOOR_LIFT,
+            #height=BRIDGE_LOW,#speed=16);
+      Send(self,@OpenSecretDoorSound);
 
       return;
    }
 
-   CloseSecretDoor()
+   CloseSanctum()
    {
-      ptBridge = $;
       Send(self,@SetSector,#sector=BRIDGE,#animation=ANIMATE_FLOOR_LIFT,
             #height=BRIDGE_HIGH,#speed=16);
-      Send(self,@CloseSecretDoorSound);
 
       return;
    }
@@ -203,13 +201,6 @@ messages:
             #new_row=14,#new_col=6,#fine_row=24,#fine_col=8);
       Send(self,@NewHold,#what=Create(&Brazier),
             #new_row=29,#new_col=17,#fine_row=32,#fine_col=0);
-
-      Send(self,@NewHold,#what=Create(&Chest),
-            #new_row=29,#new_col=9,#fine_row=32,#fine_col=0,
-            #new_angle=ANGLE_NORTH_EAST);
-      Send(self,@NewHold,#what=Create(&Chest),
-            #new_row=26,#new_col=9,#fine_row=32,#fine_col=0,
-            #new_angle=ANGLE_SOUTH_EAST);
 
       propagate;
    }

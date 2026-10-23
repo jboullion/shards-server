@@ -45,6 +45,8 @@ classvars:
    viColorTranslate2 = XLAT_TO_BLACK    // Pants
    vcShieldClass = &NecromancerShield
    viFaction = FACTION_NECROMANCER
+   // The school it casts from (FactionMage.SetBattleSchool)
+   viSchool = SS_QOR
 
 properties:
 
@@ -61,7 +63,7 @@ messages:
 
    Constructed()
    {
-      Send(self,@SetBattleSchool,#school=SS_QOR);
+      Send(self,@SetBattleSchool,#school=viSchool);
       plResistances = [ [ATCK_WEAP_PIERCE, 70 ],
                         [-ATCK_SPELL_UNHOLY, 70 ],
                         [-ATCK_SPELL_SHOCK, 50 ],

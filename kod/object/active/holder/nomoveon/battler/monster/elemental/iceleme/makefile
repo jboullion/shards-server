@@ -5,7 +5,7 @@
 !include $(TOPDIR)\common.mak
 
 DEPEND = ..\iceleme.bof
-BOFS  = icelech.bof \
+BOFS  = icelech.bof frostwrd.bof
 
 
 

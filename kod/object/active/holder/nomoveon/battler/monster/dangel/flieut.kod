@@ -1,0 +1,49 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+FallenLieutenant is DarkAngel
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Lieutenant Morvaine,
+// the dark angel Queen Venya'cyr set over the Wetland Fortress, the highest
+// of her eight lieutenants. The Fallen Hall boss of guildh19: the hall sets
+// its strength (Monster.SetGarrisonStrength) and gives it its prize. A
+// Fallen Hall's garrison never fights through walls (ResetBehaviorFlags).
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   FallenLieutenant_name_rsc = "Lieutenant Morvaine"
+   FallenLieutenant_desc_rsc = \
+      "Morvaine was the first of the dark angels to kneel to Queen "
+      "Venya'cyr, and she rewarded it with the Wetland Fortress.  It holds "
+      "the swamp's edge for her, and its black wings fill the hall when it "
+      "rises to fight."
+   FallenLieutenant_dead_name_rsc = "the fallen form of Lieutenant Morvaine"
+
+classvars:
+
+   vrName = FallenLieutenant_name_rsc
+   vrDesc = FallenLieutenant_desc_rsc
+   vrDead_name = FallenLieutenant_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 5000
+   viCashmax = 7000
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

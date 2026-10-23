@@ -1,0 +1,48 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+FallenThane is GiantDaemonSkeleton
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Thane Durrek, who
+// ruled the Old Dwarven Hall, raised from his own tomb by the Order of
+// Necromancers. The Fallen Hall boss of guildh7: the hall sets its strength
+// (Monster.SetGarrisonStrength) and gives it its prize.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   FallenThane_name_rsc = "Thane Durrek"
+   FallenThane_desc_rsc = \
+      "Thane Durrek was laid to rest beneath the hall his clan carved, with "
+      "his axe across his chest.  The Order of Necromancers broke his tomb "
+      "and woke his bones, and now he guards their plunder from the dwarves "
+      "who would have mourned him."
+   FallenThane_dead_name_rsc = "the bones of Thane Durrek"
+
+classvars:
+
+   vrName = FallenThane_name_rsc
+   vrDesc = FallenThane_desc_rsc
+   vrDead_name = FallenThane_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 2500
+   viCashmax = 4000
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

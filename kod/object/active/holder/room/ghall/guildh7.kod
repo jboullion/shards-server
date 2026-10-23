@@ -8,7 +8,14 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////
-GuildHall7 is GuildHall
+GuildHall7 is FallenHall
+
+// Ours (guild revamp, ADR 0022 decision 16): the Order of Necromancers holds
+// the Old Dwarven Hall, the ladder's fourth rung, with the dwarves' own dead
+// raised beside its soldiers and mages. Thane Durrek waits in the sanctum,
+// the low room east of the dais, whose steps (sectors 1-6) sink for good
+// once the main hall's guard has fallen. Its three outer doors open for
+// anyone.
 
 constants:
 
@@ -28,9 +35,6 @@ constants:
    GH7_FOYER_NE = 3
 
    RESET_TIME = 10000
-   SECRET_DELAY = 10000
-
-   STATUS_OKAY = 3
 
    include blakston.khd
 
@@ -48,19 +52,16 @@ classvars:
    viTeleport_row = 5
    viTeleport_col = 11
 
-   viNews_row = 14
-   viNews_col = 17
-   viNews_finerow = 12
-   viNews_finecol = 60
-
-
    viInner_teleport_row = 14
    viInner_teleport_col = 29
 
-   viQuality = 6
+   viTerrain_type = TERRAIN_CITY
 
-   viTerrain_type = TERRAIN_CITY | TERRAIN_GUILDHALL
-   viSeconds_til_close = 15
+   viGarrison_level = 135
+   viBoss_level = 150
+   viBoss_hp_percent = 500
+   viBoss_damage_percent = 90
+   viPrize_seed = 7
 
 properties:
 
@@ -68,7 +69,6 @@ properties:
    piRoom_num = RID_GUILDH7
 
    piBaseLight = LIGHT_NICE
-   ptSecretDoor = $
    ptEastDoor = $
    ptWestDoor = $
    ptSouthDoor = $
@@ -80,8 +80,7 @@ properties:
 messages:
 
    Constructor()
-   "These mark the exterior door of the guild, which is only openable by "
-   "a guild member or an allied guild member."
+   "These mark the hall's three outer doors."
    {
       plGuild_doors = [ [18,8], [6,11], [5,23] ];
 
@@ -94,87 +93,8 @@ messages:
       propagate;
    }
 
-   IsMoveOK(old_row = 1, old_col = 1, old_fine_row = 1, old_fine_col = 1,
-            new_row = 1, new_col = 1, new_fine_row = 1, new_fine_col = 1,
-            who = $)
-   {
-      // Hardcoded movement check, prevent hacking into hall.
-      // Basic requirement door must not be open
-      if ptEastDoor = $
-         AND ptWestDoor = $
-         AND ptSouthDoor = $
-      {
-         if Send(self,@InFoyer,#iRow=old_row,#iCol=old_col)
-         {
-            // We're in the foyer. Check if we're trying to move into the hall.
-            if NOT Send(self,@InFoyer,#iRow=new_row,#iCol=new_col)
-            {
-               // Bad player! Fail the attempt.
-               Debug("ALERT!",Send(who,@GetTrueName),who,
-                     "tried to move through closed Guild Hall door ",
-                     Send(self,@GetName)," from ",old_row,old_col,old_fine_row,
-                     old_fine_col," to ",new_row,new_col,new_fine_row,
-                     new_fine_col,". Last door opening was ",
-                     GetTime() - Send(self,@GetDoorTimeStamp),
-                     " seconds ago.");
-               return FALSE;
-            }
-         }
-      }
-
-      return TRUE;
-   }
-
-   InFoyer(who=$,iRow=$,iCol=$)
-   "Due to the multiple foyers in this guild hall, we return which "
-   "foyer 'who' is currently in.  Returns FALSE if not in foyer, a positive "
-   "integer otherwise."
-   {
-      if who <> $
-      {
-         if Send(who,@GetOwner) <> self
-         {
-            return FALSE;
-         }
-
-         iRow = Send(who,@GetRow);
-         iCol = Send(who,@GetCol);
-      }
-
-      if (iRow > 15) AND (iRow < 22) AND (iCol < 9)
-      {
-         return GH7_FOYER_SW;
-      }
-
-      if (iRow < 7) AND (iCol < 14) AND (iCol > 5)
-      {
-         return GH7_FOYER_NW;
-      }
-
-      if (iRow < 6) AND (iCol < 26) AND (iCol > 18)
-      {
-         return GH7_FOYER_NE;
-      }
-
-      return FALSE;
-   }
-
-   ValidEntry(what=$)
-   {
-
-      if Send(self,@InFoyer,#who=what)
-      {
-         // Since we have multiple foyers, let people enter the appropriate foyer
-         return;
-      }
-
-      // Superclass teleports people to the One True Foyer(tm) if they enter
-      // (or log on) inside when they're not normally allowed to enter.
-      propagate;
-   }
-
    SomethingTryGo(what=$,row=$,col=$)
-   "Opens the guild outer doors, but only if you're a guildmember!"
+   "Opens whichever of the three outer doors is tried, for anyone."
    {
       local i, count;
 
@@ -183,21 +103,9 @@ messages:
       {
          if row = First(i) AND col = Nth(i,2)
          {
-            // check to see if the doors should open
-            if piStatus = STATUS_OKAY
-               AND NOT Send(self,@CanEnter,#who=what)
-            {
-               // Send a message saying 'only members and their allies may enter.' 
-               Send(what,@MsgSendUser,#message_rsc=guildhall_cant_open,#parm1=vrName);
+            Send(self,@OpenEntranceDoor,#doorNum=count);
 
-               return TRUE;
-            }
-            else
-            {
-               Send(self,@OpenEntranceDoor,#doorNum=count);
-
-               return TRUE;
-            }
+            return TRUE;
          }
 
          count = count + 1;
@@ -256,7 +164,7 @@ messages:
          ptWestDoor = CreateTimer(self,@CloseWestDoor,RESET_TIME);
       }
 
-      if (doorNum = 2)
+      if (doorNum = 2) and ptEastDoor = $
       {
          Send(self,@TimeStampDoor);
          Send(self,@SetSector,#sector=NEDOOR,#animation=ANIMATE_CEILING_LIFT,
@@ -323,32 +231,52 @@ messages:
       return;
    }
 
-   OpenSecretDoor()
+   GetGarrison()
    {
-      if ptSecretDoor = $
-      {
-         Send(self,@SetSector,#sector=STEP1,#animation=ANIMATE_FLOOR_LIFT,
-               #height=58,#speed=16);
-         Send(self,@SetSector,#sector=STEP2,#animation=ANIMATE_FLOOR_LIFT,
-               #height=72,#speed=16);
-         Send(self,@SetSector,#sector=STEP3,#animation=ANIMATE_FLOOR_LIFT,
-               #height=86,#speed=16);
-         Send(self,@SetSector,#sector=STEP4,#animation=ANIMATE_FLOOR_LIFT,
-               #height=90,#speed=16);
-         Send(self,@SetSector,#sector=STEP5,#animation=ANIMATE_FLOOR_LIFT,
-               #height=104,#speed=16);
-         Send(self,@SetSector,#sector=STEP6,#animation=ANIMATE_FLOOR_LIFT,
-               #height=128,#speed=16);
-         Send(self,@OpenSecretDoorSound);
-         ptSecretDoor = CreateTimer(self,@CloseSecretDoor,SECRET_DELAY);
-      }
+      return [ [ &OrderSoldier, 8, 18, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 13, 20, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 14, 22, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 16, 29, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 11, 17, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 13, 28, FALLEN_ROLE_HALL ],
+               [ &DaemonSkeleton, 9, 19, FALLEN_ROLE_HALL ],
+               [ &DaemonSkeleton, 15, 25, FALLEN_ROLE_HALL ],
+               [ &TuskedSkeleton, 13, 15, FALLEN_ROLE_HALL ],
+               [ &TuskedSkeleton, 12, 25, FALLEN_ROLE_HALL ],
+               [ &DaemonSkeleton, 14, 34, FALLEN_ROLE_SANCTUM ],
+               [ &DaemonSkeleton, 14, 36, FALLEN_ROLE_SANCTUM ],
+               [ &FallenThane, 14, 37, FALLEN_ROLE_BOSS ]
+             ];
+   }
+
+   InSanctum(row=$,col=$)
+   {
+      return row >= 13 AND row <= 15 AND col >= 36;
+   }
+
+   OpenSanctum()
+   "The steps sink into a stair down to the sanctum, and stay until the "
+   "reset."
+   {
+      Send(self,@SetSector,#sector=STEP1,#animation=ANIMATE_FLOOR_LIFT,
+            #height=58,#speed=16);
+      Send(self,@SetSector,#sector=STEP2,#animation=ANIMATE_FLOOR_LIFT,
+            #height=72,#speed=16);
+      Send(self,@SetSector,#sector=STEP3,#animation=ANIMATE_FLOOR_LIFT,
+            #height=86,#speed=16);
+      Send(self,@SetSector,#sector=STEP4,#animation=ANIMATE_FLOOR_LIFT,
+            #height=90,#speed=16);
+      Send(self,@SetSector,#sector=STEP5,#animation=ANIMATE_FLOOR_LIFT,
+            #height=104,#speed=16);
+      Send(self,@SetSector,#sector=STEP6,#animation=ANIMATE_FLOOR_LIFT,
+            #height=128,#speed=16);
+      Send(self,@OpenSecretDoorSound);
 
       return;
    }
 
-   CloseSecretDoor()
+   CloseSanctum()
    {
-      ptSecretDoor = $;
       Send(self,@SetSector,#sector=STEP1,#animation=ANIMATE_FLOOR_LIFT,
             #height=154,#speed=16);
       Send(self,@SetSector,#sector=STEP2,#animation=ANIMATE_FLOOR_LIFT,
@@ -361,7 +289,6 @@ messages:
             #height=136,#speed=16);
       Send(self,@SetSector,#sector=STEP6,#animation=ANIMATE_FLOOR_LIFT,
             #height=132,#speed=16);
-      Send(self,@CloseSecretDoorSound);
 
       return;
    }
@@ -408,24 +335,11 @@ messages:
       Send(self,@NewHold,#what=Create(&Brazier),
             #new_row=16,#new_col=33,#fine_row=0,#fine_col=0);
 
-      Send(self,@NewHold,#what=Create(&WoodenBox),
-            #new_row=13,#new_col=37,#fine_row=48,#fine_col=0,
-            #new_angle=ANGLE_SOUTH);
-      Send(self,@NewHold,#what=Create(&WoodenBox),
-            #new_row=14,#new_col=37,#fine_row=48,#fine_col=48,
-            #new_angle=ANGLE_WEST);
-
       propagate;
    }
 
    Delete()
    {
-      if ptSecretDoor <> $
-      {
-         DeleteTimer(ptSecretDoor);
-         ptSecretDoor = $;
-      }
-
       if ptEastDoor <> $
       {
          DeleteTimer(ptEastDoor);

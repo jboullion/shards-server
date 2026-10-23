@@ -1,0 +1,47 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+SewerKing is LupoggKing
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Grisk, the Sewer King,
+// a lupogg warlord the Order of Necromancers feeds, who keeps the Sewer
+// Hideout for it. The Fallen Hall boss of guildh8: the hall sets its
+// strength (Monster.SetGarrisonStrength) and gives it its prize.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   SewerKing_name_rsc = "Grisk, the Sewer King"
+   SewerKing_desc_rsc = \
+      "Grisk is the largest lupogg the sewers of Barloque have bred, fat on "
+      "what the Order of Necromancers throws him.  He keeps their hideout, "
+      "and he has not lost a fight in it."
+   SewerKing_dead_name_rsc = "the carcass of Grisk"
+
+classvars:
+
+   vrName = SewerKing_name_rsc
+   vrDesc = SewerKing_desc_rsc
+   vrDead_name = SewerKing_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 3000
+   viCashmax = 4500
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

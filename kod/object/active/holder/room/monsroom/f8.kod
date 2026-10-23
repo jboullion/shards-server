@@ -127,7 +127,10 @@ messages:
          Send(self,@OpenDoor);
       }
 
-      if (pbPasswordDoorUnlocked OR (Send(oGuildHall,@GetGuildOwner) = $))
+      // Ours (guild revamp): the balcony door leads into the Den of Shadows'
+      // sanctum, so it lets players through only once the Order's guard in
+      // the hall has fallen (FallenHall.IsSanctumOpen).
+      if Send(oGuildHall,@IsSanctumOpen)
          AND (row=26) AND (col=50)
       {
          Send(what,@WaveSendUser,#wave_rsc=Send(self,@GetDoorSound));
@@ -217,8 +220,8 @@ messages:
             }
          }
       }
-      // Ours (guild revamp): "open", from anyone the hall would let in, in
-      // place of the guild's password.
+      // Ours (guild revamp): "open", once the hall's sanctum is open
+      // (FallenHall.IsDoorWord), in place of the guild's password.
       if Send(oGuildHall,@IsDoorWord,#what=what,#string=string)
             AND Send(self,@inBalcony,#who=what) and (pbPasswordDoorUnlocked = FALSE)
             AND type <> SAY_EMOTE

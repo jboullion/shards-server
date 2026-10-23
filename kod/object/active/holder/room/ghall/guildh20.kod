@@ -8,7 +8,14 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////
-GuildHall20 is GuildHall
+GuildHall20 is FallenHall
+
+// Ours (guild revamp, ADR 0022 decision 16): the Order of Necromancers holds
+// Muskgate Post, the ladder's third rung, with ice elementals and wendigos
+// bound beside its soldiers and mages. Hrimvald waits in the sanctum, the low
+// room in the west. Its door is a lift (sector 1): nobody could climb back
+// out while it stayed down, so it keeps its old cycle, down and up again
+// after LIFT_DELAY, and "open" brings it down whenever the sanctum is open.
 
 constants:
 
@@ -27,6 +34,11 @@ resources:
    room_name_guildh20 = "Muskgate Post"
    room_guildh20 = guildh20.roo
 
+   guildh20_sanctum_opens = \
+      "~BWith the last of the hall's guard fallen, the lift in the west wall "
+      "sinks to the Order's sanctum, where %s%s waits.  It rises again after "
+      "a few seconds: say \"open\" to bring it down, going in or coming out."
+
 classvars:
 
    vrName = room_name_guildh20
@@ -37,28 +49,13 @@ classvars:
    viInner_teleport_row = 6
    viInner_teleport_col = 17
 
-   viNews_row = 5
-   viNews_col = 23
-   viNews_finerow = 0
-   viNews_finecol = 0
+   vrSanctum_opens = guildh20_sanctum_opens
 
-   viFoyer_north = 10
-   viFoyer_south = 16
-   viFoyer_west = 20
-   viFoyer_east = 27
-
-
-   viHellPortal_row = 3
-   viHellPortal_col = 16
-   viHellPortal_angle = ANGLE_SOUTH
-
-   viPublicChest_row = 10
-   viPublicChest_col = 23
-   viPublicChest_angle = ANGLE_SOUTH
-
-   viQuality = 4
-
-   viSeconds_til_close = 16
+   viGarrison_level = 120
+   viBoss_level = 135
+   viBoss_hp_percent = 500
+   viBoss_damage_percent = 90
+   viPrize_seed = 6
 
    vbIsExpansionRoom = TRUE
 
@@ -70,7 +67,6 @@ properties:
    piBaseLight = LIGHT_NICE
 
    ptSecret = $
-   ptEntrance = $
 
 messages:
 
@@ -107,13 +103,53 @@ messages:
          ptSecret = $;
       }
 
-      if ptEntrance <> $
+      propagate;
+   }
+
+   GetGarrison()
+   {
+      return [ [ &OrderSoldier, 3, 15, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 7, 20, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 12, 12, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 5, 24, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 11, 16, FALLEN_ROLE_HALL ],
+               [ &IceElemental, 3, 22, FALLEN_ROLE_HALL ],
+               [ &IceElemental, 7, 15, FALLEN_ROLE_HALL ],
+               [ &IceElemental, 15, 15, FALLEN_ROLE_HALL ],
+               [ &Wendigo, 5, 17, FALLEN_ROLE_HALL ],
+               [ &Wendigo, 9, 13, FALLEN_ROLE_HALL ],
+               [ &IceElemental, 2, 6, FALLEN_ROLE_SANCTUM ],
+               [ &Wendigo, 5, 6, FALLEN_ROLE_SANCTUM ],
+               [ &Frostwarden, 4, 4, FALLEN_ROLE_BOSS ]
+             ];
+   }
+
+   InSanctum(row=$,col=$)
+   "The low room in the west and the tunnel to the lift."
+   {
+      return row >= 2 AND row <= 5 AND col <= 10;
+   }
+
+   OpenSanctum()
+   "The lift comes down, and rises again after LIFT_DELAY (OpenSecretDoor)."
+   {
+      Send(self,@OpenSecretDoor);
+
+      return;
+   }
+
+   CloseSanctum()
+   {
+      if ptSecret <> $
       {
-         DeleteTimer(ptEntrance);
-         ptEntrance = $;
+         DeleteTimer(ptSecret);
+         ptSecret = $;
       }
 
-      propagate;
+      Send(self,@SetSector,#sector=OUT1,#animation=ANIMATE_FLOOR_LIFT,
+           #height=88,#speed=16);
+
+      return;
    }
 
    OpenEntranceDoor()
@@ -180,9 +216,6 @@ messages:
       Send(self,@NewHold,#what=Create(&Brazier),
            #new_row=7,#new_col=26,#fine_row=32,#fine_col=32);
 
-      Send(self,@NewHold,#what=Create(&Chest),
-           #new_row=4,#new_col=4,#fine_row=0,#fine_col=16,#new_angle=ANGLE_EAST);
-  
       Send(self,@NewHold,#what=Create(&Firepit,#iSoundRadius=5),
             #new_row=2,#new_col=26,#fine_row=36,#fine_col=28);
 

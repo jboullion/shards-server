@@ -1,0 +1,40 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+OrderIllusionist is OrderMage
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): an Order mage who casts
+// Riija's illusions in place of Qor's curses, for the Den of Shadows.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   OrderIllusionist_name_rsc = "illusionist of the Order"
+   OrderIllusionist_desc_rsc = \
+      "This necromancer of the Order wears Riija's violet beneath Queen "
+      "Venya'cyr's grey, and the shadows around it never quite keep still."
+   OrderIllusionist_dead_name_rsc = "fallen illusionist of the Order"
+
+classvars:
+
+   vrName = OrderIllusionist_name_rsc
+   vrDesc = OrderIllusionist_desc_rsc
+   vrDead_name = OrderIllusionist_dead_name_rsc
+   viSchool = SS_RIIJA
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

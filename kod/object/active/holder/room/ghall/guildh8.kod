@@ -8,7 +8,13 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////
-GuildHall8 is GuildHall
+GuildHall8 is FallenHall
+
+// Ours (guild revamp, ADR 0022 decision 16): the Order of Necromancers holds
+// the Sewer Hideout, the ladder's sixth rung, with lupoggs and dusk rats it
+// feeds beside its soldiers and mages. Grisk, the Sewer King, waits in the
+// sanctum, the flooded chest room east of the secret door (walls 5-7),
+// which opens for good once the main hall's guard has fallen.
 
 constants:
 
@@ -48,24 +54,13 @@ classvars:
    viTeleport_row = 24
    viTeleport_col = 9
 
-   viNews_row = 22
-   viNews_col = 17
-   viNews_finerow = 32
-   viNews_finecol = 32
+   viTerrain_type = TERRAIN_SEWERS
 
-
-   viQuality = 3
-
-   viFoyer_North = 22
-   viFoyer_west = 8
-   viFoyer_south = 31
-   viFoyer_east = 10
-
-   viInner_teleport_row = 3
-   viInner_teleport_col = 14
-
-   viTerrain_type = TERRAIN_SEWERS | TERRAIN_GUILDHALL
-   viSeconds_til_close = 12
+   viGarrison_level = 165
+   viBoss_level = 180
+   viBoss_hp_percent = 500
+   viBoss_damage_percent = 90
+   viPrize_seed = 8
 
    vrEntrancedoor_open_sound = guildh8_entrancedoor_open_sound
    vrEntrancedoor_close_sound = guildh8_entrancedoor_close_sound
@@ -80,7 +75,6 @@ properties:
    piBaseLight = LIGHT_NICE
 
    piEntrance_door_state = CLOSED
-   ptEntrance
 
    piSecret_door_state = CLOSED
    ptSecret_door
@@ -122,6 +116,13 @@ messages:
             #passable=TRUE);
       piEntrance_door_state = CLOSED;
 
+      Send(self,@ResetSecretDoor);
+
+      return;
+   }
+
+   ResetSecretDoor()
+   {
       Send(self,@AnimateWall,#wall=DOOR2_1,#animation=ANIMATE_NONE,#first_group=1,
             #passable=FALSE);
       Send(self,@AnimateWall,#wall=DOOR2_2,#animation=ANIMATE_NONE,#first_group=2,
@@ -206,74 +207,61 @@ messages:
       return;
    }
 
-   OpenSecretDoor()
+   GetGarrison()
    {
-      if ptSecret_door = $
+      return [ [ &Lupogg, 3, 4, FALLEN_ROLE_HALL ],
+               [ &Lupogg, 9, 10, FALLEN_ROLE_HALL ],
+               [ &Lupogg, 7, 20, FALLEN_ROLE_HALL ],
+               [ &Lupogg, 17, 14, FALLEN_ROLE_HALL ],
+               [ &DuskRat, 4, 9, FALLEN_ROLE_HALL ],
+               [ &DuskRat, 11, 8, FALLEN_ROLE_HALL ],
+               [ &DuskRat, 15, 16, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 7, 6, FALLEN_ROLE_HALL ],
+               [ &OrderSoldier, 20, 13, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 5, 19, FALLEN_ROLE_HALL ],
+               [ &OrderMage, 11, 26, FALLEN_ROLE_SANCTUM ],
+               [ &OrderMage, 18, 24, FALLEN_ROLE_SANCTUM ],
+               [ &SewerKing, 13, 27, FALLEN_ROLE_BOSS ]
+             ];
+   }
+
+   InSanctum(row=$,col=$)
+   "The flooded chest room and its passage, east of the secret door."
+   {
+      return col >= 21 AND row >= 8 AND row <= 20;
+   }
+
+   OpenSanctum()
+   "The secret door opens at once (its walls as SecretDoorOpenTimer leaves "
+   "them), and stays open until the reset."
+   {
+      if ptSecret_door <> $
       {
-         piSecret_door_state = CLOSED;
-         ptSecret_door = CreateTimer(self,@SecretDoorOpenTimer,SECRET_DOOR_TIME/2);
-         Send(self,@OpenSecretDoorSound);
+         DeleteTimer(ptSecret_door);
+         ptSecret_door = $;
       }
+
+      Send(self,@AnimateWall,#wall=DOOR2_1,#animation=ANIMATE_NONE,#first_group=2,
+            #passable=TRUE);
+      Send(self,@AnimateWall,#wall=DOOR2_2,#animation=ANIMATE_NONE,#first_group=2,
+            #passable=TRUE);
+      Send(self,@AnimateWall,#wall=DOOR2_3,#animation=ANIMATE_NONE,#first_group=1,
+            #passable=FALSE);
+      piSecret_door_state = OPEN;
+      Send(self,@OpenSecretDoorSound);
 
       return;
    }
 
-   SecretDoorOpenTimer()
+   CloseSanctum()
    {
-      ptSecret_door = $;
-      if piSecret_door_state = CLOSED
+      if ptSecret_door <> $
       {
-         Send(self,@AnimateWall,#wall=DOOR2_1,#animation=ANIMATE_NONE,#first_group=2,
-               #passable=TRUE);
-         Send(self,@AnimateWall,#wall=DOOR2_2,#animation=ANIMATE_NONE,#first_group=1,
-               #passable=FALSE);
-         piSecret_door_state = HALF_OPEN;
-         ptSecret_door = CreateTimer(self,@SecretDoorOpenTimer,SECRET_DOOR_TIME);
-
-         return;
+         DeleteTimer(ptSecret_door);
+         ptSecret_door = $;
       }
 
-      if piSecret_door_state = HALF_OPEN
-      {
-         Send(self,@AnimateWall,#wall=DOOR2_2,#animation=ANIMATE_NONE,#first_group=2,
-               #passable=TRUE);
-         Send(self,@AnimateWall,#wall=DOOR2_3,#animation=ANIMATE_NONE,#first_group=1,
-               #passable=FALSE);
-         piSecret_door_state = OPEN;
-         ptSecret_door = CreateTimer(self,@SecretDoorCloseTimer,DOOR_TIME);
-
-         return;
-      }
-
-      return;
-   }
-
-   SecretDoorCloseTimer()
-   {
-      ptSecret_door = $;
-      if piSecret_door_state = OPEN
-      {
-         Send(self,@CloseSecretDoorSound);
-         Send(self,@AnimateWall,#wall=DOOR2_3,#animation=ANIMATE_NONE,#first_group=2,
-               #passable=TRUE);
-         Send(self,@AnimateWall,#wall=DOOR2_2,#animation=ANIMATE_NONE,#first_group=1,
-               #passable=FALSE);
-         piSecret_door_state = HALF_OPEN;
-         ptSecret_door = CreateTimer(self,@SecretDoorCloseTimer,SECRET_DOOR_TIME);
-
-         return;
-      }
-
-      if piSecret_door_state = HALF_OPEN
-      {
-         Send(self,@AnimateWall,#wall=DOOR2_2,#animation=ANIMATE_NONE,#first_group=2,
-               #passable=TRUE);
-         Send(self,@AnimateWall,#wall=DOOR2_1,#animation=ANIMATE_NONE,#first_group=1,
-               #passable=FALSE);
-         piSecret_door_state = Closed;
-
-         return;
-      }
+      Send(self,@ResetSecretDoor);
 
       return;
    }
@@ -311,19 +299,6 @@ messages:
       Send(self,@NewHold,#what=Create(&Brazier),#new_row=17,#new_col=18);
       Send(self,@NewHold,#what=Create(&Brazier),#new_row=21,#new_col=11);
       Send(self,@NewHold,#what=Create(&Brazier),#new_row=13,#new_col=18);
-
-      Send(self,@NewHold,#what=Create(&Chest),
-            #new_row=12,#new_col=26,#fine_row=48,#fine_col=16,
-            #new_angle=ANGLE_SOUTH);
-      Send(self,@NewHold,#what=Create(&Chest),
-            #new_row=12,#new_col=28,#fine_row=48,#fine_col=16,
-            #new_angle=ANGLE_SOUTH);
-      Send(self,@NewHold,#what=Create(&Chest),
-            #new_row=13,#new_col=26,#fine_row=56,#fine_col=16,
-            #new_angle=ANGLE_SOUTH);
-      Send(self,@NewHold,#what=Create(&Chest),
-            #new_row=13,#new_col=28,#fine_row=56,#fine_col=16,
-            #new_angle=ANGLE_SOUTH);
 
       propagate;
    }

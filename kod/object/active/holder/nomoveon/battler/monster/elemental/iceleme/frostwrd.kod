@@ -1,0 +1,48 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+Frostwarden is IceElemental
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Hrimvald, an ice
+// elemental bound by the Order of Necromancers to guard Muskgate Post. The
+// Fallen Hall boss of guildh20: the hall sets its strength
+// (Monster.SetGarrisonStrength) and gives it its prize.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   Frostwarden_name_rsc = "Hrimvald"
+   Frostwarden_desc_rsc = \
+      "The Order of Necromancers bound this ancient spirit of the northern "
+      "ice into a shell of frozen stone, and set it to guard Muskgate Post.  "
+      "Frost spreads from its feet across the floor, and the air around it "
+      "cracks with cold."
+   Frostwarden_dead_name_rsc = "the shattered ice of Hrimvald"
+
+classvars:
+
+   vrName = Frostwarden_name_rsc
+   vrDesc = Frostwarden_desc_rsc
+   vrDead_name = Frostwarden_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 2500
+   viCashmax = 4000
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////
