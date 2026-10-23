@@ -521,6 +521,10 @@ properties:
    // kept only for event mobs, and some bosses use it for their own rewards.
    plStruckBy = $
 
+   // Ours (guild revamp): a Fallen Hall garrison's level, which GetLevel
+   // returns in place of viLevel (SetGarrisonStrength). $ for any other.
+   piGarrisonLevel = $
+
    // some monsters are created on the fly (ex: avar) we may need to set this at
    // runtime
    piReputationGroup = REP_NEUTRAL
@@ -5559,7 +5563,43 @@ messages:
 
    GetLevel()
    {
+      if piGarrisonLevel <> $
+      {
+         return piGarrisonLevel;
+      }
+
       return viLevel;
+   }
+
+   SetGarrisonStrength(level = $, hp = $, damage_percent = 100)
+   "Ours (guild revamp, ADR 0022 decision 16): a Fallen Hall makes us a "
+   "monster of level whatever our class: its to-hit, defense and damage (as "
+   "GetOffense, GetDefense and GetDamage work them out from viLevel), its "
+   "level for experience (GetLevel), and hp hit points (by default as "
+   "GetMaxHitPoints would give).  damage_percent scales the damage alone "
+   "(a boss that hits true but not as hard).  We stay until the hall's reset."
+   {
+      if level = $
+      {
+         return;
+      }
+
+      piGarrisonLevel = level;
+      piOffense = 4 * level + 8 * piAim;
+      piDefense = 4 * level + 8 * piAgility;
+      piMinDamage = Bound(level * damage_percent / 1500,1,$);
+      piMaxDamage = Bound(level * damage_percent / 1000,1,$);
+
+      if hp = $
+      {
+         hp = 120 * level / 100;
+      }
+
+      piMax_hit_points = Bound(hp,1,$);
+      piHit_points = piMax_hit_points * 100;
+      pbDontDispose = TRUE;
+
+      return;
    }
 
    GetDifficulty()

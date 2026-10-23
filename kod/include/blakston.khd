@@ -3024,6 +3024,12 @@
    RANK_SIR = 2
    RANK_APPRENTICE = 1
 
+   // Ours (guild revamp): a Fallen Hall's garrison (room/ghall/fallenhall.kod):
+   //  the main hall's guard, the sanctum's, and the boss.
+   FALLEN_ROLE_HALL = 1
+   FALLEN_ROLE_SANCTUM = 2
+   FALLEN_ROLE_BOSS = 3
+
    // How GM is chosen
    GS_VOTING = 1
    GS_ASSASSINATION = 2

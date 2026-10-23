@@ -229,8 +229,10 @@ messages:
          return;
       }
 
+      // (The Order of Necromancers isn't in the Faction War.)
       if IsClass(what,&FactionTroop)
          AND Send(what,@GetFaction) <> viFaction
+         AND Send(what,@GetFaction) <> FACTION_NECROMANCER
       {
          Send(poOwner,@EnemyTroopKilled);
       }

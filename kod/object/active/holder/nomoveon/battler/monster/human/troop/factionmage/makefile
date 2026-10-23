@@ -5,7 +5,7 @@
 !include $(TOPDIR)\common.mak
 
 DEPEND = ..\factionmage.bof
-BOFS  = prinmage.bof dukemage.bof rebelmage.bof
+BOFS  = prinmage.bof dukemage.bof rebelmage.bof ordermage.bof
 
 
 !include $(KODDIR)\kod.mak

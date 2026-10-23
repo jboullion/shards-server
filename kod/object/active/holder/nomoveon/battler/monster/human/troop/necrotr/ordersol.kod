@@ -1,0 +1,45 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+OrderSoldier is NecromancerTroop
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): a soldier of Queen
+// Venya'cyr's Order of Necromancers, holding a Fallen Hall. Unlike the
+// necromancers of Brax, it attacks every player it sees (FactionTroop's
+// pbHuntsAll). The hall sets its strength (Monster.SetGarrisonStrength).
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   OrderSoldier_name_rsc = "soldier of the Order"
+   OrderSoldier_desc_rsc = \
+      "Grey-skinned and hollow-eyed, this soldier of the Order of "
+      "Necromancers wears Queen Venya'cyr's colours over armour stripped from "
+      "the hall's fallen.  It holds the hall for her, and it will not let "
+      "you pass."
+   OrderSoldier_dead_name_rsc = "fallen soldier of the Order"
+
+classvars:
+
+   vrName = OrderSoldier_name_rsc
+   vrDesc = OrderSoldier_desc_rsc
+   vrDead_name = OrderSoldier_dead_name_rsc
+
+properties:
+
+   pbHuntsAll = TRUE
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

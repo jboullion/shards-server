@@ -1,0 +1,48 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+FallenMarshal is CaptainKnight
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): Marshal Corvane, who
+// led the Slaughtered Command and fell with it, raised by Queen Venya'cyr's
+// Order to hold the hall's sanctum. The Fallen Hall boss of guildh13: the hall
+// sets its strength (Monster.SetGarrisonStrength) and gives it its prize.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   FallenMarshal_name_rsc = "Marshal Corvane"
+   FallenMarshal_desc_rsc = \
+      "Marshal Corvane led the Slaughtered Command, and died with it on the "
+      "shore below.  The Order of Necromancers raised him, and he holds the "
+      "hall for Queen Venya'cyr now.  His armour still bears the "
+      "command's crest, dented where the blow that killed him landed."
+   FallenMarshal_dead_name_rsc = "the remains of Marshal Corvane"
+
+classvars:
+
+   vrName = FallenMarshal_name_rsc
+   vrDesc = FallenMarshal_desc_rsc
+   vrDead_name = FallenMarshal_dead_name_rsc
+   vbNamedMob = TRUE
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+   viCashmin = 4000
+   viCashmax = 6000
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

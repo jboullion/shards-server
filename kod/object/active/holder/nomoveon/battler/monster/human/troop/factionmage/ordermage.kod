@@ -1,0 +1,87 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+OrderMage is FactionMage
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): a necromancer of Queen
+// Venya'cyr's Order, holding a Fallen Hall beside its soldiers. It casts Qor's
+// curses (FactionMage.SetBattleSchool) and attacks every player it sees
+// (FactionTroop's pbHuntsAll). The hall sets its strength.
+
+constants:
+
+   include blakston.khd
+
+   FACTIONTROOP_TRANSLATION_Skin_MASK = 0xff0000
+   FACTIONTROOP_TRANSLATION_Skin_MUL = 0x10000
+
+resources:
+
+   OrderMage_name_rsc = "necromancer of the Order"
+   OrderMage_desc_rsc = \
+      "Robed in Qor's black and grey, this necromancer of the Order mutters "
+      "the curses Queen Venya'cyr taught it.  Its skin has the ashen cast "
+      "of the long dead."
+   OrderMage_dead_name_rsc = "fallen necromancer of the Order"
+   OrderMage_sound_aware = skl2_awr.ogg
+
+classvars:
+
+   vrName = OrderMage_name_rsc
+   vrDesc = OrderMage_desc_rsc
+   vrDead_name = OrderMage_dead_name_rsc
+   vbIsUndead = TRUE
+   viTreasure_type = TID_NECRO
+   viCashmin = 3000
+   viCashmax = 4000
+   viColorTranslate1 = XLAT_TO_GRAY     // Shirt
+   viColorTranslate2 = XLAT_TO_BLACK    // Pants
+   vcShieldClass = &NecromancerShield
+   viFaction = FACTION_NECROMANCER
+
+properties:
+
+   piBaseLevel = 150
+   piBaseDifficulty = 4
+   // Here so they can be set
+   viLevel = 150
+   viDifficulty = 4
+   viKarma = -150
+   vrSound_aware = OrderMage_sound_aware
+   pbHuntsAll = TRUE
+
+messages:
+
+   Constructed()
+   {
+      Send(self,@SetBattleSchool,#school=SS_QOR);
+      plResistances = [ [ATCK_WEAP_PIERCE, 70 ],
+                        [-ATCK_SPELL_UNHOLY, 70 ],
+                        [-ATCK_SPELL_SHOCK, 50 ],
+                        [-ATCK_SPELL_COLD, 50 ],
+                        [-ATCK_SPELL_FIRE, -10 ],
+                        [-ATCK_SPELL_HOLY, -20 ],
+                        [ATCK_WEAP_BLUDGEON, -20 ]
+                      ];
+
+      propagate;
+   }
+
+   SetSkinColor()
+   {
+      piBody_translations = piBody_translations & ~FACTIONTROOP_TRANSLATION_SKIN_MASK;
+      piBody_translations = piBody_translations
+                            | (PT_BLUE_TO_ASHEN * FACTIONTROOP_TRANSLATION_SKIN_MUL);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

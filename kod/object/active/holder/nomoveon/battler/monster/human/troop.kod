@@ -92,6 +92,10 @@ properties:
    // Ours: a town duty (SetDuty): a celebration's reveller, or a sentry at the town's pole
    piDuty = DUTY_NONE
 
+   // Ours (guild revamp): the Order of Necromancers' garrisons hunt every
+   // player, shield or none (OrderSoldier, OrderMage).
+   pbHuntsAll = FALSE
+
 messages:
 
    SetClothes()
@@ -294,6 +298,11 @@ messages:
 
       if IsClass(target,&Player)
       {
+         if pbHuntsAll
+         {
+            return FALSE;
+         }
+
          iFaction = Send(target,@GetFaction);
          if (NOT regroup) AND (iFaction = FACTION_NEUTRAL)
          {
@@ -327,6 +336,18 @@ messages:
          }
 
          return 1000 - 4 * (Send(self,@SquaredFineDistanceTo,#what=what) / (FINENESS * FINENESS));
+      }
+
+      // Ours (guild revamp): the Order hunts players, the nearest most, and
+      //  leaves the monsters beside it be.
+      if pbHuntsAll
+      {
+         if IsClass(what,&Player)
+         {
+            return 1000 - 4 * (Send(self,@SquaredFineDistanceTo,#what=what) / (FINENESS * FINENESS));
+         }
+
+         return -10000;
       }
 
       if (IsClass(what,&User)
@@ -526,6 +547,11 @@ messages:
          piBehavior = AI_NPC | AI_NOFIGHT | AI_NOMOVE;
 
          return;
+      }
+
+      if pbHuntsAll
+      {
+         piBehavior |= AI_FIGHT_AGGRESSIVE | AI_FIGHT_SWITCHALOT;
       }
 
       if poBattle <> $

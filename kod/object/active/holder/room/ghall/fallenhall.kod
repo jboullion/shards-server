@@ -1,0 +1,584 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+FallenHall is MonsterRoom
+
+// Ours (guild revamp, ADR 0022 decisions 16 and 26): a guild hall the Order of
+// Necromancers has taken. It is no longer for rent; it is a dungeon for a
+// party of about three, run once each Meridian day.
+//
+//   STATE_READY    nobody has come since the last reset. The first player in
+//                  brings out the garrison (SpawnGarrison): the main hall's
+//                  guard, the sanctum's guard and its boss, each at the
+//                  hall's strength (Monster.SetGarrisonStrength). The boss
+//                  carries the prize, a magic item (GetPrizeSeed).
+//   STATE_HELD     the main hall's guard stands.
+//   STATE_SANCTUM  the main hall's guard has fallen, and the hall's old secret
+//                  door lets anyone through (subclass: OpenSanctum).
+//   STATE_CLEARED  the boss has fallen. Each guild with a member there who
+//                  struck it gains BOSS_PRESTIGE.
+//
+// Each Meridian day (System.NewGameDay, through FallenHalls) the hall resets:
+// at once if it is empty, otherwise once the last player leaves.
+//
+// A subclass gives its garrison (GetGarrison), its strength (viGarrison_level,
+// viBoss_level, viBoss_hp_percent, viBoss_damage_percent, viPrize_seed) and
+// its sanctum's door. The GuildHall messages other rooms send a hall
+// (CanEnter, GetGuildOwner, IsDoorWord) answer as for an open, unowned hall.
+
+constants:
+
+   include blakston.khd
+
+   STATE_READY = 0
+   STATE_HELD = 1
+   STATE_SANCTUM = 2
+   STATE_CLEARED = 3
+
+   BOSS_PRESTIGE = 2
+
+resources:
+
+   fallenhall_open_word = "open"
+
+   fallenhall_held = \
+      "~BThe Order of Necromancers holds %s.  Its dead stand guard where "
+      "the hall's guild once kept its treasures."
+   fallenhall_sanctum_held = \
+      "~BThe Order's sanctum lies beyond, behind the hall's old secret "
+      "door.  It will not open while the hall's guard stands."
+   fallenhall_cleared = \
+      "~BThe Order's dead lie where they fell.  It will hold %s again with "
+      "the new day."
+   fallenhall_sanctum_opens = \
+      "~BWith the last of the hall's guard fallen, the hall's old secret door "
+      "stirs.  Say \"open\" beside it to pass into the Order's sanctum, "
+      "where %s%s waits."
+   fallenhall_boss_slain = \
+      "~B%s%s has fallen, and %s is free of the Order until the new day."
+   fallenhall_prestige = \
+      "~B%s%q gains %i prestige for the fall of %s%s."
+
+   fallenhall_entrancedoor_open_sound = doorrsup.ogg
+   fallenhall_entrancedoor_close_sound = doordown.ogg
+
+classvars:
+
+   viTerrain_type = TERRAIN_CASTLE
+
+   viInner_teleport_row = $
+   viInner_teleport_col = $
+
+   // The garrison's level, the boss's, the boss's hit points (percent of
+   // the usual for its level) and its damage (percent of its level's):
+   // Monster.SetGarrisonStrength.
+   viGarrison_level = 100
+   viBoss_level = 150
+   viBoss_hp_percent = 400
+   viBoss_damage_percent = 100
+
+   // The prize's difficulty, 1 to 10 (TreasureType.GenerateItemAtt).
+   viPrize_seed = 8
+
+   vrEntrancedoor_open_sound = fallenhall_entrancedoor_open_sound
+   vrEntrancedoor_close_sound = fallenhall_entrancedoor_close_sound
+
+properties:
+
+   piOutside_factor = OUTDOORS_NONE
+   piBaselight = LIGHT_NICE
+
+   pbGenerateMonsters = FALSE
+
+   // The hall's outer doors, [row, col], and the box around them
+   // ([top, left, bottom, right] in fine units) cleared as they close.
+   plGuild_doors = $
+   plEntrance = $
+   ptEntrance = $
+   piLastDoorOpen = 0
+
+   piState = STATE_READY
+   plHallGuard = $
+   plSanctumGuard = $
+   poBoss = $
+
+   // The day turned with players inside: reset once the last leaves.
+   pbResetDue = FALSE
+   pbResetting = FALSE
+
+messages:
+
+   Constructor()
+   {
+      Send(Send(SYS,@GetFallenHalls),@AddHall,#hall=self);
+
+      propagate;
+   }
+
+   Delete()
+   {
+      if ptEntrance <> $
+      {
+         DeleteTimer(ptEntrance);
+         ptEntrance = $;
+      }
+
+      Send(Send(SYS,@GetFallenHalls),@RemoveHall,#hall=self);
+
+      propagate;
+   }
+
+   //// The garrison
+
+   GetGarrison()
+   "Subclass: [class, row, col, role] for each of the garrison, role being "
+   "FALLEN_ROLE_HALL (the main hall's guard), FALLEN_ROLE_SANCTUM or FALLEN_ROLE_BOSS (one)."
+   {
+      return $;
+   }
+
+   GetState()
+   {
+      return piState;
+   }
+
+   GetBoss()
+   {
+      return poBoss;
+   }
+
+   FirstUserEntered(what = $)
+   {
+      if piState = STATE_READY
+      {
+         Send(self,@SpawnGarrison,#who=what);
+      }
+
+      propagate;
+   }
+
+   SpawnGarrison(who = $)
+   {
+      local i, oMonster, iRole, iHP, oTreasure, oItem;
+
+      Send(self,@ClearGarrison);
+
+      piState = STATE_HELD;
+      pbResetDue = FALSE;
+
+      foreach i in Send(self,@GetGarrison)
+      {
+         oMonster = Create(First(i));
+         iRole = Nth(i,4);
+
+         if iRole = FALLEN_ROLE_BOSS
+         {
+            // The usual hit points for its level, viBoss_hp_percent of them.
+            iHP = (120 * viBoss_level / 100) * viBoss_hp_percent / 100;
+            Send(oMonster,@SetGarrisonStrength,#level=viBoss_level,#hp=iHP,
+                  #damage_percent=viBoss_damage_percent);
+            poBoss = oMonster;
+         }
+         else
+         {
+            Send(oMonster,@SetGarrisonStrength,#level=viGarrison_level);
+
+            if iRole = FALLEN_ROLE_SANCTUM
+            {
+               plSanctumGuard = Cons(oMonster,plSanctumGuard);
+            }
+            else
+            {
+               plHallGuard = Cons(oMonster,plHallGuard);
+            }
+         }
+
+         Send(self,@NewHold,#what=oMonster,#new_row=Nth(i,2),
+               #new_col=Nth(i,3),#fine_row=32,#fine_col=32);
+      }
+
+      // The prize: GenerateItemWithAttribute asks a player for its odds.
+      if poBoss <> $
+         AND who <> $
+         AND IsClass(who,&Player)
+      {
+         oTreasure = Send(SYS,@FindTreasureByNum,#num=TID_NECRO);
+         if oTreasure <> $
+         {
+            oItem = Send(oTreasure,@GenerateItemAtt,#diff_seed=viPrize_seed,
+                         #raw=TRUE,#who=who);
+            if oItem <> $
+            {
+               Send(poBoss,@NewHold,#what=oItem);
+            }
+         }
+      }
+
+      if plHallGuard = $
+      {
+         Send(self,@StartSanctum);
+      }
+
+      return;
+   }
+
+   ClearGarrison()
+   "Takes away whatever is left of the garrison."
+   {
+      local i, lMonsters;
+
+      pbResetting = TRUE;
+
+      lMonsters = plHallGuard;
+      foreach i in plSanctumGuard
+      {
+         lMonsters = Cons(i,lMonsters);
+      }
+
+      if poBoss <> $
+      {
+         lMonsters = Cons(poBoss,lMonsters);
+      }
+
+      plHallGuard = $;
+      plSanctumGuard = $;
+      poBoss = $;
+
+      foreach i in lMonsters
+      {
+         Send(i,@Delete);
+      }
+
+      pbResetting = FALSE;
+
+      return;
+   }
+
+   LeaveHold(what = $)
+   {
+      if NOT pbResetting
+         AND what <> $
+         AND IsClass(what,&Monster)
+      {
+         if FindListElem(plHallGuard,what) > 0
+         {
+            plHallGuard = DelListElem(plHallGuard,what);
+            if plHallGuard = $
+               AND piState = STATE_HELD
+            {
+               Post(self,@StartSanctum);
+            }
+         }
+
+         if FindListElem(plSanctumGuard,what) > 0
+         {
+            plSanctumGuard = DelListElem(plSanctumGuard,what);
+         }
+
+         // It's gone as it dies: its struck list (and its prize, dropped) is
+         // still to hand.
+         if what = poBoss
+         {
+            poBoss = $;
+            piState = STATE_CLEARED;
+            Send(self,@BossSlain,#oBoss=what);
+         }
+      }
+
+      propagate;
+   }
+
+   StartSanctum()
+   {
+      if piState <> STATE_HELD
+      {
+         return;
+      }
+
+      piState = STATE_SANCTUM;
+      Send(self,@OpenSanctum);
+
+      if poBoss <> $
+      {
+         SendListByClass(plActive,1,&User,@MsgSendUser,
+               #message_rsc=fallenhall_sanctum_opens,
+               #parm1=Send(poBoss,@GetDef),#parm2=Send(poBoss,@GetName));
+      }
+
+      return;
+   }
+
+   OpenSanctum()
+   "Subclass: the sanctum's door now lets anyone through."
+   {
+      return;
+   }
+
+   CloseSanctum()
+   "Subclass: the sanctum's door shuts again (a reset)."
+   {
+      return;
+   }
+
+   BossSlain(oBoss = $)
+   "Each guild with a member here who struck the boss gains BOSS_PRESTIGE, "
+   "once (spells count: Monster.WasStruckBy)."
+   {
+      local i, each_obj, oGuild, lGuilds;
+
+      SendListByClass(plActive,1,&User,@MsgSendUser,
+            #message_rsc=fallenhall_boss_slain,
+            #parm1=Send(oBoss,@GetCapDef),#parm2=Send(oBoss,@GetName),
+            #parm3=vrName);
+
+      lGuilds = $;
+      foreach i in plActive
+      {
+         each_obj = Send(self,@HolderExtractObject,#data=i);
+         if IsClass(each_obj,&Player)
+            AND Send(oBoss,@WasStruckBy,#who=each_obj)
+         {
+            oGuild = Send(each_obj,@GetGuild);
+            if oGuild <> $
+               AND FindListElem(lGuilds,oGuild) = 0
+            {
+               lGuilds = Cons(oGuild,lGuilds);
+            }
+         }
+      }
+
+      foreach oGuild in lGuilds
+      {
+         Send(oGuild,@AddPrestige,#amount=BOSS_PRESTIGE);
+
+         foreach i in plActive
+         {
+            each_obj = Send(self,@HolderExtractObject,#data=i);
+            if IsClass(each_obj,&User)
+               AND Send(each_obj,@GetGuild) = oGuild
+            {
+               Send(each_obj,@MsgSendUser,#message_rsc=fallenhall_prestige,
+                     #parm1=Send(oGuild,@GetCapDef),
+                     #parm2=Send(oGuild,@GetName),#parm3=BOSS_PRESTIGE,
+                     #parm4=Send(oBoss,@GetDef),#parm5=Send(oBoss,@GetName));
+            }
+         }
+      }
+
+      return;
+   }
+
+   //// The day's reset (FallenHalls.NewGameDay)
+
+   NewGameDay()
+   {
+      if piState = STATE_READY
+      {
+         return;
+      }
+
+      if Send(self,@CountHoldingHowMany,#class=&User) > 0
+      {
+         pbResetDue = TRUE;
+
+         return;
+      }
+
+      Send(self,@ResetHall);
+
+      return;
+   }
+
+   LastUserLeft(what = $)
+   {
+      if pbResetDue
+      {
+         Post(self,@ResetHall);
+      }
+
+      propagate;
+   }
+
+   ResetHall()
+   {
+      if Send(self,@CountHoldingHowMany,#class=&User) > 0
+      {
+         pbResetDue = TRUE;
+
+         return;
+      }
+
+      Send(self,@ClearGarrison);
+      Send(self,@CloseSanctum);
+
+      piState = STATE_READY;
+      pbResetDue = FALSE;
+
+      return;
+   }
+
+   //// Players
+
+   NewHold(what = $)
+   {
+      if IsClass(what,&User)
+      {
+         Post(self,@Greet,#who=what);
+      }
+
+      propagate;
+   }
+
+   Greet(who = $)
+   {
+      if who = $
+         OR Send(who,@GetOwner) <> self
+      {
+         return;
+      }
+
+      if piState = STATE_CLEARED
+      {
+         Send(who,@MsgSendUser,#message_rsc=fallenhall_cleared,
+               #parm1=vrName);
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=fallenhall_held,#parm1=vrName);
+
+      if piState = STATE_HELD
+      {
+         Send(who,@MsgSendUser,#message_rsc=fallenhall_sanctum_held);
+      }
+
+      return;
+   }
+
+   IsSanctumOpen()
+   {
+      return piState = STATE_SANCTUM
+         OR piState = STATE_CLEARED;
+   }
+
+   IsOpenWord(string = $)
+   {
+      return string <> $
+         AND StringEqual(string,fallenhall_open_word);
+   }
+
+   //// The outer doors: they open for anyone.
+
+   SomethingTryGo(what = $,row = $,col = $)
+   {
+      local i;
+
+      foreach i in plGuild_doors
+      {
+         if row = First(i) AND col = Nth(i,2)
+         {
+            Send(self,@OpenEntranceDoor);
+
+            return TRUE;
+         }
+      }
+
+      propagate;
+   }
+
+   OpenEntranceDoor()
+   "Subclass: open the doors and start ptEntrance to close them."
+   {
+      return;
+   }
+
+   TimeStampDoor()
+   {
+      piLastDoorOpen = GetTime();
+
+      return;
+   }
+
+   GetDoorTimeStamp()
+   {
+      return piLastDoorOpen;
+   }
+
+   CloseEntranceDoor()
+   {
+      // Players get 2 seconds while the door is closing to move through it.
+      ptEntrance = CreateTimer(self,@ClearDoor,2000);
+
+      return;
+   }
+
+   ClearDoor(lDoor = $)
+   {
+      local i, lFound;
+
+      if lDoor = $
+      {
+         lDoor = plEntrance;
+      }
+
+      lFound = Send(self,@FindUsersInArea,#lArea=lDoor);
+      foreach i in lFound
+      {
+         Send(self,@Teleport,#what=i);
+      }
+
+      ptEntrance = $;
+
+      return;
+   }
+
+   OpenEntranceDoorSound()
+   {
+      Send(self,@SomethingWaveRoom,#wave_rsc=vrEntrancedoor_open_sound);
+
+      return;
+   }
+
+   CloseEntranceDoorSound()
+   {
+      Send(self,@SomethingWaveRoom,#wave_rsc=vrEntrancedoor_close_sound);
+
+      return;
+   }
+
+   //// What other rooms ask a guild hall
+
+   CanEnter(who = $)
+   {
+      return TRUE;
+   }
+
+   GetGuildOwner()
+   {
+      return $;
+   }
+
+   IsDoorWord(what = $,string = $)
+   {
+      return Send(self,@IsOpenWord,#string=string);
+   }
+
+   CanHavePlayerPortal()
+   {
+      return FALSE;
+   }
+
+   CanTokenEnterRoom()
+   {
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

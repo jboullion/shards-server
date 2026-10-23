@@ -13262,7 +13262,9 @@ messages:
       {
          iTheirFaction = Send(what,@GetFaction);
 
+         // (The Order of Necromancers isn't in the Faction War.)
          return iTheirFaction <> FACTION_NEUTRAL
+                AND iTheirFaction <> FACTION_NECROMANCER
                 AND iTheirFaction <> Send(oShield,@GetFaction);
       }
 

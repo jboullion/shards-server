@@ -420,6 +420,8 @@ properties:
    // Ours: Roq's contracts on the lieges' agents (util/roqcontracts.kod), made on demand
    poRoqContracts = $
    poFactionWar = $
+   // Ours: the guild halls the Order of Necromancers holds (util/fallenhalls.kod), made on demand
+   poFallenHalls = $
    poCosmeticsBook = $
    // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
    poItemServiceBook = $
@@ -4525,6 +4527,7 @@ messages:
       Send(poParliament,@NewGameDay);
       Send(poNodeAttack,@NewGameDay);
       Send(poRentableRoomMaintenance,@NewGameDay);
+      Send(Send(self,@GetFallenHalls),@NewGameDay);
 
       Send(Send(self,@FindSpellByNum,#num=SID_NODEBURST),@NewGameDay);
 
@@ -5320,6 +5323,18 @@ messages:
       }
 
       return poFactionWar;
+   }
+
+   GetFallenHalls()
+   "Ours: the guild halls the Order of Necromancers holds (util/fallenhalls.kod), made on "
+   "demand."
+   {
+      if poFallenHalls = $
+      {
+         poFallenHalls = Create(&FallenHalls);
+      }
+
+      return poFallenHalls;
    }
 
    GetCosmeticsBook()
