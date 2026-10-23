@@ -1,0 +1,39 @@
+{
+  "id": 330,
+  "key": "guild-story-a-guilds-calling",
+  "name": "A Guild's Calling",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "text": {
+    "offer": "\"So your guild is on the rolls. Good. The realm has need of guilds again. Not long ago eight of the great guild halls fell in a single season, and not to any rival guild. The Order of Necromancers took them: Queen Venya'cyr's servants, who were thought broken. They hold the halls still, and they raise the old guilds' dead to guard them. Start where it started. The Den of Shadows lies off the Lake of Jala's Song. Go to its door and see what holds it now, then come back to me, or to any Guild Master.\"",
+    "progress": "\"Have you been to the Den of Shadows yet? Its door is off the Lake of Jala's Song.\"",
+    "complete": "\"Then you've seen them. Every one of the eight halls is held like that, each by one of the Queen's lieutenants. Your guild could take them back, one at a time. The Den is the place to begin.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_GUILDH3"
+      ],
+      "objective": "Visit the Den of Shadows"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25,
+    "shillings": 250
+  }
+}

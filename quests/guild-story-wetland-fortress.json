@@ -1,0 +1,42 @@
+{
+  "id": 338,
+  "key": "guild-story-wetland-fortress",
+  "name": "The Fallen Halls VIII: The Wetland Fortress",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      337
+    ]
+  },
+  "text": {
+    "offer": "\"Lieutenant Morvaine was the first dark angel to kneel to Queen Venya'cyr. It holds the Wetland Fortress on the swamp's edge, the hardest of the eight. Everything the Order took passes through its hands. Bring it down, and we'll know what the Queen intends. Its door is off the Marsh.\"",
+    "progress": "\"Lieutenant Morvaine still holds the Wetland Fortress for the Order.\"",
+    "complete": "\"Morvaine is fallen, and the last of the eight halls is free, for a day. Its papers say the rest plainly: Queen Venya'cyr waits in the Inner Sanctum, beneath the lever maze under Castle Brax, and every hall's plunder has been feeding her. The Order will retake the halls with each new day. But a guild that holds a trophy from all eight could find the way down. That day will come.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH19",
+      "auto": false,
+      "objective": "Lieutenant Morvaine brought down in the Wetland Fortress"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.7,
+    "shillings": 4500,
+    "prestige": 9
+  }
+}

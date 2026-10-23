@@ -1,0 +1,42 @@
+{
+  "id": 331,
+  "key": "guild-story-den-of-shadows",
+  "name": "The Fallen Halls I: The Den of Shadows",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      330
+    ]
+  },
+  "text": {
+    "offer": "\"The Den of Shadows was the illusionists' hall, until one of their own let the Order in. Mistress Ysolde came to learn Riija's arts and stayed to sell her guild to the Queen. She holds the Den now, behind its bridge. Break her guard and bring her down. Its door is off the Lake of Jala's Song.\"",
+    "progress": "\"Mistress Ysolde still holds the Den of Shadows for the Order.\"",
+    "complete": "\"Ysolde is gone? Then the first hall is free, for a day at least. Among her things was a letter in the Queen's own hand. It names her one of eight lieutenants, and it speaks of the grove of the Friends of the Forest as the next to be fed. Fed. I don't like that word.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH3",
+      "auto": false,
+      "objective": "Mistress Ysolde brought down in the Den of Shadows"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.0,
+    "shillings": 1000,
+    "prestige": 2
+  }
+}

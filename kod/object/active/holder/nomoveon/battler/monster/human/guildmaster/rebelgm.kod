@@ -1,0 +1,53 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+RebelGuildMaster is GuildMaster
+
+// Ours (guild revamp, ADR 0022 decision 28): the rebels' Guild Master, who
+// stands beside Jonas D'Accor in Pietro's Wicked Brews, the Jasper tavern
+// (jastavrn.kod). The looks are fixed (GuildMaster's Looks classvars).
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   RebelGuildMaster_name_rsc = "Brannoc the Red"
+   RebelGuildMaster_desc_rsc = \
+      "Brannoc the Red keeps the rolls of the guilds that fight beside "
+      "Jonas D'Accor.  His guild was one of the first the Order of "
+      "Necromancers drove from its hall, and he wants it back."
+   guildmaster_beard_braided = pbdf.bgf
+
+classvars:
+
+   vrName = RebelGuildMaster_name_rsc
+   vrDesc = RebelGuildMaster_desc_rsc
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+
+   viLooks_gender = GENDER_MALE
+   vrLooks_hair = human_hair_ba_icon
+   vrLooks_eyes = human_eyes_bx_icon
+   vrLooks_nose = human_nose_cx_icon
+   vrLooks_mouth = human_mouth_cx_icon
+   vrLooks_beard = guildmaster_beard_braided
+   viLooks_hair_colour = PT_GRAY_TO_RED
+   viLooks_skin = 3
+   viLooks_shirt = XLAT_TO_RED
+   viLooks_pants = XLAT_TO_BLACK
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

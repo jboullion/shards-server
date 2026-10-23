@@ -1,0 +1,42 @@
+{
+  "id": 336,
+  "key": "guild-story-sewer-hideout",
+  "name": "The Fallen Halls VI: The Sewer Hideout",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      335
+    ]
+  },
+  "text": {
+    "offer": "\"Beneath Barloque the Order feeds the lupoggs and the dusk rats, and the biggest of them, Grisk, keeps the hideout where the Order's plunder passes through. Clear it, and follow the trail. Its door is off the Sewers of Barloque.\"",
+    "progress": "\"Grisk, the Sewer King still holds the Sewer Hideout for the Order.\"",
+    "complete": "\"The trail out of the sewers leads to Ko'catan, and to the Hall of the Slaughtered Command. The Command fell defending the island, and the Order raised every one of its soldiers. It's building an army out of the dead.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH8",
+      "auto": false,
+      "objective": "Grisk, the Sewer King brought down in the Sewer Hideout"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "shillings": 3500,
+    "prestige": 7
+  }
+}

@@ -1,0 +1,53 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+DukeGuildMaster is GuildMaster
+
+// Ours (guild revamp, ADR 0022 decision 28): the Duke's Guild Master, who stands
+// beside Duke Akardius in his chambers (duke3.kod). The looks are fixed
+// (GuildMaster's Looks classvars).
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   DukeGuildMaster_name_rsc = "Master Aldric Vane"
+   DukeGuildMaster_desc_rsc = \
+      "Master Aldric Vane keeps the rolls of the guilds that serve Duke "
+      "Akardius.  He served in a guild himself, before the Order of "
+      "Necromancers took its hall, and he has not forgiven them."
+   guildmaster_beard_short = pbda.bgf
+
+classvars:
+
+   vrName = DukeGuildMaster_name_rsc
+   vrDesc = DukeGuildMaster_desc_rsc
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+
+   viLooks_gender = GENDER_MALE
+   vrLooks_hair = human_hair_ad_icon
+   vrLooks_eyes = human_eyes_cx_icon
+   vrLooks_nose = human_nose_bx_icon
+   vrLooks_mouth = human_mouth_bx_icon
+   vrLooks_beard = guildmaster_beard_short
+   viLooks_hair_colour = PT_GRAY_TO_KGRAY
+   viLooks_skin = 2
+   viLooks_shirt = XLAT_TO_PURPLE
+   viLooks_pants = XLAT_TO_BLACK
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

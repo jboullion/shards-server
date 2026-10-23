@@ -962,6 +962,33 @@ resources:
    qd_327_name = "Rank VIII: The Wetland Fortress"
    qd_327_s1 = "Lieutenant Morvaine brought down in the Wetland Fortress"
    qd_327_t1 = "the guild window"
+   qd_330_name = "A Guild's Calling"
+   qd_330_s1 = "Visit the Den of Shadows"
+   qd_330_t1 = "any Guild Master"
+   qd_331_name = "The Fallen Halls I: The Den of Shadows"
+   qd_331_s1 = "Mistress Ysolde brought down in the Den of Shadows"
+   qd_331_t1 = "any Guild Master"
+   qd_332_name = "The Fallen Halls II: The home of the Friends of the Forest"
+   qd_332_s1 = "Old Blackroot brought down in the home of the Friends of the Forest"
+   qd_332_t1 = "any Guild Master"
+   qd_333_name = "The Fallen Halls III: Muskgate Post"
+   qd_333_s1 = "Hrimvald brought down in Muskgate Post"
+   qd_333_t1 = "any Guild Master"
+   qd_334_name = "The Fallen Halls IV: The Old Dwarven Hall"
+   qd_334_s1 = "Thane Durrek brought down in the Old Dwarven Hall"
+   qd_334_t1 = "any Guild Master"
+   qd_335_name = "The Fallen Halls V: The Abandoned Warehouse"
+   qd_335_s1 = "Captain Vesk brought down in the Abandoned Warehouse"
+   qd_335_t1 = "any Guild Master"
+   qd_336_name = "The Fallen Halls VI: The Sewer Hideout"
+   qd_336_s1 = "Grisk, the Sewer King brought down in the Sewer Hideout"
+   qd_336_t1 = "any Guild Master"
+   qd_337_name = "The Fallen Halls VII: The Hall of the Slaughtered Command"
+   qd_337_s1 = "Marshal Corvane brought down in the Hall of the Slaughtered Command"
+   qd_337_t1 = "any Guild Master"
+   qd_338_name = "The Fallen Halls VIII: The Wetland Fortress"
+   qd_338_s1 = "Lieutenant Morvaine brought down in the Wetland Fortress"
+   qd_338_t1 = "any Guild Master"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -977,7 +1004,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 90436213;
+      return 39115574;
    }
 
    GetQuests()
@@ -2529,53 +2556,107 @@ messages:
                0, $, $, $, 1 ] ],
            33708, 10000, $, 0, 1, 3, $, 0, [ [ 4, 15 ] ], $, $, 70 ],
          // fallen-daily-den-of-shadows
-         [ 320, qd_320_name, $, 0, 80, 150, $,
+         [ 320, qd_320_name, $, 0, 80, 150, [ 331 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_320_s1, $, $, qd_320_t1,
                1, $, $, $, 703 ] ],
            3281, 500, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-friends-of-the-forest
-         [ 321, qd_321_name, $, 0, 90, 150, $,
+         [ 321, qd_321_name, $, 0, 90, 150, [ 332 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_321_s1, $, $, qd_321_t1,
                1, $, $, $, 712 ] ],
            4555, 750, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-muskgate-post
-         [ 322, qd_322_name, $, 0, 100, 150, $,
+         [ 322, qd_322_name, $, 0, 100, 150, [ 333 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_322_s1, $, $, qd_322_t1,
                1, $, $, $, 720 ] ],
            6121, 1000, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-old-dwarven-hall
-         [ 323, qd_323_name, $, 0, 100, 150, $,
+         [ 323, qd_323_name, $, 0, 100, 150, [ 334 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_323_s1, $, $, qd_323_t1,
                1, $, $, $, 706 ] ],
            6631, 1250, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-abandoned-warehouse
-         [ 324, qd_324_name, $, 0, 100, 150, $,
+         [ 324, qd_324_name, $, 0, 100, 150, [ 335 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_324_s1, $, $, qd_324_t1,
                1, $, $, $, 709 ] ],
            7141, 1500, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-sewer-hideout
-         [ 325, qd_325_name, $, 0, 100, 150, $,
+         [ 325, qd_325_name, $, 0, 100, 150, [ 336 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_325_s1, $, $, qd_325_t1,
                1, $, $, $, 708 ] ],
            7651, 1750, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-slaughtered-command
-         [ 326, qd_326_name, $, 0, 100, 150, $,
+         [ 326, qd_326_name, $, 0, 100, 150, [ 337 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_326_s1, $, $, qd_326_t1,
                1, $, $, $, 713 ] ],
            8161, 2000, $, 0, 1, $, $, 192, $, $, $, $ ],
          // fallen-daily-wetland-fortress
-         [ 327, qd_327_name, $, 0, 100, 150, $,
+         [ 327, qd_327_name, $, 0, 100, 150, [ 338 ],
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_327_s1, $, $, qd_327_t1,
                1, $, $, $, 719 ] ],
-           8671, 2250, $, 0, 1, $, $, 192, $, $, $, $ ]
+           8671, 2250, $, 0, 1, $, $, 192, $, $, $, $ ],
+         // guild-story-a-guilds-calling
+         [ 330, qd_330_name, &GuildMaster, 0, 80, 150, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &GuildMaster, 0, qd_330_s1, [ 703 ], $, qd_330_t1,
+               0, $, $, $, 0 ] ],
+           1640, 250, $, 0, 2, $, $, 64, $, $, $, $ ],
+         // guild-story-den-of-shadows
+         [ 331, qd_331_name, &GuildMaster, 0, 80, 150, [ 330 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_331_s1, $, $, qd_331_t1,
+               0, $, $, $, 703 ] ],
+           6561, 1000, $, 0, 2, $, $, 64, [ [ 6, 2 ] ], $, $, $ ],
+         // guild-story-friends-of-the-forest
+         [ 332, qd_332_name, &GuildMaster, 0, 90, 150, [ 331 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_332_s1, $, $, qd_332_t1,
+               0, $, $, $, 712 ] ],
+           9109, 1500, $, 0, 2, $, $, 64, [ [ 6, 3 ] ], $, $, $ ],
+         // guild-story-muskgate-post
+         [ 333, qd_333_name, &GuildMaster, 0, 100, 150, [ 332 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_333_s1, $, $, qd_333_t1,
+               0, $, $, $, 720 ] ],
+           12241, 2000, $, 0, 2, $, $, 64, [ [ 6, 4 ] ], $, $, $ ],
+         // guild-story-old-dwarven-hall
+         [ 334, qd_334_name, &GuildMaster, 0, 100, 150, [ 333 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_334_s1, $, $, qd_334_t1,
+               0, $, $, $, 706 ] ],
+           13261, 2500, $, 0, 2, $, $, 64, [ [ 6, 5 ] ], $, $, $ ],
+         // guild-story-abandoned-warehouse
+         [ 335, qd_335_name, &GuildMaster, 0, 100, 150, [ 334 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_335_s1, $, $, qd_335_t1,
+               0, $, $, $, 709 ] ],
+           14281, 3000, $, 0, 2, $, $, 64, [ [ 6, 6 ] ], $, $, $ ],
+         // guild-story-sewer-hideout
+         [ 336, qd_336_name, &GuildMaster, 0, 100, 150, [ 335 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_336_s1, $, $, qd_336_t1,
+               0, $, $, $, 708 ] ],
+           15302, 3500, $, 0, 2, $, $, 64, [ [ 6, 7 ] ], $, $, $ ],
+         // guild-story-slaughtered-command
+         [ 337, qd_337_name, &GuildMaster, 0, 100, 150, [ 336 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_337_s1, $, $, qd_337_t1,
+               0, $, $, $, 713 ] ],
+           16322, 4000, $, 0, 2, $, $, 64, [ [ 6, 8 ] ], $, $, $ ],
+         // guild-story-wetland-fortress
+         [ 338, qd_338_name, &GuildMaster, 0, 100, 150, [ 337 ],
+           $, $, $, $,
+           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_338_s1, $, $, qd_338_t1,
+               0, $, $, $, 719 ] ],
+           17342, 4500, $, 0, 2, $, $, 64, [ [ 6, 9 ] ], $, $, $ ]
          ]
       ];
    }

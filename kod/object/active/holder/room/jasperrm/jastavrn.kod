@@ -53,6 +53,10 @@ messages:
       Send(self,@NewHold,#what=Create(&JasperBartender),
 	   #new_row=15,#new_col=6,#new_angle=ANGLE_NORTH);
 
+      // Ours (guild revamp, ADR 0022 decision 28): the rebels' Guild Master, beside Jonas
+      Send(self,@NewHold,#what=Create(&RebelGuildMaster),
+           #new_row=7,#new_col=7,#fine_row=32,#fine_col=32,#new_angle=ANGLE_NORTH);
+
       oNews = Create(&Newslink,#nid=NID_ADVENTURE,#name=jastav_adv_name,#icon=jastav_adv_icon,#desc=jastav_adv_desc);
       Send(self,@NewHold,#what=oNews,#new_row=16,#new_col=2,#fine_row=8,#fine_col=32,#new_angle = ANGLE_NORTH_EAST);
 

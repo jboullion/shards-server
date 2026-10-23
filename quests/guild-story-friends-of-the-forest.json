@@ -1,0 +1,42 @@
+{
+  "id": 332,
+  "key": "guild-story-friends-of-the-forest",
+  "name": "The Fallen Halls II: The home of the Friends of the Forest",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 90,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      331
+    ]
+  },
+  "text": {
+    "offer": "\"The Friends of the Forest tended a grove around the eldest tree in the land. The Order poured death into its roots, and now the tree they called Old Blackroot hates everything that lives. The Order is drawing something out of that grove. Put an end to it. Its door is off the Source of the River Ille.\"",
+    "progress": "\"Old Blackroot still holds the home of the Friends of the Forest for the Order.\"",
+    "complete": "\"The grove is quiet now. The Friends' old records say the tree's life ran deeper than its roots, and that the Order was drawing it off, into stone vessels carried away north. Whatever the Queen is building, she means to feed it. Muskgate Post is next: the Order has bound something there too.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH11",
+      "auto": false,
+      "objective": "Old Blackroot brought down in the home of the Friends of the Forest"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.1,
+    "shillings": 1500,
+    "prestige": 3
+  }
+}

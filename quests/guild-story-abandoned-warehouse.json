@@ -1,0 +1,42 @@
+{
+  "id": 335,
+  "key": "guild-story-abandoned-warehouse",
+  "name": "The Fallen Halls V: The Abandoned Warehouse",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      334
+    ]
+  },
+  "text": {
+    "offer": "\"Captain Vesk smuggled spices once. Now he smuggles bones, bound spirits and crates that whisper, for the Order of Necromancers, out of the old warehouse in the Ports of Barloque. Stop him, and find out where his cargo goes. Its door is off the Ports of Barloque.\"",
+    "progress": "\"Captain Vesk still holds the Abandoned Warehouse for the Order.\"",
+    "complete": "\"Vesk's ledgers are a fine read. The crates don't go to sea at all. They go down, into the Sewers of Barloque, where the Order keeps a hideout of its own. Something beneath the city is being fed, too.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH9",
+      "auto": false,
+      "objective": "Captain Vesk brought down in the Abandoned Warehouse"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.4,
+    "shillings": 3000,
+    "prestige": 6
+  }
+}

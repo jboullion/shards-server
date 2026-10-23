@@ -1,0 +1,42 @@
+{
+  "id": 334,
+  "key": "guild-story-old-dwarven-hall",
+  "name": "The Fallen Halls IV: The Old Dwarven Hall",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      333
+    ]
+  },
+  "text": {
+    "offer": "\"The dwarves carved their hall in the Forest of Farol and buried their thanes beneath it. The Order broke Thane Durrek's tomb and woke his bones to guard what they took. Lay him to rest again, and find out what was carried out of those tombs. Its door is off the Forest of Farol.\"",
+    "progress": "\"Thane Durrek still holds the Old Dwarven Hall for the Order.\"",
+    "complete": "\"Thane Durrek rests again. The dwarves' rune-stones were taken, all of them, and crated. The crates went to the Ports of Barloque, to the old warehouse there. Someone is moving the Order's plunder by sea, and they're being paid well for it.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH7",
+      "auto": false,
+      "objective": "Thane Durrek brought down in the Old Dwarven Hall"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.3,
+    "shillings": 2500,
+    "prestige": 5
+  }
+}

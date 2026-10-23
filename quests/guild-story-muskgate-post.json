@@ -1,0 +1,42 @@
+{
+  "id": 333,
+  "key": "guild-story-muskgate-post",
+  "name": "The Fallen Halls III: Muskgate Post",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      332
+    ]
+  },
+  "text": {
+    "offer": "\"Muskgate Post kept the trade road north of Bergentaal open through every winter. Now the Order has bound a spirit of the northern ice into a shell of stone, Hrimvald, and set it over the post. Free the post, and see where the Order's vessels go. Its door is off the Trader's Route by Bergentaal.\"",
+    "progress": "\"Hrimvald still holds Muskgate Post for the Order.\"",
+    "complete": "\"Hrimvald's binding was the same craft as the grove's vessels. Spirits, life, cold: the Order is gathering power of every kind it can bind. And the dwarves' old hall in the Forest of Farol has been broken open. Their tombs, their runes, their dead. Go and see.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH20",
+      "auto": false,
+      "objective": "Hrimvald brought down in Muskgate Post"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.2,
+    "shillings": 2000,
+    "prestige": 4
+  }
+}

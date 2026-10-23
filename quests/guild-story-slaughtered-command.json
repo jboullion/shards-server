@@ -1,0 +1,42 @@
+{
+  "id": 337,
+  "key": "guild-story-slaughtered-command",
+  "name": "The Fallen Halls VII: The Hall of the Slaughtered Command",
+  "tier": "story",
+  "giver": {
+    "class": "GuildMaster",
+    "rooms": [
+      "RID_DUKE3",
+      "RID_CASTLE2C",
+      "RID_JAS_BAR"
+    ]
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true,
+    "quests": [
+      336
+    ]
+  },
+  "text": {
+    "offer": "\"Marshal Corvane led the Slaughtered Command and died with it on the shore below its hall. The Order raised him, and his soldiers stand guard for the Queen where they fell. Only a strong guild should try this one. Bring the marshal down. Its door is off Ko'catan.\"",
+    "progress": "\"Marshal Corvane still holds the Hall of the Slaughtered Command for the Order.\"",
+    "complete": "\"Corvane carried the Queen's last orders. Everything the Order has gathered goes to the Wetland Fortress, to her highest lieutenant, Morvaine, and from there below Castle Brax. Below. The Queen is not broken. She's waiting.\""
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH13",
+      "auto": false,
+      "objective": "Marshal Corvane brought down in the Hall of the Slaughtered Command"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.6,
+    "shillings": 4000,
+    "prestige": 8
+  }
+}

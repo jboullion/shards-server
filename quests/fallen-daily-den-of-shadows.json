@@ -8,7 +8,10 @@
     "max": 150
   },
   "requires": {
-    "inGuild": true
+    "inGuild": true,
+    "quests": [
+      331
+    ]
   },
   "repeat": {
     "cooldownHours": 24
