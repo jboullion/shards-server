@@ -64,6 +64,9 @@ constants:
    // A soldier who reaches a fought battle: this long before the enemy will turn on them,
    //  while their own army forms up round them (NoteParticipants)
    GRACE_SECONDS = 8
+   // A soldier who comes once the armies are out brings this many of their liege's soldiers
+   //  (Reinforce): only the first comer has the whole army formed round them
+   REINFORCEMENTS = 3
 
    // A story siege (StartSiege) gathers this many minutes after it's called
    SIEGE_MUSTER_MINUTES = 2
@@ -99,6 +102,7 @@ resources:
    fw_rally = \
       "~IYour liege's soldiers close ranks round you.  You have a moment to find your place in "
       "the line."
+   fw_reinforce = "~IA squad of your liege's soldiers comes up with you."
    fw_siege_no_target = "~IThere are no walls of that enemy left to besiege."
    fw_siege_won = \
       "~B~k[Celebration]~n ~BThe siege at %s is won!  %s celebrates in %s."
@@ -803,7 +807,7 @@ messages:
       }
 
       // Whoever came (in grace now) has their own army round them
-      Send(self,@NoteParticipants);
+      Send(self,@NoteParticipants,#bReinforce=FALSE);
       oFirst = $;
       foreach i in plParticipants
       {
@@ -971,14 +975,20 @@ messages:
       return;
    }
 
-   PlaceTroop(troop = $,bHome = FALSE)
-   "Defenders near the pole, attackers near their anchor (SpawnArmies); anywhere in the room "
-   "if there's no room there. Returns whether it was placed (if not, the troop is gone)."
+   PlaceTroop(troop = $,bHome = FALSE,anchor = $)
+   "Defenders near the pole, attackers near their anchor (SpawnArmies), or near anchor "
+   "([ row, col ]) if it's given; anywhere in the room if there's no room there. Returns "
+   "whether it was placed (if not, the troop is gone)."
    {
       local iTry, iRow, iCol, iAnchorRow, iAnchorCol;
 
       iAnchorRow = $;
-      if bHome
+      if anchor <> $
+      {
+         iAnchorRow = First(anchor);
+         iAnchorCol = Nth(anchor,2);
+      }
+      else if bHome
       {
          if plDefendAnchor <> $
          {
@@ -1123,8 +1133,47 @@ messages:
       return;
    }
 
-   NoteParticipants()
-   "Soldiers of either liege in the room, shields worn, fight in it (and stop regrouping)."
+   Reinforce(who = $,faction = $)
+   "who came to a battle whose armies are already out: REINFORCEMENTS of their liege's soldiers "
+   "come up with them."
+   {
+      local i, oTroop, bHome, lAt;
+
+      bHome = (faction = piDefender);
+      lAt = [ Send(who,@GetRow), Send(who,@GetCol) ];
+      i = 0;
+      while i < REINFORCEMENTS
+      {
+         i = i + 1;
+         oTroop = Create(Send(self,@TroopClass,#faction=faction));
+         Send(oTroop,@SetBattle,#battle=self,#role=BATTLE_ROLE_SOLDIER);
+         if NOT Send(self,@PlaceTroop,#troop=oTroop,#bHome=bHome,#anchor=lAt)
+         {
+            continue;
+         }
+
+         if bHome
+         {
+            plDefendArmy = Cons(oTroop,plDefendArmy);
+            piDefendRaised = piDefendRaised + 1;
+         }
+         else
+         {
+            plAttackArmy = Cons(oTroop,plAttackArmy);
+            piAttackRaised = piAttackRaised + 1;
+         }
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=fw_reinforce);
+      Send(self,@KeepTargets,#all=TRUE);
+
+      return;
+   }
+
+   NoteParticipants(bReinforce = TRUE)
+   "Soldiers of either liege in the room, shields worn, fight in it (and stop regrouping). One "
+   "who comes once the armies are out brings reinforcements (unless bReinforce is FALSE: the "
+   "armies are being raised round them)."
    {
       local i, j, oThing, oShield, iFaction, bKnown;
 
@@ -1166,6 +1215,10 @@ messages:
                                   plParticipants);
             Send(oThing,@EndRegrouping,#report=FALSE);
             Send(oThing,@MsgSendUser,#message_rsc=fw_rally);
+            if bReinforce AND pbSpawned
+            {
+               Send(self,@Reinforce,#who=oThing,#faction=iFaction);
+            }
          }
       }
 

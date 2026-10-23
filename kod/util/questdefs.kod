@@ -907,7 +907,7 @@ resources:
    qd_307_s2 = "Claim a flagpole for the Princess"
    qd_307_t2 = "Princess Kateriina"
    qd_308_name = "The Envoy's Return"
-   qd_308_s1 = "Take the treaty to the captain in Ko'catan"
+   qd_308_s1 = "Take the treaty to Cital ko'Manca in Ko'catan, by day"
    qd_308_p1 = "the Princess's treaty"
    qd_308_t1 = "Cital ko'Manca"
    qd_308_s2 = "Avars on the jungle paths slain"
@@ -953,7 +953,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 119724634;
+      return 17052896;
    }
 
    GetQuests()

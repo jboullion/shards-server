@@ -17,11 +17,11 @@ resources:
 
    include rmgcombat.lkod
 
-   rmgcombat_name_rsc = "Murderer, Guild and Faction Combat Only"
+   rmgcombat_name_rsc = "Guild and Faction Combat Only"
    rmgcombat_icon_rsc = rmgcombat.bgf
    rmgcombat_desc_rsc = \
-      "You must be a murderer, in a guild, or be a faction soldier "
-      "to fight here."
+      "Only guilds at war, and the lieges' soldiers wearing their shields against "
+      "a rival liege's, may fight here."
 
 classvars:
 

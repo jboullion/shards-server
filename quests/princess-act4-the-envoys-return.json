@@ -21,8 +21,8 @@
     ]
   },
   "text": {
-    "offer": "Princess Kateriina says, \"Ko'catan's captain has read my letters; now he must sign. Take him the treaty. He will want proof the crown can keep its friends safe, so clear the avars from the jungle paths while you are there.\"",
-    "progress": "The captain keeps the watch in Ko'catan. The avars roam the jungle beyond.",
+    "offer": "Princess Kateriina says, \"Ko'catan's captain has read my letters; now he must sign. Take him the treaty: Cital ko'Manca keeps the East Tower by day. By night another captain holds it, and he is no friend of ours. Cital will want proof the crown can keep its friends safe, so clear the avars from the jungle paths while you are there.\"",
+    "progress": "Cital ko'Manca keeps the East Tower in Ko'catan by day, from the eighth hour to the twentieth; by night Xacal ko'Ixca holds it, and he will not sign. The avars roam the jungle beyond.",
     "complete": "Princess Kateriina says, \"Ko'catan stands with the crown. With their ships behind us, I name you one of my Captains. When you have risen to the rank, ask me for my gift: say champion.\""
   },
   "steps": [
@@ -32,7 +32,8 @@
       "turnin": {
         "class": "KocatanCaptainGood"
       },
-      "objective": "Take the treaty to the captain in Ko'catan"
+      "objective": "Take the treaty to Cital ko'Manca in Ko'catan, by day",
+      "brief": "Cital ko'Manca keeps the East Tower in Ko'catan by day, from the eighth hour to the twentieth. By night Xacal ko'Ixca holds it: come back in the morning."
     },
     {
       "kind": "kill",

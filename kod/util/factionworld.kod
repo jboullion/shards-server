@@ -49,6 +49,7 @@ resources:
       "~B~k[Celebration]~n ~B%s's armies have won %i battles running!  %s celebrates in %s."
    fw_celebrate_over = "~IThe celebrations for %s in %s draw to a close."
    fw_celebrate_boon = "~IThe celebrations for your liege lift your spirits."
+   fw_nobody = "the unfactioned"
    fw_mourn = \
       "~B~k[War]~n ~B%s has fallen to %s.  The flags of %s fly at half-staff."
 
@@ -189,9 +190,11 @@ messages:
    }
 
    TownOf(where = $)
-   "The town RID a room is part of (its class: a tavern in Tos is a TosRoom), or $."
+   "The town RID a room is part of, or $: by its class (a tavern in Tos is a TosRoom), or else "
+   "by its RID, as many of the towns' shops and inns are plain rooms (Marion's smithy is an "
+   "ObjectRoom): each town's rooms are numbered together in blakston.khd."
    {
-      local i;
+      local i, iRID;
 
       if where = $
       {
@@ -206,11 +209,63 @@ messages:
          }
       }
 
+      iRID = Send(where,@GetRoomNum);
+      if iRID = $
+      {
+         return $;
+      }
+
+      // RID_TOS to RID_TOS_DEATH_ARENA
+      if iRID >= RID_TOS AND iRID <= 79
+      {
+         return RID_TOS;
+      }
+
+      // RID_BAR_NORTH to RID_BAR_JAIL
+      if iRID >= RID_BAR_NORTH AND iRID <= 116
+      {
+         return RID_BAR_NORTH;
+      }
+
+      // RID_CORNOTH to RID_COR_MUSEUM
+      if iRID >= RID_CORNOTH AND iRID <= 158
+      {
+         return RID_CORNOTH;
+      }
+
+      // RID_MARION to RID_MARION_PLAN_WORKER1
+      if iRID >= RID_MARION AND iRID <= 208
+      {
+         return RID_MARION;
+      }
+
+      // RID_RAZA to RID_RAZA_MUSEUM, and its vault and bank
+      if (iRID >= RID_RAZA AND iRID <= 308)
+         OR iRID = RID_RAZA_VAULT
+         OR iRID = RID_RAZA_BANK
+      {
+         return RID_RAZA;
+      }
+
+      // RID_JASPER to RID_JAS_VAULT
+      if iRID >= RID_JASPER AND iRID <= RID_JAS_VAULT
+      {
+         return RID_JASWEST;
+      }
+
       return $;
    }
 
    LiegeName(faction = $)
+   "The liege's name; for no liege (a town taken by neutrals), 'the unfactioned'."
    {
+      if faction = $
+         OR faction <= FACTION_NEUTRAL
+         OR faction > FACTION_NORMAL_MAX
+      {
+         return fw_nobody;
+      }
+
       return Send(Send(SYS,@GetParliament),@GetFactionLiegeName,#faction=faction);
    }
 
@@ -237,7 +292,7 @@ messages:
    TownChanged(town = $,from = FACTION_NEUTRAL,to = FACTION_NEUTRAL)
    "A town's pole changed hands (TerritoryGame.RecalcTownFlags)."
    {
-      local iCapital;
+      local iCapital, lCeleb;
 
       if town = $
          OR from = to
@@ -245,9 +300,15 @@ messages:
          return;
       }
 
+      // A liege who loses a town stops celebrating anywhere: its capital mourns instead
       if from <> FACTION_NEUTRAL
       {
-         Send(self,@EndCelebrationIn,#faction=from,#town=town);
+         lCeleb = Send(self,@FindCelebration,#faction=from);
+         if lCeleb <> $
+         {
+            Send(self,@EndCelebration,#celebration=lCeleb);
+         }
+
          Send(self,@Mourn,#faction=from,#town=town,#victor=to);
       }
 

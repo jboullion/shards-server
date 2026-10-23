@@ -7506,6 +7506,8 @@ messages:
       if IsClass(self,&User)
       {
          Send(self,@ToCliRoomContents);
+         // ...and our client's battle banner and War window know our liege (factionwar.kod)
+         Send(Send(SYS,@GetFactionWar),@SendWar,#who=self);
       }
 
       return;
