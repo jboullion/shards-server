@@ -50,13 +50,13 @@ resources:
    gcreator_rent_due = "%s%q owes %i coins in rent at this time."
    gcreator_hours_til_rent = \
       "The guild members have %i hours to pay off their balance, or the guild "
-      "will be disbanded."
+      "will lose its hall."
    gcreator_lesshour_til_rent = \
       "The guild members have less than an hour to pay off their balance, or "
-      "the guild will be disbanded."
+      "the guild will lose its hall."
    gcreator_hour_til_rent = \
       "The guild members have an hour to pay off their balance, or the guild "
-      "will be disbanded."
+      "will lose its hall."
    gcreator_positive_balance = \
       "%s%q has a positive balance of %i shillings.  I thank thee for thy "
       "timely payments."

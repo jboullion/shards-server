@@ -13,6 +13,7 @@ GuildHall is Room
 constants:
 
    include blakston.khd
+   include protocol.khd
 
    // Ours (guild revamp, 2026-10-22): halls can no longer be raided or
    // conquered, so a hall is either for rent or owned.
@@ -42,6 +43,9 @@ resources:
    guildhall_now_private = \
       "~B%s%s closes %s to visitors.  Only your guild and its allies may now "
       "come through its door."
+   guildhall_public_rank = \
+      "Only the guild's %q rank and above may open or close the hall to "
+      "visitors."
    guildhall_already_public = "%s is already open to visitors."
    guildhall_already_private = "%s is already closed to visitors."
    guildhall_public_welcome = "%s, home of %s%q, is open to visitors."
@@ -50,6 +54,14 @@ resources:
       "Only members of %s%q may use the chests in their hall."
    guildhall_chest_rank = \
       "Only the guild's %q rank and above may use the %s."
+
+   guildhall_chest_full = \
+      "The %s is full: it holds %i items.  Your guild's prestige will make "
+      "room for more."
+   guildhall_prestige_word = "prestige"
+   guildhall_prestige = \
+      "%s%q has %i prestige.  The chests in its hall hold up to %i items "
+      "each."
 
    guildhall_stone_given = \
       "You take a recall stone.  Use it anywhere to return to %s."
@@ -575,6 +587,33 @@ messages:
       return TRUE;
    }
 
+   ChestHasRoom(who=$,oChest=$)
+   "Ours (guild revamp, ADR 0022 decision 10): an owned hall's chests hold "
+   "up to the owner's Guild.GetChestLimit items each.  A chest already over "
+   "keeps what it has but takes nothing new."
+   {
+      local iLimit, iCount;
+
+      if poGuild_owner = $
+         OR oChest = $
+         OR IsClass(who,&Admin)
+      {
+         return TRUE;
+      }
+
+      iLimit = Send(poGuild_owner,@GetChestLimit);
+      iCount = Send(oChest,@GetItemCount);
+      if iCount >= iLimit
+      {
+         Send(who,@MsgSendUser,#message_rsc=guildhall_chest_full,
+               #parm1=Send(oChest,@GetName),#parm2=iCount);
+
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
    GetMemberRank(who=$)
    "The rank who holds in the owner guild, or 0."
    {
@@ -633,11 +672,26 @@ messages:
       {
          if iRank < RANK_LIEUTENANT
          {
-            return FALSE;
+            Send(what,@MsgSendUser,#message_rsc=guildhall_public_rank,
+                  #parm1=Send(poGuild_owner,@GetRankName,#rank=RANK_LIEUTENANT,
+                              #sex=Send(what,@GetGender)));
+
+            return TRUE;
          }
 
          Send(self,@SetPublic,#who=what,
                #public=StringEqual(string,guildhall_public_word));
+
+         return TRUE;
+      }
+
+      if StringEqual(string,guildhall_prestige_word)
+      {
+         Send(what,@MsgSendUser,#message_rsc=guildhall_prestige,
+               #parm1=Send(poGuild_owner,@GetCapDef),
+               #parm2=Send(poGuild_owner,@GetName),
+               #parm3=Send(poGuild_owner,@GetPrestige),
+               #parm4=Send(poGuild_owner,@GetChestLimit));
 
          return TRUE;
       }
@@ -708,6 +762,24 @@ messages:
                   #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName),
                   #parm3=vrName);
          }
+      }
+
+      return;
+   }
+
+   SendRoomIcons(what=$)
+   "Ours (guild revamp): halls are safe, since AllowBattlerAttack refuses "
+   "every player attack in one, so they show the safe room's icon.  They "
+   "aren't ROOM_NO_COMBAT, which would also stop members casting buffs on "
+   "one another (PersonalEnchantment)."
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetRoomIcons,
+                        #flags=(piRoom_Flags & ~ROOM_GUILD_PK_ONLY)
+                               | ROOM_NO_COMBAT)
+      {
+         Send(what,@ShowAddEnchantment,#what=i,#type=ENCHANTMENT_ROOM);
       }
 
       return;

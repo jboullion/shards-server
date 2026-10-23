@@ -107,11 +107,6 @@ guild_only_one_suing_for_peace = de \
    "Ihr könnt nur bei einem Feind auf einmal um Frieden flehen."
 guild_hour_rsc = de "Stunde"
 guild_hours_rsc = de "Stunden"
-guild_rent_nonpayment = de \
-   "~BDeine Gilde wurde aufgelöst, weil sie ihre Schulden nicht bezahlt hat!"
-guild_rent_due = de \
-   "~BDeine Gilde hat %i Schulden. Wenn dieser Betrag in den nächsten %i%s "
-   "nicht beglichen wird, wird Deine Gilde aufgelöst."
 guild_new_hall = de "~B%s ist die neue Halle der Gilde %s%q!"
 guild_abandon_hall = de "~B%s ist nicht mehr die Halle der Gilde %s%q!"
 guild_ranks_full = de \
@@ -229,8 +224,6 @@ guild_already_suing_for_peace = pt "Você já está pedindo paz de %s%q."
 guild_only_one_suing_for_peace = pt "Você só pode pedir paz a um inimigo de cada vez."
 guild_hour_rsc = pt "hora"
 guild_hours_rsc = pt "horas"
-guild_rent_nonpayment = pt "~BSua guilda foi dissolvida por não pagar o aluguel!"
-guild_rent_due = pt "~BSua guilda deve %i de aluguel. Se este valor não for reduzido para 0 nas próximas %i %s, sua guilda será dissolvida."
 guild_new_hall = pt "~B%s é o novo lar de %s%q!"
 guild_abandon_hall = pt "~B%s não é mais o lar de %s%q!"
 guild_ranks_full = pt "~BVocê não pôde ser aceito em %s%q porque os cargos já estão cheios."

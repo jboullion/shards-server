@@ -516,6 +516,11 @@ properties:
    plAttackers = $
    piAttackers = 15
 
+   // Ours (guild revamp): the players who have struck this monster, newest
+   // first, at most piAttackers of them (WasStruckBy). plAttackers above is
+   // kept only for event mobs, and some bosses use it for their own rewards.
+   plStruckBy = $
+
    // some monsters are created on the fly (ex: avar) we may need to set this at
    // runtime
    piReputationGroup = REP_NEUTRAL
@@ -638,6 +643,18 @@ messages:
       propagate;
    }
    
+   WasStruckBy(who=$)
+   "Ours (guild revamp): has who struck this monster (plStruckBy)?"
+   {
+      if who = $
+         OR plStruckBy = $
+      {
+         return FALSE;
+      }
+
+      return FindListElem(plStruckBy,who) > 0;
+   }
+
    GetBonusXP()
    {
        return viBonusXP;
@@ -2385,6 +2402,18 @@ messages:
          Send(what,@MsgSendUser,#message_rsc=LS_nofight_attacked);
 
          return 0;
+      }
+
+      if what <> $
+         AND IsClass(what,&Player)
+         AND NOT Send(self,@WasStruckBy,#who=what)
+      {
+         if Length(plStruckBy) >= piAttackers
+         {
+            plStruckBy = DelListElem(plStruckBy,Nth(plStruckBy,piAttackers));
+         }
+
+         plStruckBy = Cons(what,plStruckBy);
       }
       
       if poEventMob

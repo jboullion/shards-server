@@ -39,6 +39,15 @@ constants:
    // the highest-ranked active member (CheckSuccession). There are no votes.
    LEADER_INACTIVE_SECS = 30 * 24 * 60 * 60
 
+   // Ours (guild revamp, ADR 0022 decisions 10 and 20): prestige. Kills that
+   // earned the guild bonus give a point per PRESTIGE_KILLS_PER_POINT, at most
+   // PRESTIGE_KILL_POINTS_PER_DAY a real day. The tiers (GetPrestigeTier) are
+   // at 0, 50, 150, 300 and 500, and each raises the hall chests' limit.
+   PRESTIGE_KILLS_PER_POINT = 50
+   PRESTIGE_KILL_POINTS_PER_DAY = 5
+   CHEST_LIMIT_BASE = 50
+   CHEST_LIMIT_PER_TIER = 25
+
    RENT_BASE = 5
    RENT_SECRET = 10
 
@@ -175,14 +184,18 @@ resources:
    guild_mature = \
       "~B%s%q is now a mature guild, and may now lease a guild hall."
 
+   guild_prestige_tier = \
+      "~B%s%q's prestige has reached %i.  The chests in its hall now hold up "
+      "to %i items each."
+
    guild_hour_rsc = "hour"
    guild_hours_rsc = "hours"
 
    guild_rent_nonpayment = \
-      "~BYour guild has been disbanded for not paying rent!"
+      "~BYour guild has lost its hall for not paying the rent!"
    guild_rent_due = \
       "~BYour guild owes %i in rent.  If this number is not reduced to 0 "
-      "in the next %i %s, your guild will be disbanded."
+      "in the next %i %s, your guild will lose its hall."
 
    guild_new_hall = "~B%s is the new home of %s%q!"
    guild_abandon_hall = "~B%s is no longer the home of %s%q!"
@@ -238,12 +251,12 @@ resources:
       "to the highest-ranking member who is still about, the longest-serving "
       "first."
       "\n\n"
-      "RENT:  It costs me time and money to keep up the paperwork involved "
-      "with your charter, and thus I charge for the service.  Rent is accrued "
-      "at a regular rate, and the rate of increase is affected by many "
-      "factors, including the number of members in your guild and the number "
-      "of enemies and allies you have declared.  The largest affector of rent "
-      "is whether or not you lease a guild hall."
+      "RENT:  Your charter costs nothing to keep.  A guild hall does: while "
+      "your guild leases one, rent is accrued at a regular rate.  The rate "
+      "is affected by the hall itself, the number of members in your guild, "
+      "and the number of enemies and allies you have declared.  Should the "
+      "rent go unpaid too long, I will take the hall back, but your guild "
+      "will go on."
       "\n\n"
       "Incidentally, anyone in your guild can pay me rent owed.  However, to "
       "avoid confusion, it is recommended that you assign one person to "
@@ -264,7 +277,10 @@ resources:
       "\n\n"
       "CHESTS:  Every hall has a common chest for all your members, a "
       "members' chest for rank '%q' and above, and a vault for rank '%q' and "
-      "above.  Only your own members may use them."
+      "above.  Only your own members may use them.  Each holds fifty items "
+      "at first; prestige, which your members earn by hunting together, "
+      "makes room for more.  Say \"prestige\" in the hall to hear where you "
+      "stand."
       "\n\n"
       "THE SANCTUM:  A member of rank '%q' or above who says \"open\" in the "
       "hall opens its secret door."
@@ -278,9 +294,11 @@ resources:
       "stone\" in the hall to take a stone that brings them back to it from "
       "anywhere in Meridian."
       "\n\n"
-      "ALLIES:  If you declare a guild to be an ally, then they may enter "
-      "your guild hall as if it were their own.  This measure of trust also "
-      "lowers your guild's rent."
+      "ALLIES:  If you declare a guild to be an ally, its members of the "
+      "rank named above and higher may come through your hall's door even "
+      "while it is closed to visitors, though your chests stay your own.  "
+      "This measure "
+      "of trust also lowers your guild's rent."
       "\n\n"
       "WAR:  If you declare a guild to be an enemy and that guild likewise "
       "declares yours, you are at war, and the members of either guild may "
@@ -410,6 +428,14 @@ properties:
    piColor1 = XLAT_TO_GRAY
    piColor2 = XLAT_TO_GRAY
    piShield_shape = SHIELDSHAPE_DEFAULT
+
+   // Ours (guild revamp): prestige never decays (AddPrestige). The bonus
+   // kills toward the next point, and the real day the kill points are
+   // counted for.
+   piPrestige = 0
+   piBonusKills = 0
+   piPrestigeKillDay = 0
+   piPrestigeKillPoints = 0
 
    // Information for suing for peace from a mutual guild war.
    ptSuingForPeace = $
@@ -626,6 +652,20 @@ messages:
          piRentCounter = 0;
       }
 
+      // Ours (guild revamp, 2026-10-23): rent is only for a guild hall. A
+      // guild without one owes nothing (rent prepaid stays to its credit),
+      // and unpaid rent costs the guild its hall, not its charter.
+      if piGuild_hall = $
+      {
+         piRentCounter = 0;
+         if piRentDue > 0
+         {
+            piRentDue = 0;
+         }
+
+         return;
+      }
+
       if piRentCounter = 1
       {
          foreach i in plMembers
@@ -633,7 +673,9 @@ messages:
             Post(First(i),@MsgSendUser,#message_rsc=guild_rent_nonpayment);
          }
 
-         Send(self,@Delete,#timerdelete=TRUE);
+         Send(self,@AbandonGuildHall);
+         piRentDue = 0;
+         piRentCounter = 0;
 
          return;
       }
@@ -650,35 +692,18 @@ messages:
          rent = rent + RENT_PER_MEMBER;
       }
 
-      if piGuild_hall <> $
+      rent = rent + Send(Send(self,@GetGuildHall),@GetRentValue)/10;   
+      foreach i in plAllies
       {
-         rent = rent + Send(Send(self,@GetGuildHall),@GetRentValue)/10;   
-         foreach i in plAllies
-         {
-            rent = rent + RENT_PER_ALLY;
-         }
-
-         foreach i in plEnemies
-         {
-            rent = rent + RENT_PER_ENEMY;
-         }
-
-         rent = bound(rent,2,$);
+         rent = rent + RENT_PER_ALLY;
       }
-      else
+
+      foreach i in plEnemies
       {
-         foreach i in plAllies
-         {
-            rent = rent + RENT_PER_ALLY/2;
-         }
-
-         foreach i in plEnemies
-         {
-            rent = rent + RENT_PER_ENEMY/5;
-         }
-
-         rent = bound(rent,2,$);
+         rent = rent + RENT_PER_ENEMY;
       }
+
+      rent = bound(rent,2,$);
 
       piRentDue = piRentDue + rent;
       if piRentCounter = 0
@@ -1607,6 +1632,105 @@ messages:
       }
 
       return oHeir;
+   }
+
+   GetPrestige()
+   {
+      return piPrestige;
+   }
+
+   GetPrestigeTier(prestige=$)
+   "0 to 4, at 0, 50, 150, 300 and 500 prestige."
+   {
+      if prestige = $
+      {
+         prestige = piPrestige;
+      }
+
+      if prestige >= 500
+      {
+         return 4;
+      }
+
+      if prestige >= 300
+      {
+         return 3;
+      }
+
+      if prestige >= 150
+      {
+         return 2;
+      }
+
+      if prestige >= 50
+      {
+         return 1;
+      }
+
+      return 0;
+   }
+
+   GetChestLimit()
+   "How many items each of the hall's chests may hold."
+   {
+      return CHEST_LIMIT_BASE
+         + CHEST_LIMIT_PER_TIER * Send(self,@GetPrestigeTier);
+   }
+
+   AddPrestige(amount=0)
+   {
+      local i, iOldTier;
+
+      if amount <= 0
+      {
+         return;
+      }
+
+      iOldTier = Send(self,@GetPrestigeTier);
+      piPrestige = piPrestige + amount;
+
+      if Send(self,@GetPrestigeTier) > iOldTier
+      {
+         foreach i in plMembers
+         {
+            if Send(First(i),@IsLoggedOn)
+            {
+               Send(First(i),@MsgSendUser,#message_rsc=guild_prestige_tier,
+                     #parm1=Send(self,@GetCapDef),#parm2=Send(self,@GetName),
+                     #parm3=piPrestige,#parm4=Send(self,@GetChestLimit));
+            }
+         }
+      }
+
+      return;
+   }
+
+   GuildBonusKill()
+   "A member earned the guild kill bonus (Player.AdvancementCheck)."
+   {
+      local iDay;
+
+      iDay = GetTime() / (24 * 60 * 60);
+      if iDay <> piPrestigeKillDay
+      {
+         piPrestigeKillDay = iDay;
+         piPrestigeKillPoints = 0;
+      }
+
+      if piPrestigeKillPoints >= PRESTIGE_KILL_POINTS_PER_DAY
+      {
+         return;
+      }
+
+      piBonusKills = piBonusKills + 1;
+      if piBonusKills >= PRESTIGE_KILLS_PER_POINT
+      {
+         piBonusKills = 0;
+         piPrestigeKillPoints = piPrestigeKillPoints + 1;
+         Send(self,@AddPrestige,#amount=1);
+      }
+
+      return;
    }
 
    HasActiveMember()

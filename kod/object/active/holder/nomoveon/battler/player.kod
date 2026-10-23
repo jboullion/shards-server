@@ -73,6 +73,10 @@ constants:
    ADVANCE_TIMER_MAX =   1320000
    ADVANCEMENT_LIMIT =   10
 
+   // Ours (guild revamp): the extra kill XP, in percent, for fighting a
+   // monster with a guildmate (AdvancementCheck, HasGuildmateOn).
+   GUILD_BONUS_XP_PERCENT = 20
+
    PLAYER_TRANSLATION_LEGS_MASK = 0xff
    PLAYER_TRANSLATION_LEGS_MUL = 1
    PLAYER_TRANSLATION_BODY_MASK = 0xff00
@@ -261,6 +265,7 @@ resources:
       "You have received your daily training bonus of ~B%i~B points!  "
       "Come back tomorrow for more!"
    player_experience_gained = "You have gained ~B~s%i~v~B XP."
+   player_guild_bonus_xp = "Guild member questing bonus experience: ~B+%i~n"
    player_experience_lost = "You have lost ~B~r%i~B~v XP!"
 
    player_health_gain_maxed = "Your health cannot increase any further."
@@ -8657,6 +8662,34 @@ messages:
       propagate;
    }
 
+   HasGuildmateOn(what=$)
+   "Ours (guild revamp): is another member of our guild in the room who also "
+   "struck this monster (Monster.WasStruckBy)?  Only one character per "
+   "account can be in the game, so a guildmate is always another account."
+   {
+      local i, each_obj;
+
+      if poGuild = $
+         OR poOwner = $
+      {
+         return FALSE;
+      }
+
+      foreach i in Send(poOwner,@GetHolderActive)
+      {
+         each_obj = Send(poOwner,@HolderExtractObject,#data=i);
+         if each_obj <> self
+            AND IsClass(each_obj,&User)
+            AND Send(each_obj,@GetGuild) = poGuild
+            AND Send(what,@WasStruckBy,#who=each_obj)
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
    ResetGainFlags()
    {
       poKill_target = $;
@@ -8678,7 +8711,7 @@ messages:
    "stamina, all the way down to half for those with high staminas."
    {
       local i, iMaxHealth, dodgeskill, oSkill, monster_level, iXP, oWeapon,
-            iItemBonus, iBonusXP, iBonusTP;
+            iItemBonus, iBonusXP, iBonusTP, iGuildBonus;
 
       iXP = 0;
       iItemBonus = 0;
@@ -8826,6 +8859,18 @@ messages:
          }
 
          iXP = iXP * Bound(Send(SETTINGS_OBJECT,@GetXPPercent),50,1000) / 100;
+
+         // Ours (guild revamp, ADR 0022 decision 21): a fifth more for a
+         // monster killed alongside a guildmate who struck it too, before the
+         // flat bonuses. Arena kills never get here; player kills don't count.
+         iGuildBonus = 0;
+         if iXP > 0
+            AND IsClass(what,&Monster)
+            AND Send(self,@HasGuildmateOn,#what=what)
+         {
+            iGuildBonus = iXP * GUILD_BONUS_XP_PERCENT / 100;
+         }
+
          // Add in XP bonus from items after this.
          iXP += iItemBonus;
 		   iXP += iBonusXP;
@@ -8833,6 +8878,14 @@ messages:
          // AddXP checks for HP gain and redraws the XP bar.
          // NOTE: iMaxHealth could be wrong after this point.
          Send(self,@AddXP,#iAmount=iXP);
+
+         if iGuildBonus > 0
+         {
+            Send(self,@AddXP,#iAmount=iGuildBonus,#report=FALSE);
+            Send(self,@MsgSendUser,#message_rsc=player_guild_bonus_xp,
+                  #parm1=iGuildBonus);
+            Send(poGuild,@GuildBonusKill);
+         }
 
          // Here, we work out if the player deserves a training point.
          // They qualify if they got at least one gain point from the monster,

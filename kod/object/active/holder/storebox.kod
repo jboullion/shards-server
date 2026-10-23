@@ -82,6 +82,12 @@ messages:
       return piGuildRank;
    }
 
+   GetItemCount()
+   "Ours (guild revamp): how many items (a stack counts once) it holds."
+   {
+      return Length(plPassive) + Length(plActive);
+   }
+
    GetGuildChestName()
    {
       if piGuildRank >= RANK_LORD
@@ -269,7 +275,13 @@ messages:
 
       if IsClass(oWhoOwner,&GuildHall)
       {
-         return Send(oWhoOwner,@ReqUseGuildChest,#who=who,#oChest=self);
+         // Ours (guild revamp): the chest's rank, then its room.
+         if NOT Send(oWhoOwner,@ReqUseGuildChest,#who=who,#oChest=self)
+         {
+            return FALSE;
+         }
+
+         return Send(oWhoOwner,@ChestHasRoom,#who=who,#oChest=self);
       }
 
       propagate;
