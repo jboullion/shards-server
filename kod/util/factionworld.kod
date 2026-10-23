@@ -914,7 +914,7 @@ messages:
    ReadLedger(who = $,liege = $)
    "who said 'ledger' to their liege: the LEDGER_SIZE best of the liege's soldiers."
    {
-      local iFaction, i, j, lBest, iScore, lNew, bPlaced, lRecord, iPlace;
+      local iFaction, i, j, lBest, lRecord, iPlace;
 
       iFaction = Send(liege,@GetFaction);
       if Send(who,@GetFaction) <> iFaction
@@ -922,7 +922,37 @@ messages:
          return;
       }
 
-      // The best LEDGER_SIZE, best first: [ score, player ]
+      lBest = Send(self,@LedgerOf,#faction=iFaction);
+      if lBest = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=fw_ledger_empty,
+              #parm1=Send(liege,@GetName));
+
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=fw_ledger_head,#parm1=Send(liege,@GetName));
+      iPlace = 0;
+      foreach j in lBest
+      {
+         iPlace = iPlace + 1;
+         i = Nth(j,2);
+         lRecord = Send(i,@GetWarRecord);
+         Send(who,@MsgSendUser,#message_rsc=fw_ledger_line,#parm1=iPlace,
+              #parm2=Send(i,@GetName),#parm3=Send(i,@GetRenownRankName),
+              #parm4=First(lRecord),#parm5=Nth(lRecord,4),#parm6=Nth(lRecord,3));
+      }
+
+      return;
+   }
+
+   LedgerOf(faction = $)
+   "The LEDGER_SIZE best of faction's soldiers, best first: [ score, player ] (also our "
+   "client's war window, FactionWar.SendWar)."
+   {
+      local iFaction, i, j, lBest, iScore, lNew, bPlaced;
+
+      iFaction = faction;
       lBest = $;
       foreach i in Send(SYS,@GetUsers)
       {
@@ -970,27 +1000,7 @@ messages:
          }
       }
 
-      if lBest = $
-      {
-         Send(who,@MsgSendUser,#message_rsc=fw_ledger_empty,
-              #parm1=Send(liege,@GetName));
-
-         return;
-      }
-
-      Send(who,@MsgSendUser,#message_rsc=fw_ledger_head,#parm1=Send(liege,@GetName));
-      iPlace = 0;
-      foreach j in lBest
-      {
-         iPlace = iPlace + 1;
-         i = Nth(j,2);
-         lRecord = Send(i,@GetWarRecord);
-         Send(who,@MsgSendUser,#message_rsc=fw_ledger_line,#parm1=iPlace,
-              #parm2=Send(i,@GetName),#parm3=Send(i,@GetRenownRankName),
-              #parm4=First(lRecord),#parm5=Nth(lRecord,4),#parm6=Nth(lRecord,3));
-      }
-
-      return;
+      return lBest;
    }
 
 end

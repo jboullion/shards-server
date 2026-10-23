@@ -4153,6 +4153,13 @@ messages:
          return;
       }
 
+      if StringEqual(sVerb,"war")
+      {
+         Send(Send(SYS,@GetFactionWar),@WarCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       if StringEqual(sVerb,"arena")
       {
          Send(Send(SYS,@GetArenaBouts),@ArenaCommand,#who=self,#words=lWords);

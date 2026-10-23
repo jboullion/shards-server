@@ -258,6 +258,9 @@
    // Ours (the magic item revamp, phase 2): a revealed magic item's full name, asked for with
    // UC_SHARDS_OBJECT "magicname" (util/itemservicebook.kod SendMagicName)
    UC_MAGIC_NAME = 119
+   // Ours (the faction revamp, phase 5): the Faction War for our client's war window and
+   // battle banner (util/factionwar.kod SendWar, SendBattle)
+   UC_FACTION_WAR = 120
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

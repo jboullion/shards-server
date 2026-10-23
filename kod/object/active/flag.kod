@@ -1005,6 +1005,12 @@ messages:
       return;
    }
 
+   IsHalfStaff()
+   "Ours (the faction revamp): whether we fly at half-staff, mourning."
+   {
+      return ptHalfStaffOff <> $;
+   }
+
    HalfStaffTimer(timer=$)
    {
       if (timer = $)

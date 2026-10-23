@@ -23,12 +23,23 @@
 //
 // Maintenance port: StartBattle (rid int, attacker int), EndBattle (winner int),
 // AddWarEffort (faction int, amount int), and the settings below.
+//
+// Our client (phase 5): "war" (UC_SHARDS -> WarCommand) asks for UC_FACTION_WAR kind 1, all
+// of it for the war window (SendWar); kind 2, the battle alone, goes to everyone when a battle
+// is called, opens or ends, and every few seconds of a fight, for the battle banner
+// (BroadcastBattle). docs/research/protocol.md has the layout.
 ////////////////////////////////////////////////////////////////////////////////
 FactionWar is UtilityFunctions
 
 constants:
 
    include blakston.khd
+   include protocol.khd
+
+   // UC_FACTION_WAR's kinds of packet, and how often a fight's banner is brought up to date
+   WAR_PKT_ALL = 1
+   WAR_PKT_BATTLE = 2
+   BANNER_SECONDS = 5
 
    STATE_NONE = 0
    STATE_MUSTER = 1
@@ -84,7 +95,9 @@ resources:
    fw_siege_called = "~IYour liege's army will be waiting for you at %s.  Lead it there."
    fw_siege_busy = \
       "~IThe armies are already in the field.  Your liege will march when this battle is done."
-   fw_rally =       "~IYour liege's soldiers close ranks round you.  You have a moment to find your place in "
+   fw_blank = ""
+   fw_rally = \
+      "~IYour liege's soldiers close ranks round you.  You have a moment to find your place in "
       "the line."
    fw_siege_no_target = "~IThere are no walls of that enemy left to besiege."
    fw_siege_won = \
@@ -111,6 +124,8 @@ properties:
    piAttacker = FACTION_NEUTRAL
    piDefender = FACTION_NEUTRAL
    pbOpenGround = FALSE
+   // When the fight's banner was last sent (Tick)
+   piBannerSent = 0
    // A story siege (StartSiege): the player who called it
    pbSiege = FALSE
    poSiegeLeader = $
@@ -538,6 +553,7 @@ messages:
       }
 
       ptStage = CreateTimer(self,@OpenBattle,Bound(piMusterMinutes,0,60) * 60000 + 1);
+      Send(self,@BroadcastBattle);
 
       return TRUE;
    }
@@ -623,6 +639,7 @@ messages:
       Send(who,@MsgSendUser,#message_rsc=fw_siege_called,#parm1=Send(poRoom,@GetName));
 
       ptStage = CreateTimer(self,@OpenBattle,SIEGE_MUSTER_MINUTES * 60000);
+      Send(self,@BroadcastBattle);
 
       return TRUE;
    }
@@ -643,6 +660,8 @@ messages:
            #parm2=Send(self,@LiegeName,#faction=piDefender),
            #parm3=Send(poRoom,@GetName));
 
+      piBannerSent = GetTime();
+      Send(self,@BroadcastBattle);
       Send(self,@Tick);
 
       return;
@@ -687,6 +706,12 @@ messages:
 
          Send(self,@CheckGuards);
          Send(self,@KeepTargets);
+
+         if GetTime() >= piBannerSent + BANNER_SECONDS
+         {
+            piBannerSent = GetTime();
+            Send(self,@BroadcastBattle);
+         }
       }
 
       if GetTime() >= piDeadline
@@ -1435,6 +1460,7 @@ messages:
 
       pbSiege = FALSE;
       poSiegeLeader = $;
+      Send(self,@BroadcastBattle);
 
       return;
    }
@@ -1442,6 +1468,257 @@ messages:
    GetHistory()
    {
       return plHistory;
+   }
+
+   //// Our client: the war window and the battle banner (UC_FACTION_WAR)
+
+   WarCommand(who = $,words = $)
+   "The client's 'war': the war window's all of it."
+   {
+      Send(self,@SendWar,#who=who);
+
+      return;
+   }
+
+   BroadcastBattle()
+   "The battle, to everyone logged on (their banners)."
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         Send(self,@SendBattle,#who=i);
+      }
+
+      return;
+   }
+
+   SendBattle(who = $)
+   "UC_FACTION_WAR kind 2: the battle alone."
+   {
+      local oSession;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_FACTION_WAR,1,WAR_PKT_BATTLE);
+      Send(self,@AddBattlePacket);
+      SendPacket(oSession);
+
+      return;
+   }
+
+   AddBattlePacket()
+   "The battle: state, attacker, defender, flags (1 a siege, 2 the armies are out, 4 open "
+   "ground), its room, the seconds to the clash or left of the fight, each army's troops left "
+   "and raised, and the seconds to the next battle called (0: not known)."
+   {
+      local iFlags, iRID, rName, iSeconds, iNext;
+
+      iFlags = 0;
+      iRID = 0;
+      rName = fw_blank;
+      iSeconds = 0;
+      if piState <> STATE_NONE AND poRoom <> $
+      {
+         if pbSiege
+         {
+            iFlags = iFlags | 1;
+         }
+
+         if pbSpawned
+         {
+            iFlags = iFlags | 2;
+         }
+
+         if pbOpenGround
+         {
+            iFlags = iFlags | 4;
+         }
+
+         iRID = Send(poRoom,@GetRoomNum);
+         rName = Send(poRoom,@GetName);
+         if piState = STATE_MUSTER
+         {
+            if ptStage <> $
+            {
+               iSeconds = GetTimeRemaining(ptStage) / 1000;
+            }
+         }
+         else
+         {
+            iSeconds = Bound(piDeadline - GetTime(),0,$);
+         }
+      }
+
+      iNext = 0;
+      if ptNext <> $
+      {
+         iNext = GetTimeRemaining(ptNext) / 1000;
+      }
+
+      AddPacket(1,piState,1,piAttacker,1,piDefender,1,iFlags,4,iRID,STRING_RESOURCE,rName,
+                2,Bound(iSeconds,0,65535),
+                1,Bound(Length(plAttackArmy),0,255),1,Bound(Length(plDefendArmy),0,255),
+                1,Bound(piAttackRaised,0,255),1,Bound(piDefendRaised,0,255),4,iNext);
+
+      return;
+   }
+
+   SendWar(who = $)
+   "UC_FACTION_WAR kind 1: all of it, for the war window. Ours: faction, renown, rank, record "
+   "[ kills, deaths, fought, won ], flags (1 shield worn, 2 regrouping); the battle; the war "
+   "effort; every flag room [ rid, name, liege, flags: 1 a town's own pole, 2 at half-staff, "
+   "4 the battle's ]; the towns [ rid, name, liege, liege celebrating there ]; the last "
+   "battles [ rid, name, attacker, defender, winner, how, seconds ago ]; our liege's ledger "
+   "[ name, rank, kills, battles won, fought ]."
+   {
+      local oSession, oWorld, oTG, i, j, iFlags, oPole, iFaction, lRecord, lList, iCeleb, oRoom;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      oWorld = Send(self,@GetWorld);
+      oTG = Send(SYS,@GetTerritoryGame);
+      iFaction = Send(who,@GetFaction);
+      lRecord = Send(who,@GetWarRecord);
+      iFlags = 0;
+      if Send(who,@FindUsing,#class=&SoldierShield) <> $
+      {
+         iFlags = iFlags | 1;
+      }
+
+      if Send(who,@IsRegrouping)
+      {
+         iFlags = iFlags | 2;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_FACTION_WAR,1,WAR_PKT_ALL,
+                1,iFaction,1,Send(who,@GetFactionRenown),
+                STRING_RESOURCE,Send(who,@GetRenownRankName),
+                2,First(lRecord),2,Nth(lRecord,2),2,Nth(lRecord,3),2,Nth(lRecord,4),1,iFlags);
+      Send(self,@AddBattlePacket);
+
+      foreach i in [ FACTION_DUKE, FACTION_PRINCESS, FACTION_REBEL ]
+      {
+         AddPacket(1,Bound(Send(self,@GetWarEffort,#faction=i),0,255));
+      }
+
+      // The flag rooms (towns' own poles among them)
+      lList = $;
+      if oTG <> $
+      {
+         foreach i in Send(oTG,@GetFlagRIDs)
+         {
+            oRoom = Send(SYS,@FindRoomByNum,#num=i);
+            if oRoom <> $
+            {
+               oPole = Send(oRoom,@FindHoldingActive,#class=&Flagpole);
+               if oPole <> $
+               {
+                  lList = Cons([ i, oRoom, oPole ],lList);
+               }
+            }
+         }
+      }
+
+      AddPacket(1,Length(lList));
+      foreach i in lList
+      {
+         iFlags = 0;
+         foreach j in Send(oWorld,@TownList)
+         {
+            if First(j) = First(i)
+            {
+               iFlags = iFlags | 1;
+            }
+         }
+
+         if Send(Nth(i,3),@IsHalfStaff)
+         {
+            iFlags = iFlags | 2;
+         }
+
+         if piState <> STATE_NONE AND poRoom = Nth(i,2)
+         {
+            iFlags = iFlags | 4;
+         }
+
+         AddPacket(4,First(i),STRING_RESOURCE,Send(Nth(i,2),@GetName),
+                   1,Send(Nth(i,3),@GetFaction),1,iFlags);
+      }
+
+      // The towns
+      AddPacket(1,Length(Send(oWorld,@TownList)));
+      foreach i in Send(oWorld,@TownList)
+      {
+         iCeleb = FACTION_NEUTRAL;
+         foreach j in [ FACTION_DUKE, FACTION_PRINCESS, FACTION_REBEL ]
+         {
+            if Send(oWorld,@IsCelebrating,#faction=j,#town=First(i))
+            {
+               iCeleb = j;
+            }
+         }
+
+         AddPacket(4,First(i),STRING_RESOURCE,Send(oWorld,@RoomName,#rid=First(i)),
+                   1,Send(oWorld,@TownOwner,#rid=First(i)),1,iCeleb);
+      }
+
+      // The last battles
+      AddPacket(1,Length(plHistory));
+      foreach i in plHistory
+      {
+         oRoom = Send(SYS,@FindRoomByNum,#num=Nth(i,2));
+         if oRoom <> $
+         {
+            AddPacket(4,Nth(i,2),STRING_RESOURCE,Send(oRoom,@GetName));
+         }
+         else
+         {
+            AddPacket(4,Nth(i,2),STRING_RESOURCE,fw_blank);
+         }
+
+         AddPacket(1,Nth(i,3),1,Nth(i,4),1,Nth(i,5),1,Nth(i,6),
+                   4,Bound(GetTime() - First(i),0,$));
+      }
+
+      // Our liege's ledger
+      lList = $;
+      if iFaction > FACTION_NEUTRAL AND iFaction <= FACTION_NORMAL_MAX
+      {
+         lList = Send(oWorld,@LedgerOf,#faction=iFaction);
+      }
+
+      AddPacket(1,Length(lList));
+      foreach i in lList
+      {
+         j = Nth(i,2);
+         lRecord = Send(j,@GetWarRecord);
+         AddPacket(STRING_RESOURCE,Send(j,@GetTrueName),
+                   STRING_RESOURCE,Send(j,@GetRenownRankName),
+                   2,First(lRecord),2,Nth(lRecord,4),2,Nth(lRecord,3));
+      }
+
+      SendPacket(oSession);
+
+      return;
    }
 
    ClearTimers()
