@@ -1,0 +1,33 @@
+{
+  "id": 322,
+  "key": "fallen-daily-muskgate-post",
+  "name": "Rank III: Muskgate Post",
+  "tier": "main",
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank III of VIII. The Order of Necromancers holds Muskgate Post, its door off the Trader's Route by Bergentaal. The Order bound spirits of the northern ice to guard the post, and the frost has not let go of it since. Break its guard, open the sanctum and bring down Hrimvald. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Hrimvald still holds Muskgate Post for the Order.",
+    "complete": "Hrimvald has fallen, and Muskgate Post is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH20",
+      "objective": "Hrimvald brought down in Muskgate Post"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 1000
+  }
+}

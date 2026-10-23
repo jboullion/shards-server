@@ -47,6 +47,7 @@ resources:
 
    room_name_guildh19 = "The Wetland Fortress"
    room_guildh19 = guildh19.roo
+   guildh19_door = "the Marsh"
 
 classvars:
 
@@ -59,6 +60,12 @@ classvars:
    viInner_teleport_col = 24
 
    viTerrain_type = TERRAIN_CASTLE
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 8 of VIII, its daily quest
+   viRank = 8
+   viMin_health = 100
+   viDaily_quest = 327
+   vrDoor = guildh19_door
 
    viGarrison_level = 200
    viBoss_level = 215

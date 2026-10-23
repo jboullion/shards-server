@@ -44,6 +44,7 @@ resources:
 
    room_name_guildh7 = "The Old Dwarven Hall"
    room_guildh7 = guildh7.roo
+   guildh7_door = "the Forest of Farol"
 
 classvars:
 
@@ -56,6 +57,12 @@ classvars:
    viInner_teleport_col = 29
 
    viTerrain_type = TERRAIN_CITY
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 4 of VIII, its daily quest
+   viRank = 4
+   viMin_health = 100
+   viDaily_quest = 323
+   vrDoor = guildh7_door
 
    viGarrison_level = 135
    viBoss_level = 150

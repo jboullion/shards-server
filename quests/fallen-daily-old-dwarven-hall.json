@@ -1,0 +1,33 @@
+{
+  "id": 323,
+  "key": "fallen-daily-old-dwarven-hall",
+  "name": "Rank IV: The Old Dwarven Hall",
+  "tier": "main",
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank IV of VIII. The Order of Necromancers holds the Old Dwarven Hall, its door off the Forest of Farol. The Order broke the dwarves' tombs and raised their dead to guard its plunder, their own Thane among them. Break its guard, open the sanctum and bring down Thane Durrek. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Thane Durrek still holds the Old Dwarven Hall for the Order.",
+    "complete": "Thane Durrek has fallen, and the Old Dwarven Hall is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH7",
+      "objective": "Thane Durrek brought down in the Old Dwarven Hall"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.65,
+    "shillings": 1250
+  }
+}

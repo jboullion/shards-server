@@ -1,0 +1,33 @@
+{
+  "id": 324,
+  "key": "fallen-daily-abandoned-warehouse",
+  "name": "Rank V: The Abandoned Warehouse",
+  "tier": "main",
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank V of VIII. The Order of Necromancers holds the Abandoned Warehouse, its door off the Ports of Barloque. Vesk's bandits smuggle the Order's relics through the warehouse, with its soldiers and mages to keep them honest. Break its guard, open the sanctum and bring down Captain Vesk. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Captain Vesk still holds the Abandoned Warehouse for the Order.",
+    "complete": "Captain Vesk has fallen, and the Abandoned Warehouse is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH9",
+      "objective": "Captain Vesk brought down in the Abandoned Warehouse"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.7,
+    "shillings": 1500
+  }
+}

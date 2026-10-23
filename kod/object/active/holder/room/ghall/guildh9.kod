@@ -31,6 +31,7 @@ resources:
 
    room_name_guildh9 = "The Abandoned Warehouse"
    room_guildh9 = guildh9.roo
+   guildh9_door = "the Ports of Barloque"
 
 classvars:
 
@@ -40,6 +41,12 @@ classvars:
    viTeleport_col = 19
 
    viTerrain_type = TERRAIN_CITY
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 5 of VIII, its daily quest
+   viRank = 5
+   viMin_health = 100
+   viDaily_quest = 324
+   vrDoor = guildh9_door
 
    viGarrison_level = 150
    viBoss_level = 165

@@ -1,0 +1,33 @@
+{
+  "id": 326,
+  "key": "fallen-daily-slaughtered-command",
+  "name": "Rank VII: The Hall of the Slaughtered Command",
+  "tier": "main",
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank VII of VIII. The Order of Necromancers holds the Hall of the Slaughtered Command, its door off Ko'catan. The Order raised the Command's own dead, and its marshal holds the hall where his soldiers fell. Break its guard, open the sanctum and bring down Marshal Corvane. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Marshal Corvane still holds the Hall of the Slaughtered Command for the Order.",
+    "complete": "Marshal Corvane has fallen, and the Hall of the Slaughtered Command is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH13",
+      "objective": "Marshal Corvane brought down in the Hall of the Slaughtered Command"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.8,
+    "shillings": 2000
+  }
+}

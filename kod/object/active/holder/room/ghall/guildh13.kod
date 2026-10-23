@@ -35,6 +35,7 @@ resources:
 
    room_name_guildh13 = "The Hall of the Slaughtered Command"
    room_guildh13 = guildh13.roo
+   guildh13_door = "Ko'catan"
 
    guildh13_locked = "The door is firmly locked"
    guildh13_sanctum_opens = \
@@ -58,6 +59,12 @@ classvars:
    viInner_teleport_col = 28
 
    vrSanctum_opens = guildh13_sanctum_opens
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 7 of VIII, its daily quest
+   viRank = 7
+   viMin_health = 100
+   viDaily_quest = 326
+   vrDoor = guildh13_door
 
    viGarrison_level = 185
    viBoss_level = 200

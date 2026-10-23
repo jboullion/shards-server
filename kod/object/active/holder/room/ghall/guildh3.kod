@@ -38,6 +38,7 @@ resources:
 
    room_name_guildhall3 = "The Den of Shadows"
    room_guildhall3 = guildh3.roo
+   guildh3_door = "the Lake of Jala's Song"
 
 classvars:
 
@@ -47,6 +48,12 @@ classvars:
    viTeleport_col = 4
 
    viTerrain_type = TERRAIN_CAVES | TERRAIN_RIVER
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 1 of VIII, its daily quest
+   viRank = 1
+   viMin_health = 80
+   viDaily_quest = 320
+   vrDoor = guildh3_door
 
    viGarrison_level = 90
    viBoss_level = 105

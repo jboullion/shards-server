@@ -33,6 +33,7 @@ resources:
 
    room_name_guildh20 = "Muskgate Post"
    room_guildh20 = guildh20.roo
+   guildh20_door = "the Trader's Route by Bergentaal"
 
    guildh20_sanctum_opens = \
       "~BWith the last of the hall's guard fallen, the lift in the west wall "
@@ -50,6 +51,12 @@ classvars:
    viInner_teleport_col = 17
 
    vrSanctum_opens = guildh20_sanctum_opens
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 3 of VIII, its daily quest
+   viRank = 3
+   viMin_health = 100
+   viDaily_quest = 322
+   vrDoor = guildh20_door
 
    viGarrison_level = 120
    viBoss_level = 135

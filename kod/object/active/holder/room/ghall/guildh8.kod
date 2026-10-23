@@ -43,6 +43,7 @@ resources:
 
    room_name_guildh8 = "The Sewer Hideout"
    room_guildh8 = guildh8.roo
+   guildh8_door = "the Sewers of Barloque"
 
    guildh8_entrancedoor_open_sound = woodup1.ogg
    guildh8_entrancedoor_close_sound = wooddn1.ogg
@@ -55,6 +56,12 @@ classvars:
    viTeleport_col = 9
 
    viTerrain_type = TERRAIN_SEWERS
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 6 of VIII, its daily quest
+   viRank = 6
+   viMin_health = 100
+   viDaily_quest = 325
+   vrDoor = guildh8_door
 
    viGarrison_level = 165
    viBoss_level = 180

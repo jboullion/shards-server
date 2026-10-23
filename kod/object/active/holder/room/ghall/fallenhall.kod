@@ -70,6 +70,16 @@ resources:
    fallenhall_prestige = \
       "~B%s%q gains %i prestige for the fall of %s%s."
 
+   // Ours (ADR 0022 decision 33): told to everyone online as a hall falls
+   fallenhall_announce_guild = \
+      "~B~k[Halls]~n ~B%s%q has driven the Order of Necromancers from %s."
+   fallenhall_announce_guilds = \
+      "~B~k[Halls]~n ~B%s%q and their allies have driven the Order of "
+      "Necromancers from %s."
+   fallenhall_announce_player = \
+      "~B~k[Halls]~n ~B%s has driven the Order of Necromancers from %s."
+   fallenhall_door_unknown = ""
+
    fallenhall_entrancedoor_open_sound = doorrsup.ogg
    fallenhall_entrancedoor_close_sound = doordown.ogg
 
@@ -90,6 +100,14 @@ classvars:
 
    // The prize's difficulty, 1 to 10 (TreasureType.GenerateItemAtt).
    viPrize_seed = 8
+
+   // For the guild window (FallenHalls.SendHalls; ADR 0022 decisions 30 and 32): the hall's
+   // difficulty rank (I to VIII), the base health its daily quest asks, that quest's id, and
+   // where its door is.
+   viRank = 0
+   viMin_health = 100
+   viDaily_quest = 0
+   vrDoor = fallenhall_door_unknown
 
    // Told to everyone in the hall as the sanctum opens (%s%s, the boss).
    vrSanctum_opens = fallenhall_sanctum_opens
@@ -121,6 +139,11 @@ properties:
    // The day turned with players inside: reset once the last leaves.
    pbResetDue = FALSE
    pbResetting = FALSE
+
+   // Who cleared the hall since its reset: the guild that struck the boss (the first, if
+   // several), or with none a player who did (ADR 0022 decision 32)
+   poClearedGuild = $
+   poClearedBy = $
 
 messages:
 
@@ -156,6 +179,36 @@ messages:
    GetState()
    {
       return piState;
+   }
+
+   GetRank()
+   {
+      return viRank;
+   }
+
+   GetMinHealth()
+   {
+      return viMin_health;
+   }
+
+   GetDailyQuest()
+   {
+      return viDaily_quest;
+   }
+
+   GetDoor()
+   {
+      return vrDoor;
+   }
+
+   GetClearedGuild()
+   {
+      return poClearedGuild;
+   }
+
+   GetClearedBy()
+   {
+      return poClearedBy;
    }
 
    GetBoss()
@@ -313,6 +366,7 @@ messages:
 
       piState = STATE_SANCTUM;
       Send(self,@OpenSanctum);
+      Post(Send(SYS,@GetFallenHalls),@Broadcast);
 
       if poBoss <> $
       {
@@ -338,22 +392,29 @@ messages:
 
    BossSlain(oBoss = $)
    "Each guild with a member here who struck the boss gains BOSS_PRESTIGE, "
-   "once (spells count: Monster.WasStruckBy)."
+   "once (spells count: Monster.WasStruckBy). Each player here who struck it "
+   "has it counted for their quests (QuestBook.FallenHallCleared: the daily "
+   "hall quests), and everyone online hears who cleared the hall."
    {
-      local i, each_obj, oGuild, lGuilds;
+      local i, each_obj, oGuild, lGuilds, oStriker, oQuests, oHalls;
 
       SendListByClass(plActive,1,&User,@MsgSendUser,
             #message_rsc=fallenhall_boss_slain,
             #parm1=Send(oBoss,@GetCapDef),#parm2=Send(oBoss,@GetName),
             #parm3=vrName);
 
+      oQuests = Send(SYS,@GetQuestBook);
       lGuilds = $;
+      oStriker = $;
       foreach i in plActive
       {
          each_obj = Send(self,@HolderExtractObject,#data=i);
          if IsClass(each_obj,&Player)
             AND Send(oBoss,@WasStruckBy,#who=each_obj)
          {
+            oStriker = each_obj;
+            Send(oQuests,@FallenHallCleared,#who=each_obj,#rid=piRoom_num);
+
             oGuild = Send(each_obj,@GetGuild);
             if oGuild <> $
                AND FindListElem(lGuilds,oGuild) = 0
@@ -362,6 +423,36 @@ messages:
             }
          }
       }
+
+      // Who cleared it, for the guild window and the announcement
+      poClearedGuild = $;
+      poClearedBy = oStriker;
+      oHalls = Send(SYS,@GetFallenHalls);
+      // A guild with no name (made over the maintenance port) is told of as no guild
+      if lGuilds <> $
+         AND Send(First(lGuilds),@GetName) <> $
+      {
+         poClearedGuild = First(lGuilds);
+         if Length(lGuilds) > 1
+         {
+            Send(oHalls,@Announce,#rsc=fallenhall_announce_guilds,
+                  #parm1=Send(poClearedGuild,@GetCapDef),
+                  #parm2=Send(poClearedGuild,@GetName),#parm3=vrName);
+         }
+         else
+         {
+            Send(oHalls,@Announce,#rsc=fallenhall_announce_guild,
+                  #parm1=Send(poClearedGuild,@GetCapDef),
+                  #parm2=Send(poClearedGuild,@GetName),#parm3=vrName);
+         }
+      }
+      else if oStriker <> $
+      {
+         Send(oHalls,@Announce,#rsc=fallenhall_announce_player,
+               #parm1=Send(oStriker,@GetTrueName),#parm2=vrName);
+      }
+
+      Post(oHalls,@Broadcast);
 
       foreach oGuild in lGuilds
       {
@@ -429,6 +520,9 @@ messages:
 
       piState = STATE_READY;
       pbResetDue = FALSE;
+      poClearedGuild = $;
+      poClearedBy = $;
+      Post(Send(SYS,@GetFallenHalls),@Broadcast);
 
       return;
    }

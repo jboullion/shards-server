@@ -1,0 +1,33 @@
+{
+  "id": 327,
+  "key": "fallen-daily-wetland-fortress",
+  "name": "Rank VIII: The Wetland Fortress",
+  "tier": "main",
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank VIII of VIII. The Order of Necromancers holds the Wetland Fortress, its door off the Marsh. The highest of Queen Venya'cyr's lieutenants holds the fortress on the swamp's edge, the hardest of the Fallen Halls. Break its guard, open the sanctum and bring down Lieutenant Morvaine. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Lieutenant Morvaine still holds the Wetland Fortress for the Order.",
+    "complete": "Lieutenant Morvaine has fallen, and the Wetland Fortress is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH19",
+      "objective": "Lieutenant Morvaine brought down in the Wetland Fortress"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.85,
+    "shillings": 2250
+  }
+}

@@ -15,13 +15,27 @@ FallenHalls is UtilityFunctions
 // SYS@GetFallenHalls, made on demand. Each hall adds itself as it is made, and
 // each Meridian day (System.NewGameDay) every hall is told to reset.
 //
+// Our client's guild window (decision 32): "halls" (UC_SHARDS -> HallsCommand)
+// asks for UC_FALLEN_HALLS, every hall and the player's daily quest for each
+// (SendHalls). It's pushed to every guild member online whenever a hall
+// changes: its sanctum opens, it's cleared, it resets (Broadcast). As a hall
+// falls, everyone online is told (Announce, decision 33). docs/research/
+// protocol.md has the layout.
+//
 // Maintenance port: send object <this> NewGameDay resets them all now.
 
 constants:
 
    include blakston.khd
+   include protocol.khd
+
+   // A Meridian day is two real hours (System.RecalcWeatherConditions works
+   // the hour out the same way)
+   GAME_DAY_SECONDS = 7200
 
 resources:
+
+   fallenhalls_blank = ""
 
 classvars:
 
@@ -64,6 +78,135 @@ messages:
       foreach i in plHalls
       {
          Send(i,@NewGameDay);
+      }
+
+      return;
+   }
+
+   //// Our client's guild window
+
+   SecondsToReset()
+   "Until the next Meridian day, when the halls reset (System.NewGameDay)."
+   {
+      return GAME_DAY_SECONDS - ((GetTime() - 5 * HOUR) % GAME_DAY_SECONDS);
+   }
+
+   HallsCommand(who = $,words = $)
+   "\"halls\": the guild window asks for the Fallen Halls."
+   {
+      Send(self,@SendHalls,#who=who);
+
+      return;
+   }
+
+   SortedHalls()
+   "The halls by rank, I to VIII."
+   {
+      local i, iRank, lOut;
+
+      lOut = $;
+      iRank = 1;
+      while iRank <= 10
+      {
+         foreach i in plHalls
+         {
+            if Send(i,@GetRank) = iRank
+            {
+               lOut = AppendListElem(i,lOut);
+            }
+         }
+
+         iRank = iRank + 1;
+      }
+
+      return lOut;
+   }
+
+   SendHalls(who = $)
+   "UC_FALLEN_HALLS: the seconds to the next reset and a count, then each hall: its room "
+   "number, rank, the health its daily asks, name, where its door is, state (FallenHall's "
+   "STATE_*: 0 ready, 1 held, 2 its sanctum open, 3 cleared), who cleared it (a guild's name, "
+   "else a player's, else blank), and the daily quest's id, its state for who (QuestBook."
+   "BoardState: 0 not offered, 1 offered, 2 taken, 3 done) and seconds until it's offered "
+   "again."
+   {
+      local i, oSession, lHalls, lDaily, oGuild, oBy, sBy, oQuests;
+
+      if who = $
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      oQuests = Send(SYS,@GetQuestBook);
+      lHalls = Send(self,@SortedHalls);
+      AddPacket(1,BP_USERCOMMAND,1,UC_FALLEN_HALLS,4,Send(self,@SecondsToReset),
+                1,Bound(Length(lHalls),0,255));
+      foreach i in lHalls
+      {
+         sBy = fallenhalls_blank;
+         oGuild = Send(i,@GetClearedGuild);
+         oBy = Send(i,@GetClearedBy);
+         if oGuild <> $
+         {
+            sBy = Send(oGuild,@GetName);
+         }
+         else if oBy <> $
+         {
+            sBy = Send(oBy,@GetTrueName);
+         }
+
+         if sBy = $
+         {
+            sBy = fallenhalls_blank;
+         }
+
+         lDaily = [ 0, 0 ];
+         if Send(i,@GetDailyQuest) > 0
+         {
+            lDaily = Send(oQuests,@BoardState,#who=who,#id=Send(i,@GetDailyQuest));
+         }
+
+         AddPacket(4,Send(i,@GetRoomNum),1,Send(i,@GetRank),2,Send(i,@GetMinHealth),
+                   STRING_RESOURCE,Send(i,@GetName),STRING_RESOURCE,Send(i,@GetDoor),
+                   1,Send(i,@GetState),STRING_RESOURCE,sBy,
+                   4,Send(i,@GetDailyQuest),1,First(lDaily),4,Nth(lDaily,2));
+      }
+      SendPacket(oSession);
+
+      return;
+   }
+
+   Broadcast()
+   "A hall changed: every guild member online gets the halls again."
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         if Send(i,@GetGuild) <> $
+         {
+            Send(self,@SendHalls,#who=i);
+         }
+      }
+
+      return;
+   }
+
+   Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $,parm5 = $)
+   "Everyone online is told (as FactionWar.Announce)."
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         Send(i,@MsgSendUser,#message_rsc=rsc,#parm1=parm1,#parm2=parm2,#parm3=parm3,
+              #parm4=parm4,#parm5=parm5);
       }
 
       return;

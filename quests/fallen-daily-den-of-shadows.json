@@ -1,0 +1,33 @@
+{
+  "id": 320,
+  "key": "fallen-daily-den-of-shadows",
+  "name": "Rank I: The Den of Shadows",
+  "tier": "main",
+  "band": {
+    "min": 80,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank I of VIII. The Order of Necromancers holds the Den of Shadows, its door off the Lake of Jala's Song. Her illusionists and the shadowbeasts they keep hold the old guild's caves. Break its guard, open the sanctum and bring down Mistress Ysolde. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Mistress Ysolde still holds the Den of Shadows for the Order.",
+    "complete": "Mistress Ysolde has fallen, and the Den of Shadows is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH3",
+      "objective": "Mistress Ysolde brought down in the Den of Shadows"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 500
+  }
+}

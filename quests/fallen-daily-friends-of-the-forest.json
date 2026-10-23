@@ -1,0 +1,33 @@
+{
+  "id": 321,
+  "key": "fallen-daily-friends-of-the-forest",
+  "name": "Rank II: The home of the Friends of the Forest",
+  "tier": "main",
+  "band": {
+    "min": 90,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank II of VIII. The Order of Necromancers holds the home of the Friends of the Forest, its door off the Source of the River Ille. The grove the Friends tended is diseased now, and its eldest tree has turned on anything that lives. Break its guard, open the sanctum and bring down Old Blackroot. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Old Blackroot still holds the home of the Friends of the Forest for the Order.",
+    "complete": "Old Blackroot has fallen, and the home of the Friends of the Forest is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH11",
+      "objective": "Old Blackroot brought down in the home of the Friends of the Forest"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.55,
+    "shillings": 750
+  }
+}

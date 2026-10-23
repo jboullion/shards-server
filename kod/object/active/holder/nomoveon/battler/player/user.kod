@@ -4160,6 +4160,14 @@ messages:
          return;
       }
 
+      // Ours (guild revamp, ADR 0022 decision 32): the guild window's Fallen Halls
+      if StringEqual(sVerb,"halls")
+      {
+         Send(Send(SYS,@GetFallenHalls),@HallsCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       if StringEqual(sVerb,"arena")
       {
          Send(Send(SYS,@GetArenaBouts),@ArenaCommand,#who=self,#words=lWords);

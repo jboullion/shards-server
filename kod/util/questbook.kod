@@ -75,6 +75,12 @@ constants:
    // Ours: never offered by an NPC; it starts by itself on a death (a quest file's "start":
    // "death", PlayerDied)
    QBQ_ON_DEATH = 32
+   // Ours (guild revamp, ADR 0022 decision 31): only for a guild's members (a quest file's
+   // "requires": {"inGuild": true})
+   QBQ_IN_GUILD = 64
+   // Ours (the same): never offered by an NPC; taken from the guild window, the guild's board
+   // (a quest file's "start": "guild"; "quest board", BoardAccept)
+   QBQ_ON_BOARD = 128
 
    // A step's fields
    QBS_KIND = 1
@@ -113,6 +119,9 @@ constants:
    // Ours (the faction revamp's battles): war effort for the player's faction's next battle
    // (util/factionwar.kod), its number the points
    QRW_WAR_EFFORT = 5
+   // Ours (guild revamp, ADR 0022 decision 31): prestige for the player's guild, its number
+   // the amount (Guild.AddPrestige)
+   QRW_PRESTIGE = 6
 
    // Step kinds (tools/quests/validate.ts KIND_NUM)
    QK_KILL = 1
@@ -155,6 +164,9 @@ constants:
    // one's liege on this step calls it: FactionWar.StartSiege)
    QK_BATTLE = 22
    QK_SIEGE = 23
+   // Ours (guild revamp, ADR 0022 decision 31): being there when a Fallen Hall's boss falls,
+   // having struck it (FallenHall.BossSlain); the amount is the hall's room number, 0 any
+   QK_FALLEN = 24
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -467,10 +479,10 @@ messages:
       return FALSE;
    }
 
-   CanOffer(who = $,qrow = $,death = FALSE)
+   CanOffer(who = $,qrow = $,death = FALSE,board = FALSE)
    "QO_OFFER if this quest is offered to who now, QO_SOON if only their health keeps them from "
    "it (and not by much), else QO_NONE. death: asked by PlayerDied, for the quests that start on "
-   "a death."
+   "a death. board: asked for the guild's board (the guild window), for the quests taken there."
    {
       local i, lDone, iHealth, iKarma, iMin, iFaction, lStep;
 
@@ -531,7 +543,8 @@ messages:
          return QO_NONE;
       }
 
-      if NOT Send(self,@MeetsNeeds,#who=who,#needs=Nth(qrow,QB_NEEDS),#death=death)
+      if NOT Send(self,@MeetsNeeds,#who=who,#needs=Nth(qrow,QB_NEEDS),#death=death,
+                  #board=board)
       {
          return QO_NONE;
       }
@@ -574,15 +587,16 @@ messages:
       return QO_OFFER;
    }
 
-   MeetsNeeds(who = $,needs = 0,death = FALSE)
+   MeetsNeeds(who = $,needs = 0,death = FALSE,board = FALSE)
    "Whether who has what QB_NEEDS asks: of interest to the court, a guild master, a guild shield, "
-   "no guild. A quest that starts on a death is only for PlayerDied (death)."
+   "no guild, any guild. A quest that starts on a death is only for PlayerDied (death), and one "
+   "taken from the guild's board only for it (board)."
    {
       local oGuild;
 
       if needs = $ OR needs = 0
       {
-         return NOT death;
+         return NOT death AND NOT board;
       }
 
       if needs & QBQ_PAUSED
@@ -591,6 +605,16 @@ messages:
       }
 
       if ((needs & QBQ_ON_DEATH) <> 0) <> death
+      {
+         return FALSE;
+      }
+
+      if ((needs & QBQ_ON_BOARD) <> 0) <> board
+      {
+         return FALSE;
+      }
+
+      if (needs & QBQ_IN_GUILD) AND Send(who,@GetGuild) = $
       {
          return FALSE;
       }
@@ -869,7 +893,8 @@ messages:
    }
 
    QuestCommand(who = $,words = $)
-   "The client's quest commands (UC_SHARDS): accept, turnin, offers, abandon, log."
+   "The client's quest commands (UC_SHARDS): accept, turnin, offers, abandon, log, and the "
+   "guild window's board and board-accept."
    {
       local sVerb, iId, oNpc;
 
@@ -898,6 +923,14 @@ messages:
          return;
       }
 
+      // Ours (guild revamp): the guild's board needs no NPC
+      if StringEqual(sVerb,"board")
+      {
+         Send(self,@SendBoard,#who=who);
+
+         return;
+      }
+
       if Length(words) < 3
       {
          return;
@@ -907,6 +940,13 @@ messages:
       if StringEqual(sVerb,"abandon")
       {
          Send(self,@Abandon,#who=who,#id=iId);
+
+         return;
+      }
+
+      if StringEqual(sVerb,"board-accept")
+      {
+         Send(self,@BoardAccept,#who=who,#id=iId);
 
          return;
       }
@@ -1155,6 +1195,118 @@ messages:
       Send(self,@StartQuest,#who=who,#qrow=lQuest);
 
       return;
+   }
+
+   //// Ours (guild revamp, ADR 0022 decision 31): the guild's board, the quests taken from the
+   //// guild window rather than an NPC (QBQ_ON_BOARD)
+
+   BoardOffers(who = $)
+   "The board's quests who may take now: [ id, QO_* ] each (QO_SOON too)."
+   {
+      local i, iOffer, lOut;
+
+      lOut = $;
+      Send(self,@EnsureLoaded);
+      foreach i in plQuests
+      {
+         if Nth(i,QB_NEEDS) <> $ AND (Nth(i,QB_NEEDS) & QBQ_ON_BOARD)
+         {
+            iOffer = Send(self,@CanOffer,#who=who,#qrow=i,#board=TRUE);
+            if iOffer <> QO_NONE
+            {
+               lOut = AppendListElem([First(i),iOffer],lOut);
+            }
+         }
+      }
+
+      return lOut;
+   }
+
+   SendBoard(who = $)
+   "UC_QUEST_OFFERS for the board: no NPC (0), then each quest as id, QO_* and step 1."
+   {
+      local i, lOffers, oSession;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lOffers = Send(self,@BoardOffers,#who=who);
+      AddPacket(1,BP_USERCOMMAND,1,UC_QUEST_OFFERS,4,0,1,Length(lOffers));
+      foreach i in lOffers
+      {
+         AddPacket(4,First(i),1,Nth(i,2),1,1);
+      }
+      SendPacket(oSession);
+
+      return;
+   }
+
+   BoardAccept(who = $,id = $)
+   "\"quest board-accept <id>\": take on one of the board's quests."
+   {
+      local lQuest;
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest = $
+         OR Nth(lQuest,QB_NEEDS) = $
+         OR (Nth(lQuest,QB_NEEDS) & QBQ_ON_BOARD) = 0
+         OR Send(self,@CanOffer,#who=who,#qrow=lQuest,#board=TRUE) <> QO_OFFER
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_cant);
+
+         return;
+      }
+
+      if Send(self,@ActiveCount,#who=who) >= QUEST_MAX_ACTIVE
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_full);
+
+         return;
+      }
+
+      Send(self,@StartQuest,#who=who,#qrow=lQuest);
+      // The guild window shows the halls' daily quests
+      Send(Send(SYS,@GetFallenHalls),@SendHalls,#who=who);
+
+      return;
+   }
+
+   BoardState(who = $,id = $)
+   "For the guild window: a board quest's state for who. 0 not offered, 1 offered, 2 taken, 3 "
+   "done (and waiting on its cooldown), with the seconds until it's offered again."
+   {
+      local lQuest, lDone, iLeft;
+
+      lQuest = Send(self,@GetQuest,#id=id);
+      if lQuest = $
+      {
+         return [ 0, 0 ];
+      }
+
+      if Send(self,@LogEntry,#who=who,#id=id) <> $
+      {
+         return [ 2, 0 ];
+      }
+
+      if Send(self,@CanOffer,#who=who,#qrow=lQuest,#board=TRUE) = QO_OFFER
+      {
+         return [ 1, 0 ];
+      }
+
+      lDone = Send(self,@DoneEntry,#who=who,#id=id);
+      if lDone <> $ AND Nth(lQuest,QB_COOLDOWN) <> $
+      {
+         iLeft = Nth(lQuest,QB_COOLDOWN) - (GetTime() - Nth(lDone,QBD_LAST));
+         if iLeft > 0
+         {
+            return [ 3, iLeft ];
+         }
+      }
+
+      return [ 0, 0 ];
    }
 
    PlayerDied(who = $)
@@ -1440,6 +1592,16 @@ messages:
       {
          // Posted, so a quest that also joins a faction gives renown with the new one
          Post(who,@AddFactionRenown,#amount=num);
+
+         return;
+      }
+
+      if kind = QRW_PRESTIGE
+      {
+         if Send(who,@GetGuild) <> $
+         {
+            Send(Send(who,@GetGuild),@AddPrestige,#amount=num);
+         }
 
          return;
       }
@@ -1803,6 +1965,12 @@ messages:
          return what AND (Nth(step,QBS_AMOUNT) = 0 OR Nth(step,QBS_AMOUNT) = num);
       }
 
+      // fallen: the hall the step names (num, its room number), or any
+      if Nth(step,QBS_KIND) = QK_FALLEN
+      {
+         return Nth(step,QBS_AMOUNT) = 0 OR Nth(step,QBS_AMOUNT) = num;
+      }
+
       if Nth(step,QBS_KIND) = QK_STASH
       {
          // what is the list of items left; any one of the class will do
@@ -1884,6 +2052,15 @@ messages:
    "FactionWar.Resolve: who stood in a story siege on against's capital (QK_SIEGE)."
    {
       Send(self,@ActionDone,#who=who,#kind=QK_SIEGE,#what=won,#num=against);
+
+      return;
+   }
+
+   FallenHallCleared(who = $,rid = 0)
+   "Ours (guild revamp): FallenHall.BossSlain: who was there when the hall's boss fell, having "
+   "struck it (QK_FALLEN)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_FALLEN,#num=rid);
 
       return;
    }

@@ -33,6 +33,7 @@ resources:
 
    room_name_guildh11 = "The home of the Friends of the Forest"
    room_guildh11 = guildh11.roo
+   guildh11_door = "the Source of the River Ille"
 
    guildh11_forest_sound = ambcntry.ogg
 
@@ -44,6 +45,12 @@ classvars:
    viTeleport_col = 16
 
    viTerrain_type = TERRAIN_FOREST
+
+   // The guild window (ADR 0022 decisions 30 and 32): rank 2 of VIII, its daily quest
+   viRank = 2
+   viMin_health = 90
+   viDaily_quest = 321
+   vrDoor = guildh11_door
 
    viGarrison_level = 105
    viBoss_level = 120

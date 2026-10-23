@@ -261,6 +261,9 @@
    // Ours (the faction revamp, phase 5): the Faction War for our client's war window and
    // battle banner (util/factionwar.kod SendWar, SendBattle)
    UC_FACTION_WAR = 120
+   // Ours (guild revamp, ADR 0022 decision 32): the Fallen Halls for our client's guild window
+   // (util/fallenhalls.kod SendHalls)
+   UC_FALLEN_HALLS = 121
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

@@ -1,0 +1,33 @@
+{
+  "id": 325,
+  "key": "fallen-daily-sewer-hideout",
+  "name": "Rank VI: The Sewer Hideout",
+  "tier": "main",
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "inGuild": true
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "start": "guild",
+  "text": {
+    "offer": "An End Game dungeon, rank VI of VIII. The Order of Necromancers holds the Sewer Hideout, its door off the Sewers of Barloque. The Order feeds the lupoggs and dusk rats of the sewers, and the biggest of them keeps the hideout for it. Break its guard, open the sanctum and bring down Grisk, the Sewer King. The Order returns with every Meridian day, and you may take this on once a day.",
+    "progress": "Grisk, the Sewer King still holds the Sewer Hideout for the Order.",
+    "complete": "Grisk, the Sewer King has fallen, and the Sewer Hideout is free of the Order until the new day."
+  },
+  "steps": [
+    {
+      "kind": "fallen",
+      "hall": "RID_GUILDH8",
+      "objective": "Grisk, the Sewer King brought down in the Sewer Hideout"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 1750
+  }
+}
