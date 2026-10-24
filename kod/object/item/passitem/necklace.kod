@@ -34,10 +34,8 @@ messages:
          OR IsClass (what,&JalaNecklace)
          AND NOT IsClass(what,&NecromancerAmulet)
       {
-         // Try to remove ourselves, unless we're cursed.
-         // This is to avoid problems with the Amulets of Shadow exploits.
-         if NOT send(self,@IsCursed)
-            AND Send(poOwner,@TryUnuseItem,#what=self)
+         // Try to remove ourselves.
+         if Send(poOwner,@TryUnuseItem,#what=self)
          {
             propagate;
          }

@@ -157,8 +157,8 @@ messages:
       {
          if Send(victim,@IsUndead)
          {
-            // Automatically do extra half damage to undead.
-            iDamage = 2/iDamage;
+            // Ours: half damage to undead, who resist Qor's energy (this was 2/iDamage).
+            iDamage = iDamage/2;
          }
          else
          {

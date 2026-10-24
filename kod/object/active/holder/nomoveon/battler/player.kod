@@ -11521,39 +11521,6 @@ messages:
       return;
    }
 
-   IsCursedByItems()
-   "Returns TRUE if player is using an item that's cursed, FALSE otherwise."
-   {
-      local i;
-
-      foreach i in plUsing
-      {
-         if Send(i,@IsCursed)
-         {
-            return TRUE;
-         }
-      }
-
-      return FALSE;
-   }
-
-   RemoveCurseAllItems()
-   "Returns TRUE if the player has a cursed item stripped away, FALSE if not."
-   {
-      local i, bFound;
-
-      bFound = FALSE;
-      foreach i in plUsing
-      {
-         if Send(i,@IsCursed)
-         {
-            Send(self,@UnuseItem,#what=i);
-            bFound = TRUE;
-         }
-      }
-
-      return bFound;
-   }
 
    GetArmor()
    "If plUsing holds any armor, return that object."

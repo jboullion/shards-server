@@ -19,6 +19,8 @@ constants:
 
 resources:
 
+   radproj_dancing_rsc = "You can't call down a storm while you're dancing!"
+
 classvars:
 
    vrRadius_Icon = $
@@ -55,6 +57,20 @@ properties:
    piNumber = 8
 
 messages:
+
+   CanPayCosts(who=$,lTargets=$,bItemCast=FALSE)
+   "Ours: Fire Storm and Ice Nova checked for Jig in CastSpell, after the "
+   "mana and reagents were spent."
+   {
+      if Send(who,@IsEnchanted,#what=Send(SYS,@FindSpellByNum,#num=SID_JIG))
+      {
+         Send(who,@MsgSendUser,#message_rsc=radproj_dancing_rsc);
+
+         return FALSE;
+      }
+
+      propagate;
+   }
 
    GetNumSpellTargets()
    {

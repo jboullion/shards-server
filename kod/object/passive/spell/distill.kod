@@ -298,10 +298,11 @@ messages:
       iPotionPower = iPotionPower + Random(-20,(iSpellPower/10));
       iPotionPower = Bound(iPotionPower,5,SPELLPOWER_MAXIMUM);
 
-      // Potion has duration (In days) determined by distill spellpower and
-      //  spell level.
+      // Potion has duration determined by distill spellpower and spell level.
+      // Ours: 22 to 34 hours. This was 1 to 7 days with an extra * 60, which
+      //  overflowed: a Kod timer can't run past MAX_KOD_INT ms (about 37 hours).
       iGoBadTime = Bound((iSpellPower / iLevel) / 3,1,7);
-      iGoBadTime = iGoBadTime * 24 * 60 * 60 * 60 * 1000;
+      iGoBadTime = (20 + 2 * iGoBadTime) * 60 * 60 * 1000;
 
       oPotion = Create(cPotionClass,#labelled=TRUE,#iSpellPower=iPotionPower,
                   #gobadtime=igobadtime,#maker=caster,#ability=iSkill);
@@ -389,12 +390,14 @@ messages:
 
       // Get percent in the target spell.  If not there or fail check bail and
       // print failure.
+      // Ours: the parameter was misspelt #spellnum, so this was always 0 and
+      //  the check below (which was also backwards) always passed.
       iAbility = Send(who,@GetSpellAbility,
-                      #spellnum=Send(oTarget,@GetSpellNum));
+                      #spell_num=Send(oTarget,@GetSpellNum));
 
-      if iAbility <> $
+      if iAbility > 0
       {
-         if iRand > iAbility
+         if iRand <= iAbility
          {
             // If pass check Start distilling.
             Send(self,@PerformDistill,#caster=who,#oTarget=oTarget);

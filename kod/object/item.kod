@@ -29,9 +29,6 @@ resources:
    item_desc_template = "%r%r%r%r%r%r%r"
    resource_blank = ""
 
-   item_try_use_cursed_rsc = \
-      "As you pick the item up, you feel a will greater than your own "
-      "overwhelm your mind!  Not of your own volition, you try to put it on!"
 
    item_broken_battle = "Your %s shatters in the heat of battle!"
    item_broken_battle_plural = "Your %s shatter in the heat of battle!"
@@ -1115,15 +1112,6 @@ messages:
               #BondedItemOwner=what);
       }      
 
-      if what <> $ 
-         AND (IsClass(what,&User)) 
-         AND (Send(self,@IsCursed)) 
-         AND (NOT Send(what,@PlayerIsImmortal))
-      {
-         Send(what,@MsgSendUser,#message_rsc=item_try_use_cursed_rsc);
-         Post(what,@TryUseItem,#what=self);
-      }
-
       propagate;
    }
 
@@ -1394,25 +1382,6 @@ messages:
       return 1;
    }
 
-   IsCursed()
-   "This returns TRUE if a RemoveCurse spell should unuse the item."
-   "Since an ItemAtt can curse an item, go through those to check."
-   {
-      local i, oItemAtt, iNum;
-                
-      // Check to be sure nothing in ItemAtts disallows this
-      foreach i in plItem_Attributes
-      {
-         iNum = Send(self,@GetNumFromCompound,#compound=First(i));
-         oItemAtt = Send(SYS,@FindItemAttByNum,#num=iNum);
-         if Send(oItemAtt,@ItemIsCursed,#oItem=self)
-         {
-            return TRUE;
-         }
-      }
-
-      return FALSE;
-   }
 
    ModifyDefensePower(defense_power = 0)
    "Gives the defensive bonus"

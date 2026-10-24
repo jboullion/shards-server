@@ -245,7 +245,7 @@ messages:
 
       oCaster = Nth(state,2);
 
-      if ((who = self AND NOT vbRoomEnchHitCaster)
+      if ((who = oCaster AND NOT vbRoomEnchHitCaster)
          OR NOT Send(oCaster,@AllowBattlerAttack,#victim=who,#stroke_obj=self))
       {
          return FALSE;
@@ -261,7 +261,7 @@ messages:
 
       oCaster = Nth(state,2);
 
-      if ((who = self AND NOT vbRoomEnchHitCaster)
+      if ((who = oCaster AND NOT vbRoomEnchHitCaster)
          OR NOT Send(oCaster,@AllowBattlerAttack,#victim=who,#stroke_obj=self))
       {
          return FALSE;

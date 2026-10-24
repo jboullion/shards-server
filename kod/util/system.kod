@@ -3677,7 +3677,7 @@ messages:
    CreateAllItemAttsIfNew()
    {
       // Keep arranged somewhat in order from rarest to most common,
-      //  with cursed and castable spell types (like enchanted weapon) at the end
+      //  with castable spell types (like enchanted weapon) at the end
 
       Send(self,@CreateOneItemAttIfNew,#num=IA_DM_CREATED,#class=&ItemAttDMCreated);
       Send(self,@CreateOneItemAttIfNew,#num=WA_SPELLCASTER,#class=&WeapAttSpellCaster);

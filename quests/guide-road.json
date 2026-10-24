@@ -93,10 +93,9 @@
       }
     },
     {
-      "kind": "cast",
-      "spell": "Meditate",
-      "objective": "Cast your Meditate spell",
-      "brief": "Rook says, \"Hut! Hop to, adventurer. I'll make a soldier out of you yet. Let's spar!\" You've learned much from your training session under the famed swordsman Rook. To use that knowledge, cast the spell Meditate and say the name of a spell or skill you would like to improve. You may purchase skills from trainers like Rook and practice them immediately.",
+      "kind": "train",
+      "objective": "Spend training points on a skill or spell",
+      "brief": "Rook says, \"Hut! Hop to, adventurer. I'll make a soldier out of you yet. Let's spar!\" You've learned much from your training session under the famed swordsman Rook. To use that knowledge, open the Train window (the Train button beside Training points in your Stats, or type 'train') and spend your training points on a spell or skill you would like to improve. You may purchase skills from trainers like Rook and practice them immediately.",
       "rewards": {
         "xp": 400
       }

@@ -83,7 +83,8 @@ messages:
 
       // Global effects of the enchantment.
       Send(oRoom,@SomeoneSaid,#type=SAY_MESSAGE,#string=winds_on,#what=self);
-      Send(oRoom,@RoomStartEnchantment,#what=self,#time=Send(self,@GetDuration),
+      Send(oRoom,@RoomStartEnchantment,#what=self,
+            #time=Send(self,@GetDuration,#iSpellPower=iSpellPower),
             #state=[iSpellPower, who]);
       Send(oRoom,@EnchantAllOccupants,#what=self,#iSpellPower=iSpellPower,
             #state=[iSpellPower, who]);
@@ -162,7 +163,7 @@ messages:
 
       oCaster = Nth(state,2);
 
-      if ((who = self AND NOT vbRoomEnchHitCaster)
+      if ((who = oCaster AND NOT vbRoomEnchHitCaster)
          OR NOT Send(oCaster,@AllowBattlerAttack,#victim=who,#stroke_obj=self))
       {
          return FALSE;
@@ -178,7 +179,7 @@ messages:
 
       oCaster = Nth(state,2);
 
-      if ((who = self AND NOT vbRoomEnchHitCaster)
+      if ((who = oCaster AND NOT vbRoomEnchHitCaster)
          OR NOT Send(oCaster,@AllowBattlerAttack,#victim=who,#stroke_obj=self))
       {
          return FALSE;

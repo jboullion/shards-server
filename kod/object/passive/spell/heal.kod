@@ -135,13 +135,14 @@ messages:
       iHeal = Send(self,@GetHealAmount,#oTarget=oTarget,
                      #iSpellPower=iSpellPower);
 
-      iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
-
       // A little boost for casting on newbies, even if you're the newbie!
+      // Ours: added before the heal, so it's given and not only reported.
       if NOT Send(oTarget,@CheckPlayerFlag,#flag=PFLAG_PKILL_ENABLE)
       {
          iHeal = iHeal + Random(200,500);
       }
+
+      iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
 
       if who <> oTarget
       {

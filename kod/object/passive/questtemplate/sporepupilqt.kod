@@ -50,8 +50,7 @@ resources:
    sporepupilquest_completed = \
       "You have completed Maleval's pupil quest.  Maleval will now "
       "teach you the sporeburst spell, provided you know at least level "
-      "5 Qor and level 6 Faren.  He will also teach you the curse weapon "
-      "spell, if you know level 4 Qor and level 5 Kraanan."
+      "5 Qor and level 6 Faren."
 
    // Quest resources.
    sporeburstlearn_assign_2 = \
@@ -87,7 +86,7 @@ resources:
       "%INDEF_CARGO%CARGO, and I shall teach you that, and more - I have "
       "recently discovered another intriguing spell as well."
    sporeburstlearn_assign_3_h = \
-      "Ah yes, the spell, the spell.  Curse weapon!  Now bring me "
+      "Ah yes, the spell, the spell.  Sporeburst!  Now bring me "
       "%INDEF_CARGO%CARGO, and I shall teach you."
    sporeburstlearn_success_3 = \
       "It has been many moons since %INDEF_CARGO%CARGO last touched my "
@@ -99,7 +98,7 @@ resources:
    sporeburstlearn_success_3_h = \
       "It has been many moons since %INDEF_CARGO%CARGO last touched my "
       "lips.  Would you care for a sip?  It's ~Iquite~I refreshing.  Well, "
-      "return when you wish to learn the curse weapon spell, and we'll have "
+      "return when you wish to learn the sporeburst spell, and we'll have "
       "a little toast - ~ITo the foolish masses, who offer up their feeble "
       "bodies of blood and bone to be swallowed by silent stones or "
       "jigging delusory puppet-gods.~I"

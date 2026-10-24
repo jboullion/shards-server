@@ -94,7 +94,7 @@ messages:
    }
 
    NewUnused(what = $)
-   "When something that can break the curse unuses the item"
+   "When the item is taken off"
    {
       Send(what,@AddAim,#points=-piAim_change);
       Send(what,@AddStamina,#points=-piStamina_change);

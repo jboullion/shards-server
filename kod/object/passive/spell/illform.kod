@@ -339,7 +339,7 @@ messages:
       oIllusion = Nth(Send(SYS,@GetMonsterTemplates),iIllusion_type);
       if animation = PANM_WEAPON_ATTACK
          OR animation = PANM_FIST_ATTACK
-         OR PANM_MONSTER_ATTACK
+         OR animation = PANM_MONSTER_ATTACK
       {
          Send(oIllusion,@SetAnimation,#animation=ANIM_ATTACK);
       }
@@ -382,7 +382,7 @@ messages:
       oIllusion = Nth(Send(SYS,@GetMonsterTemplates),iIllusion_type);
       if animation = PANM_WEAPON_ATTACK
          OR animation = PANM_FIST_ATTACK
-         OR PANM_MONSTER_ATTACK
+         OR animation = PANM_MONSTER_ATTACK
       {
          Send(oIllusion,@SetAnimation,#animation=ANIM_ATTACK);
       }

@@ -2229,7 +2229,7 @@
    IA_TRANSCENDANT         = 5
    IA_SKILL_BONUS          = 6
    IA_SPELL_BONUS          = 7
-   IA_CURSED               = 8
+   // 8 was IA_CURSED (cursed items are gone)
    IA_DURABLE              = 9
    IA_ENGRAVED             = 11
    IA_SELL_INFO            = 13
@@ -2639,7 +2639,7 @@
    SID_GLOW_WEAPON = 153               // use SID_GLOW
 
    // Boons
-   SID_AGILITY_BOON = 190
+   SID_AGILITY_BOON = 204              // Ours: was 190, Spiritual Sword's, so it was never made
    SID_AIM_BOON =     191
    SID_STAMINA_BOON = 192
    SID_STRENGTH_BOON = 193

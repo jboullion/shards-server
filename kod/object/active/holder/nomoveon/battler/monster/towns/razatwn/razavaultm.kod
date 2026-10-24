@@ -30,8 +30,8 @@ include razavaultm.lkod
    RazaVaultman_entry_welcome = "Why, hullo there!"
 
    RazaVaultman_nogold = "This ain't no bank!"
-   RazaVaultman_nocursed = "Are ye insane?  No way I'll let ye use my "
-      "vault fer %s cursed %s!"
+   RazaVaultman_nocursed = "Are ye insane?  No way I'll let ye put %s%s "
+      "in my vault!"
    RazaVaultman_fullvault = \
       "I don't have any more space fer ye things!"
    RazaVaultman_thanks_amount = \

@@ -46,7 +46,7 @@ classvars:
    viSchool = SS_QOR
    viSpell_level = 1
    viMana = 10
-   viSpell_Exertion = 4
+   viSpellExertion = 4
 
    viFlash = FLASH_BAD
 

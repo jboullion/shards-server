@@ -273,8 +273,8 @@ messages:
 
    ItemReqUnuse()
    {
-      return TRUE;      /// for cursed items.  See weapattcursed   
-   }                    /// for an explanation of this item.
+      return TRUE;      /// can the item be taken off?
+   }
 
    ItemUnused(oItem=$,oPlayer=$)
    {
@@ -284,12 +284,7 @@ messages:
    ItemReqLeaveOwner()
    {
       return TRUE;      /// can the item be dropped?
-   }                    /// see weapattcursed.
-
-   ItemIsCursed()
-   {
-      return FALSE;     /// is the item cursed as a result of          
-   }                    /// this att?  See weapattcursed.
+   }
 
    ItemCanMend()
    {
@@ -761,8 +756,7 @@ messages:
 
    GetNamePriority()
    {
-      /// Most items will have their rank order determined by their difficulty.
-      ///   Exceptions are cursed weapons.
+      /// Items have their rank order determined by their difficulty.
 
       return viDifficulty;
    }
