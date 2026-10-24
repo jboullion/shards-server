@@ -13,9 +13,6 @@
     "min": 80,
     "max": 150
   },
-  "requires": {
-    "karmaMin": 1
-  },
   "repeat": {
     "cooldownHours": 3
   },
