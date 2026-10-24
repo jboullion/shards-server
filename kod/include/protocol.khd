@@ -264,6 +264,8 @@
    // Ours (guild revamp, ADR 0022 decision 32): the Fallen Halls for our client's guild window
    // (util/fallenhalls.kod SendHalls)
    UC_FALLEN_HALLS = 121
+   // Ours (guild revamp phase 8): the guild window's Hall tab (guild.kod SendHallInfo)
+   UC_GUILD_HALL = 122
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

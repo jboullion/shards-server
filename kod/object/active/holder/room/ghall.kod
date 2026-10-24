@@ -294,12 +294,10 @@ messages:
       return;
    }
 
-   AssignChestRanks()
-   "Ours (guild revamp): every hall chest belongs to a rank. The last chest "
-   "a hall makes is the Vault (Lords and up), the one before it the Members' "
-   "chest (Sirs and up), and the rest are Common (every member)."
+   GetGuildChests()
+   "The hall's chests in the order it made them (Common first, the Vault last)."
    {
-      local i, each_obj, lChests, iCount, iIndex, iRank;
+      local i, each_obj, lChests;
 
       lChests = $;
       foreach i in plActive
@@ -312,6 +310,17 @@ messages:
          }
       }
 
+      return lChests;
+   }
+
+   AssignChestRanks()
+   "Ours (guild revamp): every hall chest belongs to a rank. The last chest "
+   "a hall makes is the Vault (Lords and up), the one before it the Members' "
+   "chest (Sirs and up), and the rest are Common (every member)."
+   {
+      local each_obj, lChests, iCount, iIndex, iRank;
+
+      lChests = Send(self,@GetGuildChests);
       iCount = Length(lChests);
       iIndex = 0;
       foreach each_obj in lChests
@@ -817,6 +826,9 @@ messages:
                   #parm3=vrName);
          }
       }
+
+      // Ours (phase 8): and their guild windows' Hall tabs
+      Send(poGuild_owner,@BroadcastHallInfo);
 
       return;
    }

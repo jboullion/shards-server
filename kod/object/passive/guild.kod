@@ -69,6 +69,10 @@ resources:
 
    include guild.lkod
 
+   // Ours (guild revamp phase 8): the guild window's Hall tab
+   guild_hall_public_rank = "Only the guild's %q rank and above may open or close the hall to visitors."
+   guild_hall_none = "Your guild has no hall to open or close."
+
    guild_name_rsc = "guild"
    guild_icon_rsc = light.bgf
    guild_desc_rsc = "An organization of individuals with similar purposes."
@@ -1678,6 +1682,137 @@ messages:
    {
       return CHEST_LIMIT_BASE
          + CHEST_LIMIT_PER_TIER * Send(self,@GetPrestigeTier);
+   }
+
+   GetNextTierAt()
+   "The prestige the next tier starts at (GetPrestigeTier), or 0 at the top."
+   {
+      local i;
+
+      foreach i in [ 50, 150, 300, 500 ]
+      {
+         if piPrestige < i
+         {
+            return i;
+         }
+      }
+
+      return 0;
+   }
+
+   //// Ours (guild revamp phase 8, ADR 0022): the guild window's Hall tab
+
+   HallCommand(who = $,words = $)
+   "\"guildhall\": the Hall tab asks for UC_GUILD_HALL. \"guildhall public\" and \"guildhall "
+   "private\" open or close the hall to visitors, for an Officer or the Leader."
+   {
+      local sWord, oHall;
+
+      if who = $
+         OR Send(who,@GetGuild) <> self
+      {
+         return;
+      }
+
+      if Length(words) >= 2
+      {
+         sWord = Nth(words,2);
+         if StringEqual(sWord,"public")
+            OR StringEqual(sWord,"private")
+         {
+            oHall = Send(self,@GetGuildHall);
+            if oHall = $
+            {
+               Send(who,@MsgSendUser,#message_rsc=guild_hall_none);
+            }
+            else if Send(self,@GetRank,#who=who) < RANK_LIEUTENANT
+            {
+               Send(who,@MsgSendUser,#message_rsc=guild_hall_public_rank,
+                     #parm1=Send(self,@GetRankName,#rank=RANK_LIEUTENANT,
+                                 #sex=Send(who,@GetGender)));
+            }
+            else
+            {
+               // GuildHall.SetPublic tells the members and sends them the Hall again
+               Send(oHall,@SetPublic,#who=who,#public=StringEqual(sWord,"public"));
+
+               return;
+            }
+         }
+      }
+
+      Send(self,@SendHallInfo,#who=who);
+
+      return;
+   }
+
+   SendHallInfo(who = $)
+   "UC_GUILD_HALL: whether the guild has a hall, and if so its name, whether it's public, "
+   "whether who may change that, and its chests (each its name, the lowest rank that may use "
+   "it and how many items it holds). Then the prestige, its tier, the prestige the next tier "
+   "starts at (0 at the top) and each chest's limit; the rent owed (below 0: paid ahead) and "
+   "the hours left before unpaid rent costs the hall (0 for none); the trophies held, of how "
+   "many; and whether the guild has chosen its colours (for its cloaks). docs/research/"
+   "protocol.md has the layout."
+   {
+      local i, oSession, oHall, lChests, iHours;
+
+      if who = $
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      oHall = Send(self,@GetGuildHall);
+      AddPacket(1,BP_USERCOMMAND,1,UC_GUILD_HALL,1,(oHall <> $));
+      if oHall <> $
+      {
+         lChests = Send(oHall,@GetGuildChests);
+         AddPacket(STRING_RESOURCE,Send(oHall,@GetName),1,Send(oHall,@IsPublic),
+                   1,(Send(self,@GetRank,#who=who) >= RANK_LIEUTENANT),
+                   1,Bound(Length(lChests),0,255));
+         foreach i in lChests
+         {
+            AddPacket(STRING_RESOURCE,Send(i,@GetName),1,Send(i,@GetGuildRank),
+                      2,Bound(Send(i,@GetItemCount),0,65535));
+         }
+      }
+
+      iHours = 0;
+      if piRentCounter > 0
+      {
+         iHours = Bound((piRentCounter + 9) / 10,1,65535);
+      }
+
+      AddPacket(4,piPrestige,1,Send(self,@GetPrestigeTier),4,Send(self,@GetNextTierAt),
+                2,Send(self,@GetChestLimit),4,piRentDue,2,iHours,
+                1,Bound(Length(plTrophies),0,255),
+                1,Length(Send(Send(SYS,@GetGuildTrophies),@GetTrophies)),
+                1,Send(self,@HasGuildColors));
+      SendPacket(oSession);
+
+      return;
+   }
+
+   BroadcastHallInfo()
+   "The hall changed: every member online gets the Hall again."
+   {
+      local i;
+
+      foreach i in plMembers
+      {
+         if Send(First(i),@IsLoggedOn)
+         {
+            Send(self,@SendHallInfo,#who=First(i));
+         }
+      }
+
+      return;
    }
 
    AddPrestige(amount=0)

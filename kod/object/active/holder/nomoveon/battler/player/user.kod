@@ -4168,6 +4168,17 @@ messages:
          return;
       }
 
+      // Ours (guild revamp phase 8): the guild window's Hall tab
+      if StringEqual(sVerb,"guildhall")
+      {
+         if poGuild <> $
+         {
+            Send(poGuild,@HallCommand,#who=self,#words=lWords);
+         }
+
+         return;
+      }
+
       if StringEqual(sVerb,"arena")
       {
          Send(Send(SYS,@GetArenaBouts),@ArenaCommand,#who=self,#words=lWords);
