@@ -1,7 +1,7 @@
 {
   "id": 333,
   "key": "guild-story-muskgate-post",
-  "name": "The Fallen Halls III: Muskgate Post",
+  "name": "Fallen Halls III: Muskgate Post",
   "tier": "story",
   "giver": {
     "class": "GuildMaster",

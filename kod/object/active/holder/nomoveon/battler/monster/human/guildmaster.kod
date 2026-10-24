@@ -26,6 +26,9 @@ constants:
 
    include blakston.khd
 
+   // The guild story's first quest asks this much base health (quests/guild-story-a-guilds-calling.json)
+   STORY_HEALTH = 80
+
 resources:
 
    // Only the subclasses stand anywhere: this is how the quests name them all
@@ -33,6 +36,17 @@ resources:
    GuildMaster_desc_rsc = \
       "A Guild Master keeps the rolls of the guilds that serve the realm, "
       "and knows where the Order of Necromancers has taken their halls."
+
+   // For those the guild story isn't open to yet (SayNoQuests)
+   GuildMaster_no_guild = \
+      "I keep the rolls of the realm's guilds, and your name is on none of "
+      "them.  Eight of the old guild halls have fallen to the Order of "
+      "Necromancers, and it will take guilds to win them back.  Found one "
+      "with Frular, the guild creator in Barloque, or join one, and come "
+      "back to me."
+   GuildMaster_too_weak = \
+      "Your guild has need of you, but not yet.  Come back when you have "
+      "80 health, and I'll tell you what became of the old guild halls."
 
 classvars:
 
@@ -118,6 +132,33 @@ messages:
       }
 
       return;
+   }
+
+   SayNoQuests(who = $)
+   "Monster.SayNoQuests: with no guild, or too little health for the guild story, a "
+   "player hears why, and where the story begins."
+   {
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         return FALSE;
+      }
+
+      if Send(who,@GetGuild) = $
+      {
+         Send(self,@SayToOne,#target=who,#message_rsc=GuildMaster_no_guild);
+
+         return TRUE;
+      }
+
+      if Send(who,@GetBaseMaxHealth) < STORY_HEALTH
+      {
+         Send(self,@SayToOne,#target=who,#message_rsc=GuildMaster_too_weak);
+
+         return TRUE;
+      }
+
+      return FALSE;
    }
 
    SetClothes()

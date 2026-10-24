@@ -239,6 +239,8 @@ resources:
    quest_reward_item = "You receive %s."
    quest_reward_floor = "You can't carry %s; it's on the ground at your feet."
    quest_reward_insignia = "Your guild shield now bears a new sign."
+   // Ours (guild revamp): QRW_PRESTIGE
+   quest_reward_prestige = "Your guild gains %i prestige."
    quest_no_shield = "You have no guild shield to bear the sign."
 
    quest_sound_accept = nodeup.ogg
@@ -1067,8 +1069,10 @@ messages:
       }
 
       lOffers = Send(self,@OffersFrom,#who=who,#npcobj=npcobj);
-      // Ours: a tailor or barber says nothing of quests (its menu opens: util/cosmeticsbook.kod)
+      // Ours: a tailor or barber says nothing of quests (its menu opens: util/cosmeticsbook.kod),
+      // and some NPCs say why there's nothing (a Guild Master: GuildMaster.SayNoQuests)
       if lOffers = $ AND Send(npcobj,@GetShardsService) = 0
+         AND NOT Send(npcobj,@SayNoQuests,#who=who)
       {
          Send(who,@MsgSendUser,#message_rsc=quest_nothing);
       }
@@ -1600,6 +1604,7 @@ messages:
       {
          if Send(who,@GetGuild) <> $
          {
+            Send(who,@MsgSendUser,#message_rsc=quest_reward_prestige,#parm1=num);
             Send(Send(who,@GetGuild),@AddPrestige,#amount=num);
          }
 

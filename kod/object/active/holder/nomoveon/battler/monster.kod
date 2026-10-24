@@ -7193,6 +7193,13 @@ messages:
       return 0;
    }
 
+   SayNoQuests(who = $)
+   "Ours (guild revamp): who talked to us and we have no quests for them (QuestBook.SendOffers). "
+   "TRUE if we said something of our own, in place of the plain \"no work for you\"."
+   {
+      return FALSE;
+   }
+
    TakesMinionCommand(defend = FALSE)
    {
       return TRUE;
