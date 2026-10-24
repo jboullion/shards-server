@@ -1004,7 +1004,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 29792352;
+      return 5960899;
    }
 
    GetQuests()
