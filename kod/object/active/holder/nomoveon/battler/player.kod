@@ -246,6 +246,8 @@ resources:
    player_no_hall_pvp = "Nobody may fight inside a guild hall."
    player_recall_stone_crumbles = \
       "Your recall stone crumbles to dust as you leave the guild."
+   player_guild_cloak_crumbles = \
+      "Your guild cloak falls to threads as you leave the guild."
    player_assgame_soon = \
       "~kRoq tells you, \"~IA new Assassin's Circle shall be initiated "
       "shortly.\""
@@ -4164,6 +4166,14 @@ messages:
          return FALSE;
       }
 
+      // Ours (guild revamp): one guild cloak, over everything else
+      if (iUse_type & ITEM_USE_CLOAK)
+         AND NOT Send(self,@CheckPosition,#what=what,
+                     #type=ITEM_USE_CLOAK,#space=1)
+      {
+         return FALSE;
+      }
+
       if (iUse_type & ITEM_USE_LEGS)
          AND NOT Send(self,@CheckPosition,#what=what,
                      #type=ITEM_USE_LEGS,#space=viLeg_space)
@@ -7507,6 +7517,14 @@ messages:
       {
          Send(oStone,@Delete);
          Send(self,@MsgSendUser,#message_rsc=player_recall_stone_crumbles);
+      }
+
+      // And so does its cloak (GuildCloak).
+      oStone = Send(self,@FindHolding,#class=&GuildCloak);
+      if oStone <> $
+      {
+         Send(oStone,@Crumble);
+         Send(self,@MsgSendUser,#message_rsc=player_guild_cloak_crumbles);
       }
 
       if poOwner <> $ AND Send(poOwner,@GetWatcher) <> $

@@ -2152,6 +2152,8 @@
    ITEM_USE_SHIRT = 0x0800
    // In theory, used for masks.
    ITEM_USE_FACE = 0x1000
+   // Ours (guild revamp, ADR 0022 decision 22): the guild cloak, worn over everything else
+   ITEM_USE_CLOAK = 0x2000
 
    ITEMTYPE_MISC =     0
    ITEMTYPE_WEAPON =   0x000001

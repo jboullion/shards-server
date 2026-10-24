@@ -1,0 +1,187 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+CloakRack is PassiveObject
+
+// Ours (guild revamp, ADR 0022 decision 22): the cloak rack in every guild hall, beside its
+// news globe on the other side from the trophy case (GuildHall.PlaceCloakRack). It hangs in
+// the colours of the guild that holds the hall, and a member who uses it takes a cloak
+// (GuildCloak) once the guild has chosen its colours.
+
+constants:
+
+   include blakston.khd
+
+   RACK_RANGE = 3
+
+resources:
+
+   cloakrack_icon_rsc = cloakrk.bgf
+   cloakrack_name_rsc = "cloak rack"
+   cloakrack_desc_rsc = \
+      "A wooden stand hung with cloaks in the colours of %s%q.  Any member "
+      "of the guild may take one."
+   cloakrack_desc_empty_rsc = \
+      "A wooden stand for a guild's cloaks.  It stands empty until a guild "
+      "that has chosen its colours holds this hall."
+
+   cloakrack_far = "You need to be closer to take a cloak from the rack."
+   cloakrack_not_member = "These cloaks belong to the members of %s%q."
+   cloakrack_no_guild = "No guild holds this hall, and the rack is bare."
+   cloakrack_no_colours = \
+      "Your guild has no colours yet, so the rack is bare.  Your Commander "
+      "chooses them, with the guild's shield, in the guild window's Shield "
+      "tab."
+   cloakrack_have_one = "You already have your guild's cloak."
+   cloakrack_cant_carry = "You can't carry a cloak just now."
+   cloakrack_taken = \
+      "You take a cloak in your guild's colours from the rack.  Use it to "
+      "put it on or take it off."
+
+classvars:
+
+   viObject_flags = OF_ACTIVATABLE
+   viMoveOn_type = MOVEON_NO
+
+   vrName = cloakrack_name_rsc
+   vrIcon = cloakrack_icon_rsc
+   vrDesc = cloakrack_desc_rsc
+
+properties:
+
+messages:
+
+   GetRackGuild()
+   "The guild that holds the hall, if it has chosen its colours."
+   {
+      local oGuild;
+
+      if poOwner = $
+      {
+         return $;
+      }
+
+      oGuild = Send(poOwner,@GetGuildOwner);
+      if oGuild = $
+         OR NOT Send(oGuild,@HasGuildColors)
+      {
+         return $;
+      }
+
+      return oGuild;
+   }
+
+   ShowDesc()
+   {
+      local oGuild;
+
+      oGuild = Send(self,@GetRackGuild);
+      if oGuild = $
+         OR Send(oGuild,@GetName) = $
+      {
+         AddPacket(4,cloakrack_desc_empty_rsc);
+
+         return;
+      }
+
+      AddPacket(4,cloakrack_desc_rsc,4,Send(oGuild,@GetDef),4,Send(oGuild,@GetName));
+
+      return;
+   }
+
+   GetTranslation()
+   "The hall's guild's colours, as its cloaks are; plain grey with none."
+   {
+      local oGuild;
+
+      oGuild = Send(self,@GetRackGuild);
+      if oGuild = $
+      {
+         return Send(SYS,@EncodeTwoColorXLAT,#color1=XLAT_TO_GRAY,#color2=XLAT_TO_GRAY);
+      }
+
+      return Send(SYS,@EncodeTwoColorXLAT,#color1=Send(oGuild,@GetPrimaryGuildColor),
+                  #color2=Send(oGuild,@GetSecondaryGuildColor));
+   }
+
+   SendAnimation()
+   {
+      AddPacket(1,ANIMATE_TRANSLATION,1,Send(self,@GetTranslation));
+      AddPacket(1,ANIMATE_NONE,2,1);
+
+      return;
+   }
+
+   TryActivate(who = $)
+   "A member takes a cloak. Returns TRUE: it always answers for itself."
+   {
+      local oGuild, oCloak;
+
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         return TRUE;
+      }
+
+      if Abs(Send(who,@GetRow) - Send(self,@GetRow)) > RACK_RANGE
+         OR Abs(Send(who,@GetCol) - Send(self,@GetCol)) > RACK_RANGE
+      {
+         Send(who,@MsgSendUser,#message_rsc=cloakrack_far);
+
+         return TRUE;
+      }
+
+      oGuild = Send(poOwner,@GetGuildOwner);
+      if oGuild = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cloakrack_no_guild);
+
+         return TRUE;
+      }
+
+      if Send(who,@GetGuild) <> oGuild
+      {
+         Send(who,@MsgSendUser,#message_rsc=cloakrack_not_member,
+               #parm1=Send(oGuild,@GetDef),#parm2=Send(oGuild,@GetName));
+
+         return TRUE;
+      }
+
+      if NOT Send(oGuild,@HasGuildColors)
+      {
+         Send(who,@MsgSendUser,#message_rsc=cloakrack_no_colours);
+
+         return TRUE;
+      }
+
+      if Send(who,@FindHolding,#class=&GuildCloak) <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=cloakrack_have_one);
+
+         return TRUE;
+      }
+
+      oCloak = Create(&GuildCloak,#oGuild=oGuild);
+      if NOT Send(who,@ReqNewHold,#what=oCloak)
+      {
+         Send(oCloak,@Delete);
+         Send(who,@MsgSendUser,#message_rsc=cloakrack_cant_carry);
+
+         return TRUE;
+      }
+
+      Send(who,@NewHold,#what=oCloak);
+      Send(who,@MsgSendUser,#message_rsc=cloakrack_taken);
+
+      return TRUE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

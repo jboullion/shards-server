@@ -125,6 +125,19 @@ python tools/iconforge/weapon.py masterwand --install
 - Outputs go to `build/iconforge/weapon/<name>/`. `preview.png` shows the old frames, the new ones, and the new ones in each school's colour. `raw.png` is cached; `--force` asks the model again.
 - `--install` also replaces the copies `forge.py install` would otherwise copy back over these.
 
+## Guild cloaks (`cloak.ts`)
+
+```
+node tools/iconforge/cloak.ts [--browser <meridian-browser>] [--install]
+```
+
+The guild cloak (meridian-browser `docs/adr/0022-guilds.md` decision 22) is drawn by script, not by a model. A cape is a sheet hanging from the shoulders and wrapped half round the back, sized from every torso of a gender aligned on the neck, and seen from each of a torso's six views, so the views agree by construction.
+
+- It writes `cloakm.bgf` and `cloakf.bgf` (the capes, with the torso's groups, hanging from `HS_HEAD`), `cloakic.bgf` (the icon) and `cloakrk.bgf` (the hall's rack) to `build/iconforge/cloak/`, with `preview.png`: both genders in a shirt, a robe and plate, from every view, in four guild colour pairs, drawn by meridian-browser's own compositor.
+- The cloth is the red ramp and the trim the dark-blue ramp, the two a guild's colour translation changes.
+- Each frame carries meridian-browser's depth marker: `HS_OVER_BODY` (125) from behind, `HS_BEHIND_FIGURE` (126) otherwise.
+- `--install` copies the BGFs to `resource/graphics/shards/`. Re-running overwrites hand fixes made in the sprite editor.
+
 ## Fixing sprites by hand
 
 meridian-browser's admin dashboard (`npm run dev`, then `localhost:5173/admin.html`) has a **Sprites** tab: a pixel editor for any `.bgf`, with hair and facial hair previewed on both heads in every hair colour. It saves to `resource/graphics/shards/`, keeping the copy it replaces in `build/spriteforge/backups/`. It can also import a PNG and list a new style in `system.kod`.
@@ -138,6 +151,7 @@ Hand fixes live in the same folder iconforge installs to. Re-running `forge.py i
 - `providers.py`: the model calls.
 - `pixelize.py`: matte, fit, downscale and palette mapping.
 - `hair.py`, `headrender.ts`: player hairstyles and facial hair.
+- `cloak.ts`: the guild cloak, its icon and its rack.
 - `weapon.py`, `xlats.ts`: one drawing posed into a weapon's icon, in-hand and first-person sprites (`xlats.ts` gives the previews the client's palette translations).
 - `bgf.py`: BGF read/write (round-trip tested on the 104 client's files).
 - `review.py`: contact sheets and the review page.

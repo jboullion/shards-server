@@ -48,6 +48,8 @@ classvars:
    viNews_col = 4
    viTrophy_row = 13
    viTrophy_col = 5
+   viRack_row = 13
+   viRack_col = 6
    viNews_finerow = 32
    viNews_finecol = 24
 
