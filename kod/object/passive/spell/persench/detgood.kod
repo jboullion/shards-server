@@ -21,9 +21,9 @@ resources:
    DetectGood_name_rsc = "detect good"
    DetectGood_icon_rsc = iDetGood.bgf
    DetectGood_desc_rsc = \
-      "Allows you to see the disgustingly pure of heart.  This spell will "
-      "reveal all good people and monsters that are more good than you "
-      "are corrupted.  Requires a fairy wing to cast."
+      "Allows you to see the disgustingly pure of heart.  Good creatures and "
+      "players who follow Shal'ille shine out to you, even when they hide or "
+      "walk unseen.  Requires a fairy wing to cast."
 
    DetectGood_on_rsc = \
       "You can now sense all things good, merely waiting to be defiled."

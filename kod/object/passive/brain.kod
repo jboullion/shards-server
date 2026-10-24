@@ -1267,6 +1267,14 @@ messages:
          return FALSE;
       }
 
+      // Ours (spell revamp D22): we don't go after what we can't see, unless
+      //  it just struck us.
+      if event <> TS_FIGHT_ME_VICTIM
+         AND Send(mob,@LosesSightOf,#who=what)
+      {
+         return FALSE;
+      }
+
       behavior = Send(mob,@GetBehavior);
       iHatred = Send(self,@GetHatred,#what=what,#mob=mob,
                      #event=event,#behavior=behavior);

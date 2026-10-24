@@ -126,19 +126,8 @@ messages:
             // Use the detect option in case we're hitting an event monster.
             if IsClass(victim,&Player)
             {
-               foreach i in Send(victim,@GetSpellList)
-               {
-                  oSpell = Send(SYS,@FindSpellByNum,
-                                 #num=Send(victim,@DecodeSpellNum,#compound=i));
-                  if Send(oSpell,@GetSchool) = SS_QOR
-                  {
-                     oFound = TRUE;
-
-                     break;
-                  }
-               }
-               
-               if oFound = TRUE
+               // Ours (spell revamp D33): a player who knows Qor.
+               if Send(self,@IsRivalSchoolPlayer,#victim=victim)
                {
                   iDamage = iDamage + Random(500,1500);
                }

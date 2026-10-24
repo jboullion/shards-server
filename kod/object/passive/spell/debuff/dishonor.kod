@@ -24,10 +24,9 @@ resources:
    MarkOfDishonor_name_rsc = "mark of dishonor"
    MarkOfDishonor_icon_rsc = imarkdis.bgf
    MarkOfDishonor_desc_rsc = \
-      "Allows caster to cast Shal'ille's displeasure upon a target.  Will "
-      "prevent target's life force from exceeding the body's maximum.  For "
-      "evil targets, Shal'ille will cause a loss of vigor.  A marked "
-      "monster can't heal, and takes a tenth more damage.  "
+      "Allows caster to cast Shal'ille's displeasure upon a target.  While "
+      "the mark lasts, nothing heals the target, not even rest, and every "
+      "blow against it lands a tenth harder.  "
       "Requires an emerald to cast."
 
    MarkOfDishonor_sound = smarkdis.ogg
@@ -100,36 +99,14 @@ messages:
 
       if IsClass(oTarget,&Player)
       {
-         iKarma = Send(oTarget,@GetKarma);
-         iVigorRestThresholdChange = 0;
-
-         // Shal'ille only takes vigor from evil people.
-         if iKarma < 0
-         {
-            iVigorRestThreshold = Send(oTarget,@GetVigorRestThreshold);
-            iVigorRestThresholdChange = iKarma * (iVigorRestThreshold -
-                                      DISHONOR_LOWEST_VIGOR_REST_THRESHOLD)
-                                      / MAX_EVIL;
-
-            // Make sure we aren't going to lower target's VigorRestThreshold
-            // below 10, otherwise we could end up increasing the player's
-            // VigorRestThreshold (see player.kod for reason why)
-            if (iVigorRestThreshold - iVigorRestThresholdChange) < 10
-            {
-               iVigorRestThresholdChange = iVigorRestThreshold - 10;
-            }
-
-            Send(oTarget,@AddExertion,#amount=200000);
-            Send(oTarget,@SetVigorRestThreshold,
-                  #amount=iVigorRestThreshold-iVigorRestThresholdChange);
-         }
-
-         Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,
-               #state=iVigorRestThresholdChange);
+         // Ours (spell revamp phase 5): as for a monster, no healing and a
+         //  tenth more damage (it was a vigor drain on evil players, and
+         //  players have no karma now). Health stays held to the maximum.
+         Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,#state=0);
+         Send(oTarget,@AddDefenseModifier,#what=self);
          Send(oTarget,@MsgSendUser,#message_rsc=MarkOfDishonor_start);
          Send(what,@MsgSendUser,#message_rsc=MarkOfDishonor_success,
                #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
-
          // Make sure hps aren't over maximum.  Post this so enchantment is finished.
          Post(oTarget,@NewHealth);
       }
@@ -174,14 +151,9 @@ messages:
 
    EndEnchantment(who=$,state=0,report=TRUE)
    {
-      local iVigorRestThreshold;
-
-      // If we end enchantment on a player, reset VigorRestThreshold
-      if isClass(who,&Player)
+      if IsClass(who,&Player)
       {
-         iVigorRestThreshold = Send(who,@GetVigorRestThreshold);
-         Send(who,@SetVigorRestThreshold,#amount=iVigorRestThreshold+state);
-
+         Send(who,@RemoveDefenseModifier,#what=self);
          if report
          {
             Send(who,@MsgSendUser,#message_rsc=MarkOfDishonor_stop);
@@ -189,6 +161,28 @@ messages:
       }
 
       return;
+   }
+
+   ModifyDefensePower(who=$,what=$,defense_power=0,state=$)
+   "A defense modifier must answer this too (Player.GetDefense)."
+   {
+      return defense_power;
+   }
+
+   DefendingHit(who=$,what=$)
+   {
+      return;
+   }
+
+   ModifyDefenseDamage(who=$,what=$,damage=$)
+   "A marked player takes a tenth more."
+   {
+      if damage = $
+      {
+         return damage;
+      }
+
+      return damage * 110 / 100;
    }
 
 end

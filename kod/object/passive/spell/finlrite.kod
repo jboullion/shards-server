@@ -137,8 +137,9 @@ messages:
          }
             
          // Do damage to them.
-         iDamage = random(1,5) + (iSpellpower/20) + (2*((Send(who,@GetKarma,#detect=TRUE)
-            - Send(oUndead,@GetKarma,#detect=TRUE))/40));
+         // Ours (spell revamp phase 5): 12 to 20, and up to 16 more with
+         //  spellpower. It was 1 to 5 plus a karma gap players no longer have.
+         iDamage = Random(12,20) + (iSpellpower/6);
          if Send(oUndead,@AssessDamage,#what=who,#damage=iDamage,#aspell=ATCK_SPELL_HOLY) = $
          {
             Send(who,@KilledSomething,#what=oUndead,#use_weapon=self);

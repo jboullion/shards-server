@@ -107,5 +107,22 @@ messages:
    }
 
 
+   DamageFactors(damage=0,who=$,lTargets=$)
+   "Ours (spell revamp D33): a quarter more to a player who knows Shal'ille."
+   {
+      local iDamage;
+
+      iDamage = damage;
+      if lTargets <> $
+      {
+         if Send(self,@IsRivalSchoolPlayer,#victim=First(lTargets))
+         {
+            iDamage = iDamage * 125 / 100;
+         }
+      }
+
+      return iDamage;
+   }
+
 end
 ////////////////////////////////////////////////////////////////////////////////

@@ -270,6 +270,9 @@ resources:
    
 classvars:
 
+   // Ours (spell revamp D22): sees invisible players (LosesSightOf).
+   vbSeesInvisible = FALSE
+
    vrKocName = monster_koc_name
    viGender = GENDER_NEUTER
    
@@ -651,6 +654,50 @@ messages:
       propagate;
    }
    
+   CanSeeInvisible()
+   "Ours (spell revamp D22): monsters that see invisible players set "
+   "vbSeesInvisible."
+   {
+      return vbSeesInvisible;
+   }
+
+   LosesSightOf(who=$)
+   "Ours (spell revamp D22): a faded player is never seen; an invisible one "
+   "is, by a monster that sees invisible or that they struck."
+   {
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         return FALSE;
+      }
+
+      if Send(who,@IsEnchanted,#byClass=&Fade)
+      {
+         return TRUE;
+      }
+
+      if NOT Send(who,@IsInvisible)
+         OR vbSeesInvisible
+      {
+         return FALSE;
+      }
+
+      return NOT Send(self,@WasStruckBy,#who=who);
+   }
+
+   SomethingChanged(what = $)
+   "Ours (spell revamp D22): our target just faded or turned invisible."
+   {
+      if what <> $
+         AND what = poTarget
+         AND Send(self,@LosesSightOf,#who=what)
+      {
+         Post(self,@EnterStateMove);
+      }
+
+      propagate;
+   }
+
    WasStruckBy(who=$)
    "Ours (guild revamp): has who struck this monster (plStruckBy)?"
    {
@@ -1598,6 +1645,14 @@ messages:
          return;
       }
 
+      // Ours (spell revamp D22): lost sight of a faded or invisible target.
+      if Send(self,@LosesSightOf,#who=poTarget)
+      {
+         Send(self,@EnterStateMove);
+
+         return;
+      }
+
       Send(poBrain,@GetAttackBehavior,#mob=self,#target=poTarget,
            #behavior=piBehavior);
       
@@ -1669,6 +1724,14 @@ messages:
       // Victim phased out or is now in spectator mode, break aggro.
       if IsClass(oVictim,&User)
          AND Send(oVictim,@IsInCannotInteractMode)
+      {
+         Send(self,@EnterStateMove);
+
+         return;
+      }
+
+      // Ours (spell revamp D22): lost sight of a faded or invisible target.
+      if Send(self,@LosesSightOf,#who=oVictim)
       {
          Send(self,@EnterStateMove);
 

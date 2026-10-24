@@ -22,7 +22,8 @@ resources:
    defile_desc_rsc = \
       "In this darkest of rituals, the very spirit of Qor is summoned to "
       "defile the corpse of a monster or player, transforming flesh and blood "
-      "into magical energy for the caster.  Requires a fairy wing "
+      "into magical energy for the caster: a player's corpse yields twice what "
+      "a creature's does.  Requires a fairy wing "
       "and the slain."
    defile_cast_rsc = "Your nausea betokens the imminence of Qor."
    defile_corpse_gone = \
@@ -93,23 +94,17 @@ messages:
          return FALSE;
       }
 
-      if NOT Send(target,@WasGoodPlayer)
-      {
-         Send(who,@MsgSendUser,#message_rsc=defile_not_good);
-
-         return FALSE;
-      }
+      // Ours (spell revamp phase 5): any corpse; it needed a good player's.
 
       propagate;
    }
 
    CastSpell(who=$,lTargets=$,iSpellPower=0)
    {
-      local oTarget, oRoom, iKarmaAct;
+      local oTarget, oRoom;
 
       oTarget = First(lTargets);
       oRoom = Send(who,@GetOwner);
-      iKarmaAct = 0;
 
       if Send(oTarget,@GetOwner) <> oRoom
       {
@@ -118,24 +113,16 @@ messages:
          return;
       }
 
-      if Send(who,@GetKarma) <> $
-      {
-         if abs(Send(who,@GetKarma)) < (iSpellpower + 1)
-         {
-            iKarmaAct = Bound(iKarmaAct,Abs(Send(who,@GetKarma)),iSpellpower+1);
-         }
-         else
-         {
-            iKarmaAct = Abs(Send(who,@GetKarma));
-         }
-
-         //Send(who,@AddKarma,#amount=Send(who,@CalculateKarmaChangeFromAct,
-         //      #karma_act=-iKarmaAct,
-         //      #karma_doer=Send(who,@GetKarma),#swing_factor=4));
-      }
-
       Send(who,@MsgSendUser,#message_rsc=defile_cast_rsc);
-      Send(who,@GainMana,#amount=(viMana_bonus+(iSpellPower/3)));
+      // A player's corpse gives it all; a creature's, half.
+      if Send(oTarget,@WasPlayer)
+      {
+         Send(who,@GainMana,#amount=(viMana_bonus+(iSpellPower/3)));
+      }
+      else
+      {
+         Send(who,@GainMana,#amount=(viMana_bonus+(iSpellPower/3))/2);
+      }
 
       // Don't let them defile to over-max
       if Send(who,@GetMana) > Send(who,@GetMaxMana)

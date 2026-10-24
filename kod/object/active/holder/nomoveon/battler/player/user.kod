@@ -2775,7 +2775,7 @@ messages:
    "show_type is used to get the look or inventory animation and overlays "
    "instead of the normal animation and overlays."
    {
-      local iFlags, iEnemyKarma, iSelfKarma, iMinimapFlags, iDrawingFlags;
+      local iFlags, iEnemyKarma, iSelfKarma, iMinimapFlags, iDrawingFlags, bSensed;
 
       // Send given object's id number, name, icon, and animation info
 
@@ -2812,27 +2812,40 @@ messages:
          iFlags = (iFlags | OF_FLASHING);
       }
 
+      // Ours (spell revamp D34): players have no karma now. Detect Evil
+      //  shows evil creatures and players who know Qor, Detect Good good
+      //  creatures and players who know Shal'ille, hidden ones too.
       if IsClass(what,&Battler)
+         AND what <> self
+         AND (piFlags2 & (PFLAG2_DETECT_EVIL | PFLAG2_DETECT_GOOD))
       {
-         iEnemyKarma = Send(what,@GetKarma,#detect=TRUE);
-         iSelfKarma = Send(self,@GetKarma);
-
-         if (piFlags2 & PFLAG2_DETECT_EVIL)
-            AND iSelfKarma > 0
-            AND iEnemyKarma < -10
-            AND (IsClass(what,&Player)
-                 OR (IsClass(what,&Monster) AND abs(iEnemyKarma) > iSelfKarma))
+         bSensed = FALSE;
+         if IsClass(what,&Monster)
          {
-            iFlags = (iFlags & (~OF_FLICKERING));
-            iFlags = (iFlags | OF_FLASHING);
+            iEnemyKarma = Send(what,@GetKarma,#detect=TRUE);
+            if ((piFlags2 & PFLAG2_DETECT_EVIL) AND iEnemyKarma < -10)
+               OR ((piFlags2 & PFLAG2_DETECT_GOOD) AND iEnemyKarma > 10)
+            {
+               bSensed = TRUE;
+            }
+         }
+         else if IsClass(what,&Player)
+         {
+            if ((piFlags2 & PFLAG2_DETECT_EVIL)
+                AND Send(what,@KnowsSpellSchool,#school=SS_QOR))
+               OR ((piFlags2 & PFLAG2_DETECT_GOOD)
+                AND Send(what,@KnowsSpellSchool,#school=SS_SHALILLE))
+            {
+               bSensed = TRUE;
+            }
          }
 
-         if (piFlags2 & PFLAG2_DETECT_GOOD)
-            AND iSelfKarma < 0
-            AND iEnemyKarma > 10
-            AND (IsClass(what,&Player)
-                 OR (IsClass(what,&Monster) AND iEnemyKarma > abs(iSelfKarma)))
+         if bSensed
          {
+            if (iDrawingFlags & DRAWFX_MASK) = DRAWFX_INVISIBLE
+            {
+               iDrawingFlags = (iDrawingFlags & (~DRAWFX_MASK));
+            }
             iFlags = (iFlags & (~OF_FLICKERING));
             iFlags = (iFlags | OF_FLASHING);
          }

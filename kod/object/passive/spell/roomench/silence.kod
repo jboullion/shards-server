@@ -21,9 +21,11 @@ resources:
    Silence_name_rsc = "silence"
    Silence_icon_rsc = isilence.bgf
    Silence_desc_rsc = \
-      "Muffles all speech preventing spell casting and communication as long "
-      "as caster concentrates.  Requires dark angel feathers and purple "
-      "mushrooms."
+      "Muffles all speech in the room for as long as the caster holds the "
+      "trance: nobody else can cast a spell or speak, monsters and players "
+      "alike.  It draws ten mana every one to two seconds, less often the "
+      "stronger the caster.  Requires dark angel feathers and a purple "
+      "mushroom."
    Silence_unnecessary = "This area already is already silenced."
    Silence_on = "A curtain of silence falls across the room."
    Silence_off = "The curtain of silence is lifted."
@@ -34,7 +36,7 @@ resources:
       "Your words ring through the silence spell covering the room."
    Silence_blocked_jala_victim = "The silence spell muffles your song."
    Silence_spell_intro = \
-      "Qor Level 3: Draws a curtain of Silence over the room, stirring the "
+      "Qor Level 6: Draws a curtain of Silence over the room, stirring the "
       "servants of Qor."
 
 classvars:
@@ -49,7 +51,8 @@ classvars:
    viSpell_num = SID_SILENCE
    viSchool = SS_QOR
    viMana = 10
-   viSpell_level = 3
+   // Ours (spell revamp D23): Qor level 6 (it was 3, and disabled).
+   viSpell_level = 6
 
    viManaDrain = 10      // Drain is amount used every viDrainTime milliseconds
    viDrainTime = 1000    // Drain some mana every viDrainTime milliseconds
@@ -62,8 +65,6 @@ classvars:
 
 properties:
 
-   pbAccessible = FALSE
-   pbEnabled = FALSE
 
 messages:
 
@@ -89,30 +90,6 @@ messages:
             #time=Send(self,@GetDuration,#iSpellPower=iSpellPower),
             #iSpellPower=iSpellPower,#lastcall=FALSE);
       Send(who,@SetTranceFlag);
-
-      // See if there's a Jala song going on and try to kill it
-      // Format of lJalaInfo is: [timer, spell object, state]
-      lJalaInfo = Send(oRoom,@GetJalaInfo);
-
-      if lJalaInfo <> $
-      {
-         // Format of lJalaState is: [volume, caster, spellpower]
-         lJalaState = Nth(lJalaInfo,3);
-         oJalaCaster = Nth(lJalaInfo,2);
-
-         if Random(iSpellPower/2,iSpellPower) > First(lJalaState)
-         {
-            // We have blocked the Jala song.
-            Send(oJalaCaster,@MsgSendUser,#message_rsc=Silence_blocked_jala_victim);
-            Send(oRoom,@RemoveEnchantment,#what=oJalaCaster);
-         }
-         else
-         {
-            // The Jala song continues on!
-            Send(who,@MsgSendUser,#message_rsc=Silence_cant_block_jala_caster);
-            Send(oJalaCaster,@MsgSendUser,#message_rsc=Silence_cant_block_jala_victim);
-         }
-      }
 
       propagate;
    }

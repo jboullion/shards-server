@@ -23,7 +23,8 @@ resources:
    fade_desc_rsc = \
       "Temporarily dissolves your physical form leaving "
       "you invisible.  The spell lasts as long as your trance "
-      "is maintained.  "
+      "is maintained, and while it holds no monster can find you; "
+      "doing anything at all breaks it.  "
       "Requires dark angel feather."
    
    fade_already_enchanted = "You are already invisible."

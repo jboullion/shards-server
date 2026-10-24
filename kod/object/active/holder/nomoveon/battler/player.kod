@@ -6654,6 +6654,16 @@ messages:
          amount *= 100;
       }
 
+      // Ours (spell revamp phase 5): Mark of Dishonor stops all healing,
+      //  regeneration too (NewHealth keeps the regeneration timer going).
+      if amount > 0
+         AND Send(self,@IsEnchanted,#byClass=&MarkOfDishonor)
+      {
+         Send(self,@NewHealth);
+
+         return;
+      }
+
       if NOT Send(self,@IsInCannotInteractMode)
       {
          if (200*piMax_health) < (piHealth+amount)
@@ -6695,6 +6705,12 @@ messages:
       if amount < 0
       {
          return;
+      }
+
+      // Ours (spell revamp phase 5): Mark of Dishonor stops all healing.
+      if Send(self,@IsEnchanted,#byClass=&MarkOfDishonor)
+      {
+         return 0;
       }
 
       if piHealth > piMax_health*100
@@ -7212,6 +7228,24 @@ messages:
       }
 
       return Nth(plSchools,school);
+   }
+
+   KnowsSpellSchool(school=0)
+   "Ours (spell revamp D33, D34): do we know any spell of this school?"
+   {
+      local i;
+
+      foreach i in plSpells
+      {
+         if Send(Send(SYS,@FindSpellByNum,
+                      #num=Send(self,@DecodeSpellNum,#compound=i)),
+                 @GetSchool) = school
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
    }
 
    GetNumSpellsInSchool(school = 0)

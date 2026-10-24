@@ -21,15 +21,17 @@ resources:
    forcesoflight_name_rsc = "forces of light"
    forcesoflight_icon_rsc = ifrclite.bgf
    forcesoflight_desc_rsc = \
-      "Summons Shal'ille to infuse her power into all good players in the room, "
-      "making their attacks more accurate and her spells more potent.  "
+      "Summons Shal'ille to infuse her power into the caster's allies in the "
+      "room, making their attacks far more accurate and her spells more "
+      "potent.  Those who follow Qor get nothing from it.  "
       "Requires elderberries and emeralds to cast."
 
    forcesoflight_already_enchanted = \
       "This place is already infused with the spirit of Shal'ille."
    forcesoflight_enchantment_rsc = \
-      "\n\nThe %s enchantment currently adds %i offense to the attacks of good "
-      "players and %i spellpower to all Shal'ille spells cast in the area."
+      "\n\nThe %s enchantment currently adds %i offense to the attacks of the "
+      "caster's allies and %i spellpower to all Shal'ille spells cast in the "
+      "area."
    forcesoflight_on = "This place is infused with the spirit of Shal'ille."
    forcesoflight_off = "The spirit of Shal'ille departs from this place."
    forcesoflight_player_on = "You are filled with the spirit of Shal'ille."
@@ -85,18 +87,33 @@ messages:
       propagate;
    }
 
-   StartEnchantmentNewOccupant(who = $)
+   StartEnchantmentNewOccupant(who = $, state = $)
    "Called on new occupants of the enchanted room."
    {
-      Send(self,@StartEnchantment,#who=who);
-      
+      Send(self,@StartEnchantment,#who=who,#state=state);
+
       return;
    }
 
-   StartEnchantment(who = $)
+   StartEnchantment(who = $, state = $)
    "Starts enchantment effect on one player"
    {
+      local oCaster;
+
+      // Ours (spell revamp D32): the caster's allies, not "good players"
+      //  (anyone who knew no Qor spell, foes included).
+      oCaster = $;
+      if state <> $
+      {
+         oCaster = Nth(state,2);
+      }
+
       if Send(self,@KarmaCheck,#who=who)
+         AND (oCaster = $
+              OR who = oCaster
+              OR NOT IsClass(oCaster,&Battler)
+              OR NOT Send(oCaster,@AllowBattlerAttack,#victim=who,
+                          #report=FALSE))
       {
          Send(who,@AddAttackModifier,#what=self);
          Send(who,@MsgSendUser,#message_rsc=forcesoflight_player_on);

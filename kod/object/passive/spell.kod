@@ -104,7 +104,8 @@ resources:
    spell_pp_immortal = "Immortal"
    spell_pp_ability = "Half your %s ability (%i%%)"
    spell_pp_shal_place = "Shal'ille's favour in this place"
-   spell_pp_karma = "Your karma"
+   spell_pp_light = "The light here"
+   spell_pp_dark = "The darkness here"
    spell_pp_room_ench = "%s in this room"
    spell_pp_hour = "The hour of the day"
    spell_pp_moon = "The moon's position"
@@ -592,8 +593,8 @@ messages:
 
       // A school's two sources show even at zero: they tell the player what
       //  would raise the spell.
-      lAlways = [ spell_pp_ability, spell_pp_shal_place, spell_pp_karma,
-                  spell_pp_hour, spell_pp_moon, spell_pp_pack,
+      lAlways = [ spell_pp_ability, spell_pp_shal_place, spell_pp_light,
+                  spell_pp_dark, spell_pp_hour,spell_pp_moon, spell_pp_pack,
                   spell_pp_faren_place, spell_pp_vigor, spell_pp_company,
                   spell_pp_health, spell_pp_instrument, spell_pp_base_health ];
 
@@ -2523,13 +2524,14 @@ messages:
          // Shal'ille gives bonuses depending on the room setting,
          //  prefers natural settings.
          iPrimaryBonus = Send(oRoom,@GetShalilleBonus);
-         // Secondary bonus based on Karma.
-         iSecondaryBonus = Abs(Send(who,@GetKarma)/10);
+         // Ours (spell revamp D31): the brighter the room, the stronger (it
+         //  was karma, which players no longer have).
+         iSecondaryBonus = Send(self,@GetLightBonus,#oRoom=oRoom);
          if bParts
          {
             lParts = AppendListElem([spell_pp_shal_place, iPrimaryBonus, $],
                                     lParts);
-            lParts = AppendListElem([spell_pp_karma, iSecondaryBonus, $],
+            lParts = AppendListElem([spell_pp_light, iSecondaryBonus, $],
                                     lParts);
          }
 
@@ -2553,30 +2555,14 @@ messages:
       {
          // Qor strength determined by day or night.
          iPrimaryBonus =  (2 + Send(SYS,@GetHour));
-         // Secondary bonus comes from Karma.
-         iSecondaryBonus = Abs(Send(who,@GetKarma)/10);
+         // Ours (spell revamp D31): the darker the room, the stronger (it was
+         //  karma, plus a bonus for Darkness, which now simply darkens it).
+         iSecondaryBonus = 10 - Send(self,@GetLightBonus,#oRoom=oRoom);
          if bParts
          {
             lParts = AppendListElem([spell_pp_hour, iPrimaryBonus, $], lParts);
-            lParts = AppendListElem([spell_pp_karma, iSecondaryBonus, $],
+            lParts = AppendListElem([spell_pp_dark, iSecondaryBonus, $],
                                     lParts);
-         }
-
-         // Darkness boosts Qor
-         if Send(oRoom,@IsEnchanted,#what=SID_DARKNESS)
-         {
-            // This reconstructs the darkness spellpower.
-            iAbilityGain = First(Send(oRoom,@GetEnchantmentState,
-                                 #what=SID_DARKNESS));
-            iAbilityGain = -(iAbilityGain - 25);
-            iAbilityGain /= 10;
-            iSecondaryBonus += iAbilityGain;
-            if bParts
-            {
-               lParts = AppendListElem([spell_pp_room_ench, iAbilityGain,
-                  [Send(Send(SYS,@FindSpellByNum,#num=SID_DARKNESS),
-                        @GetName)]], lParts);
-            }
          }
       }
       else if viSchool = SS_RIIJA
@@ -2807,6 +2793,51 @@ messages:
       }
 
       return iBound;
+   }
+
+   GetLightBonus(oRoom=$)
+   "Ours (spell revamp D31): 0 in a dungeon's gloom (light 84 or less) to "
+   "10 in bright daylight (220 or more); Qor's is 10 less this."
+   {
+      if oRoom = $
+      {
+         return 0;
+      }
+
+      return Bound((Send(oRoom,@GetRoomLight) - 84) * 10 / 136,0,10);
+   }
+
+   GetRivalSchool()
+   "Ours (spell revamp D33): Shal'ille's rival is Qor, and Qor's Shal'ille."
+   {
+      if viSchool = SS_SHALILLE
+      {
+         return SS_QOR;
+      }
+
+      if viSchool = SS_QOR
+      {
+         return SS_SHALILLE;
+      }
+
+      return $;
+   }
+
+   IsRivalSchoolPlayer(victim=$)
+   "Ours (spell revamp D33): TRUE if victim is a player who knows spells of "
+   "our rival school."
+   {
+      local iRival;
+
+      iRival = Send(self,@GetRivalSchool);
+      if victim = $
+         OR iRival = $
+         OR NOT IsClass(victim,&Player)
+      {
+         return FALSE;
+      }
+
+      return Send(victim,@KnowsSpellSchool,#school=iRival);
    }
 
    GetFarenElement()

@@ -23,8 +23,9 @@ resources:
    holyblaze_icon_rsc = iholybl.bgf
 
    holyblaze_desc_rsc = \
-      "Bathes a target at short range in a blaze of holy energy, healing it "
-      "or harming it, depending on its karma.  Requires emeralds and elderberries to cast."
+      "Bathes a target at short range in a blaze of holy energy.  It heals "
+      "an ally and burns a foe; the undead, evil creatures and players who "
+      "follow Qor burn hottest.  Requires emeralds and elderberries to cast."
 
    holyblaze_sound = sholytch.ogg
 
@@ -90,21 +91,13 @@ messages:
 
       oTarget = First(lTargets);
 
-      if IsClass(oTarget,&User)
+      // Ours (spell revamp D32): it burns a foe and heals anyone else, a
+      //  player or a companion (it was: burns players who know Qor).
+      if (IsClass(oTarget,&User)
+          OR (IsClass(oTarget,&Monster) AND Send(oTarget,@IsCompanion)))
+         AND IsClass(who,&Player)
       {
-            foreach i in Send(oTarget,@GetSpellList)
-            {
-               oSpell = Send(SYS,@FindSpellByNum,
-                              #num=Send(oTarget,@DecodeSpellNum,#compound=i));
-               if Send(oSpell,@GetSchool) = SS_QOR
-               {
-                  oFound = TRUE;
-
-                  break;
-               }
-            }
-
-            if oFound = TRUE
+            if Send(who,@AllowBattlerAttack,#victim=oTarget,#report=FALSE)
             {
                viHarmful = TRUE;
                viOutlaw = TRUE;
@@ -142,7 +135,8 @@ messages:
       oTarget = First(lTargets);
 
       iHeal = Random(piDamageMin*100,piDamageMax*100)*(iSpellpower+101)/100;
-      iHeal = (100 + bound(100/4,0,50))*iHeal/100;
+      // Ours: up to a quarter more with spellpower (it was a fixed 25%).
+      iHeal = (100 + bound(iSpellpower/4,0,50))*iHeal/100;
 
       iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
 
@@ -182,11 +176,18 @@ messages:
       }
 
       // Ours: no target when the description asks for the damage range.
+      //  (spell revamp D33) A player who knows Qor burns hottest; any other
+      //  foe player takes plain damage.
       if oTarget <> $
       {
-         if IsClass(oTarget,&Player)
+         if Send(self,@IsRivalSchoolPlayer,#victim=oTarget)
          {
             return damage + damage*(random(130,260))/400;
+         }
+
+         if IsClass(oTarget,&Player)
+         {
+            return damage;
          }
       }
 
