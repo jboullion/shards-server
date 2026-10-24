@@ -32,6 +32,7 @@ classvars:
 
    viSpell_num = SID_ICEWALL
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_FROST
    viSpell_level = 4
    viMana = 15
    viSpellExertion = 3

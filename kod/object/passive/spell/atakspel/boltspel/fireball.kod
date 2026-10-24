@@ -41,6 +41,7 @@ classvars:
 
    viMana = 7
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_FLAME
    viSpell_level = 4
 
    vrSucceed_wav = fireball_sound

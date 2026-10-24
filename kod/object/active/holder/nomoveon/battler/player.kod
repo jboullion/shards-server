@@ -792,6 +792,10 @@ properties:
 
    vrIcon = player_male_icon_rsc
 
+   // Ours (spell revamp D10): the Faren element we attuned to, once
+   //  (FAREN_ELEMENT_*; Priestess Tenuv'vyal, FarenPriestess.SomeoneSaid).
+   piFarenAttunement = FAREN_ELEMENT_NONE
+
    poSession
    pbLogged_on = FALSE
 
@@ -5737,7 +5741,8 @@ messages:
 
       if oWeapon <> $
       {
-         Send(oWeapon,@WeaponHitTarget);
+         // Ours (spell revamp D10): a touch spell needs to know whom it hit.
+         Send(oWeapon,@WeaponHitTarget,#who=self,#victim=what,#damage=amount);
       }
 
       foreach i in plAttack_modifiers
@@ -6300,6 +6305,14 @@ messages:
       else
       {
          i = time;
+      }
+
+      // Ours (spell revamp D11): a chill slows our recovery.
+      if i > 0
+         AND Send(self,@IsEnchanted,#byClass=&Chill)
+      {
+         i = i * Send(Send(SYS,@FindSpellByNum,#num=SID_CHILL),@GetSlowPercent)
+             / 100;
       }
 
       if i > 0
@@ -13327,6 +13340,21 @@ messages:
       }
 
       return FALSE;
+   }
+
+   GetFarenAttunement()
+   {
+      return piFarenAttunement;
+   }
+
+   SetFarenAttunement(element=FAREN_ELEMENT_NONE)
+   "Admin supported\n"
+   "Ours (spell revamp D10): 0 none, 1 flame, 2 frost, 3 storm. Players choose "
+   "once, at Priestess Tenuv'vyal."
+   {
+      piFarenAttunement = Bound(element,FAREN_ELEMENT_NONE,FAREN_ELEMENT_STORM);
+
+      return;
    }
 
    BreakWornGear()

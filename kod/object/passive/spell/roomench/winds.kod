@@ -18,6 +18,9 @@ constants:
 
    include blakston.khd
 
+   // Ours (spell revamp D14): a gust every so often, as Sandstorm has.
+   WINDS_PERIOD = 10000
+
 resources:
 
    include winds.lkod
@@ -26,8 +29,9 @@ resources:
    winds_icon_rsc = iwinds.bgf
    winds_desc_rsc = \
       "Summons powerful winds which render ranged attacks more difficult "
-      "for several minutes.  Requires three elderberries and a purple "
-      "mushroom to cast."
+      "for a minute or more.  Each gust buffets your foes, monsters too, for "
+      "a little damage and spoils their aim.  Requires three elderberries "
+      "and a purple mushroom to cast."
    winds_already_enchanted = "Magical winds are already present."
    winds_on = "Violent winds suddenly sweep the area and buffet your limbs."
    winds_off = "The winds slow and then cease."
@@ -53,6 +57,8 @@ classvars:
    viMana = 10
    viSpell_level = 3
    viSchool = SS_FAREN
+   // Ours (spell revamp D13, D14): only foes, not the caster.
+   vbRoomEnchHitCaster = FALSE
    viChance_To_Increase = 35
    viMeditate_ratio = 30
 
@@ -81,15 +87,53 @@ messages:
 
       oRoom = Send(who,@GetOwner);
 
-      // Global effects of the enchantment.
+      // Global effects of the enchantment. Ours (spell revamp D14): a gust
+      //  every WINDS_PERIOD, Sandstorm's way: the state's first number is the
+      //  time gone by plus the spellpower in its last two digits.
+      iSpellPower = Bound(iSpellPower,0,99);
       Send(oRoom,@SomeoneSaid,#type=SAY_MESSAGE,#string=winds_on,#what=self);
-      Send(oRoom,@RoomStartEnchantment,#what=self,
-            #time=Send(self,@GetDuration,#iSpellPower=iSpellPower),
-            #state=[iSpellPower, who]);
+      Send(oRoom,@RoomStartEnchantment,#what=self,#time=WINDS_PERIOD,
+            #state=[WINDS_PERIOD + iSpellPower, who],#addicon=TRUE,
+            #lastcall=FALSE);
       Send(oRoom,@EnchantAllOccupants,#what=self,#iSpellPower=iSpellPower,
-            #state=[iSpellPower, who]);
+            #state=[WINDS_PERIOD + iSpellPower, who]);
 
       propagate;
+   }
+
+   StartPeriodicEnchantment(who = $, where = $, state = 0)
+   "A gust: the next one, or the last stretch to the end."
+   {
+      local iCombined, iNext_time, iSpellPower, iEnd;
+
+      iCombined = First(state);
+      iSpellPower = iCombined % 100;
+      iCombined = iCombined - iSpellPower;
+      iEnd = Send(self,@GetDuration,#iSpellPower=iSpellPower);
+
+      iNext_time = iCombined + WINDS_PERIOD;
+      if iNext_time >= iEnd
+      {
+         Send(where,@RoomStartEnchantment,#what=self,
+               #time=Bound(iEnd - iCombined,1000,$),
+               #state=[iEnd + iSpellPower, Nth(state,2)],
+               #addicon=FALSE,#lastcall=TRUE);
+
+         return;
+      }
+
+      Send(where,@RoomStartEnchantment,#what=self,#time=WINDS_PERIOD,
+            #state=[iNext_time + iSpellPower, Nth(state,2)],
+            #addicon=FALSE,#lastcall=FALSE);
+      Send(where,@EnchantAllOccupants,#what=self,#iSpellPower=iSpellPower,
+            #state=state);
+
+      return;
+   }
+
+   AffectsMonsters()
+   {
+      return TRUE;
    }
 
    StartEnchantmentNewOccupant(who = $, state=$)
@@ -104,14 +148,55 @@ messages:
    StartEnchantment(who = $, state = $)
    "Starts enchantment effect on one player"
    {
+      // Ours (spell revamp D14): a monster's aim is spoiled until the next
+      //  gust.
+      if IsClass(who,&Monster)
+      {
+         if Send(self,@IsHostileTo,#oTarget=who,#state=state)
+         {
+            if Send(who,@IsEnchanted,#what=self)
+            {
+               Send(who,@RemoveEnchantment,#what=self);
+            }
+
+            Send(who,@StartEnchantment,#what=self,#time=WINDS_PERIOD,
+                  #state=First(state) % 100);
+         }
+
+         Send(self,@RoomEnchantmentDamage,#oTarget=who,#state=state);
+
+         return;
+      }
+
       if (NOT Send(who,@IsEnchanted,#what=self)
          AND Send(self,@CanEnchantUser,#who=who,#state=state))
       {
-         Send(who,@AddAim,#points=-(First(state) / 3));
+         Send(who,@AddAim,#points=-((First(state) % 100) / 3));
          Send(who,@StartEnchantment,#what=self,#state=state);
       }
 
+      Send(self,@RoomEnchantmentDamage,#oTarget=who,#state=state);
+
       return;
+   }
+
+   ComputeDamage(who=$,oTarget=$,iDamage=$,iSpellPower=0)
+   "Ours (spell revamp D14): a buffeting, 1 to 3. It never kills."
+   {
+      iDamage = 1 + (iSpellPower / 40);
+
+      return Bound(iDamage,0,Send(oTarget,@GetHealth) - 1);
+   }
+
+   ModifyMonsterOffense(mob=$,iOffense=0,state=$)
+   "Ours: spellpower/3 percent less (20% at 60), as a player loses spellpower/3 aim."
+   {
+      if state = $
+      {
+         return iOffense;
+      }
+
+      return iOffense * (100 - (state / 3)) / 100;
    }
 
    EndRoomEnchantment(who = $, state = $)
@@ -125,7 +210,12 @@ messages:
    EndEnchantment(who = $, state = $)
    "Ends enchantment effect on one player"
    {
-      Send(who,@AddAim,#points=First(state) / 3);
+      if IsClass(who,&Monster)
+      {
+         return;
+      }
+
+      Send(who,@AddAim,#points=(First(state) % 100) / 3);
 
       return;
    }
@@ -148,8 +238,9 @@ messages:
    }
 
    GetDuration(iSpellPower=0)
+   "60 to 159 seconds (it was a random time up to this)."
    {
-      return Random(60000,60000 + (iSpellPower * 1000));
+      return 60000 + (iSpellPower * 1000);
    }
 
    CanEnchantUser(who=$,state=$)

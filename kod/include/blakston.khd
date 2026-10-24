@@ -2612,6 +2612,11 @@
    SID_ICESHARD = 202
    // Ours: brings a fallen companion back (spell/restcomp.kod)
    SID_RESTORE_COMPANION = 203
+   // Ours (spell revamp D11): the frost spells' chill (spell/chill.kod), an
+   //  effect nobody learns
+   SID_CHILL = 205
+   // Ours (spell revamp D10): a flame-attuned mage's burn (spell/burn.kod)
+   SID_BURN = 206
    SID_ICEWALL             = 241
    SID_INDEST              = 242
    SID_NODROP              = 253
@@ -2743,6 +2748,13 @@
    // Constants for spellpower
    SPELLPOWER_MINIMUM = 1
    SPELLPOWER_MAXIMUM = 99
+
+   // Ours (spell revamp D10): the element a Faren mage attunes to, once
+   //  (Player.piFarenAttunement), and a Faren spell's element (Spell.viFarenElement)
+   FAREN_ELEMENT_NONE = 0
+   FAREN_ELEMENT_FLAME = 1
+   FAREN_ELEMENT_FROST = 2
+   FAREN_ELEMENT_STORM = 3
 
    // Monster flags (piMonsterFlags in monster.kod)
    // Set if a monster is part of a invader's army.

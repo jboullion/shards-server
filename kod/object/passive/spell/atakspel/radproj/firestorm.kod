@@ -51,6 +51,7 @@ classvars:
 
    viSpell_num = SID_FIRE_STORM
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_FLAME
    viSpell_level = 6
    viMana = 30
 

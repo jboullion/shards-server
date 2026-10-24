@@ -1,0 +1,137 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+Chill is Spell
+
+// Ours (spell revamp D11): Faren's frost slows what it hits. Ice Shard,
+//  Explosive Frost, Ice Nova and the ice wall chill their targets for a few
+//  seconds: a monster moves and attacks more slowly, a player's attacks and
+//  spells recover more slowly. An effect the frost spells share, so chills
+//  don't stack; nobody can learn or cast it.
+
+constants:
+
+   include blakston.khd
+
+   // How much slower a chilled monster moves and attacks, and a chilled
+   //  player recovers from an attack or a spell (percent of normal time).
+   CHILL_SLOW_PCT = 150
+
+resources:
+
+   chill_name_rsc = "chill"
+   chill_icon_rsc = iicenova.bgf
+   chill_desc_rsc = \
+      "Faren's frost has seeped into your bones.  You attack and cast more "
+      "slowly until it passes."
+   chill_on_rsc = "~bFrost bites into you, and your limbs stiffen."
+   chill_off_rsc = "The frost leaves your limbs."
+   chill_summary_rsc = \
+      "  It chills what it hits for %i seconds: a monster moves and attacks "
+      "half again as slowly, and a player recovers half again as slowly from "
+      "each attack and spell."
+
+classvars:
+
+   vrName = chill_name_rsc
+   vrIcon = chill_icon_rsc
+   vrDesc = chill_desc_rsc
+
+   viSpell_num = SID_CHILL
+   viSchool = SS_FAREN
+   viSpell_level = 6
+   viHarmful = TRUE
+   viFlash = FLASH_NONE
+
+properties:
+
+   pbAccessible = FALSE
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+
+      return;
+   }
+
+   OfferToNewCharacters()
+   {
+      return FALSE;
+   }
+
+   GetChillTime(iSpellPower=0)
+   "Four to six seconds."
+   {
+      return 4000 + (Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) * 20);
+   }
+
+   DoChill(oTarget=$,iSpellPower=0)
+   "Chills oTarget, or starts its chill over."
+   {
+      if oTarget = $
+         OR NOT IsClass(oTarget,&Battler)
+      {
+         return;
+      }
+
+      if Send(oTarget,@IsEnchanted,#what=self)
+      {
+         Send(oTarget,@RemoveEnchantment,#what=self,#report=FALSE);
+      }
+      else if IsClass(oTarget,&User)
+      {
+         Send(oTarget,@MsgSendUser,#message_rsc=chill_on_rsc);
+      }
+
+      Send(oTarget,@StartEnchantment,#what=self,
+           #time=Send(self,@GetChillTime,#iSpellPower=iSpellPower));
+
+      return;
+   }
+
+   SendChillSummary(iSpellPower=0)
+   "One resource for a frost spell's description (SendSideEffectSummary)."
+   {
+      AddPacket(4,chill_summary_rsc,
+                4,Send(self,@GetChillTime,#iSpellPower=iSpellPower) / 1000);
+
+      return;
+   }
+
+   GetSlowPercent()
+   {
+      return CHILL_SLOW_PCT;
+   }
+
+   ModifyMonsterMoveSpeed(mob=$,iSpeed=0,state=$)
+   {
+      return Bound(iSpeed * 100 / CHILL_SLOW_PCT,1,$);
+   }
+
+   ModifyMonsterAttackTime(mob=$,iTime=0,state=$)
+   {
+      return iTime * CHILL_SLOW_PCT / 100;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   {
+      if report
+         AND IsClass(who,&User)
+      {
+         Send(who,@MsgSendUser,#message_rsc=chill_off_rsc);
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

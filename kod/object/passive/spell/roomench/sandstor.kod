@@ -57,6 +57,8 @@ classvars:
    viNoNewbieOffense = TRUE
    viSpell_num = SID_SANDSTORM
    viSchool = SS_FAREN
+   // Ours (spell revamp D13, D14): only foes, not the caster.
+   vbRoomEnchHitCaster = FALSE
    viAttack_spell = 0
    viAttack_type = ATCK_WEAP_SLASH
    viSpell_level = 5
@@ -149,6 +151,11 @@ messages:
       return;
    }
 
+   AffectsMonsters()
+   {
+      return TRUE;
+   }
+
    StartEnchantmentNewOccupant(who = $, state = $)
    "Called on new occupants of the enchanted room."
    {
@@ -161,6 +168,26 @@ messages:
    StartEnchantment(who = $, state = $)
    "Does enchantment effect on one player"
    {
+      // Ours (spell revamp D14): a monster is blinded by sand until the next
+      //  gust (less to-hit), and stung by it.
+      if IsClass(who,&Monster)
+      {
+         if Send(self,@IsHostileTo,#oTarget=who,#state=state)
+         {
+            if Send(who,@IsEnchanted,#what=self)
+            {
+               Send(who,@RemoveEnchantment,#what=self);
+            }
+
+            Send(who,@StartEnchantment,#what=self,#time=SANDSTORM_PERIOD,
+                  #state=First(state) % 100);
+         }
+
+         Send(self,@RoomEnchantmentDamage,#oTarget=who,#state=state);
+
+         return;
+      }
+
       Send(who,@EffectSendUser,#what=self,#effect=EFFECT_SAND);
 
       if (NOT Send(who,@IsEnchanted,#what=self)
@@ -180,7 +207,10 @@ messages:
       local i, lUsing;
 
       // 1 to 10 point vigor loss.
-      Send(oTarget,@AddExertion,#amount=((iSpellPower + 1) / 25) * 10000);
+      if IsClass(oTarget,&Player)
+      {
+         Send(oTarget,@AddExertion,#amount=((iSpellPower + 1) / 25) * 10000);
+      }
       iDamage = 1 + (iSpellPower / 30);
       // Don't let people die because of sandstorm.
       iDamage = Bound(iDamage,0,Send(oTarget,@GetHealth) - 1);
@@ -229,9 +259,25 @@ messages:
 
    EndEnchantment(who=$,state=$)
    {
+      if IsClass(who,&Monster)
+      {
+         return;
+      }
+
       Send(who,@AddAim,#points=((First(state) % 100) / 3));
 
       return;
+   }
+
+   ModifyMonsterOffense(mob=$,iOffense=0,state=$)
+   "Ours: spellpower/3 percent less (20% at 60), as a player loses spellpower/3 aim."
+   {
+      if state = $
+      {
+         return iOffense;
+      }
+
+      return iOffense * (100 - (state / 3)) / 100;
    }
 
    CanEnchantUser(who=$,state=$)

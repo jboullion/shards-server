@@ -66,6 +66,7 @@ classvars:
    viDefinite = ARTICLE_NONE
 
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_FLAME
    viSpell_num = SID_TOUCH_OF_FLAME
    viSpell_level = 2
    viSpellExertion = 1

@@ -3646,13 +3646,23 @@ messages:
 
    EnchantAllOccupants(what = $, iSpellPower = 0, state = $)
    {
-      local i, each_obj;
+      local i, each_obj, bMonsters;
+
+      // Ours (spell revamp D13, D14): Heat, Freezing, Winds and Sandstorm
+      //  reach monsters too (Spell.AffectsMonsters).
+      bMonsters = Send(what,@AffectsMonsters);
 
       foreach i in plActive
       {
          each_obj = First(i);
          if IsClass(each_obj,&User)
             AND NOT Send(each_obj,@IsInCannotInteractMode)
+         {
+            Send(what,@StartEnchantment,#who=each_obj,
+                  #iSpellPower=iSpellPower,#state=state);
+         }
+         else if bMonsters
+            AND IsClass(each_obj,&Monster)
          {
             Send(what,@StartEnchantment,#who=each_obj,
                   #iSpellPower=iSpellPower,#state=state);

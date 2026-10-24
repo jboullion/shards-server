@@ -20,7 +20,7 @@ resources:
 
    include atakspel.lkod
 
-   attack_spell_effect_rsc = "%i to %i %s damage, before resistances%r.%r"
+   attack_spell_effect_rsc = "%i to %i %s damage, before resistances%r.%r%r"
    attack_spell_effect_focus_rsc = ", and up to %i more from Mana Focus"
    attack_spell_effect_self_rsc = " You take %i%% of it yourself."
 
@@ -291,7 +291,8 @@ messages:
 
          Send(oRoom,@SomethingAttacked,#what=who,#victim=i,#use_weapon=self);
 
-         Send(self,@DoSideEffect,#who=who,#victim=i,#damage=iDamage);
+         Send(self,@DoSideEffect,#who=who,#victim=i,#damage=iDamage,
+              #iSpellPower=iSpellPower);
       }
 
       // This used to not propagate, but as of July 2014 it does. No bugs yet noted.
@@ -307,7 +308,10 @@ messages:
                      #lTargets=lTargets);
 
       // Reduce damage based on spell power.
-      return (iDamage * (50 + (iSpellPower / 2))) / SPELLPOWER_MAXIMUM;
+      iDamage = (iDamage * (50 + (iSpellPower / 2))) / SPELLPOWER_MAXIMUM;
+
+      // Ours (spell revamp D10): a Faren mage attuned to our element.
+      return Send(self,@ApplyAttunementDamage,#who=who,#iDamage=iDamage);
    }
 
    HasEffectSummary()
@@ -356,6 +360,8 @@ messages:
          AddPacket(4,spell_blank);
       }
 
+      Send(self,@SendSideEffectSummary,#who=who,#iSpellPower=iSpellPower);
+
       return;
    }
 
@@ -389,8 +395,11 @@ messages:
    }
 
    // The chance to do something in addition to normal damage.
-   DoSideEffect(who=$,victim=$,damage=0)
+   DoSideEffect(who=$,victim=$,damage=0,iSpellPower=0)
    {
+      // Ours (spell revamp D10): a flame-attuned mage's fire sets it burning.
+      Send(self,@TryAttunementBurn,#who=who,#victim=victim,#iDamage=damage);
+
       return;
    }
 

@@ -125,6 +125,10 @@ resources:
    spell_pp_server = "Server bonus"
    spell_pp_dement = "Dement (up to %i more on each cast)"
    spell_pp_kraanan = "Kraanan's favour"
+   spell_pp_attuned = "Attuned to %s"
+   spell_element_flame = "flame"
+   spell_element_frost = "frost"
+   spell_element_storm = "storm"
    spell_pp_total_cap = "The most a spell can reach is %i"
    spell_pp_total_floor = "The least a spell can have is %i"
    spell_pp_other = "Other effects"
@@ -260,6 +264,14 @@ classvars:
    viDefensive = FALSE
    viOffensive = FALSE
    viResistanceType = 0
+
+   // Ours (spell revamp D10): a Faren spell's element (FAREN_ELEMENT_*). A mage
+   //  attuned to it gets +10 spellpower and 15% more damage with it.
+   viFarenElement = FAREN_ELEMENT_NONE
+   // A flame spell sets its target burning for an attuned mage instead of
+   //  hitting 15% harder (spell/burn.kod). FALSE for those that burn over
+   //  time already (Heat, the fire walls), which keep the 15%.
+   vbAttunementBurns = TRUE
 
 properties:
 
@@ -2479,7 +2491,7 @@ messages:
       local iSpellPower, i, oRoom, oModifierSpell, iAbilityLoss,
             iAbilityGain, iItemModifier, iBase, iPrimaryBonus, iSecondaryBonus,
             iPowerBonus, iShrines, lParts, lItemParts, iMod, iBefore, iBound,
-            iBonus, iAbility;
+            iBonus, iAbility, iAttune;
 
       if who = $
       {
@@ -2719,7 +2731,16 @@ messages:
          lParts = AppendListElem([spell_pp_faction, iPowerBonus, $], lParts);
       }
 
-      iSpellPower = iPrimaryBonus + iSecondaryBonus + iPowerBonus + iBase;
+      // Ours (spell revamp D10): a Faren mage's chosen element.
+      iAttune = Send(self,@GetAttunementBonus,#who=who);
+      if bParts AND iAttune <> 0
+      {
+         lParts = AppendListElem([spell_pp_attuned, iAttune,
+                                  [Send(self,@GetFarenElementName)]], lParts);
+      }
+
+      iSpellPower = iPrimaryBonus + iSecondaryBonus + iPowerBonus + iBase
+                    + iAttune;
 
       if Send(oRoom,@CheckRoomFlag,#flag=ROOM_ANTI_MAGIC)
       {
@@ -2831,6 +2852,119 @@ messages:
       return iBound;
    }
 
+   GetFarenElement()
+   {
+      return viFarenElement;
+   }
+
+   GetFarenElementName(element=$)
+   "The name of a Faren element (this spell's if element is $)."
+   {
+      if element = $
+      {
+         element = viFarenElement;
+      }
+
+      if element = FAREN_ELEMENT_FLAME
+      {
+         return spell_element_flame;
+      }
+
+      if element = FAREN_ELEMENT_FROST
+      {
+         return spell_element_frost;
+      }
+
+      if element = FAREN_ELEMENT_STORM
+      {
+         return spell_element_storm;
+      }
+
+      return spell_blank;
+   }
+
+   IsAttuned(who=$)
+   "Ours (spell revamp D10): TRUE if who, a player, is attuned to our element."
+   {
+      if viFarenElement = FAREN_ELEMENT_NONE
+         OR who = $
+      {
+         return FALSE;
+      }
+
+      if NOT IsClass(who,&Player)
+      {
+         return FALSE;
+      }
+
+      return Send(who,@GetFarenAttunement) = viFarenElement;
+   }
+
+   GetAttunementBonus(who=$)
+   {
+      if Send(self,@IsAttuned,#who=who)
+      {
+         return 10;
+      }
+
+      return 0;
+   }
+
+   ApplyAttunementDamage(who=$,iDamage=0)
+   "15% more damage for a mage attuned to our element, unless it's a flame "
+   "spell that burns instead (AttunementBurns)."
+   {
+      if Send(self,@IsAttuned,#who=who)
+         AND NOT Send(self,@AttunementBurns,#who=who)
+      {
+         return iDamage * 115 / 100;
+      }
+
+      return iDamage;
+   }
+
+   AttunementBurns(who=$)
+   "TRUE if who's hits with this spell set their target burning."
+   {
+      if viFarenElement <> FAREN_ELEMENT_FLAME
+         OR NOT vbAttunementBurns
+      {
+         return FALSE;
+      }
+
+      return Send(self,@IsAttuned,#who=who);
+   }
+
+   TryAttunementBurn(who=$,victim=$,iDamage=0)
+   "A hit for iDamage (hundredths) sets victim burning, if who burns with "
+   "this spell."
+   {
+      if iDamage <> $
+         AND iDamage > 0
+         AND Send(self,@AttunementBurns,#who=who)
+      {
+         Send(Send(SYS,@FindSpellByNum,#num=SID_BURN),@DoBurn,#who=who,
+              #oTarget=victim,#iHitDamage=iDamage);
+      }
+
+      return;
+   }
+
+   SendSideEffectSummary(who=$,iSpellPower=0)
+   "Ours: one resource after an attack spell's damage in its description."
+   {
+      if Send(self,@AttunementBurns,#who=who)
+      {
+         Send(Send(SYS,@FindSpellByNum,#num=SID_BURN),@SendBurnSummary);
+
+         return;
+      }
+
+      AddPacket(4,spell_blank);
+
+      return;
+   }
+
    GetCapLabel(iValue=0)
    "Ours: the breakdown line for a school bonus held to its range."
    {
@@ -2924,6 +3058,25 @@ messages:
    MonsterCanHeal(mob=$,state=$)
    {
       return TRUE;
+   }
+
+   AffectsMonsters()
+   "Ours (spell revamp D13, D14): a room enchantment that reaches monsters "
+   "as well as players (Room.EnchantAllOccupants)."
+   {
+      return FALSE;
+   }
+
+   ModifyMonsterMoveSpeed(mob=$,iSpeed=0,state=$)
+   "Squares per 10 seconds (Monster.GetMoveSpeed)."
+   {
+      return iSpeed;
+   }
+
+   ModifyMonsterAttackTime(mob=$,iTime=0,state=$)
+   "Milliseconds between the monster's attacks (Monster.GetAttackTime)."
+   {
+      return iTime;
    }
 
    IsIllusion()

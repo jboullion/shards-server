@@ -39,6 +39,7 @@ classvars:
    viAttack_spell = ATCK_SPELL_ALL + ATCK_SPELL_FIRE
 
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_FLAME
    viSpell_level = 4
    viMana = 8
 

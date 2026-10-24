@@ -73,8 +73,18 @@ messages:
       iDamage = 0;
       iMaxDamage = piMaxDamage;
       
-      iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=Random(0,iMaxDamage),
+      // Ours (spell revamp D10, D11): more for a caster attuned to frost, and
+      //  whoever crosses is chilled.
+      iDamage = Send(Send(SYS,@FindSpellByNum,#num=SID_ICEWALL),
+                     @ApplyAttunementDamage,#who=poCaster,
+                     #iDamage=Random(0,iMaxDamage));
+      iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=iDamage,
                      #aspell=ATCK_SPELL_ALL+ATCK_SPELL_COLD,#report=FALSE,#report_resistance=FALSE);
+      if iDamage <> $
+      {
+         Send(Send(SYS,@FindSpellByNum,#num=SID_CHILL),@DoChill,#oTarget=what,
+              #iSpellPower=0);
+      }
 
       Send(poOwner,@SomethingAttacked,#what=poCaster,#victim=what,
             #use_weapon=self,#stroke_obj=self);

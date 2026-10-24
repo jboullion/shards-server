@@ -13,7 +13,13 @@ Lightning is BoltSpell
 constants:
    include blakston.khd
 
+   // Ours (spell revamp D11): how long a monster it hits can't cast (ms).
+   STORM_DISRUPT_TIME = 3000
+
 resources:
+
+   lightning_disrupt_summary_rsc = \
+      "  A monster it hits can't cast spells for %i seconds."
 
    include lightnin.lkod
 
@@ -39,6 +45,7 @@ classvars:
 
    viMana = 10
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_STORM
    viSpell_level = 5
 
    viChance_To_Increase = 15
@@ -83,6 +90,41 @@ messages:
    SendProjectileAnimation()
    {
       AddPacket(1, ANIMATE_CYCLE, 4, 40, 2, 2, 2, 3);   // 40ms between animations
+      return;
+   }
+
+   DoSideEffect(who=$,victim=$,damage=0,iSpellPower=0)
+   "Ours (spell revamp D11): storm disrupts. A monster it hits can't cast "
+   "spells for a moment (a player's casting breaks on any damage already)."
+   {
+      if damage <> $
+         AND IsClass(victim,&Monster)
+      {
+         if Send(victim,@IsEnchanted,#what=self)
+         {
+            Send(victim,@RemoveEnchantment,#what=self);
+         }
+
+         Send(victim,@StartEnchantment,#what=self,#time=STORM_DISRUPT_TIME);
+      }
+
+      propagate;
+   }
+
+   MonsterCanCast(mob=$,state=$)
+   {
+      return FALSE;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   {
+      return;
+   }
+
+   SendSideEffectSummary(who=$,iSpellPower=0)
+   {
+      AddPacket(4,lightning_disrupt_summary_rsc, 4,STORM_DISRUPT_TIME / 1000);
+
       return;
    }
 

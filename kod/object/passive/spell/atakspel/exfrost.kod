@@ -39,6 +39,7 @@ classvars:
    viAttack_spell = ATCK_SPELL_ALL + ATCK_SPELL_COLD
 
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_FROST
    viSpell_level = 4
    viMana = 8
    viMeditate_ratio = 40
@@ -69,6 +70,26 @@ messages:
       return;
    }
 
+
+   DoSideEffect(who=$,victim=$,damage=0,iSpellPower=0)
+   "Ours (spell revamp D11): frost chills what it hits."
+   {
+      if damage <> $
+      {
+         Send(Send(SYS,@FindSpellByNum,#num=SID_CHILL),@DoChill,
+              #oTarget=victim,#iSpellPower=iSpellPower);
+      }
+
+      propagate;
+   }
+
+   SendSideEffectSummary(who=$,iSpellPower=0)
+   {
+      Send(Send(SYS,@FindSpellByNum,#num=SID_CHILL),@SendChillSummary,
+           #iSpellPower=iSpellPower);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

@@ -25,7 +25,10 @@ resources:
    freezing_icon_rsc = iicenova.bgf
    freezing_desc_rsc = \
       "Fills the room with the earth magic of Faren, freezing "
-      "all armor causing frostbite. "
+      "all armor causing frostbite.  The lighter the armor, the deeper the "
+      "cold bites, and everyone it bites is chilled, slowing them.  "
+      "Monsters freeze too.  "
+      "Requires blue mushroom and firesand to cast."
    
    freezing_already_enchanted = "This place already has a freezing enchantment."
 
@@ -57,6 +60,9 @@ classvars:
    viAttack_spell = ATCK_SPELL_COLD
    viSpell_num = SID_FREEZING
    viSchool = SS_FAREN
+   // Ours (spell revamp D13, D14): only foes, not the caster.
+   vbRoomEnchHitCaster = FALSE
+   viFarenElement = FAREN_ELEMENT_FROST
    viSpell_level = 3
    viMana = 8
 
@@ -168,6 +174,17 @@ messages:
       return;
    }
 
+   GetSpellPowerFromState(state=$)
+   "Ours: the state packs the time gone by with the spellpower in its last two digits."
+   {
+      return First(state) % 100;
+   }
+
+   AffectsMonsters()
+   {
+      return TRUE;
+   }
+
    StartEnchantmentNewOccupant(who = $,state = $)
    "Called on new occupants of the enchanted room."
    {
@@ -185,25 +202,40 @@ messages:
          return;
       }
 
+      // Ours (spell revamp D13): the cold chills whoever it bites.
+      if Send(self,@IsHostileTo,#oTarget=who,#state=state)
+      {
+         Send(Send(SYS,@FindSpellByNum,#num=SID_CHILL),@DoChill,#oTarget=who,
+              #iSpellPower=First(state) % 100);
+      }
+
       Send(self,@RoomEnchantmentDamage,#oTarget=who,#state=state);
 
       return;
    }
 
-   ComputeDamage(who=$,oTarget=$,iDamage=$)
+   ComputeDamage(who=$,oTarget=$,iDamage=$,iSpellPower=0)
+   "Ours (spell revamp D13): Heat's opposite. The lighter a player's armor, "
+   "the more it hurts (8 unarmored, 1 in the heaviest); a monster takes 2 to 5."
    {
-      local i, lUsing;
+      local i;
 
-      lUsing = Send(oTarget,@GetPlayerUsing);
-
-      iDamage = 0;
-
-      foreach i in lUsing
+      if IsClass(oTarget,&Player)
       {
-         iDamage = iDamage + Send(i,@GetHeatDamage);
+         iDamage = 0;
+         foreach i in Send(oTarget,@GetPlayerUsing)
+         {
+            iDamage = iDamage + Send(i,@GetHeatDamage);
+         }
+
+         iDamage = Bound(8 - iDamage,1,8);
+      }
+      else
+      {
+         iDamage = 2 + (iSpellPower / 25);
       }
 
-      return iDamage;
+      return Send(self,@ApplyAttunementDamage,#who=who,#iDamage=iDamage);
    }
 
    EndSpell(where = $, state = $)

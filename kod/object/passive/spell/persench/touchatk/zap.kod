@@ -57,6 +57,7 @@ classvars:
    viDefinite = ARTICLE_NONE
 
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_STORM
    viSpell_num = SID_ZAP
    viSpellExertion = 1
    viSpell_level = 1

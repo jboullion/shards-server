@@ -5905,23 +5905,39 @@ if isClass(self,&Reflection)
 
    GetAttackTime()
    {
-      local itime;
+      local itime, i;
 
       iTime = Send(self,@Fuzzy,#num=MOB_ATTACK_TIMER_WAIT) + 3500-70*(3*viDifficulty+viSpeed);
-      
+
       if iTime < 0
       {
          iTime = Random(1000,2000);
       }
-      
+
+      // Ours (spell revamp D11): a chill slows our attacks.
+      foreach i in plEnchantments
+      {
+         iTime = Send(Nth(i,2),@ModifyMonsterAttackTime,#mob=self,#iTime=iTime,
+                      #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
       return iTime;
    }
 
    GetMoveSpeed()
    "Ours: how fast we move now, squares per 10 seconds (viSpeed; a companion keeps up with its "
-   "running master)."
+   "running master). A chill slows us (spell revamp D11)."
    {
-      return viSpeed;
+      local i, iSpeed;
+
+      iSpeed = viSpeed;
+      foreach i in plEnchantments
+      {
+         iSpeed = Send(Nth(i,2),@ModifyMonsterMoveSpeed,#mob=self,#iSpeed=iSpeed,
+                       #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
+      return iSpeed;
    }
 
    GetMoveTime()

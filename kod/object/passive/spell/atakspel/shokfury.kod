@@ -14,7 +14,13 @@ constants:
 
    include blakston.khd
 
+   // Ours (spell revamp D11): how long a monster it hits can't cast (ms).
+   STORM_DISRUPT_TIME = 3000
+
 resources:
+
+   storm_disrupt_summary_rsc = \
+      "  A monster it hits can't cast spells for %i seconds."
 
    include shokfury.lkod
 
@@ -39,6 +45,7 @@ classvars:
    viAttack_spell = ATCK_SPELL_ALL + ATCK_SPELL_SHOCK
 
    viSchool = SS_FAREN
+   viFarenElement = FAREN_ELEMENT_STORM
    viSpell_level = 3
    viMana = 8
 
@@ -64,6 +71,41 @@ messages:
       plReagents = $;
       plReagents = Cons([&BlueMushroom,2],plReagents);
       plReagents = Cons([&Elderberry,1],plReagents);
+
+      return;
+   }
+
+   DoSideEffect(who=$,victim=$,damage=0,iSpellPower=0)
+   "Ours (spell revamp D11): storm disrupts. A monster it hits can't cast "
+   "spells for a moment (a player's casting breaks on any damage already)."
+   {
+      if damage <> $
+         AND IsClass(victim,&Monster)
+      {
+         if Send(victim,@IsEnchanted,#what=self)
+         {
+            Send(victim,@RemoveEnchantment,#what=self);
+         }
+
+         Send(victim,@StartEnchantment,#what=self,#time=STORM_DISRUPT_TIME);
+      }
+
+      propagate;
+   }
+
+   MonsterCanCast(mob=$,state=$)
+   {
+      return FALSE;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   {
+      return;
+   }
+
+   SendSideEffectSummary(who=$,iSpellPower=0)
+   {
+      AddPacket(4,storm_disrupt_summary_rsc, 4,STORM_DISRUPT_TIME / 1000);
 
       return;
    }

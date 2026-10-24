@@ -257,6 +257,19 @@ messages:
       return viRange;
    }
 
+   WeaponHitTarget(who=$,victim=$,damage=$)
+   "Ours (spell revamp D10): Player.DidDamage tells us whom we hit and for "
+   "how much; a flame-attuned mage's fiery fists set it burning."
+   {
+      if who <> $
+         AND victim <> $
+      {
+         Send(self,@TryAttunementBurn,#who=who,#victim=victim,#iDamage=damage);
+      }
+
+      return;
+   }
+
    FindMinDamage(who=$)
    {
       local damage, iAbility;
@@ -264,7 +277,8 @@ messages:
       damage = viMin_Damage;
       iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
       damage = (damage * (iAbility+1));
-      damage = Send(self,@DamageFactors,#damage=damage,#who=who)/100;
+      damage = Send(self,@DamageFactors,#damage=damage,#who=who);
+      damage = Send(self,@ApplyAttunementDamage,#who=who,#iDamage=damage)/100;
       
       return bound(damage,0,$);
    }
@@ -276,7 +290,8 @@ messages:
       damage = viMax_Damage;
       iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
       damage = (damage * (iAbility+1));
-      damage = Send(self,@DamageFactors,#damage=damage,#who=who)/100;
+      damage = Send(self,@DamageFactors,#damage=damage,#who=who);
+      damage = Send(self,@ApplyAttunementDamage,#who=who,#iDamage=damage)/100;
       
       return bound(damage,0,$);
    }
@@ -302,6 +317,9 @@ messages:
       // Myst boosts base damage
       damage = Send(self,@DamageFactors,#damage=damage,#who=who,
                     #victim=victim);
+
+      // Ours (spell revamp D10): a Faren mage attuned to our element.
+      damage = Send(self,@ApplyAttunementDamage,#who=who,#iDamage=damage);
       
       return bound(damage,0,$);
    }

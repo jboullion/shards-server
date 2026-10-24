@@ -1,0 +1,216 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+Burn is Spell
+
+// Ours (spell revamp D10): a mage attuned to flame sets what their fire
+//  spells hit burning, instead of hitting 15% harder: a quarter of the hit
+//  again, over three ticks two seconds apart. A burn on a burning target
+//  starts over. An effect the fire spells share; nobody learns or casts it.
+//
+// The enchantment marks who's burning (an icon for players; it ends on death,
+//  Purify and the like). The ticks run on our own timers, one entry in
+//  plBurns per target: [timer, target, caster, damage per tick, ticks left].
+
+constants:
+
+   include blakston.khd
+
+   BURN_PCT = 25
+   BURN_TICKS = 3
+   BURN_TICK_TIME = 2000
+
+   BURN_TIMER = 1
+   BURN_TARGET = 2
+   BURN_CASTER = 3
+   BURN_DAMAGE = 4
+   BURN_LEFT = 5
+
+resources:
+
+   burn_name_rsc = "burning"
+   burn_icon_rsc = iheat.bgf
+   burn_desc_rsc = "You are on fire, and the flames are eating at you."
+   burn_on_rsc = "~rFlames catch on you!"
+   burn_off_rsc = "The flames on you gutter out."
+   burn_summary_rsc = \
+      "  Attuned to flame, it sets what it hits burning: a quarter of the "
+      "hit again over %i seconds."
+
+classvars:
+
+   vrName = burn_name_rsc
+   vrIcon = burn_icon_rsc
+   vrDesc = burn_desc_rsc
+
+   viSpell_num = SID_BURN
+   viSchool = SS_FAREN
+   viSpell_level = 6
+   viHarmful = TRUE
+   viFlash = FLASH_NONE
+
+properties:
+
+   pbAccessible = FALSE
+   plBurns = $
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+
+      return;
+   }
+
+   OfferToNewCharacters()
+   {
+      return FALSE;
+   }
+
+   DoBurn(who=$,oTarget=$,iHitDamage=0)
+   "Sets oTarget burning for a quarter of iHitDamage (hundredths), or starts "
+   "its burn over."
+   {
+      local iTick;
+
+      if who = $
+         OR oTarget = $
+         OR NOT IsClass(oTarget,&Battler)
+      {
+         return;
+      }
+
+      iTick = (iHitDamage * BURN_PCT / 100) / BURN_TICKS;
+      if iTick <= 0
+      {
+         return;
+      }
+
+      if Send(oTarget,@IsEnchanted,#what=self)
+      {
+         // EndEnchantment drops its entry and timer.
+         Send(oTarget,@RemoveEnchantment,#what=self,#report=FALSE);
+      }
+      else if IsClass(oTarget,&User)
+      {
+         Send(oTarget,@MsgSendUser,#message_rsc=burn_on_rsc);
+      }
+
+      Send(oTarget,@StartEnchantment,#what=self,#time=$);
+      plBurns = Cons([CreateTimer(self,@BurnTimer,BURN_TICK_TIME), oTarget, who,
+                      iTick, BURN_TICKS], plBurns);
+
+      return;
+   }
+
+   BurnTimer(timer=$)
+   {
+      local i, lBurn, oTarget, oCaster, iDamage;
+
+      lBurn = $;
+      foreach i in plBurns
+      {
+         if Nth(i,BURN_TIMER) = timer
+         {
+            lBurn = i;
+         }
+      }
+
+      if lBurn = $
+      {
+         return;
+      }
+
+      // The timer has fired; a later EndEnchantment mustn't delete it.
+      SetNth(lBurn,BURN_TIMER,$);
+      oTarget = Nth(lBurn,BURN_TARGET);
+      oCaster = Nth(lBurn,BURN_CASTER);
+
+      // Gone from the world (logged off), or no longer a foe: it goes out.
+      if Send(oTarget,@GetOwner) = $
+         OR NOT IsClass(oCaster,&Battler)
+         OR Send(oCaster,@GetOwner) = $
+         OR NOT Send(oCaster,@AllowBattlerAttack,#victim=oTarget,
+                     #stroke_obj=self)
+      {
+         Send(oTarget,@RemoveEnchantment,#what=self);
+
+         return;
+      }
+
+      SetNth(lBurn,BURN_LEFT,Nth(lBurn,BURN_LEFT) - 1);
+      if Nth(lBurn,BURN_LEFT) > 0
+      {
+         SetNth(lBurn,BURN_TIMER,CreateTimer(self,@BurnTimer,BURN_TICK_TIME));
+      }
+
+      iDamage = Send(oTarget,@AssessDamage,#what=oCaster,
+                     #damage=Nth(lBurn,BURN_DAMAGE),
+                     #aspell=ATCK_SPELL_ALL+ATCK_SPELL_FIRE,#precision=TRUE,
+                     #report=FALSE,#report_resistance=FALSE);
+      Send(Send(oTarget,@GetOwner),@SomethingAttacked,#what=oCaster,
+           #victim=oTarget,#use_weapon=self,#stroke_obj=self);
+
+      if iDamage = $
+      {
+         // Its death removes the enchantment, and with it this entry.
+         Send(oCaster,@KilledSomething,#what=oTarget,#use_weapon=self);
+
+         return;
+      }
+
+      if Nth(lBurn,BURN_LEFT) <= 0
+      {
+         Send(oTarget,@RemoveEnchantment,#what=self);
+      }
+
+      return;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   "The burn is over: drop its entry, and its timer if one is waiting."
+   {
+      local i;
+
+      foreach i in plBurns
+      {
+         if Nth(i,BURN_TARGET) = who
+         {
+            if Nth(i,BURN_TIMER) <> $
+            {
+               DeleteTimer(Nth(i,BURN_TIMER));
+            }
+
+            plBurns = DelListElem(plBurns,i);
+
+            break;
+         }
+      }
+
+      if report
+         AND IsClass(who,&User)
+      {
+         Send(who,@MsgSendUser,#message_rsc=burn_off_rsc);
+      }
+
+      return;
+   }
+
+   SendBurnSummary()
+   "One resource for a fire spell's description (SendSideEffectSummary)."
+   {
+      AddPacket(4,burn_summary_rsc, 4,(BURN_TICKS * BURN_TICK_TIME) / 1000);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

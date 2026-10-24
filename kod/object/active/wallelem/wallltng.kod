@@ -84,8 +84,18 @@ messages:
       iDamage = 0;
       iMaxDamage = piMaxDamage;
       
-      iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=Random(0,iMaxDamage),
+      // Ours (spell revamp D10, D11): more for a caster attuned to storm, and
+      //  whoever crosses is jolted (a one-second hold, as Flash does).
+      iDamage = Send(Send(SYS,@FindSpellByNum,#num=SID_LIGHTNING_WALL),
+                     @ApplyAttunementDamage,#who=poCaster,
+                     #iDamage=Random(0,iMaxDamage));
+      iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=iDamage,
                      #aspell=ATCK_SPELL_ALL+ATCK_SPELL_SHOCK,#report=FALSE,#report_resistance=FALSE);
+      if iDamage <> $
+      {
+         Send(Send(SYS,@FindSpellByNum,#num=SID_HOLD),@DoSpell,#what=poCaster,
+              #oTarget=what,#iDuration=1000,#report=FALSE);
+      }
 
       Send(poOwner,@SomethingAttacked,#what=poCaster,#victim=what,
             #use_weapon=self,#stroke_obj=self);

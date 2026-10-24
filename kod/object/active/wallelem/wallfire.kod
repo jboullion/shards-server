@@ -110,7 +110,11 @@ messages:
       }
       else
       {
-         iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=Random(0,piMaxDamage),
+         // Ours (spell revamp D10): more for a caster attuned to flame.
+         iDamage = Send(Send(SYS,@FindSpellByNum,#num=SID_FIREWALL),
+                        @ApplyAttunementDamage,#who=poCaster,
+                        #iDamage=Random(0,piMaxDamage));
+         iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=iDamage,
                         #aspell=ATCK_SPELL_ALL+ATCK_SPELL_FIRE,#report=FALSE,#report_resistance=FALSE);
          Send(poOwner,@SomethingAttacked,#what=poCaster,#victim=what,
                #use_weapon=self,#stroke_obj=self);

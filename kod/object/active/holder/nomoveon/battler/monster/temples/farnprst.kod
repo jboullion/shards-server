@@ -34,6 +34,29 @@ resources:
       "From Faren's fire, you can learn %s%s%s%s%s%s%s%s%s%s%s%s "
       "at that level."
 
+   // Ours (spell revamp D10): attuning to one of Faren's elements, once.
+   farenpriestess_attune_trigger = "attune"
+   farenpriestess_word_flame = "flame"
+   farenpriestess_word_frost = "frost"
+   farenpriestess_word_storm = "storm"
+   farenpriestess_attune_explain = \
+      "Faren's gifts run three ways.  Flame burns hottest.  Frost chills, "
+      "slowing all it touches.  Storm jolts, breaking a foe's spells.  Bind "
+      "yourself to one and its spells will answer you as no others will: "
+      "fifteen parts in a hundred harder, and stronger in your hands.  Say "
+      "~Battune flame~B, ~Battune frost~B or ~Battune storm~B.  Choose well.  "
+      "Faren does not let you choose twice."
+   farenpriestess_attune_not_disciple = \
+      "You have not walked Faren's path as my disciple.  Come back when you "
+      "have."
+   farenpriestess_attune_not_ready = \
+      "Your grasp of Faren's arts is still too weak.  Return when you can "
+      "learn his spells of the fourth circle."
+   farenpriestess_attune_already = \
+      "You are bound to %s already.  Faren does not unmake his gifts."
+   farenpriestess_attune_done = \
+      "So be it.  Faren's %s is yours, and you are its."
+
 classvars:
 
    vrTeach_message = faren_teach
@@ -48,6 +71,96 @@ classvars:
    viOccupation = MOB_ROLE_PRIESTESS
 
 messages:
+
+   SomeoneSaid(what = $,type = $,string = $)
+   "Ours (spell revamp D10): 'attune' explains the choice; 'attune flame', "
+   "'attune frost' or 'attune storm' makes it, once and for good."
+   {
+      if IsClass(what,&Player)
+         AND type = SAY_NORMAL
+         AND StringContain(string,farenpriestess_attune_trigger)
+      {
+         Send(self,@AttuneRequest,#who=what,#string=string);
+
+         return;
+      }
+
+      propagate;
+   }
+
+   AttuneRequest(who=$,string=$)
+   {
+      local iElement, iCurrent, oSpell;
+
+      // Any Faren spell can name an element.
+      oSpell = Send(SYS,@FindSpellByNum,#num=SID_FIREBALL);
+
+      iCurrent = Send(who,@GetFarenAttunement);
+      if iCurrent <> FAREN_ELEMENT_NONE
+      {
+         Send(self,@SayToOne,#target=who,
+               #message_rsc=farenpriestess_attune_already,
+               #parm1=Send(oSpell,@GetFarenElementName,#element=iCurrent));
+
+         return;
+      }
+
+      if NOT Send(self,@HasDoneLearnQuest,#who=who)
+      {
+         Send(self,@SayToOne,#target=who,
+               #message_rsc=farenpriestess_attune_not_disciple);
+
+         return;
+      }
+
+      if NOT Send(self,@CanAttune,#who=who)
+      {
+         Send(self,@SayToOne,#target=who,
+               #message_rsc=farenpriestess_attune_not_ready);
+
+         return;
+      }
+
+      iElement = FAREN_ELEMENT_NONE;
+      if StringContain(string,farenpriestess_word_flame)
+      {
+         iElement = FAREN_ELEMENT_FLAME;
+      }
+      else if StringContain(string,farenpriestess_word_frost)
+      {
+         iElement = FAREN_ELEMENT_FROST;
+      }
+      else if StringContain(string,farenpriestess_word_storm)
+      {
+         iElement = FAREN_ELEMENT_STORM;
+      }
+
+      if iElement = FAREN_ELEMENT_NONE
+      {
+         Send(self,@SayToOne,#target=who,
+               #message_rsc=farenpriestess_attune_explain);
+
+         return;
+      }
+
+      Send(who,@SetFarenAttunement,#element=iElement);
+      Send(self,@SayToOne,#target=who,#message_rsc=farenpriestess_attune_done,
+            #parm1=Send(oSpell,@GetFarenElementName,#element=iElement));
+
+      return;
+   }
+
+   CanAttune(who=$)
+   "Knows a fourth-circle Faren spell, or may learn one."
+   {
+      if Nth(Send(who,@GetSpellSchoolLevels),SS_FAREN) >= 4
+      {
+         return TRUE;
+      }
+
+      return Send(who,@PlayerCanLearn,#spell_num=SID_FIREBALL)
+               = PLAYER_LEARN_SUCCESS;
+   }
 
    InitCondSale()
    {

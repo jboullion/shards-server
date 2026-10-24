@@ -126,6 +126,34 @@ messages:
       propagate;
    }
 
+   IsHostileTo(oTarget=$,state=$)
+   "Ours (spell revamp D13, D14): TRUE if the caster in state may attack "
+   "oTarget, as RoomEnchantmentDamage checks before any damage."
+   {
+      local oCaster;
+
+      if oTarget = $
+         OR state = $
+      {
+         return FALSE;
+      }
+
+      oCaster = Nth(state,2);
+      if oCaster = $
+         OR (oTarget = oCaster AND NOT vbRoomEnchHitCaster)
+      {
+         return FALSE;
+      }
+
+      if IsClass(oCaster,&Battler)
+      {
+         return Send(oCaster,@AllowBattlerAttack,#victim=oTarget,
+                     #stroke_obj=self);
+      }
+
+      return TRUE;
+   }
+
    RoomEnchantmentDamage(oTarget=$, state=$, iLevel=1)
    "Takes a target (oTarget), an enchantment state (state) and optional "
    "iLevel parameter (used for Qor/Shalbane) and deals the damage to oTarget."
