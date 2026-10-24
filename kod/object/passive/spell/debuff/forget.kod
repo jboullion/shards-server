@@ -23,7 +23,7 @@ resources:
    forgetspell_desc_rsc = \
       "Causes the victim to forget his or her own abilities.  A monster "
       "loses track of its foe for a moment, and can't cast spells until the "
-      "spell wears off.  "
+      "spell wears off.  Either way the victim is left bewildered.  "
       "Requires one firesand and two uncut seraphym to cast."
 
    forgetspell_already_enchanted = \
@@ -109,6 +109,9 @@ messages:
          //  phase 2): it can't cast spells for all of it (MonsterCanCast).
          Send(oTarget,@EnterStateWait,#delay=iDuration/4);
          Send(oTarget,@StartEnchantment,#what=self,#time=iDuration);
+         // Ours (spell revamp D36).
+         Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),@DoBewilder,
+           #oTarget=oTarget);
          Send(what,@MsgSendUser,#message_rsc=forgetspell_caster,
                #parm1=Send(oTarget,@GetDef),
                #parm2=Send(oTarget,@GetName));
@@ -195,6 +198,9 @@ messages:
             #parm2=Send(oTarget,@GetName));
 
       Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,#state=lState);
+      // Ours (spell revamp D36).
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),@DoBewilder,
+           #oTarget=oTarget);
 
       propagate;
    }

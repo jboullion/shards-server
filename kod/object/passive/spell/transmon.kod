@@ -22,7 +22,10 @@ resources:
    transmon_name_rsc = "transmogrify monster"
    transmon_icon_rsc = imorph.bgf
    transmon_desc_rsc = \
-      "Twists a creature into another monster. Requires web moss and rainbow fern to cast."
+      "Twists a creature into another monster, near the caster's own "
+      "strength.  The new monster keeps the old one's wounds and carries "
+      "nothing worth looting.  "
+      "Requires web moss and rainbow fern to cast."
 
    transmon_cast_rsc = "%s%s warps and reforms into %s%s!"
    transmon_bad_target = "You can only transmogrify a living monster."
@@ -192,6 +195,9 @@ messages:
       // Place in same spot
       Send(oRoom,@NewHold,#what=oNewMonster,#new_row=iRow,#new_col=iCol,
             #fine_row=iFine_Row,#fine_col=iFine_Col);
+
+      // Ours (spell revamp D39): its wounds stay, and it gives no loot.
+      Send(oNewMonster,@TransmogrifiedFrom,#what=victim);
 
       // Carry over illusion/summoned flags if meaningful
       if Send(victim,@IsIllusion)

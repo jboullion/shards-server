@@ -473,6 +473,8 @@ properties:
    // A list of quest nodes for which this monster is the destination NPC
    plActiveQuestNodes = $
    pbIllusion = FALSE
+   // Ours (spell revamp D39): made by Transmogrify Monster, so no loot.
+   pbTransmogrified = FALSE
    vbSummoned = FALSE
 
    // Apparition object (caster)
@@ -672,6 +674,7 @@ messages:
       }
 
       if Send(who,@IsEnchanted,#byClass=&Fade)
+         OR Send(who,@IsEnchanted,#byClass=&FeignDeath)
       {
          return TRUE;
       }
@@ -6794,6 +6797,30 @@ if isClass(self,&Reflection)
       return viKarma;
    }
 
+   TransmogrifiedFrom(what=$)
+   "Ours (spell revamp D39): Transmogrify Monster made us from what: we keep "
+   "its share of wounds, and drop nothing."
+   {
+      local iMax;
+
+      pbTransmogrified = TRUE;
+
+      if what = $
+      {
+         return;
+      }
+
+      iMax = Send(what,@ReturnMaxHitPoints);
+      if iMax <> $
+         AND iMax > 0
+      {
+         piHit_points = Bound(piMax_hit_points * Send(what,@GetHealth)
+                              * 100 / iMax, 100, piMax_hit_points * 100);
+      }
+
+      return;
+   }
+
    GetTreasureType()
    {
       return viTreasure_type;
@@ -6831,6 +6858,7 @@ if isClass(self,&Reflection)
 
       // Apparitions, etc, provide no treasure
       if pbIllusion
+         OR pbTransmogrified
       {
          return;
       }

@@ -7230,6 +7230,27 @@ messages:
       return Nth(plSchools,school);
    }
 
+   GetRiijaGuisePower()
+   "Ours (spell revamp D40): the spellpower of the strongest Riija disguise "
+   "on us (Spell.IsRiijaGuise), 0 if none.  An enchantment entry ends with "
+   "the spellpower it was cast at."
+   {
+      local i, iPower;
+
+      iPower = 0;
+      foreach i in plEnchantments
+      {
+         if IsClass(Nth(i,2),&Spell)
+            AND Send(Nth(i,2),@IsRiijaGuise)
+            AND Nth(i,Length(i)) > iPower
+         {
+            iPower = Nth(i,Length(i));
+         }
+      }
+
+      return iPower;
+   }
+
    KnowsSpellSchool(school=0)
    "Ours (spell revamp D33, D34): do we know any spell of this school?"
    {

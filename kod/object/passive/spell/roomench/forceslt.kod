@@ -110,10 +110,7 @@ messages:
 
       if Send(self,@KarmaCheck,#who=who)
          AND (oCaster = $
-              OR who = oCaster
-              OR NOT IsClass(oCaster,&Battler)
-              OR NOT Send(oCaster,@AllowBattlerAttack,#victim=who,
-                          #report=FALSE))
+              OR Send(self,@IsCasterAlly,#oCaster=oCaster,#who=who))
       {
          Send(who,@AddAttackModifier,#what=self);
          Send(who,@MsgSendUser,#message_rsc=forcesoflight_player_on);

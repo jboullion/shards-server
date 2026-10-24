@@ -832,7 +832,16 @@ messages:
 
    SomethingKilled(what=$,victim=$)
    {
+      local i;
+
       Send(self,@SetGroupTime,#victim=victim);
+
+      // Ours (spell revamp D25): Martyr's Battleground heals on a death.
+      foreach i in plEnchantments
+      {
+         Send(Nth(i,2),@RoomSomethingKilled,#where=self,#what=what,
+              #victim=victim,#state=Nth(i,3));
+      }
 
       propagate;
    }
@@ -2235,6 +2244,15 @@ messages:
                Send(Nth(i,2),@StartEnchantmentNewOccupant,#who=what,
                      #state=(Nth(i,3)));
             }
+         }
+      }
+      else if IsClass(what,&Monster)
+      {
+         // Ours (spell revamp D25): Martyr's Battleground for allied monsters.
+         foreach i in plEnchantments
+         {
+            Send(Nth(i,2),@StartEnchantmentNewMonster,#who=what,
+                 #state=Nth(i,3));
          }
       }
 
@@ -3747,7 +3765,8 @@ messages:
       return;
    }
 
-   UnenchantAllOccupants(what = $, state = $)
+   UnenchantAllOccupants(what = $, state = $, monsters = FALSE)
+   "Ours (spell revamp D25): monsters too, if asked."
    {
       local i, each_obj;
 
@@ -3755,6 +3774,7 @@ messages:
       {
          each_obj = First(i);
          if IsClass(each_obj,&User)
+            OR (monsters AND IsClass(each_obj,&Monster))
          {
             Send(what,@EndRoomEnchantment,#who=each_obj,#state=state);
          }

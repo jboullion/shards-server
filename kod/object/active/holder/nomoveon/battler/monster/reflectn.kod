@@ -681,8 +681,11 @@ messages:
       }
 
       poOriginal = who;
-      piMax_Hit_Points = piSpellpower / 3;
-      piMax_hit_points = Bound(piMax_hit_points,15,40);
+      // Ours (spell revamp D38): a share of the caster's health, a quarter
+      //  to three quarters by spellpower (it was 15 to 40).
+      piMax_Hit_Points = Send(who,@GetMaxHealth)
+                         * (25 + Bound(piSpellpower,1,99) / 2) / 100;
+      piMax_hit_points = Bound(piMax_hit_points,15,$);
       piHit_Points = piMax_Hit_Points*100;
 
       Send(self,@GetOriginalInfo);

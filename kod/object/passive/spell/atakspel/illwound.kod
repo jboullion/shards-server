@@ -22,6 +22,8 @@ resources:
    illusionarywounds_desc_rsc = \
       "Causes the victim to see imagined wounds, but imagination "
       "always gives in to one's right mind, assuming one lives so long.  "
+      "A monster never sees through it: its wounds stay.  The wounds never "
+      "kill by themselves, and they leave the victim bewildered.  "
       "Requires solagh and firesand."
 
    illusionarywounds_cast = "Your illusion takes the form of %s."
@@ -142,9 +144,18 @@ messages:
       }
       else
       {
-         Send(oTarget,@StartEnchantment,#what=self,
-               #time=Send(self,@GetDuration,#iSpellPower=iSpellPower),
-               #lastcall=TRUE,#state=iDamage,#addicon=FALSE);
+         // Ours (spell revamp D37): a monster believes its wounds, so they
+         //  don't heal back; a player's do.
+         if NOT IsClass(oTarget,&Monster)
+         {
+            Send(oTarget,@StartEnchantment,#what=self,
+                  #time=Send(self,@GetDuration,#iSpellPower=iSpellPower),
+                  #lastcall=TRUE,#state=iDamage,#addicon=FALSE);
+         }
+
+         // Ours (spell revamp D36).
+         Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),@DoBewilder,
+           #oTarget=oTarget);
       }
 
       Send(oRoom,@SomethingAttacked,#what=who,#victim=oTarget,#use_weapon=self);

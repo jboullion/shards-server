@@ -763,6 +763,13 @@ messages:
       poOriginal = who;
       Send(self,@GetOriginalInfo);
 
+      // Ours (spell revamp D38): a quarter to a half of the original's
+      //  health by spellpower (it was about 20 whatever it copied).
+      piMax_hit_points = Bound(Send(who,@GetMaxHealth)
+                               * (25 + Bound(piSpellpower,1,99) / 4) / 100,
+                               15,$);
+      piHit_points = piMax_hit_points * 100;
+
       return;
    }
 

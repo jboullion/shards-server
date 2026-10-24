@@ -3441,6 +3441,7 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_RESTORE_COMPANION,#class=&RestoreCompanion);
       Send(self,@CreateOneSpellIfNew,#num=SID_CHILL,#class=&Chill);
       Send(self,@CreateOneSpellIfNew,#num=SID_BURN,#class=&Burn);
+      Send(self,@CreateOneSpellIfNew,#num=SID_BEWILDERED,#class=&Bewildered);
       Send(self,@CreateOneSpellIfNew,#num=SID_DMRESCUE,#class=&DMRescue);
       Send(self,@CreateOneSpellIfNew,#num=SID_DELIVERANCE_TOUCH,#class=&DeliveranceTouch);
       Send(self,@CreateOneSpellIfNew,#num=SID_SPECTATE,#class=&Spectate);

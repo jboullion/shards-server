@@ -2617,6 +2617,9 @@
    SID_CHILL = 205
    // Ours (spell revamp D10): a flame-attuned mage's burn (spell/burn.kod)
    SID_BURN = 206
+   // Ours (spell revamp D36): Riija's mind games leave a target bewildered
+   //  (spell/bewilder.kod), an effect nobody learns
+   SID_BEWILDERED = 207
    SID_ICEWALL             = 241
    SID_INDEST              = 242
    SID_NODROP              = 253

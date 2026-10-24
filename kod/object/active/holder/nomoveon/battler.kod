@@ -548,6 +548,12 @@ messages:
       return returnList;
    }
 
+   GetRiijaGuisePower()
+   "Ours (spell revamp D40): see Player."
+   {
+      return 0;
+   }
+
    KnowsSpellSchool(school=0)
    "Ours (spell revamp D33, D34): only a player knows spells of a school."
    {

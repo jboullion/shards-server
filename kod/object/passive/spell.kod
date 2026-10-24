@@ -109,7 +109,7 @@ resources:
    spell_pp_room_ench = "%s in this room"
    spell_pp_hour = "The hour of the day"
    spell_pp_moon = "The moon's position"
-   spell_pp_pack = "How full your pack is"
+   spell_pp_guise = "Your Riija disguise"
    spell_pp_faren_place = "Fire and water around you"
    spell_pp_vigor = "Your vigor"
    spell_pp_company = "Company in the room (%i)"
@@ -594,7 +594,7 @@ messages:
       // A school's two sources show even at zero: they tell the player what
       //  would raise the spell.
       lAlways = [ spell_pp_ability, spell_pp_shal_place, spell_pp_light,
-                  spell_pp_dark, spell_pp_hour,spell_pp_moon, spell_pp_pack,
+                  spell_pp_dark, spell_pp_hour,spell_pp_moon, spell_pp_guise,
                   spell_pp_faren_place, spell_pp_vigor, spell_pp_company,
                   spell_pp_health, spell_pp_instrument, spell_pp_base_health ];
 
@@ -2577,12 +2577,15 @@ messages:
             }
          }
 
-         // Riija's secondary bonus depends on the number of items you're holding.
-         iSecondaryBonus = (Send(who,@GetBulkHold)*10)/Send(who,@GetBulkMax);
+         // Ours (spell revamp D40): Riija rewards staying in disguise: up to
+         //  10 from the strongest Riija guise on the caster (Anonymity,
+         //  Illusionary Form, Morph, Shadow Form), by its spellpower.
+         iSecondaryBonus = Bound((Send(who,@GetRiijaGuisePower) + 9) / 10,
+                                 0,10);
          if bParts
          {
             lParts = AppendListElem([spell_pp_moon, iPrimaryBonus, $], lParts);
-            lParts = AppendListElem([spell_pp_pack, iSecondaryBonus, $],
+            lParts = AppendListElem([spell_pp_guise, iSecondaryBonus, $],
                                     lParts);
          }
       }
@@ -2656,7 +2659,10 @@ messages:
          {
             lParts = AppendListElem([Send(self,@GetCapLabel,
                                           #iValue=iPrimaryBonus),
-                                     iBound - iPrimaryBonus, [30]], lParts);
+                                     iBound - iPrimaryBonus,
+                                     Send(self,@GetCapParms,
+                                          #iValue=iPrimaryBonus,#iCap=30)],
+                                    lParts);
          }
          iPrimaryBonus = iBound;
       }
@@ -2665,7 +2671,10 @@ messages:
       {
          lParts = AppendListElem([Send(self,@GetCapLabel,
                                        #iValue=iSecondaryBonus),
-                                  iBound - iSecondaryBonus, [10]], lParts);
+                                  iBound - iSecondaryBonus,
+                                  Send(self,@GetCapParms,
+                                       #iValue=iSecondaryBonus,#iCap=10)],
+                                 lParts);
       }
       iSecondaryBonus = iBound;
 
@@ -2840,6 +2849,64 @@ messages:
       return Send(victim,@KnowsSpellSchool,#school=iRival);
    }
 
+   IsCasterAlly(oCaster=$,who=$)
+   "Ours (spell revamp D25, D32): TRUE if who fights on oCaster's side: the "
+   "caster, anyone they may not attack, their companions and minions (and "
+   "those of their allies), and their faction's soldiers.  With a room as "
+   "caster (the Marion crypt casts Martyr's Battleground) every player is."
+   {
+      local oLeader, iFaction;
+
+      if who = $
+      {
+         return FALSE;
+      }
+
+      if oCaster = $
+         OR NOT IsClass(oCaster,&Battler)
+      {
+         return IsClass(who,&Player);
+      }
+
+      if who = oCaster
+      {
+         return TRUE;
+      }
+
+      if IsClass(who,&Monster)
+      {
+         if Send(who,@IsCompanion)
+         {
+            oLeader = Send(who,@GetSworn);
+         }
+         else
+         {
+            oLeader = Send(who,@GetMaster);
+         }
+
+         if oLeader <> $
+         {
+            return oLeader = oCaster
+                   OR (IsClass(oLeader,&Player)
+                       AND NOT Send(oCaster,@AllowBattlerAttack,
+                                    #victim=oLeader,#report=FALSE));
+         }
+
+         if IsClass(who,&FactionTroop)
+            AND IsClass(oCaster,&Player)
+         {
+            iFaction = Send(oCaster,@GetFaction);
+
+            return iFaction <> FACTION_NEUTRAL
+                   AND iFaction = Send(who,@GetFaction);
+         }
+
+         return FALSE;
+      }
+
+      return NOT Send(oCaster,@AllowBattlerAttack,#victim=who,#report=FALSE);
+   }
+
    GetFarenElement()
    {
       return viFarenElement;
@@ -2953,6 +3020,17 @@ messages:
       return;
    }
 
+   GetCapParms(iValue=0,iCap=0)
+   "Ours: the cap line names the cap; the floor line takes nothing."
+   {
+      if iValue < 0
+      {
+         return $;
+      }
+
+      return [iCap];
+   }
+
    GetCapLabel(iValue=0)
    "Ours: the breakdown line for a school bonus held to its range."
    {
@@ -3053,6 +3131,25 @@ messages:
    "as well as players (Room.EnchantAllOccupants)."
    {
       return FALSE;
+   }
+
+   IsRiijaGuise()
+   "Ours (spell revamp D40): TRUE for the Riija disguises that add to Riija "
+   "spellpower while they're on the caster."
+   {
+      return FALSE;
+   }
+
+   StartEnchantmentNewMonster(who=$,state=$)
+   "Ours (spell revamp D25): a monster came into a room we enchant."
+   {
+      return;
+   }
+
+   RoomSomethingKilled(where=$,what=$,victim=$,state=$)
+   "Ours (spell revamp D25): what killed victim in a room we enchant."
+   {
+      return;
    }
 
    ModifyMonsterMoveSpeed(mob=$,iSpeed=0,state=$)

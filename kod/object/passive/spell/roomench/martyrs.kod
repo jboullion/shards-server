@@ -10,6 +10,11 @@
 ///////////////////////////////////////////////////////////////////////////
 MartyrsBattleground is RoomEnchantment
 
+// Ours (spell revamp D25): revenants are long gone, so this is now Kraanan's
+//  blessing on the caster's side of a fight.  Allies here (players, their
+//  companions and minions, the caster's faction's soldiers) hit more often
+//  and harder, and each death here heals them, an ally's death twice over.
+
 constants:
 
    include blakston.khd
@@ -22,11 +27,21 @@ resources:
    martyrsbg_icon_rsc = imartyrs.bgf
 
    martyrsbg_desc_rsc = \
-      "Calls the attention of the gods to the area, increasing "
-      "the likelihood they will give those who die here a chance "
-      "at vengeance with a revenant.  "
+      "Calls the gaze of Kraanan down upon the battle.  While it lasts, the "
+      "caster's allies in the area, their companions and their faction's "
+      "soldiers among them, strike truer and harder, and every death here "
+      "renews them; the fall of one of their own renews them twice over.  "
+      "Foes get nothing from it.  "
       "Requires elderberry and mushroom to cast."
-   
+
+   martyrsbg_effect_rsc = \
+      "Allies gain %i to hit and %i damage a blow (monsters %i%% more "
+      "offense), and heal %i health at each death here (%i at an ally's), "
+      "for %i seconds."
+   martyrsbg_enchantment_rsc = \
+      "\n\nThe %s enchantment gives the caster's allies here %i to hit and "
+      "%i damage a blow, and heals them %i at each death."
+
    martyrsbg_unnecessary = "You already feel the presence of the gods here."
 
    martyrsbg_on = \
@@ -38,6 +53,10 @@ resources:
 
    martyrsbg_new_entrant = \
       "You imagine you can feel the presence of the gods watching you."
+
+   martyrsbg_ally_on = "The gods' gaze settles upon you, and your arm grows sure."
+   martyrsbg_ally_off = "The gods' gaze leaves you."
+   martyrsbg_heal = "The gods honour the fallen, and you feel renewed."
 
    martrysbg_sound = smatbat.ogg
 
@@ -52,7 +71,7 @@ classvars:
    viSchool = SS_KRAANAN
    viMana = 10
    viSpell_level = 3
-   
+
    viChance_To_Increase = 15
    viMeditate_ratio = 30
    vrSucceed_wav = martrysbg_sound
@@ -86,27 +105,122 @@ messages:
 
       // global effects of the enchantment
       Send(oRoom,@SomeoneSaid,#type=SAY_MESSAGE,#string=martyrsbg_on,#what=self);
-      Send(oRoom,@RoomStartEnchantment,#what=self,#state=[iSpellPower+50, who],
-           #time=send(self,@GetDuration,#iSpellPower=iSpellPower));
-      
+      Send(oRoom,@RoomStartEnchantment,#what=self,#state=[iSpellPower, who],
+           #time=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+      Send(oRoom,@EnchantAllOccupants,#what=self,#state=[iSpellPower, who]);
+
       propagate;
    }
 
-   GetDuration(iSpellPower=0)
+   AffectsMonsters()
    {
-      local iDuration;
-
-      iDuration = 45 + (iSpellPower*3);  /// 30 - 228 seconds
-      iDuration = iDuration * 1000;      /// convert to seconds            
-
-      return random(iDuration/2,iDuration);
+      return TRUE;
    }
 
-   StartEnchantmentNewOccupant( who = $ )
+   GetDuration(iSpellPower=0)
+   "32 to 228 seconds."
+   {
+      return (30 + Bound(iSpellPower,1,99) * 2) * 1000;
+   }
+
+   GetPower(state=$)
+   "The spellpower in state, 1 to 99 (the Marion crypt casts it at 150)."
+   {
+      if state = $
+      {
+         return 1;
+      }
+
+      return Bound(First(state),1,99);
+   }
+
+   GetHitBonus(iSpellPower=0)
+   {
+      return 50 + Bound(iSpellPower,1,99);
+   }
+
+   GetDamageBonus(iSpellPower=0)
+   {
+      return 1 + Bound(iSpellPower,1,99) / 33;
+   }
+
+   GetMonsterOffensePct(iSpellPower=0)
+   {
+      return 10 + Bound(iSpellPower,1,99) / 5;
+   }
+
+   GetDeathHeal(iSpellPower=0)
+   {
+      return 2 + Bound(iSpellPower,1,99) / 20;
+   }
+
+   StartEnchantmentNewOccupant(who = $, state = $)
    "Called on new occupants of the enchanted room."
    {
       Send(who,@MsgSendUser,#message_rsc=martyrsbg_new_entrant);
+      Send(self,@StartEnchantment,#who=who,#state=state);
 
+      return;
+   }
+
+   StartEnchantmentNewMonster(who = $, state = $)
+   {
+      Send(self,@StartEnchantment,#who=who,#state=state);
+
+      return;
+   }
+
+   StartEnchantment(who = $, state = $)
+   "The caster's allies are blessed; nobody else is."
+   {
+      if state = $
+         OR NOT Send(self,@IsCasterAlly,#oCaster=Nth(state,2),#who=who)
+      {
+         return;
+      }
+
+      if IsClass(who,&Monster)
+      {
+         if NOT Send(who,@IsEnchanted,#what=self)
+         {
+            Send(who,@StartEnchantment,#what=self,
+                 #state=Send(self,@GetPower,#state=state));
+         }
+
+         return;
+      }
+
+      if IsClass(who,&Player)
+      {
+         Send(who,@RemoveAttackModifier,#what=self);
+         Send(who,@AddAttackModifier,#what=self);
+         Send(who,@MsgSendUser,#message_rsc=martyrsbg_ally_on);
+      }
+
+      return;
+   }
+
+   EndRoomEnchantment(who = $, state = $)
+   "Remove enchantment effects on this occupant"
+   {
+      if IsClass(who,&Monster)
+      {
+         Send(who,@RemoveEnchantment,#what=self);
+
+         return;
+      }
+
+      if IsClass(who,&Player)
+      {
+         Send(who,@RemoveAttackModifier,#what=self);
+      }
+
+      return;
+   }
+
+   EndEnchantment(who = $, state = $)
+   "A monster's blessing: nothing to undo."
+   {
       return;
    }
 
@@ -114,6 +228,142 @@ messages:
    "Called when spell expires."
    {
       Send(where,@SomeoneSaid,#type=SAY_MESSAGE,#string=martyrsbg_off,#what=self);
+      Send(where,@UnenchantAllOccupants,#what=self,#state=state,#monsters=TRUE);
+
+      return;
+   }
+
+   RoomSomethingKilled(where=$,what=$,victim=$,state=$)
+   "Each death here heals the caster's allies, an ally's death twice over."
+   {
+      local i, each_obj, iHeal;
+
+      if state = $
+         OR where = $
+         OR victim = $
+         OR NOT IsClass(victim,&Battler)
+      {
+         return;
+      }
+
+      iHeal = Send(self,@GetDeathHeal,
+                   #iSpellPower=Send(self,@GetPower,#state=state));
+      if Send(self,@IsCasterAlly,#oCaster=Nth(state,2),#who=victim)
+      {
+         iHeal = iHeal * 2;
+      }
+
+      foreach i in Send(where,@GetHolderActive)
+      {
+         each_obj = First(i);
+         if each_obj = victim
+            OR NOT IsClass(each_obj,&Battler)
+            OR NOT Send(self,@IsCasterAlly,#oCaster=Nth(state,2),
+                        #who=each_obj)
+         {
+            continue;
+         }
+
+         if IsClass(each_obj,&User)
+         {
+            if Send(each_obj,@IsInCannotInteractMode)
+            {
+               continue;
+            }
+
+            if Send(each_obj,@GainHealthNormal,#amount=iHeal) > 0
+            {
+               Send(each_obj,@MsgSendUser,#message_rsc=martyrsbg_heal);
+            }
+
+            continue;
+         }
+
+         Send(each_obj,@GainHealthNormal,#amount=iHeal);
+      }
+
+      return;
+   }
+
+   // Stuff we handle to be a player's attack modifier.
+
+   GetRoomPower(who=$)
+   {
+      local oRoom;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+      {
+         return 1;
+      }
+
+      return Send(self,@GetPower,
+                  #state=Send(oRoom,@GetEnchantedState,#what=self));
+   }
+
+   ModifyHitRoll(who = $, what = $, hit_roll = $)
+   {
+      return hit_roll + Send(self,@GetHitBonus,
+                             #iSpellPower=Send(self,@GetRoomPower,#who=who));
+   }
+
+   ModifyDamage(who = $, what = $, damage = $)
+   {
+      return damage + Send(self,@GetDamageBonus,
+                           #iSpellPower=Send(self,@GetRoomPower,#who=who));
+   }
+
+   // And a monster's (state is the spellpower).
+
+   ModifyMonsterOffense(mob=$,iOffense=0,state=$)
+   {
+      if state = $
+      {
+         return iOffense;
+      }
+
+      return iOffense * (100 + Send(self,@GetMonsterOffensePct,
+                                    #iSpellPower=state)) / 100;
+   }
+
+   ModifyMonsterDamage(mob=$,iDamage=0,state=$)
+   {
+      if state = $
+      {
+         return iDamage;
+      }
+
+      // A monster's damage is in hundredths.
+      return iDamage + Send(self,@GetDamageBonus,#iSpellPower=state) * 100;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   {
+      AddPacket(4,martyrsbg_effect_rsc,
+                4,Send(self,@GetHitBonus,#iSpellPower=iSpellPower),
+                4,Send(self,@GetDamageBonus,#iSpellPower=iSpellPower),
+                4,Send(self,@GetMonsterOffensePct,#iSpellPower=iSpellPower),
+                4,Send(self,@GetDeathHeal,#iSpellPower=iSpellPower),
+                4,Send(self,@GetDeathHeal,#iSpellPower=iSpellPower) * 2,
+                4,Send(self,@GetDuration,#iSpellPower=iSpellPower) / 1000);
+
+      return;
+   }
+
+   EffectDesc(who=$)
+   {
+      local iPower;
+
+      iPower = Send(self,@GetRoomPower,#who=who);
+      AddPacket(4,martyrsbg_enchantment_rsc, 4,Send(self,@GetName),
+                4,Send(self,@GetHitBonus,#iSpellPower=iPower),
+                4,Send(self,@GetDamageBonus,#iSpellPower=iPower),
+                4,Send(self,@GetDeathHeal,#iSpellPower=iPower));
 
       return;
    }

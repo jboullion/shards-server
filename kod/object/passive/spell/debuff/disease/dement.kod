@@ -23,7 +23,8 @@ resources:
    dement_desc_rsc = \
       "Sends the mind of the target reeling with dark, bewildering "
       "thoughts, making spell casting more difficult for several minutes.  "
-      "A demented monster casts less often, and its spells are weaker.  "
+      "A demented monster casts less often, and its spells are weaker, and "
+      "any victim is left bewildered.  "
       "Requires two vials of solagh and an uncut seraphym to cast."
 
    dement_sound = rdement.ogg
@@ -110,6 +111,10 @@ messages:
          Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,
                #state=[iIntellectChange]);
       }
+
+      // Ours (spell revamp D36).
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),@DoBewilder,
+           #oTarget=oTarget);
 
       propagate;
    }

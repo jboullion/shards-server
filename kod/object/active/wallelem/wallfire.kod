@@ -86,11 +86,7 @@ messages:
       
       if viIllusion
       {
-         if (piMaxDamage < 35)
-         {
-            return;
-         }
-
+         // Ours (spell revamp D37): it used to do nothing below spellpower 35.
          oIllusWounds = Send(SYS,@FindSpellByNum,#num=SID_ILLUSIONARY_WOUNDS);
          iDuration = Send(oIllusWounds,@GetDuration,#iSpellPower=piMaxDamage);
          iDamage = Send(oIllusWounds,@GetHPLoss,#who=poCaster,#victim=what,#iSpellPower=piMaxDamage);
@@ -104,8 +100,13 @@ messages:
                            #report_resistance=FALSE,#precision=TRUE);
             Send(poOwner,@SomethingAttacked,#what=poCaster,#victim=what,
                   #use_weapon=self,#stroke_obj=self);
-            Send(what,@StartEnchantment,#what=oIllusWounds,#time=iDuration,#lastcall=TRUE,
-                  #state=iDamage,#addicon=FALSE);
+            // Ours (spell revamp D37): a monster's wounds stay.
+            if iDamage <> $
+               AND NOT IsClass(what,&Monster)
+            {
+               Send(what,@StartEnchantment,#what=oIllusWounds,#time=iDuration,
+                     #lastcall=TRUE,#state=iDamage,#addicon=FALSE);
+            }
          }
       }
       else

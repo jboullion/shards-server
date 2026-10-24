@@ -22,7 +22,8 @@ resources:
    IllusionaryFireWall_icon_rsc = iwallill.bgf
    IllusionaryFireWall_desc_rsc = \
       "Creates an illusionary wall of fire.  This wall will cause illusionary "
-      "wounds, which are never lethal, to victims walking through it.  "
+      "wounds, which are never lethal, to victims walking through it; a "
+      "monster's wounds don't heal back.  "
       "Requires rainbow ferns and firesand to cast."
 
    IllusionaryFireWall_cast_rsc = \

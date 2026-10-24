@@ -67,6 +67,13 @@ properties:
 
 messages:
 
+   IsRiijaGuise()
+   "Ours (spell revamp D40): while it's on them, it adds to the caster's "
+   "Riija spellpower."
+   {
+      return TRUE;
+   }
+
    ResetReagents()
    {
       plReagents = $;

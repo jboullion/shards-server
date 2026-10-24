@@ -20,8 +20,10 @@ resources:
    denial_name_rsc = "denial"
    denial_icon_rsc = idenial.bgf
    denial_desc_rsc = \
-      "Causes the caster to unrealize their wounds, but beware when "
-      "you realize its a hoax, because the wounds are still just as deep!  "
+      "Causes the caster to unrealize their wounds, healing them fully for "
+      "a while, but beware when you realize it's a hoax: most of the wounds "
+      "come back, though they never kill.  The stronger the spell, the more "
+      "of the healing is kept.  "
       "Requires two firesand and a vial of solagh to cast."
 
    denial_on_rsc = "Your wounds suspiciously disappear."

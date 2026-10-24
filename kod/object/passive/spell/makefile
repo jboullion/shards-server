@@ -10,6 +10,7 @@ BOFS = animate.bof \
        atakspel.bof \
 	   boon.bof \
        bait.bof \
+       bewilder.bof \
        brittle.bof \
        brthlife.bof \
        burn.bof \

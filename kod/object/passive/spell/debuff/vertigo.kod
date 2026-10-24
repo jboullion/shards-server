@@ -22,8 +22,11 @@ resources:
    Vertigo_icon_rsc = ivertigo.bgf
    Vertigo_desc_rsc = \
       "This spell causes the victim to become so ill that they can hardly "
-      "stand, much less fight. "
+      "stand, much less fight, and leaves them bewildered.  "
       "Requires two dragonfly eyes and a vial of solagh to cast."
+   Vertigo_effect_rsc = \
+      "A player loses %i agility, might and aim, a monster %i%% of its "
+      "offense and defense, for %i to %i seconds.%r"
 
    Vertigo_caster = "%s%s looks strangely dazed... and confused."
    Vertigo_already_enchanted = "%s%s already appears to be freaking."
@@ -111,14 +114,59 @@ messages:
       }
       else
       {
-         iAgil = Send(oTarget,@AddMonsterAgility,#points=-iAmount);
-         iAim = Send(oTarget,@AddMonsterAim,#points=-iAmount);
-
+         // Ours (spell revamp D37): a share of its offense and defense
+         //  (ModifyMonsterOffense, ModifyMonsterDefense), so it reaches
+         //  monsters whose offense is set outright, not from aim and agility.
          Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,
-               #state=[-iAgil,-iAim]);
+               #state=iAmount);
       }
 
+      // Ours (spell revamp D36).
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),@DoBewilder,
+           #oTarget=oTarget);
+
       propagate;
+   }
+
+   ModifyMonsterOffense(mob=$,iOffense=0,state=$)
+   {
+      if state = $
+         OR IsList(state)
+      {
+         return iOffense;
+      }
+
+      return iOffense * (100 - state) / 100;
+   }
+
+   ModifyMonsterDefense(mob=$,iDefense=0,state=$)
+   {
+      if state = $
+         OR IsList(state)
+      {
+         return iDefense;
+      }
+
+      return iDefense * (100 - state) / 100;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   {
+      local iAmount, iTime;
+
+      iAmount = Send(self,@GetAmount,#iSpellPower=iSpellPower);
+      iTime = Send(self,@GetFullDuration,#iSpellPower=iSpellPower);
+      AddPacket(4,Vertigo_effect_rsc,4,iAmount,4,iAmount,
+                4,iTime * (100 - piDeviation) / 100000,4,iTime / 1000);
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),
+           @SendBewilderSummary);
+
+      return;
    }
 
    GetAmount(iSpellPower=0)
@@ -135,14 +183,16 @@ messages:
    {
       local iDuration;
 
-      // Duration calculation now uses class properties, modifiable in game
-      // By default, base duration 4000ms, total time 4000-14000ms using 101x
-      // spellpower multiplier, with the final duration 90-100// max
-
-      iDuration = (piBaseDuration + (iSpellPower+1)*piSpellPowerModifier);
+      // Ours (spell revamp D37): 10 to 30 seconds, then 90-100% of that.
+      iDuration = Send(self,@GetFullDuration,#iSpellPower=iSpellPower);
       iDuration = random(iDuration*(100-piDeviation)/100,iDuration);
 
       return iDuration;
+   }
+
+   GetFullDuration(iSpellPower=0)
+   {
+      return 10000 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) * 200;
    }
 
    EndEnchantment(who=$,state=$,report=TRUE)
@@ -158,8 +208,9 @@ messages:
          Send(who,@AddMight,#points=Nth(state,2));
          Send(who,@AddAim,#points=Nth(state,3));
       }
-      else
+      else if IsList(state)
       {
+         // One cast before the revamp.
          Send(who,@AddMonsterAgility,#points=Nth(state,1));
          Send(who,@AddMonsterAim,#points=Nth(state,2));
       }

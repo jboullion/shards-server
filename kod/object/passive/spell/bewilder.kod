@@ -1,0 +1,156 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+Bewildered is Spell
+
+// Ours (spell revamp D36): Riija's mind games leave their victims open.
+//  Vertigo, Dement, Forget, Illusionary Wounds and Flash bewilder what they
+//  touch for a while: it takes a tenth more damage from everyone, monster or
+//  player.  An effect those spells share, so it doesn't stack; nobody can
+//  learn or cast it.
+
+constants:
+
+   include blakston.khd
+
+   // How long a bewilderment lasts, and how much more damage it lets in
+   //  (percent of normal).
+   BEWILDERED_TIME = 15000
+   BEWILDERED_DAMAGE_PCT = 110
+
+resources:
+
+   bewildered_name_rsc = "bewildered"
+   bewildered_icon_rsc = ivertigo.bgf
+   bewildered_desc_rsc = \
+      "Riija's tricks have left your mind reeling, and you can't tell a real "
+      "blow from a false one.  You take more damage until it passes."
+   bewildered_on_rsc = "~bYour thoughts tangle, and you no longer trust your eyes."
+   bewildered_off_rsc = "Your head clears."
+   bewildered_summary_rsc = \
+      "  Then its victim is bewildered for %i seconds, taking a tenth more "
+      "damage from everyone."
+
+classvars:
+
+   vrName = bewildered_name_rsc
+   vrIcon = bewildered_icon_rsc
+   vrDesc = bewildered_desc_rsc
+
+   viSpell_num = SID_BEWILDERED
+   viSchool = SS_RIIJA
+   viSpell_level = 6
+   viHarmful = TRUE
+   viFlash = FLASH_NONE
+
+properties:
+
+   pbAccessible = FALSE
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+
+      return;
+   }
+
+   OfferToNewCharacters()
+   {
+      return FALSE;
+   }
+
+   GetBewilderedSeconds()
+   {
+      return BEWILDERED_TIME / 1000;
+   }
+
+   SendBewilderSummary()
+   "One resource for a Riija spell's description (SendEffectSummary)."
+   {
+      AddPacket(4,bewildered_summary_rsc,4,BEWILDERED_TIME / 1000);
+
+      return;
+   }
+
+   DoBewilder(oTarget=$)
+   "Bewilders oTarget, or starts its bewilderment over."
+   {
+      if oTarget = $
+         OR NOT IsClass(oTarget,&Battler)
+      {
+         return;
+      }
+
+      if Send(oTarget,@IsEnchanted,#what=self)
+      {
+         Send(oTarget,@RemoveEnchantment,#what=self,#report=FALSE);
+      }
+      else if IsClass(oTarget,&User)
+      {
+         Send(oTarget,@MsgSendUser,#message_rsc=bewildered_on_rsc);
+      }
+
+      if IsClass(oTarget,&Player)
+      {
+         Send(oTarget,@AddDefenseModifier,#what=self);
+      }
+
+      Send(oTarget,@StartEnchantment,#what=self,#time=BEWILDERED_TIME);
+
+      return;
+   }
+
+   ModifyMonsterDamageTaken(mob=$,iDamage=0,state=$)
+   {
+      return iDamage * BEWILDERED_DAMAGE_PCT / 100;
+   }
+
+   // A player's: Bewildered is a defense modifier while it lasts.
+
+   ModifyDefensePower(who=$,what=$,defense_power=0,state=$)
+   {
+      return defense_power;
+   }
+
+   DefendingHit(who=$,what=$)
+   {
+      return;
+   }
+
+   ModifyDefenseDamage(who=$,what=$,damage=$)
+   {
+      if damage = $
+      {
+         return damage;
+      }
+
+      return damage * BEWILDERED_DAMAGE_PCT / 100;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   {
+      if IsClass(who,&Player)
+      {
+         Send(who,@RemoveDefenseModifier,#what=self);
+      }
+
+      if report
+         AND IsClass(who,&User)
+      {
+         Send(who,@MsgSendUser,#message_rsc=bewildered_off_rsc);
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

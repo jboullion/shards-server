@@ -253,6 +253,8 @@ messages:
       // global effects of the enchantment
       Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=MarionCrtyp1_martyr_on,#what=self);
       Send(self,@RoomStartEnchantment,#what=oMartyr,#state=[150,self]);
+      // Ours (spell revamp D25): it blesses the players already here too.
+      Send(self,@EnchantAllOccupants,#what=oMartyr,#state=[150,self]);
 
       return;
    }
