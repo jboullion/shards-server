@@ -44,6 +44,10 @@ classvars:
 
    viMeditate_ratio = 10
 
+   viHealMin = 100
+   viHealMax = 500
+   viHealPerPower = 8
+
 properties:
 
 messages:
@@ -53,18 +57,6 @@ messages:
       plReagents = $;
 
       return;
-   }
-
-   GetHealAmount(oTarget=$,iSpellPower=1)
-   {
-      if (oTarget = $)
-      {
-         Debug("Trying to get heal amount for $ target!");
-
-         return 1;
-      }
-
-      return Random(100,500) + ((iSpellPower + 1) * 8);
    }
 
    GetPotionClass()

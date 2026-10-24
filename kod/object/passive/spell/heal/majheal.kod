@@ -47,6 +47,10 @@ classvars:
    viChance_To_Increase = 15
    viMeditate_ratio = 50
 
+   viHealMin = 500
+   viHealMax = 1500
+   viHealPerPower = 20
+
 properties:
 
 messages:
@@ -57,18 +61,6 @@ messages:
       plReagents = Cons([&Emerald,4],plReagents);
 
       return;
-   }
-
-   GetHealAmount(oTarget=$,iSpellPower=1)
-   {
-      if (oTarget = $)
-      {
-         Debug("Trying to get heal amount for $ target!");
-
-         return 1;
-      }
-
-      return Random(500,1500) + ((iSpellPower + 1) * 20);
    }
 
 end

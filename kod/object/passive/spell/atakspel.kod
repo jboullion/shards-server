@@ -20,6 +20,10 @@ resources:
 
    include atakspel.lkod
 
+   attack_spell_effect_rsc = "%i to %i %s damage, before resistances%r.%r"
+   attack_spell_effect_focus_rsc = ", and up to %i more from Mana Focus"
+   attack_spell_effect_self_rsc = " You take %i%% of it yourself."
+
    attack_spell_hit_rsc = "You hit %s%s."
    attack_spell_no_self_rsc = "You can't cast %s on yourself."
    attack_spell_out_of_range = "%s%s is too far away to hit with %s."
@@ -185,11 +189,9 @@ messages:
 
          if NOT bItemCast
          {
-            // Myst and Int boost base damage
-            iDamage = Send(self,@DamageFactors,#damage=iDamage,#who=who,#lTargets=lTargets);
-
-            // Reduce damage based on spell power.
-            iDamage = (iDamage * (50 + (iSpellPower / 2))) / SPELLPOWER_MAXIMUM;
+            // Myst and Int boost base damage, then spell power scales it.
+            iDamage = Send(self,@ScaleDamage,#who=who,#iDamage=iDamage,
+                           #iSpellPower=iSpellPower,#lTargets=lTargets);
 
             if Send(who,@CheckPlayerFlag,#flag=PFLAG_MANA_FOCUS)
             {
@@ -294,6 +296,67 @@ messages:
 
       // This used to not propagate, but as of July 2014 it does. No bugs yet noted.
       propagate;
+   }
+
+   ScaleDamage(who=$,iDamage=0,iSpellPower=0,lTargets=$)
+   "Ours: a player's damage before Mana Focus, shared by CastSpell and the "
+   "description (SendEffectSummary)."
+   {
+      // Myst and Int boost base damage
+      iDamage = Send(self,@DamageFactors,#damage=iDamage,#who=who,
+                     #lTargets=lTargets);
+
+      // Reduce damage based on spell power.
+      return (iDamage * (50 + (iSpellPower / 2))) / SPELLPOWER_MAXIMUM;
+   }
+
+   HasEffectSummary()
+   {
+      return (viHarmful OR viOutlaw) AND piDamageMax > 0;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp D3): the damage range at this spellpower."
+   {
+      local iManaFocus, iType;
+
+      // Most attack spells add their element to ATCK_SPELL_ALL: name the element.
+      iType = Send(self,@GetAttackSpell);
+      if iType <> ATCK_SPELL_ALL
+         AND (iType & ATCK_SPELL_ALL)
+      {
+         iType = iType - ATCK_SPELL_ALL;
+      }
+
+      AddPacket(4,attack_spell_effect_rsc,
+         4,Send(self,@ScaleDamage,#who=who,#iDamage=piDamageMin*100,
+                #iSpellPower=iSpellPower) / 100,
+         4,Send(self,@ScaleDamage,#who=who,#iDamage=piDamageMax*100,
+                #iSpellPower=iSpellPower) / 100,
+         4,Send(SYS,@GetSpellDamageTypeName,#type=iType));
+
+      if Send(who,@CheckPlayerFlag,#flag=PFLAG_MANA_FOCUS)
+      {
+         iManaFocus = Send(who,@GetEnchantedState,
+                           #what=Send(SYS,@FindSpellByNum,#num=SID_MANA_FOCUS));
+         AddPacket(4,attack_spell_effect_focus_rsc,
+                   4,(iManaFocus * piManaFocusBonus) / SPELLPOWER_MAXIMUM);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      if vbSelfHarming
+      {
+         AddPacket(4,attack_spell_effect_self_rsc, 4,piCasterDmgPct);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      return;
    }
 
    DamageFactors(damage=0,who=$)

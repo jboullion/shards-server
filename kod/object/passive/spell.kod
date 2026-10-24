@@ -21,6 +21,13 @@ constants:
    //  bonus to improve the spell?
    CASTS_PER_PERCENT_BONUS = 7
 
+   // Ours (spell revamp D1): lines in the description's spellpower breakdown
+   //  (spell_power_rsc has this many %r); any more are summed as "Other".
+   SPELL_PP_SLOTS = 18
+
+   // Ours: reagents named on the description's costs line.
+   SPELL_COST_REAGENT_SLOTS = 5
+
 resources:
 
    include spell.lkod
@@ -69,7 +76,58 @@ resources:
    spell_silenced_rsc = "Your words catch in your throat and you cannot speak."
 
    spell_fail_wav = spelfail.ogg
-   spell_desc_rsc = "SCHOOL : %s         LEVEL : %i \n\n%s%s%s%r%r%r"
+   // Ours (spell revamp phase 1): three more %r after the flavour text, for
+   //  what the spell does at your spellpower, its costs, and the breakdown.
+   spell_desc_rsc = "SCHOOL : %s         LEVEL : %i \n\n%s%s%s%r%r%r%r%r%r"
+   spell_nl = "\n"
+   spell_nl2 = "\n\n"
+
+   spell_effect_rsc = "\n\n~BAt your spellpower:~B %r"
+
+   spell_costs_rsc = "%r~BCosts:~B %r%r%r%r%r%r%r%r.%r%r"
+   spell_costs_mana = "%i mana"
+   spell_costs_no_mana = "no mana"
+   spell_costs_vigor = ", %i vigor"
+   spell_costs_reagent = ", %i %s"
+   spell_costs_reagent_unknown = ", %i other reagents"
+   spell_costs_more = ", and more"
+   spell_costs_cast_time = " Takes %i.%i seconds to cast."
+   spell_costs_recovery = " Your next spell can follow %i seconds later."
+   spell_costs_recovery_one = " Your next spell can follow a second later."
+
+   spell_power_rsc = \
+      "\n\n~BSpellpower %i~B (the most is %i)%r"
+      "%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r"
+   spell_pp_unknown = "\nYou don't know this spell yet."
+   spell_pp_line = "\n   %r: %s%i"
+   spell_pp_plus = "+"
+   spell_pp_immortal = "Immortal"
+   spell_pp_ability = "Half your %s ability (%i%%)"
+   spell_pp_shal_place = "Shal'ille's favour in this place"
+   spell_pp_karma = "Your karma"
+   spell_pp_room_ench = "%s in this room"
+   spell_pp_hour = "The hour of the day"
+   spell_pp_moon = "The moon's position"
+   spell_pp_pack = "How full your pack is"
+   spell_pp_faren_place = "Fire and water around you"
+   spell_pp_vigor = "Your vigor"
+   spell_pp_company = "Company in the room (%i)"
+   spell_pp_health = "Your health"
+   spell_pp_instrument = "Your instrument"
+   spell_pp_base_health = "Your base health"
+   spell_pp_cap = "This bonus gives at most %i"
+   spell_pp_floor = "A bonus can't go below zero"
+   spell_pp_faction = "Your faction"
+   spell_pp_inside = "Inside %s"
+   spell_pp_shrines = "%s's shrines"
+   spell_pp_gear = "Your %s"
+   spell_pp_gear_kraanan = "Kraanan halves gear penalties"
+   spell_pp_server = "Server bonus"
+   spell_pp_dement = "Dement (up to %i more on each cast)"
+   spell_pp_kraanan = "Kraanan's favour"
+   spell_pp_total_cap = "The most a spell can reach is %i"
+   spell_pp_total_floor = "The least a spell can have is %i"
+   spell_pp_other = "Other effects"
    spell_school_riija = "Riija"
    spell_school_shalille = "Shal'ille"
    spell_school_qor = "Qor"
@@ -323,6 +381,8 @@ messages:
          AddPacket(4,spell_desc_rsc, 4,rSchool, 4,viSpell_Level, 4,vrDesc,
                    4,rOutlaw, 4,rExtra);
 
+         Send(self,@SendTrueEffectsDesc,#who=who);
+
          Send(self,@SendStatsDesc,#who=who);
          Send(self,@SendTimeDesc,#who=who);
 
@@ -339,6 +399,256 @@ messages:
       }
       
       propagate;
+   }
+
+   SendTrueEffectsDesc(who=$)
+   "Ours (spell revamp D1): fills spell_desc_rsc's effect, costs and "
+   "spellpower slots for the player looking at the spell."
+   {
+      local lPower, iSpellPower, bEffect;
+
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         AddPacket(4,spell_blank, 4,spell_blank, 4,spell_blank);
+
+         return;
+      }
+
+      lPower = Send(self,@GetSpellPower,#who=who,#bParts=TRUE);
+      iSpellPower = First(lPower);
+
+      bEffect = Send(self,@HasEffectSummary);
+      if bEffect
+      {
+         AddPacket(4,spell_effect_rsc);
+         Send(self,@SendEffectSummary,#who=who,#iSpellPower=iSpellPower);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      Send(self,@SendCostsDesc,#who=who,#iSpellPower=iSpellPower,
+           #bAfterEffect=bEffect);
+      Send(self,@SendSpellPowerDesc,#who=who,#lPower=lPower);
+
+      return;
+   }
+
+   HasEffectSummary()
+   "Ours (spell revamp D3): TRUE if SendEffectSummary says what this spell "
+   "does in numbers."
+   {
+      return FALSE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp D3): adds one resource (and its parameters) saying "
+   "what the spell does at iSpellPower, for spell_effect_rsc."
+   {
+      AddPacket(4,spell_blank);
+
+      return;
+   }
+
+   SendCostsDesc(who=$,iSpellPower=0,bAfterEffect=FALSE)
+   "Ours (spell revamp D1): mana, vigor, reagents, cast time and recovery, "
+   "as they are for who."
+   {
+      local i, iCount, iExertion, iTime, oReagent, iNumber;
+
+      AddPacket(4,spell_costs_rsc);
+      if bAfterEffect
+      {
+         AddPacket(4,spell_nl);
+      }
+      else
+      {
+         AddPacket(4,spell_nl2);
+      }
+
+      iNumber = Send(self,@GetManaCost,#who=who,#iSpellPower=iSpellPower);
+      if iNumber > 0
+      {
+         AddPacket(4,spell_costs_mana, 4,iNumber);
+      }
+      else
+      {
+         AddPacket(4,spell_costs_no_mana);
+      }
+
+      iExertion = Send(self,@GetExertion);
+      if iExertion > 0
+      {
+         AddPacket(4,spell_costs_vigor, 4,iExertion);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      iCount = 0;
+      foreach i in Send(self,@GetReagents)
+      {
+         iCount = iCount + 1;
+         if iCount <= SPELL_COST_REAGENT_SLOTS
+         {
+            iNumber = Nth(i,2);
+            oReagent = Send(SYS,@FindTemplateItemByClass,#cClass=First(i));
+            if oReagent = $
+            {
+               AddPacket(4,spell_costs_reagent_unknown, 4,iNumber);
+            }
+            else if iNumber > 1
+               AND IsClass(oReagent,&NumberItem)
+            {
+               AddPacket(4,spell_costs_reagent, 4,iNumber,
+                         4,Send(oReagent,@GetPluralName));
+            }
+            else if IsClass(oReagent,&NumberItem)
+            {
+               AddPacket(4,spell_costs_reagent, 4,iNumber,
+                         4,Send(oReagent,@GetSingularName));
+            }
+            else
+            {
+               AddPacket(4,spell_costs_reagent, 4,iNumber,
+                         4,Send(oReagent,@GetName));
+            }
+         }
+      }
+
+      i = iCount;
+      while i < SPELL_COST_REAGENT_SLOTS
+      {
+         AddPacket(4,spell_blank);
+         i = i + 1;
+      }
+
+      if iCount > SPELL_COST_REAGENT_SLOTS
+      {
+         AddPacket(4,spell_costs_more);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      iTime = Send(self,@GetTranceTime,#iSpellpower=iSpellPower,#who=who);
+      if iTime > 0
+      {
+         AddPacket(4,spell_costs_cast_time, 4,iTime / 1000,
+                   4,(iTime % 1000) / 100);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      iTime = Send(self,@GetPostCastDelay);
+      if iTime = 1
+      {
+         AddPacket(4,spell_costs_recovery_one);
+      }
+      else if iTime > 1
+      {
+         AddPacket(4,spell_costs_recovery, 4,iTime);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      return;
+   }
+
+   SendSpellPowerDesc(who=$,lPower=$)
+   "Ours (spell revamp D1): the spellpower and every part of it, from "
+   "GetSpellPower's bParts list."
+   {
+      local i, j, lShown, iOther, iSlots, lAlways;
+
+      AddPacket(4,spell_power_rsc, 4,First(lPower), 4,SPELLPOWER_MAXIMUM);
+
+      if Send(who,@GetSpellAbility,#spell_num=viSpell_num) = 0
+      {
+         AddPacket(4,spell_pp_unknown);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      // A school's two sources show even at zero: they tell the player what
+      //  would raise the spell.
+      lAlways = [ spell_pp_ability, spell_pp_shal_place, spell_pp_karma,
+                  spell_pp_hour, spell_pp_moon, spell_pp_pack,
+                  spell_pp_faren_place, spell_pp_vigor, spell_pp_company,
+                  spell_pp_health, spell_pp_instrument, spell_pp_base_health ];
+
+      lShown = $;
+      foreach i in Nth(lPower,2)
+      {
+         if Nth(i,2) <> 0
+            OR FindListElem(lAlways,First(i)) <> 0
+         {
+            lShown = AppendListElem(i,lShown);
+         }
+      }
+
+      iSlots = 0;
+      iOther = 0;
+      foreach i in lShown
+      {
+         if iSlots < SPELL_PP_SLOTS - 1
+            OR Length(lShown) <= SPELL_PP_SLOTS
+         {
+            AddPacket(4,spell_pp_line, 4,First(i));
+            foreach j in Nth(i,3)
+            {
+               AddPacket(4,j);
+            }
+
+            if Nth(i,2) >= 0
+            {
+               AddPacket(4,spell_pp_plus);
+            }
+            else
+            {
+               AddPacket(4,spell_blank);
+            }
+            AddPacket(4,Nth(i,2));
+            iSlots = iSlots + 1;
+         }
+         else
+         {
+            iOther = iOther + Nth(i,2);
+         }
+      }
+
+      if Length(lShown) > SPELL_PP_SLOTS
+      {
+         if iOther >= 0
+         {
+            AddPacket(4,spell_pp_line, 4,spell_pp_other, 4,spell_pp_plus,
+                      4,iOther);
+         }
+         else
+         {
+            AddPacket(4,spell_pp_line, 4,spell_pp_other, 4,spell_blank,
+                      4,iOther);
+         }
+         iSlots = iSlots + 1;
+      }
+
+      while iSlots < SPELL_PP_SLOTS
+      {
+         AddPacket(4,spell_blank);
+         iSlots = iSlots + 1;
+      }
+
+      return;
    }
 
    SendTimeDesc()
@@ -2160,23 +2470,39 @@ messages:
       return;
    }
 
-   GetSpellPower(who=$)
+   GetSpellPower(who=$,bParts=FALSE)
+   "Ours (spell revamp D2): with bParts, returns [total, parts] instead of "
+   "the total. Each part is [label resource, value, label parameters or $], "
+   "in the order they add up. The cast and the spell's description both come "
+   "from this one calculation, so they can't disagree."
    {
-      local iSpellPower, i, iTerrain, oRoom, oModifierSpell, iAbilityLoss,
+      local iSpellPower, i, oRoom, oModifierSpell, iAbilityLoss,
             iAbilityGain, iItemModifier, iBase, iPrimaryBonus, iSecondaryBonus,
-            iPowerBonus, iShrines;
-
-      oRoom = Send(who,@GetOwner);
+            iPowerBonus, iShrines, lParts, lItemParts, iMod, iBefore, iBound,
+            iBonus, iAbility;
 
       if who = $
       {
+         if bParts
+         {
+            return [SPELLPOWER_MINIMUM, $];
+         }
+
          return SPELLPOWER_MINIMUM;
       }
+
+      oRoom = Send(who,@GetOwner);
 
       // Let immortals cast at full potency.
       if IsClass(who,&DM)
          AND Send(who,@PlayerIsImmortal)
       {
+         if bParts
+         {
+            return [SPELLPOWER_MAXIMUM,
+                    [ [spell_pp_immortal, SPELLPOWER_MAXIMUM, $] ]];
+         }
+
          return SPELLPOWER_MAXIMUM;
       }
 
@@ -2185,21 +2511,40 @@ messages:
       //         GetTargets in ManaBomb, which can be called by monsters.
       if IsClass(who,&Monster)
       {
+         if bParts
+         {
+            return [SPELLPOWER_MAXIMUM, $];
+         }
+
          return SPELLPOWER_MAXIMUM;
       }
 
+      lParts = $;
+      lItemParts = $;
+
       // Spell power starts out as half the player's spell ability.
-      iBase = Send(who,@GetSpellAbility,#spell_num=viSpell_num) / 2;
+      iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
+      iBase = iAbility / 2;
+      if bParts
+      {
+         lParts = AppendListElem([spell_pp_ability, iBase, [vrName, iAbility]],
+                                 lParts);
+      }
 
       // Check the player's in use items to see if they affect anything.
       // Note that this also checks itematts.
       iItemModifier = 0;
       foreach i in Send(who,@GetPlayerUsing)
       {
-         iItemModifier = iItemModifier + Send(i,@GetSpellModifier,
-                                              #oSpell=self);
+         iMod = Send(i,@GetSpellModifier,#oSpell=self);
+         iItemModifier = iItemModifier + iMod;
+         if bParts AND iMod <> 0
+         {
+            lItemParts = AppendListElem([spell_pp_gear, iMod,
+                                         [Send(i,@GetName)]], lItemParts);
+         }
       }
-   
+
       // Each school has a bonus for different things.
       iPrimaryBonus = 0;
       iSecondaryBonus = 0;
@@ -2211,6 +2556,13 @@ messages:
          iPrimaryBonus = Send(oRoom,@GetShalilleBonus);
          // Secondary bonus based on Karma.
          iSecondaryBonus = Abs(Send(who,@GetKarma)/10);
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_shal_place, iPrimaryBonus, $],
+                                    lParts);
+            lParts = AppendListElem([spell_pp_karma, iSecondaryBonus, $],
+                                    lParts);
+         }
 
          // Forces of Light boosts Shal'ille
          if Send(oRoom,@IsEnchanted,#what=SID_FORCES_OF_LIGHT)
@@ -2220,6 +2572,12 @@ messages:
                                  #what=SID_FORCES_OF_LIGHT));
             iAbilityGain /= 10;
             iSecondaryBonus += iAbilityGain;
+            if bParts
+            {
+               lParts = AppendListElem([spell_pp_room_ench, iAbilityGain,
+                  [Send(Send(SYS,@FindSpellByNum,#num=SID_FORCES_OF_LIGHT),
+                        @GetName)]], lParts);
+            }
          }
       }
       else if viSchool = SS_QOR
@@ -2228,6 +2586,12 @@ messages:
          iPrimaryBonus =  (2 + Send(SYS,@GetHour));
          // Secondary bonus comes from Karma.
          iSecondaryBonus = Abs(Send(who,@GetKarma)/10);
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_hour, iPrimaryBonus, $], lParts);
+            lParts = AppendListElem([spell_pp_karma, iSecondaryBonus, $],
+                                    lParts);
+         }
 
          // Darkness boosts Qor
          if Send(oRoom,@IsEnchanted,#what=SID_DARKNESS)
@@ -2238,6 +2602,12 @@ messages:
             iAbilityGain = -(iAbilityGain - 25);
             iAbilityGain /= 10;
             iSecondaryBonus += iAbilityGain;
+            if bParts
+            {
+               lParts = AppendListElem([spell_pp_room_ench, iAbilityGain,
+                  [Send(Send(SYS,@FindSpellByNum,#num=SID_DARKNESS),
+                        @GetName)]], lParts);
+            }
          }
       }
       else if viSchool = SS_RIIJA
@@ -2246,7 +2616,7 @@ messages:
          // Riija strength determined by moon position - range is -16 to 30
          foreach i in Send(SYS,@GetBackgroundObjects)
          {
-            if IsClass(i,&Moon)  
+            if IsClass(i,&Moon)
             {
                iPrimaryBonus = Send(i,@GetBackgroundOverlayHeight)/12;
             }
@@ -2254,6 +2624,12 @@ messages:
 
          // Riija's secondary bonus depends on the number of items you're holding.
          iSecondaryBonus = (Send(who,@GetBulkHold)*10)/Send(who,@GetBulkMax);
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_moon, iPrimaryBonus, $], lParts);
+            lParts = AppendListElem([spell_pp_pack, iSecondaryBonus, $],
+                                    lParts);
+         }
       }
       else if viSchool = SS_FAREN
       {
@@ -2261,6 +2637,13 @@ messages:
          iPrimaryBonus = Send(oRoom,@GetFarenBonus);
          // Faren also rewards the vigorous warrior.
          iSecondaryBonus = Send(who,@GetVigor)/20;
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_faren_place, iPrimaryBonus, $],
+                                    lParts);
+            lParts = AppendListElem([spell_pp_vigor, iSecondaryBonus, $],
+                                    lParts);
+         }
       }
       else if viSchool = SS_KRAANAN
       {
@@ -2268,10 +2651,23 @@ messages:
          iPrimaryBonus = Length(Send(oRoom,@GetHolderActive));
          // Kraanan also favors the healthy warrior.  Full hps = more bonus.
          iSecondaryBonus = (Send(who,@GetHealth)*10)/Send(who,@GetMaxHealth);
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_company, iPrimaryBonus,
+                                     [iPrimaryBonus]], lParts);
+            lParts = AppendListElem([spell_pp_health, iSecondaryBonus, $],
+                                    lParts);
+         }
 
          // Kraanan, being a combat school, doesn't take penalties from items as much.
          if iItemModifier < 0
          {
+            if bParts
+            {
+               lItemParts = AppendListElem([spell_pp_gear_kraanan,
+                  (iItemModifier / 2) - iItemModifier, $], lItemParts);
+            }
+
             iItemModifier /= 2;
          }
       }
@@ -2285,6 +2681,13 @@ messages:
          // Secondary bonus is based off of HPs.  Non-mules get bigger bonuses.
          iPrimaryBonus = Send(who,@GetInstrumentLevel);
          iSecondaryBonus = Send(who,@GetBaseMaxHealth)/12;
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_instrument, iPrimaryBonus, $],
+                                    lParts);
+            lParts = AppendListElem([spell_pp_base_health, iSecondaryBonus, $],
+                                    lParts);
+         }
       }
 
       iPowerBonus = Send(Send(SYS,@GetParliament),@GetFactionSpellPowerBonus,
@@ -2293,28 +2696,63 @@ messages:
       // Bind the bonuses to reasonable values.
       if viSchool <> SS_JALA
       {
-         iPrimaryBonus = Bound(iPrimaryBonus,0,30);
+         iBound = Bound(iPrimaryBonus,0,30);
+         if bParts AND iBound <> iPrimaryBonus
+         {
+            lParts = AppendListElem([Send(self,@GetCapLabel,
+                                          #iValue=iPrimaryBonus),
+                                     iBound - iPrimaryBonus, [30]], lParts);
+         }
+         iPrimaryBonus = iBound;
       }
-      iSecondaryBonus = Bound(iSecondaryBonus,0,10);
+      iBound = Bound(iSecondaryBonus,0,10);
+      if bParts AND iBound <> iSecondaryBonus
+      {
+         lParts = AppendListElem([Send(self,@GetCapLabel,
+                                       #iValue=iSecondaryBonus),
+                                  iBound - iSecondaryBonus, [10]], lParts);
+      }
+      iSecondaryBonus = iBound;
+
+      if bParts AND iPowerBonus <> 0
+      {
+         lParts = AppendListElem([spell_pp_faction, iPowerBonus, $], lParts);
+      }
 
       iSpellPower = iPrimaryBonus + iSecondaryBonus + iPowerBonus + iBase;
 
       if Send(oRoom,@CheckRoomFlag,#flag=ROOM_ANTI_MAGIC)
       {
          oModifierSpell = Send(SYS,@FindSpellByNum,#num=SID_ANTIMAGIC_AURA);
+         iBefore = iSpellPower;
          iSpellPower = Send(oModifierSpell,@ModifySpellPower,
                               #who=who,#oRoom=oRoom,#oSpell=self,
                               #iSpellPower=iSpellPower);
+         if bParts AND iSpellPower <> iBefore
+         {
+            lParts = AppendListElem([spell_pp_inside, iSpellPower - iBefore,
+                        [Send(oModifierSpell,@GetName)]], lParts);
+         }
       }
 
       foreach i in Send(who,@GetRadiusEnchantments)
       {
+         iBefore = iSpellPower;
          iSpellPower = Send(Nth(i,2),@ModifySpellPower,#who=who,#oRoom=oRoom,
                               #oSpell=self,#iSpellPower=iSpellPower,
                               #state=Nth(i,3));
+         if bParts AND iSpellPower <> iBefore
+         {
+            lParts = AppendListElem([spell_pp_inside, iSpellPower - iBefore,
+                        [Send(Nth(i,2),@GetName)]], lParts);
+         }
       }
 
       // Bound the lower end so that the stuff that follows is truly a bonus.
+      if bParts AND iSpellPower < 0
+      {
+         lParts = AppendListElem([spell_pp_floor, -iSpellPower, $], lParts);
+      }
       iSpellPower = Bound(iSpellPower,0,$);
 
       // This number is based on the number of shrines this god controls.
@@ -2322,16 +2760,43 @@ messages:
 
       // These bonuses (shrine, items) can boost spell power after all other modifiers.
       iSpellPower += iShrines + iItemModifier;
+      if bParts
+      {
+         if iShrines <> 0
+         {
+            lParts = AppendListElem([spell_pp_shrines, iShrines,
+                                     [Send(self,@GetSchoolStr)]], lParts);
+         }
+
+         foreach i in lItemParts
+         {
+            lParts = AppendListElem(i, lParts);
+         }
+      }
 
       // Then, add bonus from the system object, set by admins
-      iSpellPower += Send(SYS,@GetBonusSpellpower,#school=viSchool);
+      iBonus = Send(SYS,@GetBonusSpellpower,#school=viSchool);
+      iSpellPower += iBonus;
+      if bParts AND iBonus <> 0
+      {
+         lParts = AppendListElem([spell_pp_server, iBonus, $], lParts);
+      }
 
       // Affected by the Dement spell?
       oModifierSpell = Send(SYS,@FindSpellByNum,#num=SID_DEMENT);
       if Send(who,@IsEnchanted,#what=oModifierSpell)
       {
          iAbilityLoss = First(Send(who,@GetEnchantedState,#what=oModifierSpell));
-         iAbilityLoss = Random(iAbilityLoss, iAbilityLoss*2);
+         if bParts
+         {
+            // A cast loses a random amount up to twice this: show the least.
+            lParts = AppendListElem([spell_pp_dement, -iAbilityLoss,
+                                     [iAbilityLoss]], lParts);
+         }
+         else
+         {
+            iAbilityLoss = Random(iAbilityLoss, iAbilityLoss*2);
+         }
          iSpellpower -= iAbilityLoss;
       }
 
@@ -2339,13 +2804,42 @@ messages:
       if viSchool = SS_KRAANAN
       {
          iSpellPower = iSpellPower + 20;
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_kraanan, 20, $], lParts);
+         }
       }
 
       // Bound the result.
-      iSpellPower = Bound(iSpellPower,SPELLPOWER_MINIMUM,SPELLPOWER_MAXIMUM);
+      iBound = Bound(iSpellPower,SPELLPOWER_MINIMUM,SPELLPOWER_MAXIMUM);
+      if bParts
+      {
+         if iBound < iSpellPower
+         {
+            lParts = AppendListElem([spell_pp_total_cap, iBound - iSpellPower,
+                                     [SPELLPOWER_MAXIMUM]], lParts);
+         }
+         else if iBound > iSpellPower
+         {
+            lParts = AppendListElem([spell_pp_total_floor, iBound - iSpellPower,
+                                     [SPELLPOWER_MINIMUM]], lParts);
+         }
 
+         return [iBound, lParts];
+      }
 
-      return iSpellPower;
+      return iBound;
+   }
+
+   GetCapLabel(iValue=0)
+   "Ours: the breakdown line for a school bonus held to its range."
+   {
+      if iValue < 0
+      {
+         return spell_pp_floor;
+      }
+
+      return spell_pp_cap;
    }
 
    CanBeRemovedByPlayer()

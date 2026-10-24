@@ -164,6 +164,7 @@ messages:
       iCasterKarma = 20;
       iTargetKarma = 0;
       bUndead = FALSE;
+      oTarget = $;
 
       if lTargets <> $
       {
@@ -180,11 +181,16 @@ messages:
          return damage + (damage*iCasterKarma/100);
       }
 
-      if IsClass(oTarget,&Player)
+      // Ours: no target when the description asks for the damage range.
+      if oTarget <> $
       {
-         return damage + damage*(random(130,260))/400;
+         if IsClass(oTarget,&Player)
+         {
+            return damage + damage*(random(130,260))/400;
+         }
       }
-      else if iTargetKarma < 0
+
+      if iTargetKarma < 0
       {
          return damage + damage*(iCasterKarma - iTargetKarma)/400;
       }

@@ -27,6 +27,8 @@ resources:
    heal_cast_on_other = "You heal %s%s for ~g~B%i~B~n hitpoints."
    heal_unnecessary_rsc = "%s%s is perfectly healthy."
 
+   heal_effect_rsc = "Heals %i to %i health."
+
 classvars:
 
    vrUnnecessary = heal_unnecessary_rsc
@@ -35,6 +37,12 @@ classvars:
    vrSuccess = heal_cast_on_other
 
    viFlash = FLASH_GOOD
+
+   // Ours (spell revamp D3): GetHealAmount heals Random(viHealMin,viHealMax)
+   //  + (spellpower + 1) * viHealPerPower, in hundredths of a hitpoint.
+   viHealMin = 0
+   viHealMax = 0
+   viHealPerPower = 0
 
 properties:
 
@@ -135,13 +143,7 @@ messages:
       iHeal = Send(self,@GetHealAmount,#oTarget=oTarget,
                      #iSpellPower=iSpellPower);
 
-      // A little boost for casting on newbies, even if you're the newbie!
-      // Ours: added before the heal, so it's given and not only reported.
-      if NOT Send(oTarget,@CheckPlayerFlag,#flag=PFLAG_PKILL_ENABLE)
-      {
-         iHeal = iHeal + Random(200,500);
-      }
-
+      // Ours: no extra healing for new players (it was 2-5 more).
       iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
 
       if who <> oTarget
@@ -171,14 +173,36 @@ messages:
    }
 
    GetHealAmount(oTarget=$,iSpellPower=1)
-   "Heal spells override this to set the heal amount on a given target."
+   "Heal spells set viHealMin, viHealMax and viHealPerPower, or override this."
    {
       if (oTarget = $)
       {
          Debug("Trying to get heal amount for $ target!");
+
+         return 1;
       }
 
-      return 1;
+      if viHealMax = 0
+      {
+         return 1;
+      }
+
+      return Random(viHealMin,viHealMax) + ((iSpellPower + 1) * viHealPerPower);
+   }
+
+   HasEffectSummary()
+   {
+      return viHealMax > 0 AND NOT vbIsAreaEffect;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp D3): the heal range at this spellpower."
+   {
+      AddPacket(4,heal_effect_rsc,
+                4,(viHealMin + ((iSpellPower + 1) * viHealPerPower)) / 100,
+                4,(viHealMax + ((iSpellPower + 1) * viHealPerPower)) / 100);
+
+      return;
    }
 
 end

@@ -205,6 +205,12 @@ messages:
       propagate;
    }
 
+   GetSingularName()
+   "Ours: the name for one of us, whatever piNumber is (a spell's costs line)."
+   {
+      return vrName;
+   }
+
    GetPluralName()
    {
       if vrName_plural <> $

@@ -43,6 +43,10 @@ classvars:
    viSpell_level = 3
    viMeditate_ratio = 30
 
+   viHealMin = 300
+   viHealMax = 1000
+   viHealPerPower = 10
+
 properties:
 
 messages:
@@ -53,18 +57,6 @@ messages:
       plReagents = Cons([&Herbs,2],plReagents);
 
       return;
-   }
-
-   GetHealAmount(oTarget=$,iSpellPower=1)
-   {
-      if (oTarget = $)
-      {
-         Debug("Trying to get heal amount for $ target!");
-
-         return 1;
-      }
-
-      return Random(300,1000) + ((iSpellPower + 1) * 10);
    }
 
 end
