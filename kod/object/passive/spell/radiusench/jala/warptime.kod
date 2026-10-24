@@ -21,8 +21,9 @@ resources:
    WarpTime_name_rsc = "warp time"
    WarpTime_icon_rsc = iwarptim.bgf
    WarpTime_desc_rsc = \
-      "The words of this song form an enchantment which increases the time "
-      "that a spellcaster must hold trance to cast a spell.  Requires two "
+      "The words of this song bend time around your foes.  Monsters within "
+      "hearing attack a quarter to half again as slowly, and enemy players "
+      "must hold their trance up to a second longer to cast.  Requires two "
       "diamonds to cast."
    WarpTime_StartEnchantment = \
       "A woozy feeling passes through your head, slowing your mental spell "
@@ -44,6 +45,8 @@ resources:
       "You can no longer hear the eerily slow notes of %s%s's song."
 
 classvars:
+
+   vrMusic = warptime_song
 
    vrEnchantmentOn = Warp_Time_cast
    vrEnchantmentOnOther = Warp_Time_starts
@@ -67,14 +70,14 @@ classvars:
    viSpell_level = 2
    viMeditate_ratio = 20
 
+   // Ours (spell revamp D16, D17): only the singer's foes, not the singer
+   //  and their guildmates.
    viHarmful = TRUE
-
-   viAffectsGuildmates = TRUE
+   viAffectsCaster = FALSE
    viAffectsEnemies = TRUE
 
 properties:
 
-   prMusic = warptime_song
 
 messages:
 
@@ -84,6 +87,41 @@ messages:
       plReagents = Cons([&Diamond,2],plReagents);
 
       return;
+   }
+
+   ModifyMonsterAttackTime(mob=$,iTime=0,state=$)
+   "Ours (spell revamp D16): a foe monster attacks more slowly."
+   {
+      if NOT Send(self,@IsSongFoe,#who=mob,#state=state)
+      {
+         return iTime;
+      }
+
+      return iTime * (125 + (Nth(state,5) / 4)) / 100;
+   }
+
+   IsSongFoe(who=$,state=$)
+   "TRUE if who, in the song, is one of the singer's foes (trance.kod asks)."
+   {
+      local oCaster;
+
+      if who = $
+         OR state = $
+      {
+         return FALSE;
+      }
+
+      oCaster = Send(self,@GetCaster,#state=state);
+      if oCaster = $
+         OR who = oCaster
+         OR NOT IsClass(oCaster,&Battler)
+         OR NOT IsClass(who,&Battler)
+      {
+         return FALSE;
+      }
+
+      return Send(oCaster,@AllowBattlerAttack,#victim=who,#report=FALSE,
+                  #stroke_obj=self);
    }
 
 end

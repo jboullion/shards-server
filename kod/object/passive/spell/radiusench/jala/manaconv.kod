@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   vrMusic = ManaConvergence_song
+
    vrEnchantmentOn = Mana_Convergence_cast
    vrEnchantmentOnOther = Mana_Convergence_starts
    vrEnchantmentOff = Mana_Convergence_caster_ends
@@ -65,7 +67,6 @@ classvars:
 
 properties:
 
-   prMusic = ManaConvergence_song
 
 messages:
 

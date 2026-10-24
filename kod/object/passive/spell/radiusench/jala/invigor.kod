@@ -38,6 +38,8 @@ resources:
 
 classvars:
 
+   vrMusic = Invigorate_song
+
    vrEnchantmentOn = Invigorate_cast
    vrEnchantmentOnOther = Invigorate_starts
    vrEnchantmentOff = Invigorate_caster_ends
@@ -66,7 +68,6 @@ classvars:
 
 properties:
 
-   prMusic = Invigorate_song
 
 messages:
 

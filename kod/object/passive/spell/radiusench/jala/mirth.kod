@@ -38,6 +38,8 @@ resources:
 
 classvars:
 
+   vrMusic = Mirth_song
+
    vrEnchantmentOn = Mirth_cast
    vrEnchantmentOnOther = Mirth_starts
    vrEnchantmentOff = Mirth_caster_ends
@@ -66,7 +68,6 @@ classvars:
 
 properties:
 
-   prMusic = Mirth_song
 
 messages:
 

@@ -39,6 +39,8 @@ resources:
 
 classvars:
 
+   vrMusic = Melancholy_song
+
    vrEnchantmentOn = Melancholy_cast
    vrEnchantmentOnOther = Melancholy_starts
    vrEnchantmentOff = Melancholy_caster_ends
@@ -67,7 +69,6 @@ classvars:
 
 properties:
 
-   prMusic = Melancholy_song
 
 messages:
 

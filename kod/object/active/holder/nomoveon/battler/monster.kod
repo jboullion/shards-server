@@ -2339,6 +2339,13 @@ messages:
                          #iDefense=iDefense,
                          #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
       }
+      // Ours (spell revamp D16): Jala's songs too.
+      foreach i in plRadiusEnchantments
+      {
+         iDefense = Send(Nth(i,2),@ModifyMonsterDefense,#mob=self,
+                         #iDefense=iDefense,
+                         #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
 
       return Bound(iDefense,1,2000);
 }
@@ -2386,6 +2393,13 @@ messages:
 
       // Ours (spell revamp phase 2): enchantments can change this.
       foreach i in plEnchantments
+      {
+         iDamage = Send(Nth(i,2),@ModifyMonsterDamage,#mob=self,
+                        #iDamage=iDamage,
+                        #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+      // Ours (spell revamp D16): Jala's songs too.
+      foreach i in plRadiusEnchantments
       {
          iDamage = Send(Nth(i,2),@ModifyMonsterDamage,#mob=self,
                         #iDamage=iDamage,
@@ -5331,6 +5345,15 @@ if isClass(self,&Reflection)
             return FALSE;
          }
       }
+      // Ours (spell revamp D16): Jala's songs too.
+      foreach i in plRadiusEnchantments
+      {
+         if NOT Send(Nth(i,2),@MonsterCanCast,#mob=self,
+                     #state=Send(self,@GetEnchantmentEntryState,#lEntry=i))
+         {
+            return FALSE;
+         }
+      }
 
       return TRUE;
    }
@@ -5408,6 +5431,14 @@ if isClass(self,&Reflection)
          // Ours (spell revamp phase 2): enchantments (Dement) can weaken it.
          iPower = piSpellPower;
          foreach i in plEnchantments
+         {
+            iPower = Send(Nth(i,2),@ModifyMonsterSpellPower,#mob=self,
+                          #iSpellPower=iPower,
+                          #state=Send(self,@GetEnchantmentEntryState,
+                                      #lEntry=i));
+         }
+         // Ours (spell revamp D16): Jala's songs too.
+         foreach i in plRadiusEnchantments
          {
             iPower = Send(Nth(i,2),@ModifyMonsterSpellPower,#mob=self,
                           #iSpellPower=iPower,
@@ -5916,6 +5947,12 @@ if isClass(self,&Reflection)
 
       // Ours (spell revamp D11): a chill slows our attacks.
       foreach i in plEnchantments
+      {
+         iTime = Send(Nth(i,2),@ModifyMonsterAttackTime,#mob=self,#iTime=iTime,
+                      #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+      // Ours (spell revamp D16): Jala's songs too.
+      foreach i in plRadiusEnchantments
       {
          iTime = Send(Nth(i,2),@ModifyMonsterAttackTime,#mob=self,#iTime=iTime,
                       #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));

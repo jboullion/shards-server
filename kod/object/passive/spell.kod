@@ -187,8 +187,6 @@ resources:
    cannot_cast_on_phased_out = \
       "You can't cast anything on %s while %s is phased out of existence!"
 
-   Jala_hindered = "~rThe sound of jala hinders your cast!"
-   Jala_you_hindered = "~gYou hindered the spell of %s!"
    
 classvars:
 
@@ -1537,49 +1535,8 @@ messages:
          return TRUE;
       }
 
-      // Modify chance to succeed due to Jala's hinder spells.
-      // Hinder spell effects stack.
-      //Diggie - 5/31/2024
-      //So the previous jala hinder code used a mix of distance between caster and target
-      //and spell power. I was not a fan of that and think this method is much better.
-      //Caster spell power vs spellpower of the jala spell.
-      //Final Spellpower = Caster spellpower +1 - Jala spellpower +1 / 2
-      //The goal is 99 Jala spellpower vs 99 Spell power "example spell" will result in a
-      //50% chance to block the spell.
-       
-      foreach i in Send(who,@GetRadiusEnchantments)
-      {  
-         if isClass(Nth(i,2),&HinderSpell)
-         {  
-            if Send(Nth(i,2),@IsAltered,#what=self)
-            {
-               oJalaOwner = Send(Nth(i,2),@GetCaster,#state=Nth(i,3));
-               iJalaSP = Send(Nth(i,2),@GetSpellPower,#who=oJalaOwner);
-               iJalaSP = bound(iJalaSP,5,99);
-
-               if lTargets <> $
-                  AND Send(self,@GetNumSpellTargets) = 1
-                  AND IsClass(First(lTargets),&Battler)
-                  AND Send(Send(who,@GetOwner),@LineOfSight,#obj1=who,
-                               #obj2=First(lTargets))
-                  AND NOT(IsClass(who,&DM) AND NOT Send(who,@PlayerIsImmortal))
-               {
-                  iCastSP = (iSpellpower + 1) - ((iJalaSP+1)/2);
-                  iFinalSP = bound(iCastSP,1,90);
-
-                  iRan = Random(1,100);
-                  if iRan > iFinalSP
-                     AND (oRing = $ OR NOT Send(oRing,@InUse))
-                  {
-                     Send(who,@MsgSendUser,#message_rsc=Jala_hindered);
-                     Send(oJalaOwner,@MsgSendUser,#message_rsc=Jala_you_hindered,#parm1=Send(who,@GetName));
-                     
-                     return FALSE;
-                  }
-               }
-            }
-         }
-      }
+      // Ours (spell revamp D19): Jala's hinder songs, which could fail a cast,
+      //  are songs against foes now; nothing else fails a cast here.
 
       return TRUE;
    }

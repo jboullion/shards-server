@@ -36,6 +36,8 @@ resources:
 
 classvars:
 
+   vrMusic = Restorate_song
+
    vrEnchantmentOn = Restorate_cast
    vrEnchantmentOnOther = Restorate_starts
    vrEnchantmentOff = Restorate_caster_ends
@@ -64,7 +66,6 @@ classvars:
 
 properties:
 
-   prMusic = Restorate_song
 
 messages:
 

@@ -40,6 +40,8 @@ resources:
 
 classvars:
 
+   vrMusic = jig_song
+
    vrEnchantmentOn = Jig_cast
    vrEnchantmentOnOther = Jig_starts
    vrEnchantmentOff = Jig_caster_ends
@@ -70,7 +72,6 @@ classvars:
 
 properties:
 
-   prMusic = jig_song
 
 messages:
 

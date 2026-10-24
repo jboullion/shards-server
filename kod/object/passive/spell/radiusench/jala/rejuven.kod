@@ -37,6 +37,8 @@ resources:
 
 classvars:
 
+   vrMusic = Rejuvenate_song
+
    vrEnchantmentOn = Rejuvenate_cast
    vrEnchantmentOnOther = Rejuvenate_starts
    vrEnchantmentOff = Rejuvenate_caster_ends
@@ -65,7 +67,6 @@ classvars:
 
 properties:
 
-   prMusic = Rejuvenate_song
 
 messages:
 

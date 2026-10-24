@@ -21,13 +21,17 @@ resources:
    truth_name_rsc = "truth"
    truth_icon_rsc = itruth.bgf
    truth_desc_rsc = \
-      "This song hinders the spells of the master of the illusionary arts, "
-      "Riija.  A ruby and some rainbow ferns are required to begin performing "
+      "A song no lie can stand.  Invisible, faded and shadowed foes within "
+      "hearing are revealed and their disguises fall away, illusions "
+      "shatter, and every foe's defense falters by a tenth to almost a "
+      "third.  A ruby and some rainbow ferns are required to begin performing "
       "this song."
 
    truth_song = song.ogg
 
 classvars:
+
+   vrMusic = truth_song
 
    vrName = truth_name_rsc
    vrIcon = truth_icon_rsc
@@ -42,11 +46,9 @@ classvars:
    viSpell_level = 4
    viMeditate_ratio = 40
 
-   viHinderedSchool = SS_RIIJA
 
 properties:
 
-   prMusic = truth_song
 
 messages:
 
@@ -57,6 +59,72 @@ messages:
       plReagents = Cons([&RainbowFern,2],plReagents);
 
       return;
+   }
+
+   AddEnchantmentEffects(who=$,state=$)
+   {
+      Send(self,@RevealFoe,#who=who,#state=state);
+
+      propagate;
+   }
+
+   PeriodicEffect(who=$,state=$)
+   {
+      Send(self,@RevealFoe,#who=who,#state=state);
+
+      return;
+   }
+
+   RevealFoe(who=$,state=$)
+   "Ours (spell revamp D16): an illusion shatters; a foe player loses "
+   "invisibility, fade, shadow form and illusionary form."
+   {
+      local i;
+
+      if NOT Send(self,@IsSongFoe,#who=who,#state=state)
+      {
+         return;
+      }
+
+      if IsClass(who,&Monster)
+      {
+         if Send(who,@IsIllusion)
+            AND NOT Send(who,@IsCompanion)
+         {
+            Send(who,@Delete);
+         }
+
+         return;
+      }
+
+      foreach i in [SID_INVISIBILITY, SID_FADE, SID_SHADOW_FORM,
+                    SID_ILLUSIONARY_FORM]
+      {
+         Send(who,@RemoveEnchantment,#what=Send(SYS,@FindSpellByNum,#num=i));
+      }
+
+      return;
+   }
+
+   ModifyMonsterDefense(mob=$,iDefense=0,state=$)
+   {
+      if NOT Send(self,@IsSongFoe,#who=mob,#state=state)
+      {
+         return iDefense;
+      }
+
+      return iDefense * (100 - Send(self,@SongPercent,#state=state)) / 100;
+   }
+
+   ModifyDefensePower(who=$,what=$,defense_power=0,state=$)
+   "A foe player's defense falters."
+   {
+      if NOT Send(self,@IsSongFoe,#who=who,#state=state)
+      {
+         return defense_power;
+      }
+
+      return defense_power * (100 - Send(self,@SongPercent,#state=state)) / 100;
    }
 
 end

@@ -21,13 +21,16 @@ resources:
    ProfaneResonance_name_rsc = "profane resonance"
    ProfaneResonance_icon_rsc = iprofres.bgf
    ProfaneResonance_desc_rsc = \
-      "The foreboding sound of this song hinders the casting the holy spells "
-      "of Shal'ille.  A ruby and some herbs are required to begin performing "
-      "this song."
+      "A dirge that rots the flesh.  Every five seconds it eats at your foes "
+      "within hearing with unholy power, and a little of what it takes flows "
+      "back to you as health.  A ruby and some herbs are required to begin "
+      "performing this song."
 
    ProfaneResonance_song = nec02.ogg
 
 classvars:
+
+   vrMusic = ProfaneResonance_song
 
    vrName = ProfaneResonance_name_rsc
    vrIcon = ProfaneResonance_icon_rsc
@@ -42,11 +45,9 @@ classvars:
    viSpell_level = 3
    viMeditate_ratio = 30
 
-   viHinderedSchool = SS_SHALILLE
 
 properties:
 
-   prMusic = ProfaneResonance_song
 
 messages:
 
@@ -55,6 +56,29 @@ messages:
       plReagents = $;
       plReagents = Cons([&Ruby,1],plReagents);
       plReagents = Cons([&Herbs,1],plReagents);
+
+      return;
+   }
+
+   PeriodicEffect(who=$,state=$)
+   "Ours (spell revamp D16): unholy damage; the singer gains a point of "
+   "health from each foe it reaches."
+   {
+      local oCaster;
+
+      if NOT Send(self,@IsSongFoe,#who=who,#state=state)
+      {
+         return;
+      }
+
+      oCaster = Send(self,@GetCaster,#state=state);
+      if Send(self,@SongDamage,#who=who,#state=state,
+              #iDamage=Send(self,@GetPulseDamage,#state=state),
+              #iSpell=ATCK_SPELL_UNHOLY) <> 0
+         AND IsClass(oCaster,&Player)
+      {
+         Send(oCaster,@GainHealth,#amount=1);
+      }
 
       return;
    }

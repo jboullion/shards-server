@@ -21,8 +21,9 @@ resources:
    Spellbane_name_rsc = "spellbane"
    Spellbane_icon_rsc = ispebane.bgf
    Spellbane_desc_rsc = \
-      "The words of this song form an enchantment which hinders the casting "
-      "of any other spells.  Requires one perfect polished seraphym."
+      "The words of this song unravel your foes' magic.  Foes within hearing "
+      "cast with up to a third less spellpower, and monsters cast half as "
+      "often.  Requires one perfect polished seraphym."
    Spellbane_no_towns = "You are prevented from singing this song currently."
 
    Spellbane_song = jala1.ogg
@@ -55,6 +56,8 @@ resources:
 
 classvars:
 
+   vrMusic = Spellbane_song
+
    vrEnchantmentOn = Spellbane_cast
    vrEnchantmentOnOther = Spellbane_starts
    vrEnchantmentOff = Spellbane_caster_ends
@@ -80,7 +83,6 @@ classvars:
 
 properties:
 
-   prMusic = Spellbane_song
 
 messages:
 
@@ -92,14 +94,37 @@ messages:
       return;
    }
 
-   IsAltered(what=$)
+
+   ModifySpellPower(who=$,state=$,oSpell=$,iSpellPower=0)
+   "Ours (spell revamp D16): a foe player's spells are weaker."
    {
-      if what = $
+      if NOT Send(self,@IsSongFoe,#who=who,#state=state)
       {
-         return FALSE;
+         return iSpellPower;
       }
 
-      return TRUE;
+      return iSpellPower - (Send(self,@GetSongPower,#state=state) / 3);
+   }
+
+   ModifyMonsterSpellPower(mob=$,iSpellPower=0,state=$)
+   {
+      if NOT Send(self,@IsSongFoe,#who=mob,#state=state)
+      {
+         return iSpellPower;
+      }
+
+      return iSpellPower - (Send(self,@GetSongPower,#state=state) / 3);
+   }
+
+   MonsterCanCast(mob=$,state=$)
+   "A foe monster gets half its chances to cast."
+   {
+      if NOT Send(self,@IsSongFoe,#who=mob,#state=state)
+      {
+         return TRUE;
+      }
+
+      return Random(1,2) = 1;
    }
 
 end

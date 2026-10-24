@@ -21,13 +21,16 @@ resources:
    Conciliation_name_rsc = "conciliation"
    Conciliation_icon_rsc = iconcil.bgf
    Conciliation_desc_rsc = \
-      "This song hinders the casting of the spells the warrior god Kraanan "
-      "the Fist.  A ruby and some elderberries are required to begin "
-      "performing this song."
+      "A soothing melody.  Every five seconds, each monster within hearing "
+      "that would fight you may lose interest for a few moments, the more "
+      "likely the stronger you sing.  A ruby and some elderberries are "
+      "required to begin performing this song."
 
    Conciliation_song = neutfor.ogg
 
 classvars:
+
+   vrMusic = Conciliation_song
 
    vrName = Conciliation_name_rsc
    vrIcon = Conciliation_icon_rsc
@@ -41,11 +44,9 @@ classvars:
    viSchool = SS_JALA
    viSpell_level = 2
 
-   viHinderedSchool = SS_KRAANAN
 
 properties:
 
-   prMusic = Conciliation_song
 
 messages:
 
@@ -54,6 +55,24 @@ messages:
       plReagents = $;
       plReagents = Cons([&Ruby,1],plReagents);
       plReagents = Cons([&Elderberry,1],plReagents);
+
+      return;
+   }
+
+   PeriodicEffect(who=$,state=$)
+   "Ours (spell revamp D16): a foe monster may stop fighting for 4 seconds "
+   "(20 to 53 percent each pulse)."
+   {
+      if NOT IsClass(who,&Monster)
+         OR NOT Send(self,@IsSongFoe,#who=who,#state=state)
+      {
+         return;
+      }
+
+      if Random(1,100) <= 20 + (Send(self,@GetSongPower,#state=state) / 3)
+      {
+         Send(who,@EnterStateWait,#delay=4000);
+      }
 
       return;
    }

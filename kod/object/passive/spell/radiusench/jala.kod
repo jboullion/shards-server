@@ -27,10 +27,44 @@ classvars:
 
    viBaseRange = 40 * FINENESS
 
+   // Ours (spell revamp D20): the song's music, played to its listeners
+   //  while they hear it (it was a property nothing read).
+   vrMusic = $
+
 properties:
 
 
 messages:
+
+   AddEnchantmentEffects(who=$,state=$)
+   "Ours: a listener hears the song."
+   {
+      if vrMusic <> $
+         AND IsClass(who,&User)
+      {
+         Send(who,@SendRoomMusic,#music_rsc=vrMusic);
+      }
+
+      propagate;
+   }
+
+   EndEnchantment(who=$,report=TRUE,state=$,recheck=FALSE)
+   "Ours: the room's own music again."
+   {
+      local oRoom;
+
+      if vrMusic <> $
+         AND IsClass(who,&User)
+      {
+         oRoom = Send(who,@GetOwner);
+         if oRoom <> $
+         {
+            Send(who,@SendRoomMusic,#music_rsc=Send(oRoom,@GetMusic));
+         }
+      }
+
+      propagate;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

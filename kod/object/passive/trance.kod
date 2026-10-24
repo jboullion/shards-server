@@ -38,7 +38,10 @@ messages:
       local lState, iPower;
 
       lState = Send(who,@GetRadiusEnchantmentState,#byclass=&WarpTime);
+      // Ours (spell revamp D16): only the singer's foes.
       if (lState <> $)
+         AND Send(Send(SYS,@FindSpellByNum,#num=SID_WARP_TIME),@IsSongFoe,
+                  #who=who,#state=lState)
       {
          iPower = Nth(lState,5);
          // Up to an extra second.

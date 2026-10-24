@@ -18,15 +18,13 @@ resources:
 
    include hinder.lkod
 
-   hinder_cast = "You begin playing a discordant tune."
-   hinder_starts = "%s%s begins playing a discordant tune!"
-   hinder_ends = "The discordant tune maintained by %s%s fades."
-   hinder_caster_ends = "Your discordant tune fades."
-   hinder_caster_enter = \
-      "You feel the words of your song weaving together to "
-      "interfere with specific other magics."
-   hinder_enter = "A discordant tune sung by %s%s fills your mind."
-   hinder_leave = "You can no longer hear the discordant tune sung by %s%s."
+   hinder_cast = "You begin playing a song against your foes."
+   hinder_starts = "%s%s begins playing a menacing song!"
+   hinder_ends = "The menacing song played by %s%s fades."
+   hinder_caster_ends = "Your song fades."
+   hinder_caster_enter = "You feel your song reaching for your foes."
+   hinder_enter = "A menacing song played by %s%s fills your mind."
+   hinder_leave = "You can no longer hear the song played by %s%s."
 
 classvars:
 
@@ -44,26 +42,85 @@ classvars:
    viChance_To_Increase = 10
    viMeditate_ratio = 20
 
-   viHinderedSchool = SS_JALA  // What school does this song hinder?
-
+   // Ours (spell revamp D16, D17): these songs once hindered one school's
+   //  casting, for the singer's guildmates too. Now each hurts or weakens
+   //  the singer's foes in hearing, monsters and enemy players alike, and
+   //  nobody else (the singer included).
    viHarmful = TRUE
-
-   viAffectsGuildmates = TRUE
+   viAffectsCaster = FALSE
    viAffectsEnemies = TRUE
 
 properties:
 
 messages:
 
-   IsAltered(what=$)
+   IsSongFoe(who=$,state=$)
+   "TRUE if who, in the song, is one of the singer's foes."
    {
-      if what = $
-         OR Send(what,@GetSchool) <> viHinderedSchool
+      local oCaster;
+
+      if who = $
+         OR state = $
       {
          return FALSE;
       }
 
-      return TRUE;
+      oCaster = Send(self,@GetCaster,#state=state);
+      if oCaster = $
+         OR who = oCaster
+         OR NOT IsClass(oCaster,&Battler)
+         OR NOT IsClass(who,&Battler)
+      {
+         return FALSE;
+      }
+
+      return Send(oCaster,@AllowBattlerAttack,#victim=who,#report=FALSE,
+                  #stroke_obj=self);
+   }
+
+   GetSongPower(state=$)
+   "The spellpower the song was cast at."
+   {
+      if state = $
+      {
+         return 0;
+      }
+
+      return Bound(Nth(state,5),0,SPELLPOWER_MAXIMUM);
+   }
+
+   GetPulseDamage(state=$)
+   "A damage song's hit each pulse (every 5 seconds), in whole points: 1 to "
+   "3, and up to 4 more with spellpower."
+   {
+      return Random(1,3) + (Send(self,@GetSongPower,#state=state) / 25);
+   }
+
+   SongDamage(who=$,state=$,iDamage=0,iSpell=ATCK_SPELL_ALL)
+   "Hurts a foe for iDamage (whole points) of iSpell. Returns the "
+   "hundredths dealt, or $ if it died."
+   {
+      local oCaster, iDealt;
+
+      oCaster = Send(self,@GetCaster,#state=state);
+      iDealt = Send(who,@AssessDamage,#what=oCaster,#damage=iDamage * 100,
+                    #aspell=ATCK_SPELL_ALL+iSpell,#precision=TRUE,
+                    #report=FALSE,#report_resistance=FALSE);
+      Send(Send(who,@GetOwner),@SomethingAttacked,#what=oCaster,#victim=who,
+           #use_weapon=self,#stroke_obj=self);
+
+      if iDealt = $
+      {
+         Send(oCaster,@KilledSomething,#what=who,#use_weapon=self);
+      }
+
+      return iDealt;
+   }
+
+   SongPercent(state=$)
+   "A debuff song's strength: 10 to 29 percent."
+   {
+      return 10 + (Send(self,@GetSongPower,#state=state) / 5);
    }
 
 end

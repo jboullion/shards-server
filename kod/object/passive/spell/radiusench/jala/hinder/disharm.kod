@@ -21,12 +21,16 @@ resources:
    Disharmony_name_rsc = "disharmony"
    Disharmony_icon_rsc = idisharm.bgf
    Disharmony_desc_rsc = \
-      "This words of this song hinder the performance of other Jala songs.  "
+      "A clash of notes that shakes the ground.  Every five seconds it "
+      "batters your foes within hearing, and while they hear it monsters "
+      "can't cast spells and players' casting is broken.  "
       "A single ruby is required to begin performing this song."
 
    Disharmony_song = bridge.ogg
 
 classvars:
+
+   vrMusic = Disharmony_song
 
    vrName = Disharmony_name_rsc
    vrIcon = Disharmony_icon_rsc
@@ -41,11 +45,9 @@ classvars:
    viSpell_level = 4
    viMeditate_ratio = 40
 
-   viHinderedSchool = SS_JALA
 
 properties:
 
-   prMusic = Disharmony_song
 
 messages:
 
@@ -55,6 +57,26 @@ messages:
       plReagents = Cons([&Ruby,1],plReagents);
 
       return;
+   }
+
+   PeriodicEffect(who=$,state=$)
+   "Ours (spell revamp D16): earth damage, which breaks a player's casting."
+   {
+      if NOT Send(self,@IsSongFoe,#who=who,#state=state)
+      {
+         return;
+      }
+
+      Send(self,@SongDamage,#who=who,#state=state,
+           #iDamage=Send(self,@GetPulseDamage,#state=state),
+           #iSpell=ATCK_SPELL_QUAKE);
+
+      return;
+   }
+
+   MonsterCanCast(mob=$,state=$)
+   {
+      return NOT Send(self,@IsSongFoe,#who=mob,#state=state);
    }
 
 end
