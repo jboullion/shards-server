@@ -21,8 +21,14 @@ resources:
    brittle_icon_rsc = ibrittle.bgf
    brittle_desc_rsc = \
       "Ages the target's weapon by many years, making it "
-      "frail and prone to breaking.  "
+      "frail and prone to breaking.  Against a monster, it ages the creature's "
+      "hide instead, and its defense crumbles for a while.  "
       "Requires three magic mushrooms and two purple mushrooms to cast."
+   brittle_monster_rsc = "%s%s's hide greys and cracks."
+   brittle_monster_already = "%s%s's hide is already brittle."
+   brittle_effect_rsc = \
+      "A player's weapon loses 11 to %i durability.  A monster's defense "
+      "drops %i%% for %i seconds."
 
    brittle_nothing = \
       "For all of your mystic concentration, nothing seems to happen."
@@ -88,6 +94,25 @@ messages:
       }
 
       target = First(lTargets);
+
+      // Ours (spell revamp phase 2): a monster's hide instead of a weapon.
+      if IsClass(target,&Monster)
+      {
+         if Send(target,@IsEnchanted,#what=self)
+         {
+            if NOT bItemCast
+            {
+               Send(who,@MsgSendUser,#message_rsc=brittle_monster_already,
+                     #parm1=Send(target,@GetCapDef),
+                     #parm2=Send(target,@GetName));
+            }
+
+            return FALSE;
+         }
+
+         propagate;
+      }
+
       if NOT IsClass(target, &User)
       {
          if NOT bItemCast
@@ -131,6 +156,18 @@ messages:
       local oWeapon, oTarget, iHits, iMax;
 
       oTarget = First(lTargets);
+
+      if IsClass(oTarget,&Monster)
+      {
+         Send(oTarget,@StartEnchantment,#what=self,
+              #time=Send(self,@GetMonsterDuration,#iSpellPower=iSpellPower),
+              #state=Send(self,@GetMonsterDefensePct,#iSpellPower=iSpellPower));
+         Send(who,@MsgSendUser,#message_rsc=brittle_monster_rsc,
+               #parm1=Send(oTarget,@GetCapDef),#parm2=Send(oTarget,@GetName));
+
+         propagate;
+      }
+
       oWeapon = Send(oTarget,@LookupPlayerWeapon);
 
       // If target has no wielded weapon, the spell is wasted.
@@ -171,6 +208,48 @@ messages:
             #parm3=Send(oWeapon,@GetName));
 
       propagate;
+   }
+
+   GetMonsterDuration(iSpellPower=0)
+   "Ours: 30 to 90 seconds."
+   {
+      return 30000 + (iSpellPower * 606);
+   }
+
+   GetMonsterDefensePct(iSpellPower=0)
+   "Ours: how much of a monster's defense crumbles, 10 to 29 percent."
+   {
+      return 10 + (iSpellPower / 5);
+   }
+
+   ModifyMonsterDefense(mob=$,iDefense=0,state=$)
+   {
+      if state = $
+      {
+         return iDefense;
+      }
+
+      return iDefense * (100 - state) / 100;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   {
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   {
+      AddPacket(4,brittle_effect_rsc,
+                4,Bound(iSpellPower/2,SPELLPOWER_MINIMUM,SPELLPOWER_MAXIMUM)+10,
+                4,Send(self,@GetMonsterDefensePct,#iSpellPower=iSpellPower),
+                4,Send(self,@GetMonsterDuration,#iSpellPower=iSpellPower) / 1000);
+
+      return;
    }
 
    SpellBannedInArena()

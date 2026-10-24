@@ -27,7 +27,7 @@ resources:
    breathoflife_icon_rsc = ibreath.bgf
    breathoflife_desc_rsc = \
       "The great power of Shal'ille takes part of the caster's life force "
-      "and gives it to another person.  "
+      "and gives it to another person or a companion.  "
       "Requires herbs to cast."
 
    breathoflife_unnecessary_rsc = "%s%s cannot handle additional life force from this spell."
@@ -87,7 +87,9 @@ messages:
       }
 
       target = First(lTargets);
-      if not IsClass(target, &User)
+      // Ours (spell revamp phase 2): companions too.
+      if NOT IsClass(target, &User)
+         AND NOT (IsClass(target,&Monster) AND Send(target,@IsCompanion))
       {
          Send(who,@MsgSendUser,#message_rsc=spell_bad_target, 
               #parm1=vrName,#parm2=Send(target,@GetDef),#parm3=Send(target,@GetName));

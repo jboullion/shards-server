@@ -21,20 +21,22 @@ resources:
    shatter_name_rsc = "shatter"
    shatter_icon_rsc = ishatter.bgf
    shatter_desc_rsc = \
-      "The icy magic of Faren shatters one or more items in "
-      "the inventory of the target.  "
+      "The icy magic of Faren freezes the target's weapon until it shatters.  "
+      "A player's wielded weapon breaks, and a smith must mend it.  A "
+      "monster's weapons, claws or fangs crack, and its blows land a fifth "
+      "weaker for one to three minutes.  "
       "Requires three red and three purple mushrooms to cast."
-
    shatter_sound = fshatter.ogg
-
    shatter_cast_rsc = "Your %s frosts, trembles, and shatters!"
-   shatter_cast_plural_rsc = "Your %s frost, tremble, and shatter!"
    shatter_succeed = "You shatter %s%s's %s!"
-
-   shatter_failed_caster = "You point at %s%s, but nothing seems to happen."
-   shatter_failed_target = "%s%s points at you, but nothing seems to happen."
-
+   shatter_no_weapon = "%s%s isn't wielding anything you can shatter."
+   shatter_monster_rsc = \
+      "Frost cracks across %s%s's weapons, and its blows weaken."
+   shatter_monster_already = "%s%s's weapons are already cracked."
    shatter_not_enough_hp = "You are not yet powerful enough to sunder objects."
+   shatter_effect_rsc = \
+      "A player's weapon breaks.  A monster's blows land %i%% weaker for %i "
+      "to %i seconds."
 
 classvars:
 
@@ -62,15 +64,15 @@ classvars:
 
    vrToo_few_hp = shatter_not_enough_hp
 
+   // Ours (spell revamp phase 2): how much weaker a shattered monster's blows are.
+   viMonsterWeakenPct = 20
+
 properties:
 
    // Must have this many HP to cast the spell.  Added this to reduce
    // griefing: mules who shatter will likely be killed, and then have
    // to get the HP back.
    piMinHitPoints = 40
-
-   pbAccessible = FALSE
-   pbEnabled = FALSE
 
 messages:
 
@@ -91,20 +93,24 @@ messages:
    }
 
    CanPayCosts(who = $, lTargets = $, bItemCast = FALSE)
+   "Ours (spell revamp phase 2): a player wielding a weapon, or any monster or "
+   "NPC whose weapons aren't already cracked."
    {
-      local oTarget, i;
+      local oTarget;
 
-      // Can cast spell if the 1 target item is a user
       if Length(lTargets) <> 1
       {
          return FALSE;
       }
 
       oTarget = First(lTargets);
+
       if oTarget = $
-         OR NOT IsClass(oTarget,&Player)
+         OR oTarget = who
+         OR NOT IsClass(oTarget,&Battler)
       {
          if NOT bItemCast
+            AND oTarget <> $
          {
             Send(who,@MsgSendUser,#message_rsc=spell_bad_target,
                   #parm1=vrName,#parm2=Send(oTarget,@GetDef),
@@ -114,100 +120,118 @@ messages:
          return FALSE;
       }
 
-      propagate;
-   }
-
-   CastSpell(who = $, lTargets = $, iSpellPower=0)
-   {
-      local oShatter, oTarget, count, oChosen, iNumber, iPercent;
-
-      if Length(lTargets) <> 1
+      if IsClass(oTarget,&Player)
       {
+         if Send(self,@GetShatterableWeapon,#oTarget=oTarget) = $
+         {
+            if NOT bItemCast
+            {
+               Send(who,@MsgSendUser,#message_rsc=shatter_no_weapon,
+                     #parm1=Send(oTarget,@GetCapDef),
+                     #parm2=Send(oTarget,@GetName));
+            }
+
+            return FALSE;
+         }
+      }
+      else if Send(oTarget,@IsEnchanted,#what=self)
+      {
+         if NOT bItemCast
+         {
+            Send(who,@MsgSendUser,#message_rsc=shatter_monster_already,
+                  #parm1=Send(oTarget,@GetCapDef),
+                  #parm2=Send(oTarget,@GetName));
+         }
+
          return FALSE;
       }
 
+      propagate;
+   }
+
+   GetShatterableWeapon(oTarget=$)
+   "The weapon oTarget wields, if it can break."
+   {
+      local oWeapon;
+
+      oWeapon = Send(oTarget,@GetWeapon);
+      if oWeapon = $
+      {
+         return $;
+      }
+
+      if Send(oWeapon,@IsIndestructible)
+         OR Send(oWeapon,@GetMaxHits) <= 0
+      {
+         return $;
+      }
+
+      return oWeapon;
+   }
+
+   CastSpell(who = $, lTargets = $, iSpellPower = 0)
+   {
+      local oTarget, oWeapon;
+
       oTarget = First(lTargets);
-      if oTarget = $
-         OR NOT IsClass(oTarget,&Player)
+
+      if IsClass(oTarget,&Player)
       {
-         return;
-      }
-
-      count = random(0,iSpellpower/33) + 1;
-      oChosen = $;
-
-      while count > 0
-      {
-         count = count - 1;
-         oShatter = Send(oTarget,@GetRandomItem);
-         if oShatter = $
+         oWeapon = Send(self,@GetShatterableWeapon,#oTarget=oTarget);
+         if oWeapon <> $
          {
-            break;
+            // Broken as a war death breaks it: a smith mends it, and it keeps
+            //  its magic (Player.BreakWornGear).
+            Send(oTarget,@MsgSendUser,#message_rsc=shatter_cast_rsc,
+                  #parm1=Send(oWeapon,@GetName));
+            Send(who,@MsgSendUser,#message_rsc=shatter_succeed,
+                  #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName),
+                  #parm3=Send(oWeapon,@GetName));
+            Send(oWeapon,@SetHits,#number=0);
+            Send(oTarget,@TryUnuseItem,#what=oWeapon);
+            Send(oTarget,@SomethingChanged,#what=oWeapon);
          }
-
-         if NOT Send(oShatter,@CanShatter)
-         {
-            continue;
-         }
-
-         if oChosen = $
-            OR Send(oShatter,@GetValue) > Send(oChosen,@GetValue)
-         {
-            oChosen = oShatter;
-         }
-      }
-
-      oShatter = oChosen;
-      if oShatter = $
-         OR NOT Send(oShatter,@CanShatter)
-      {
-         // You get here if the spell failed to find something shatterable.
-         Send(who,@MsgSendUser,#message_rsc=shatter_failed_caster,
-               #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
-         Send(oTarget,@MsgSendUser,#message_rsc=shatter_failed_target,
-               #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName));
 
          propagate;
       }
 
-      if Send(oTarget,@ReqLeaveHold,#what=oShatter)
-      {
-         if Send(oShatter,@IsPlural)
-         {
-            Send(oTarget,@MsgSendUser,#message_rsc=shatter_cast_plural_rsc,
-                  #parm1=Send(oShatter,@GetName));
-         }
-         else
-         {
-            Send(oTarget,@MsgSendUser,#message_rsc=shatter_cast_rsc,
-                  #parm1=Send(oShatter,@GetName));
-         }
-
-         Send(who,@MsgSendUser,#message_rsc=shatter_succeed,
-               #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName),
-               #parm3=Send(oShatter,@GetName));
-
-         count = count -1;
-
-         // Only delete a percent of a number item
-         if IsClass(oShatter,&NumberItem)
-         {
-            iNumber = Send(oShatter,@GetNumber);
-            iPercent = bound(iSpellpower-29,20,70);
-            iPercent = Random(iPercent/2,iPercent+30);
-
-            // Always shatter at least one item 'cause we round down.
-            iNumber = Bound((iNumber*iPercent)/100,1,$);
-
-            Send(oShatter,@SubtractNumber,#number=iNumber);
-         }
-         else
-         {
-            Send(oShatter,@DoShatter);
-         }
-      }
+      Send(oTarget,@StartEnchantment,#what=self,
+           #time=Send(self,@GetMonsterDuration,#iSpellPower=iSpellPower));
+      Send(who,@MsgSendUser,#message_rsc=shatter_monster_rsc,
+            #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
 
       propagate;
+   }
+
+   GetMonsterDuration(iSpellPower=0)
+   "One to three minutes."
+   {
+      return 60000 + (iSpellPower * 1200);
+   }
+
+   ModifyMonsterDamage(mob=$,iDamage=0,state=$)
+   {
+      return iDamage * (100 - viMonsterWeakenPct) / 100;
+   }
+
+   EndEnchantment(who=$,state=$,report=TRUE)
+   {
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   {
+      AddPacket(4,shatter_effect_rsc, 4,viMonsterWeakenPct,
+                4,Send(self,@GetMonsterDuration,#iSpellPower=0) / 1000,
+                4,Send(self,@GetMonsterDuration,#iSpellPower=iSpellPower)
+                  / 1000);
+
+      return;
    }
 
    SpellBannedInArena()

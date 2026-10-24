@@ -26,7 +26,8 @@ resources:
    curedisease_name_rsc = "cure disease"
    curedisease_icon_rsc = icuredis.bgf
    curedisease_desc_rsc = \
-      "Pure, healing energy purges disease from the target.  "
+      "Pure, healing energy purges disease from the target, a player or a "
+      "companion.  "
       "Requires two herbs and two elderberries to cast."
    curedisease_on = "The power of Shal'ille burns the disease from your body."
    curedisease_abates = "You feel the disease grow weaker."
@@ -76,7 +77,9 @@ messages:
       }
 
       oTarget = First(lTargets);
-      if NOT IsClass(oTarget,&User)
+      // Ours (spell revamp phase 2): companions too.
+      if (NOT IsClass(oTarget,&User)
+          AND NOT (IsClass(oTarget,&Monster) AND Send(oTarget,@IsCompanion)))
          OR NOT Send(oTarget,@IsEnchanted,#byClass=&Disease)
       {
          Send(who,@MsgSendUser,#message_rsc=spell_bad_target,#parm1=vrName,
@@ -99,6 +102,17 @@ messages:
       Send(who,@MsgSendUser,#message_rsc=spell_cast_on_target,
             #parm1=Send(self,@GetName),#parm2=Send(oTarget,@GetDef),
             #parm3=Send(oTarget,@GetName));
+
+      // Ours: a companion keeps no stat loss to restore, so it's all or nothing.
+      if NOT IsClass(oTarget,&User)
+      {
+         if iRandom < iSpellpower
+         {
+            Send(oTarget,@RemoveEnchantmentClass,#class=&Disease);
+         }
+
+         propagate;
+      }
 
       if iRandom < iSpellpower
       {

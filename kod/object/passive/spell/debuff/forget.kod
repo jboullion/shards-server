@@ -21,7 +21,9 @@ resources:
    forgetspell_name_rsc = "forget"
    forgetspell_icon_rsc = iforget.bgf
    forgetspell_desc_rsc = \
-      "Causes the victim to forget his or her own abilities.  "
+      "Causes the victim to forget his or her own abilities.  A monster "
+      "loses track of its foe for a moment, and can't cast spells until the "
+      "spell wears off.  "
       "Requires one firesand and two uncut seraphym to cast."
 
    forgetspell_already_enchanted = \
@@ -102,10 +104,10 @@ messages:
 
       if IsClass(oTarget,&Monster)
       {
-         // Lasts quarter duration on mobs, 7.5-15 seconds. 
-         // Makes them enter the waiting state, 'forgetting' the target.
-         iDuration = iDuration/4;
-         Send(oTarget,@EnterStateWait,#delay=iDuration);
+         // The monster enters the waiting state, 'forgetting' its target, for
+         //  a quarter of the duration (7.5-15 seconds). Ours (spell revamp
+         //  phase 2): it can't cast spells for all of it (MonsterCanCast).
+         Send(oTarget,@EnterStateWait,#delay=iDuration/4);
          Send(oTarget,@StartEnchantment,#what=self,#time=iDuration);
          Send(what,@MsgSendUser,#message_rsc=forgetspell_caster,
                #parm1=Send(oTarget,@GetDef),
@@ -195,6 +197,11 @@ messages:
       Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,#state=lState);
 
       propagate;
+   }
+
+   MonsterCanCast(mob=$,state=$)
+   {
+      return FALSE;
    }
 
    GetDuration(iSpellPower=0)

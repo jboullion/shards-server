@@ -2290,7 +2290,7 @@ messages:
    GetOffense(what = $, stroke_obj=$)
    "This returns the battler's ability to-hit.  Ranges from 1 to 2000."
    {
-      local iAttack;
+      local iAttack, i;
 
       if piOffense = $
       {
@@ -2306,6 +2306,14 @@ messages:
          iAttack = iAttack * 3 / 4;
       }
 
+      // Ours (spell revamp phase 2): enchantments can change this.
+      foreach i in plEnchantments
+      {
+         iAttack = Send(Nth(i,2),@ModifyMonsterOffense,#mob=self,
+                        #iOffense=iAttack,
+                        #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
       return Bound(iAttack,1,2000);
    }
 
@@ -2313,7 +2321,7 @@ messages:
    "This returns the battler's ability to avoid being hit.  Ranges from "
    "1 to 2000."
    {
-      local iDefense;
+      local iDefense, i;
 
       if piDefense = $
       {
@@ -2324,8 +2332,16 @@ messages:
          iDefense = piDefense;
       }
 
+      // Ours (spell revamp phase 2): enchantments can change this.
+      foreach i in plEnchantments
+      {
+         iDefense = Send(Nth(i,2),@ModifyMonsterDefense,#mob=self,
+                         #iDefense=iDefense,
+                         #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
       return Bound(iDefense,1,2000);
-   }
+}
 
    // The next message deals with the three defense skills.  These messages
    //  return the relative values of the three skills.  Used for defense
@@ -2344,7 +2360,7 @@ messages:
    // This returns the damage done to target "what"
    GetDamage(what = $, stroke_obj=$)
    {
-      local iDamage;
+      local iDamage, i;
 
       if piMinDamage = $ and piMaxDamage = $
       {
@@ -2367,9 +2383,17 @@ messages:
       {
          iDamage = iDamage * 3 / 4 ;
       }
-      
+
+      // Ours (spell revamp phase 2): enchantments can change this.
+      foreach i in plEnchantments
+      {
+         iDamage = Send(Nth(i,2),@ModifyMonsterDamage,#mob=self,
+                        #iDamage=iDamage,
+                        #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
       return Bound(iDamage,0,$);
-   }
+}
 
    // This is the type of damage done.
    GetDamageType(what = $)
@@ -2474,6 +2498,15 @@ messages:
          iDamage = Send(self,@GetDamageFromResistance,#what=iDamage,#value=iResist);
          iDamage = iDamage + bonus;
          iDamage = iDamage * scalefactor / 1000;
+
+         // Ours (spell revamp phase 2): enchantments can change this.
+         foreach i in plEnchantments
+         {
+            iDamage = Send(Nth(i,2),@ModifyMonsterDamageTaken,#mob=self,
+                           #iDamage=iDamage,
+                           #state=Send(self,@GetEnchantmentEntryState,
+                                       #lEntry=i));
+         }
       }
       else
       {
@@ -5201,9 +5234,45 @@ messages:
          amount = amount * 100;
       }
 
+      // Ours (spell revamp phase 2): Mark of Dishonor stops healing.
+      if amount > 0
+         AND NOT Send(self,@CanBeHealed)
+      {
+         return;
+      }
+
       piHit_points = Bound(piHit_points+amount,1,piMax_hit_points*100);
 
       return;
+   }
+
+   CanBeHealed()
+   "Ours (spell revamp phase 2): FALSE while an enchantment forbids healing."
+   {
+      local i;
+
+      foreach i in plEnchantments
+      {
+         if NOT Send(Nth(i,2),@MonsterCanHeal,#mob=self,
+                     #state=Send(self,@GetEnchantmentEntryState,#lEntry=i))
+         {
+            return FALSE;
+         }
+      }
+
+      return TRUE;
+   }
+
+   GetEnchantmentEntryState(lEntry=$)
+   "Ours: an enchantment entry is [timer, spell, state, power], or "
+   "[timer, spell, power] when it has no state."
+   {
+      if Length(lEntry) > ENCHANTMENT_LIST_NO_STATE
+      {
+         return Nth(lEntry,3);
+      }
+
+      return $;
    }
 
    NewMaxMana(amount=0)
@@ -5238,7 +5307,9 @@ messages:
    MonsterCanCastSpell()
    "Returns FALSE if a monster can't currently cast a spell for some reason."
    {
-      if isClass(self,&Reflection)
+      local i;
+
+if isClass(self,&Reflection)
       {
          if NOT send(poMaster,@AllowBattlerAttack,#victim=poTarget)
          {
@@ -5251,13 +5322,24 @@ messages:
          return FALSE;
       }
 
+      // Ours (spell revamp phase 2): Forget and Silence stop a monster casting.
+      foreach i in plEnchantments
+      {
+         if NOT Send(Nth(i,2),@MonsterCanCast,#mob=self,
+                     #state=Send(self,@GetEnchantmentEntryState,#lEntry=i))
+         {
+            return FALSE;
+         }
+      }
+
       return TRUE;
    }
 
    MonsterCastSpell()
    "Handle monster spellcasting here."
    {
-      local i, iDistance, oSpell, iRandom, lTargets, iSpellNum, iManaCost;
+      local i, iDistance, oSpell, iRandom, lTargets, iSpellNum, iManaCost,
+            iPower;
 
       // If monster knows no spells, or has no target, return.
       if plSpellBook = $
@@ -5323,9 +5405,20 @@ messages:
          lTargets = [poTarget];
          lTargets = Send(oSpell,@GetTargets,#who=self,#lTargets=lTargets);
 
+         // Ours (spell revamp phase 2): enchantments (Dement) can weaken it.
+         iPower = piSpellPower;
+         foreach i in plEnchantments
+         {
+            iPower = Send(Nth(i,2),@ModifyMonsterSpellPower,#mob=self,
+                          #iSpellPower=iPower,
+                          #state=Send(self,@GetEnchantmentEntryState,
+                                      #lEntry=i));
+         }
+         iPower = Bound(iPower,SPELLPOWER_MINIMUM,SPELLPOWER_MAXIMUM);
+
          // See if we can cast the spell here.
          if Send(oSpell,@CanPayMonsterCosts,#who=self,#lTargets=lTargets,
-                  #iSpellPower=piSpellPower)
+                  #iSpellPower=iPower)
             AND Send(poOwner,@ReqSpellCast,#who=self,#oSpell=oSpell,
                      #lItems=lTargets)
          {
@@ -5334,7 +5427,7 @@ messages:
 
             // Cast the spell.
             Send(oSpell,@CastSpell,#who=self,#lTargets=lTargets,
-                  #iSpellPower=piSpellPower);
+                  #iSpellPower=iPower);
          }
 
          return TRUE;
@@ -5404,6 +5497,7 @@ messages:
       local iPercentClass, i, each_obj;
 
       if piHit_points >= piMax_Hit_points * 100
+         OR NOT Send(self,@CanBeHealed)
       {
          return;
       }

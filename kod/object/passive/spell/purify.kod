@@ -27,7 +27,8 @@ resources:
    purify_name_rsc = "purify"
    purify_icon_rsc = ipurify.bgf
    purify_desc_rsc = \
-      "Removes harmful personal enchantments on the target. "
+      "Removes harmful personal enchantments from you, another player or a "
+      "companion.  "
       "Requires two emeralds and an elderberry to cast."
    purify_on = \
       "A bright, holy light is trying to cleanse your soul of impure effects."
@@ -35,7 +36,6 @@ resources:
       "%s%s is not affected by any negative magical energies."
    purify_spell_intro = \
       "Shal'ille Lv. 4: Removes harmful personal enchantments on the target."
-   purify_spell_self_cast_rsc = "You may only cast %s on yourself."
 
 classvars:
 
@@ -56,8 +56,6 @@ classvars:
 
 properties:
 
-   pbCan_cast_on_others = FALSE
-
 messages:
 
    ResetReagents()
@@ -71,34 +69,23 @@ messages:
 
    GetNumSpellTargets()
    {
-      if pbCan_cast_on_others
-      {
-         return 1;
-      }
-
-      // Can only cast on self, no need to target
-      return 0;
+      // Ours (spell revamp phase 2): it was self only, "to curb mule abuse".
+      return 1;
    }
 
    CanPayCosts(who = $, lTargets = $, bItemCast = FALSE)
    {
       local oTarget, i, lEnchantment, bHasEnchantment, oSpell;
 
-      // If it's only self cast, spoof self as target for following code
-      if NOT pbCan_Cast_on_others
-      {
-         lTargets = Cons(who,lTargets);
-      }
-
-      // Can cast spell if the 1 target item is a user
+      // Can cast spell if the 1 target is a user or a companion
       if Length(lTargets) <> 1
       {
          return FALSE;
       }
 
       oTarget = First(lTargets);
-
       if NOT IsClass(oTarget, &User)
+         AND NOT (IsClass(oTarget,&Monster) AND Send(oTarget,@IsCompanion))
       {
          if NOT bItemCast
          {
@@ -137,16 +124,6 @@ messages:
          return FALSE;
       }
 
-      // Can only cast purify on yourself, to curb massive mule abuse.
-      if NOT pbCan_cast_on_others
-         AND oTarget <> who
-      {
-         Send(who,@WaveSendUser,#wave_rsc=spell_fail_wav);
-         Send(who,@MsgSendUser,#message_rsc=purify_spell_self_cast_rsc,
-               #parm1=vrName);
-
-         return FALSE;
-      }
 
       propagate;
    }
@@ -154,12 +131,6 @@ messages:
    CastSpell(who = $, lTargets = $, iSpellPower = 0)
    {
       local oTarget, lInfo, oSpell, lList, lEnchantmentList;
-
-      // If it's only self cast, spoof self as target for following code
-      if NOT pbCan_Cast_on_others
-      {
-         lTargets = Cons(who, lTargets);
-      }
 
       oTarget = First(lTargets);
       if oTarget <> who

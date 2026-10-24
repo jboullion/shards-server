@@ -30,7 +30,15 @@ resources:
    Foresight_icon_rsc = iforesig.bgf
    Foresight_desc_rsc = \
       "Reveals knowledge of the victim, informing you of their abilities.  "
+      "On a monster, it reveals its level, its health, its resistances and "
+      "weaknesses, and the spells it casts.  "
       "Requires two uncut seraphym to cast."
+   Foresight_monster_sizeup = \
+      "You read %s%s: level %i, with %i%% of its health left."
+   Foresight_monster_resist = "   %s %i%%"
+   Foresight_monster_weak = "   %s %i%% (a weakness)"
+   Foresight_monster_noresist = "   It has no resistances or weaknesses."
+   Foresight_monster_nospells = "%s%s casts no spells."
 
    Foresight_caster = "You glare at %s%s read their thoughts."
    Foresight_info = "%s%s %s"
@@ -215,6 +223,44 @@ messages:
       propagate;
    }
 
+   ForesightMonsterStats(who=$,oTarget=$)
+   "Ours: level, health, then each resistance and weakness on its own line."
+   {
+      local i, iMax, bAny;
+
+      iMax = Bound(Send(oTarget,@GetMaxHealth),1,$);
+      Send(who,@MsgSendUser,#message_rsc=Foresight_monster_sizeup,
+            #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName),
+            #parm3=Send(oTarget,@GetLevel),
+            #parm4=(Send(oTarget,@GetHealth) * 100) / iMax);
+
+      bAny = FALSE;
+      foreach i in Send(oTarget,@GetResistances)
+      {
+         if Nth(i,2) > 0
+         {
+            Send(who,@MsgSendUser,#message_rsc=Foresight_monster_resist,
+                  #parm1=Send(SYS,@GetResistanceName,#type=First(i)),
+                  #parm2=Nth(i,2));
+            bAny = TRUE;
+         }
+         else if Nth(i,2) < 0
+         {
+            Send(who,@MsgSendUser,#message_rsc=Foresight_monster_weak,
+                  #parm1=Send(SYS,@GetResistanceName,#type=First(i)),
+                  #parm2=Nth(i,2));
+            bAny = TRUE;
+         }
+      }
+
+      if NOT bAny
+      {
+         Send(who,@MsgSendUser,#message_rsc=Foresight_monster_noresist);
+      }
+
+      return;
+   }
+
    ForesightMonster(who = $, oTarget = $, iSpellPower = 0)
    {
       local i, iLength, oSpell, lSpellBook, rAbility;
@@ -224,14 +270,15 @@ messages:
          return;
       }
 
+      // Ours (spell revamp phase 2): its level, health and resistances first.
+      Send(self,@ForesightMonsterStats,#who=who,#oTarget=oTarget);
+
       lSpellBook = Send(oTarget,@GetSpellBook);
 
       if (lSpellBook = $)
       {
-         AddPacket(1,BP_MESSAGE,4,Foresight_nothing);
-         AddPacket(4,Send(oTarget,@GetCapDef));
-         AddPacket(4,Send(oTarget,@GetName));
-         SendPacket(Send(who,@GetSession));
+         Send(who,@MsgSendUser,#message_rsc=Foresight_monster_nospells,
+               #parm1=Send(oTarget,@GetCapDef),#parm2=Send(oTarget,@GetName));
 
          return;
       }

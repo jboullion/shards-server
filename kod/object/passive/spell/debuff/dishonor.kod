@@ -26,7 +26,8 @@ resources:
    MarkOfDishonor_desc_rsc = \
       "Allows caster to cast Shal'ille's displeasure upon a target.  Will "
       "prevent target's life force from exceeding the body's maximum.  For "
-      "evil targets, Shal'ille will cause a loss of vigor.  "
+      "evil targets, Shal'ille will cause a loss of vigor.  A marked "
+      "monster can't heal, and takes a tenth more damage.  "
       "Requires an emerald to cast."
 
    MarkOfDishonor_sound = smarkdis.ogg
@@ -134,14 +135,14 @@ messages:
       }
       else
       {
-            // EnterStateWait will make the monster stop aggro players and put
-            // them on wait-state waiting to aggro again
-            // Duration against monsters is 1/6 that against players
-            iDuration = iDuration/6;
-            Send(oTarget,@EnterStateWait,#delay=iDuration);
-            Send(oTarget,@StartEnchantment,#what=self,#time=iDuration);
-            Send(what,@MsgSendUser,#message_rsc=MarkOfDishonor_success,
-                  #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
+         // Ours (spell revamp phase 2): a marked monster can't heal and takes
+         //  a tenth more damage (MonsterCanHeal, ModifyMonsterDamageTaken),
+         //  for half as long as a player's mark. It used to make the monster
+         //  forget its target for a sixth of the time.
+         iDuration = iDuration/2;
+         Send(oTarget,@StartEnchantment,#what=self,#time=iDuration);
+         Send(what,@MsgSendUser,#message_rsc=MarkOfDishonor_success,
+               #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
       }
 
       propagate;
@@ -159,6 +160,16 @@ messages:
       iDuration = Random(iDuration*(100-piDeviation)/100,iDuration);
 
       return iDuration;
+   }
+
+   MonsterCanHeal(mob=$,state=$)
+   {
+      return FALSE;
+   }
+
+   ModifyMonsterDamageTaken(mob=$,iDamage=0,state=$)
+   {
+      return iDamage * 110 / 100;
    }
 
    EndEnchantment(who=$,state=0,report=TRUE)

@@ -23,6 +23,7 @@ resources:
    dement_desc_rsc = \
       "Sends the mind of the target reeling with dark, bewildering "
       "thoughts, making spell casting more difficult for several minutes.  "
+      "A demented monster casts less often, and its spells are weaker.  "
       "Requires two vials of solagh and an uncut seraphym to cast."
 
    dement_sound = rdement.ogg
@@ -103,11 +104,24 @@ messages:
       }
       else //// class is monster
       {
+         // Ours (spell revamp phase 2): its spells are weaker too
+         //  (ModifyMonsterSpellPower); Dementia already makes it cast less.
          Send(oTarget,@StartDementia);
-         Send(oTarget,@StartEnchantment,#what=self,#time=iDuration);
+         Send(oTarget,@StartEnchantment,#what=self,#time=iDuration,
+               #state=[iIntellectChange]);
       }
 
       propagate;
+   }
+
+   ModifyMonsterSpellPower(mob=$,iSpellPower=0,state=$)
+   {
+      if state = $
+      {
+         return iSpellPower;
+      }
+
+      return iSpellPower - First(state);
    }
 
    EndEnchantment(who=$,state=0,report=TRUE)

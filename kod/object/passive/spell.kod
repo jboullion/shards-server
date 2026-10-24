@@ -2884,6 +2884,48 @@ messages:
       return;
    }   
 
+   // Ours (spell revamp phase 2): an enchantment on a monster can change how
+   //  it fights. Monster asks each of its enchantments through these; state
+   //  is the enchantment's state ($ if it has none). The defaults change
+   //  nothing.
+
+   ModifyMonsterOffense(mob=$,iOffense=0,state=$)
+   {
+      return iOffense;
+   }
+
+   ModifyMonsterDefense(mob=$,iDefense=0,state=$)
+   {
+      return iDefense;
+   }
+
+   ModifyMonsterDamage(mob=$,iDamage=0,state=$)
+   "The damage (hundredths) the monster deals with a melee hit."
+   {
+      return iDamage;
+   }
+
+   ModifyMonsterDamageTaken(mob=$,iDamage=0,state=$)
+   "The damage (hundredths) the monster takes, after armour and resistances."
+   {
+      return iDamage;
+   }
+
+   MonsterCanCast(mob=$,state=$)
+   {
+      return TRUE;
+   }
+
+   ModifyMonsterSpellPower(mob=$,iSpellPower=0,state=$)
+   {
+      return iSpellPower;
+   }
+
+   MonsterCanHeal(mob=$,state=$)
+   {
+      return TRUE;
+   }
+
    IsIllusion()
    {           
       if viSchool = SS_RIIJA

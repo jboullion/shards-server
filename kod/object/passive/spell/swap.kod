@@ -21,7 +21,9 @@ resources:
    swap_name_rsc = "swap"
    swap_icon_rsc = iswap.bgf
    swap_desc_rsc = \
-      "The darker gods grant you the power to swap places with your target. "
+      "The darker gods grant you the power to swap places with your target: "
+      "another player, your companion, or a monster that isn't rooted to its "
+      "lair.  "
       "Requires a dark angel feather, one vial of yrxl sap, and a purple mushroom to cast."
 
    swap_cast_rsc = "~B~oYou have swapped places with %s!"
@@ -82,7 +84,7 @@ messages:
       local target, i;
 
       target = First(lTargets);
-      if NOT IsClass(target, &User) //OR IsClass(target,&DM)
+      if NOT Send(self,@CanSwapWith,#who=who,#target=target)
       {
          Send(who,@MsgSendUser,#message_rsc=spell_bad_target,
               #parm1=vrName,#parm2=Send(target,@GetDef),
@@ -96,6 +98,60 @@ messages:
          Send(who,@MsgSendUser,#message_rsc=spell_bad_location,#parm1=vrName);
 
          return FALSE;
+      }
+
+      propagate;
+   }
+
+   CanSwapWith(who=$,target=$)
+   "Ours (spell revamp phase 2): players, companions, and monsters that can "
+   "move and aren't a guild hall's trophy boss or a named one."
+   {
+      if target = $
+         OR target = who
+      {
+         return FALSE;
+      }
+
+      if IsClass(target,&User)
+      {
+         return TRUE;
+      }
+
+      if NOT IsClass(target,&Monster)
+      {
+         return FALSE;
+      }
+
+      if Send(target,@IsCompanion)
+      {
+         return TRUE;
+      }
+
+      if (Send(target,@GetAttributes) & MOB_NOMOVE)
+         OR Send(target,@GetTrophyId) <> 0
+         OR Send(target,@IsNamedMob)
+      {
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
+   CheckPlayerAttackCast(who=$,lTargets=$)
+   "Ours: swapping with your own companion isn't an attack."
+   {
+      local oTarget;
+
+      if lTargets <> $
+      {
+         oTarget = First(lTargets);
+         if IsClass(oTarget,&Monster)
+            AND Send(oTarget,@IsCompanion)
+            AND Send(oTarget,@GetSworn) = who
+         {
+            return TRUE;
+         }
       }
 
       propagate;
@@ -130,9 +186,10 @@ messages:
       p2SwapFineCol   = Send(oVictim,@GetFineCol);
       p2SwapFineAngle = Send(oVictim,@GetAngle);
 
+      // Ours: mob_override lets a monster be placed where it stands now.
       Send(SYS,@UtilGoToSquare,#what=oVictim,#where=oRoom,#new_angle=p1SwapFineAngle,
            #new_row=p1SwapRow,#new_col=p1SwapCol,
-           #fine_row=p1SwapFineRow,#fine_col=p1SwapFineCol);
+           #fine_row=p1SwapFineRow,#fine_col=p1SwapFineCol,#mob_override=TRUE);
 
       Send(SYS,@UtilGoToSquare,#what=oCaster,#where=oRoom,#new_angle=p2SwapFineAngle,
            #new_row=p2SwapRow,#new_col=p2SwapCol,

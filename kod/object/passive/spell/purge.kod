@@ -25,7 +25,13 @@ resources:
    Purge_desc_rsc = \
       "Reduces the effectiveness of the target's helpful personal enchantments.  "
       "With enough power, it can even remove the enchantment completely.  "
+      "Against a monster, it burns away its helpful magic, and destroys an "
+      "illusion or a creature bound to a master.  "
       "Requires five emeralds and two purple mushrooms to cast."
+   Purge_unbind = \
+      "Shal'ille's light unbinds %s%s from the magic that holds it, and it "
+      "is gone."
+   Purge_monster = "Shal'ille's light burns the helpful magic from %s%s."
 
    Purge_on = \
       "A bright, holy light is trying to burn away your beneficial "
@@ -89,6 +95,24 @@ messages:
 
       oTarget = First(lTargets);
 
+      // Ours (spell revamp phase 2): monsters, illusions and minions.
+      if IsClass(oTarget,&Monster)
+      {
+         if Send(self,@CanUnbind,#oTarget=oTarget)
+            OR Send(self,@HasHelpfulEnchantment,#oTarget=oTarget)
+         {
+            propagate;
+         }
+
+         if NOT bItemCast
+         {
+            Send(who,@MsgSendUser,#message_rsc=Purge_not_enchanted,
+                  #parm1=Send(oTarget,@GetCapDef),#parm2=Send(oTarget,@GetName));
+         }
+
+         return FALSE;
+      }
+
       if NOT IsClass(oTarget,&User)
       {
          if NOT bItemCast
@@ -136,6 +160,14 @@ messages:
       local oTarget, lInfo, oSpell, lList, lEnchantmentList;
 
       oTarget = First(lTargets);
+
+      if IsClass(oTarget,&Monster)
+      {
+         Send(self,@PurgeMonster,#who=who,#oTarget=oTarget);
+
+         propagate;
+      }
+
       if oTarget <> who
       {
          Send(who,@MsgSendUser,#message_rsc=spell_cast_on_target,
@@ -170,6 +202,71 @@ messages:
       }
 
       propagate;
+   }
+
+   CanUnbind(oTarget=$)
+   "Ours: an illusion, or a monster bound to a master (but not a companion)."
+   {
+      if Send(oTarget,@IsCompanion)
+      {
+         return FALSE;
+      }
+
+      return Send(oTarget,@IsIllusion) OR Send(oTarget,@GetMaster) <> $;
+   }
+
+   HasHelpfulEnchantment(oTarget=$)
+   {
+      local i, oSpell;
+
+      foreach i in Send(oTarget,@GetEnchantmentList)
+      {
+         oSpell = Nth(i,2);
+         if Send(oSpell,@CanBeRemovedByPlayer)
+            AND NOT Send(oSpell,@IsHarmful)
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   PurgeMonster(who=$,oTarget=$)
+   "Ours (spell revamp phase 2): unbinds an illusion or a minion, or strips "
+   "a monster's helpful enchantments."
+   {
+      local i, oSpell, lRemove;
+
+      if Send(self,@CanUnbind,#oTarget=oTarget)
+      {
+         Send(who,@MsgSendUser,#message_rsc=Purge_unbind,
+               #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
+         Send(oTarget,@Delete);
+
+         return;
+      }
+
+      lRemove = $;
+      foreach i in Send(oTarget,@GetEnchantmentList)
+      {
+         oSpell = Nth(i,2);
+         if Send(oSpell,@CanBeRemovedByPlayer)
+            AND NOT Send(oSpell,@IsHarmful)
+         {
+            lRemove = Cons(oSpell,lRemove);
+         }
+      }
+
+      foreach i in lRemove
+      {
+         Send(oTarget,@RemoveEnchantment,#what=i);
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=Purge_monster,
+            #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
+
+      return;
    }
 
    DoPurge(who=$,iSpellPower=$)
