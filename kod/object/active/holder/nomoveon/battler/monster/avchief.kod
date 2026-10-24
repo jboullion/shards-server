@@ -70,6 +70,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_AVAR_CHIEFTAIN
+
    vrKocName = avarchief_koc_name_rsc
    vrIcon = avarchief_icon_rsc
    

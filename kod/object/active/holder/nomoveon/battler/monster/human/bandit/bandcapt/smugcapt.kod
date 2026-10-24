@@ -31,6 +31,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_SMUGGLER_CAPTAIN
+
    vrName = SmugglerCaptain_name_rsc
    vrDesc = SmugglerCaptain_desc_rsc
    vrDead_name = SmugglerCaptain_dead_name_rsc

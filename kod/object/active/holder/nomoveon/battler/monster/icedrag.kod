@@ -28,6 +28,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_ICE_DRAGON
+
    vrName = Ice_Dragon_name_rsc
    vrIcon = Ice_Dragon_icon_rsc
    vrDesc = Ice_Dragon_desc_rsc

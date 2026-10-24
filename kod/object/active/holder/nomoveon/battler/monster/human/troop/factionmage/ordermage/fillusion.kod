@@ -30,6 +30,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_FALLEN_ILLUSIONIST
+
    vrName = FallenIllusionist_name_rsc
    vrDesc = FallenIllusionist_desc_rsc
    vrDead_name = FallenIllusionist_dead_name_rsc

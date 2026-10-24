@@ -23,6 +23,23 @@ constants:
    // Ours: Queen Venya'cyr walks here always, like Far'Nohl's ghost in the throne room
    // (throne2.kod): while anyone is here, she comes back this long after she falls (seconds)
    QUEEN_CYCLE = 600
+
+   // Ours (guild revamp, ADR 0022 decision 26): the capstone, in the sealed lever room
+   // (rows 20-25, cols 11-16) behind sector 1 at (19,14). Sealed; open, with the Ascended
+   // Queen risen; or cleared, until the next Meridian day (FallenHalls.NewGameDay).
+   CAPSTONE_SEALED = 0
+   CAPSTONE_OPEN = 1
+   CAPSTONE_CLEARED = 2
+   CAPSTONE_DOOR = 1
+   CAPSTONE_DOOR_OPEN = 100
+   CAPSTONE_DOOR_SHUT = 0
+   // The Ascended Queen's strength (Monster.SetGarrisonStrength), above Lieutenant
+   // Morvaine's (215), and her guards'
+   CAPSTONE_LEVEL = 230
+   CAPSTONE_HP_PERCENT = 600
+   CAPSTONE_DAMAGE_PERCENT = 90
+   CAPSTONE_GUARD_LEVEL = 200
+   CAPSTONE_PRIZE_SEED = 10
        
    include blakston.khd
 
@@ -46,6 +63,30 @@ resources:
 
    innersanc_queen_spawn = \
       "~kA cold voice fills the sanctum, \"~r~IKneel before your Queen!~I~k\""
+
+   // Ours (guild revamp): the capstone
+   innersanc_open_word = "open"
+   innersanc_seal_holds = \
+      "The sealed door does not stir.  Only a guild that has driven the Order "
+      "of Necromancers from all eight of the Fallen Halls may break this seal."
+   innersanc_seal_breaks = \
+      "~B~kThe seal breaks, and the door below the hall grinds open.  In the "
+      "chamber of levers beyond, Queen Venya'cyr rises in her full and "
+      "terrible power."
+   innersanc_ascended_rises = \
+      "~kQueen Venya'cyr says, \"~r~IYou have fed me well, little guild.  Every "
+      "hall you took from my Order made me stronger.  Now kneel.~I~k\""
+   innersanc_guard_1 = \
+      "~kQueen Venya'cyr shrieks, \"~r~IMy Order!  To your Queen!~I~k\""
+   innersanc_guard_2 = \
+      "~kQueen Venya'cyr screams, \"~r~IRise, my dead!  Rise and feed me!~I~k\""
+   innersanc_ascended_falls = \
+      "~B~kQueen Venya'cyr's power breaks.  For this day at least, the Inner "
+      "Sanctum is free of her."
+   innersanc_announce_guild = \
+      "~B~k[Halls]~n ~B%s%q has cast down Queen Venya'cyr in her Inner Sanctum!"
+   innersanc_announce_player = \
+      "~B~k[Halls]~n ~B%s has cast down Queen Venya'cyr in her Inner Sanctum!"
 
 classvars:
 
@@ -81,6 +122,14 @@ properties:
 
    // The timer that brings the Queen back (QUEEN_CYCLE)
    ptQueen = $
+
+   // Ours (guild revamp): the capstone (CAPSTONE_*), the Ascended Queen and her guards,
+   // and a reset waiting on the last player out
+   piCapstone = CAPSTONE_SEALED
+   poAscended = $
+   plCapstoneGuard = $
+   pbCapstoneResetDue = FALSE
+   pbCapstoneResetting = FALSE
 
 messages:
 
@@ -361,6 +410,11 @@ messages:
          ptQueen = $;
       }
 
+      if pbCapstoneResetDue
+      {
+         Post(self,@ResetCapstone);
+      }
+
       propagate;
    }
 
@@ -384,9 +438,10 @@ messages:
          ptQueen = CreateTimer(self,@QueenTimer,iTime * 1000);
       }
 
+      // The Queen who walks the sanctum; the Ascended Queen in the lever room is another
       foreach i in plActive
       {
-         if IsClass(Send(self,@HolderExtractObject,#data=i),&Lich)
+         if GetClass(Send(self,@HolderExtractObject,#data=i)) = &Lich
          {
             return FALSE;
          }
@@ -407,6 +462,313 @@ messages:
    GetRegion()
    {
       return RID_BRAX;
+   }
+
+   //// Ours (guild revamp, ADR 0022 decision 26): the capstone
+
+   SomeoneSaid(what = $,type = $,string = $,parm1 = $,parm2 = $,parm3 = $,
+               parm4 = $,parm5 = $,parm6 = $,parm7 = $,parm8 = $)
+   {
+      if IsClass(what,&Player)
+         AND type <> SAY_EMOTE
+         AND string <> $
+         AND StringEqual(string,innersanc_open_word)
+      {
+         Post(self,@CapstoneWord,#who=what);
+      }
+
+      propagate;
+   }
+
+   InLeverRoom(row = 0,col = 0)
+   {
+      return row >= 20 AND col >= 11 AND col <= 16;
+   }
+
+   BesideSeal(row = 0,col = 0)
+   "Just north of the sealed door at (19,14)."
+   {
+      return row >= 17 AND row <= 18 AND col >= 12 AND col <= 16;
+   }
+
+   GuildHoldsAll(who = $)
+   "Whether who's guild holds every Fallen Hall's trophy."
+   {
+      local oGuild;
+
+      oGuild = Send(who,@GetGuild);
+      if oGuild = $
+      {
+         return FALSE;
+      }
+
+      return Send(oGuild,@CountTrophies,#low=TROPHY_FALLEN_FIRST,#high=TROPHY_FALLEN_LAST)
+         >= TROPHY_FALLEN_LAST - TROPHY_FALLEN_FIRST + 1;
+   }
+
+   CapstoneWord(who = $)
+   "\"open\" beside the seal breaks it for a guild holding the eight trophies, and once "
+   "it's broken takes anyone through, either way."
+   {
+      local iRow, iCol;
+
+      if who = $ OR Send(who,@GetOwner) <> self
+      {
+         return;
+      }
+
+      iRow = Send(who,@GetRow);
+      iCol = Send(who,@GetCol);
+
+      if Send(self,@InLeverRoom,#row=iRow,#col=iCol)
+      {
+         Send(SYS,@UtilGoNearSquare,#what=who,#where=self,#new_row=18,#new_col=14);
+
+         return;
+      }
+
+      if NOT Send(self,@BesideSeal,#row=iRow,#col=iCol)
+      {
+         return;
+      }
+
+      if piCapstone = CAPSTONE_SEALED
+      {
+         if NOT Send(self,@GuildHoldsAll,#who=who)
+         {
+            Send(who,@MsgSendUser,#message_rsc=innersanc_seal_holds);
+
+            return;
+         }
+
+         Send(self,@OpenCapstone,#who=who);
+      }
+
+      Send(SYS,@UtilGoNearSquare,#what=who,#where=self,#new_row=22,#new_col=14);
+
+      return;
+   }
+
+   OpenCapstone(who = $)
+   "The seal breaks: the door lifts, and the Ascended Queen rises with her prize."
+   {
+      local iHP, oTreasure, oItem;
+
+      piCapstone = CAPSTONE_OPEN;
+      pbCapstoneResetDue = FALSE;
+      Send(self,@SetSector,#sector=CAPSTONE_DOOR,#animation=ANIMATE_CEILING_LIFT,
+            #height=CAPSTONE_DOOR_OPEN,#speed=50);
+
+      poAscended = Create(&AscendedQueen);
+      iHP = (120 * CAPSTONE_LEVEL / 100) * CAPSTONE_HP_PERCENT / 100;
+      Send(poAscended,@SetGarrisonStrength,#level=CAPSTONE_LEVEL,#hp=iHP,
+            #damage_percent=CAPSTONE_DAMAGE_PERCENT);
+
+      // The prize, as a Fallen Hall's boss carries hers
+      oTreasure = Send(SYS,@FindTreasureByNum,#num=TID_NECRO);
+      if oTreasure <> $ AND who <> $
+      {
+         oItem = Send(oTreasure,@GenerateItemAtt,#diff_seed=CAPSTONE_PRIZE_SEED,
+                      #raw=TRUE,#who=who);
+         if oItem <> $
+         {
+            Send(poAscended,@NewHold,#what=oItem);
+         }
+      }
+
+      Send(self,@NewHold,#what=poAscended,#new_row=24,#new_col=14,#fine_row=32,
+            #fine_col=32,#new_angle=ANGLE_NORTH);
+
+      SendListByClass(plActive,1,&User,@MsgSendUser,#message_rsc=innersanc_seal_breaks);
+      Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=innersanc_ascended_rises,#what=self);
+      Post(Send(SYS,@GetFallenHalls),@Broadcast);
+
+      return;
+   }
+
+   QueenCallsGuard(ascended = $,wave = 1)
+   "AscendedQueen.HitPointThresholdDamage: the Order comes to her, at three-fifths and "
+   "two-fifths of her health."
+   {
+      local i, lGuard, oMonster;
+
+      if ascended = $ OR ascended <> poAscended
+      {
+         return;
+      }
+
+      if wave = 1
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=innersanc_guard_1,#what=self);
+         lGuard = [ [ &OrderMage, 23, 13 ], [ &DarkAngel, 23, 15 ] ];
+      }
+      else
+      {
+         Send(self,@SomeoneSaid,#type=SAY_MESSAGE,#string=innersanc_guard_2,#what=self);
+         lGuard = [ [ &OrderSoldier, 25, 12 ], [ &OrderMage, 25, 16 ],
+                    [ &DarkAngel, 23, 14 ] ];
+      }
+
+      foreach i in lGuard
+      {
+         oMonster = Create(First(i));
+         Send(oMonster,@SetGarrisonStrength,#level=CAPSTONE_GUARD_LEVEL);
+         plCapstoneGuard = Cons(oMonster,plCapstoneGuard);
+         Send(self,@NewHold,#what=oMonster,#new_row=Nth(i,2),#new_col=Nth(i,3),
+               #fine_row=32,#fine_col=32);
+      }
+
+      return;
+   }
+
+   LeaveHold(what = $)
+   {
+      if NOT pbCapstoneResetting
+         AND what <> $
+      {
+         if FindListElem(plCapstoneGuard,what) > 0
+         {
+            plCapstoneGuard = DelListElem(plCapstoneGuard,what);
+         }
+
+         // She's gone as she dies, with her struck list still to hand
+         if what = poAscended
+         {
+            poAscended = $;
+            piCapstone = CAPSTONE_CLEARED;
+            Send(self,@AscendedSlain,#ascended=what);
+            Post(Send(SYS,@GetFallenHalls),@Broadcast);
+         }
+      }
+
+      propagate;
+   }
+
+   AscendedSlain(ascended = $)
+   "The capstone's fall: the room hears it, and everyone online hears who cast her down "
+   "(a guild that earned the trophy, else a player who struck her). Monster.Killed has "
+   "already given the trophy (util/guildtrophies.kod)."
+   {
+      local i, each_obj, oGuild, oStriker;
+
+      SendListByClass(plActive,1,&User,@MsgSendUser,#message_rsc=innersanc_ascended_falls);
+
+      oGuild = $;
+      oStriker = $;
+      foreach i in plActive
+      {
+         each_obj = Send(self,@HolderExtractObject,#data=i);
+         if IsClass(each_obj,&Player)
+            AND Send(ascended,@WasStruckBy,#who=each_obj)
+         {
+            oStriker = each_obj;
+            if oGuild = $
+               AND Send(each_obj,@GetGuild) <> $
+               AND Send(Send(each_obj,@GetGuild),@HasTrophy,#id=TROPHY_CAPSTONE)
+               AND Send(Send(each_obj,@GetGuild),@GetName) <> $
+            {
+               oGuild = Send(each_obj,@GetGuild);
+            }
+         }
+      }
+
+      if oGuild <> $
+      {
+         Send(Send(SYS,@GetFallenHalls),@Announce,#rsc=innersanc_announce_guild,
+               #parm1=Send(oGuild,@GetCapDef),#parm2=Send(oGuild,@GetName));
+      }
+      else if oStriker <> $
+      {
+         Send(Send(SYS,@GetFallenHalls),@Announce,#rsc=innersanc_announce_player,
+               #parm1=Send(oStriker,@GetTrueName));
+      }
+
+      return;
+   }
+
+   NewGameDay()
+   "FallenHalls.NewGameDay: the capstone resets with the halls, once the sanctum is empty."
+   {
+      if piCapstone = CAPSTONE_SEALED
+      {
+         return;
+      }
+
+      if Send(self,@CountHoldingHowMany,#class=&User) > 0
+      {
+         pbCapstoneResetDue = TRUE;
+
+         return;
+      }
+
+      Send(self,@ResetCapstone);
+
+      return;
+   }
+
+   ResetCapstone()
+   {
+      local i, lMonsters;
+
+      if Send(self,@CountHoldingHowMany,#class=&User) > 0
+      {
+         pbCapstoneResetDue = TRUE;
+
+         return;
+      }
+
+      pbCapstoneResetting = TRUE;
+      lMonsters = plCapstoneGuard;
+      if poAscended <> $
+      {
+         lMonsters = Cons(poAscended,lMonsters);
+      }
+
+      plCapstoneGuard = $;
+      poAscended = $;
+      foreach i in lMonsters
+      {
+         Send(i,@Delete);
+      }
+
+      pbCapstoneResetting = FALSE;
+
+      Send(self,@SetSector,#sector=CAPSTONE_DOOR,#animation=ANIMATE_CEILING_LIFT,
+            #height=CAPSTONE_DOOR_SHUT,#speed=50);
+      piCapstone = CAPSTONE_SEALED;
+      pbCapstoneResetDue = FALSE;
+      Post(Send(SYS,@GetFallenHalls),@Broadcast);
+
+      return;
+   }
+
+   NewHold(what = $)
+   {
+      if IsClass(what,&User)
+      {
+         Post(self,@LeaveSealedRoom,#who=what);
+      }
+
+      propagate;
+   }
+
+   LeaveSealedRoom(who = $)
+   "Back from logging off in the lever room after its seal closed: out to the hall."
+   {
+      if who <> $
+         AND Send(who,@GetOwner) = self
+         AND piCapstone = CAPSTONE_SEALED
+         AND Send(self,@InLeverRoom,#row=Send(who,@GetRow),#col=Send(who,@GetCol))
+      {
+         Send(SYS,@UtilGoNearSquare,#what=who,#where=self,#new_row=18,#new_col=14);
+      }
+
+      return;
+   }
+
+   GetCapstoneState()
+   {
+      return piCapstone;
    }
 
 end

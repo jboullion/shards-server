@@ -35,6 +35,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_GROUNDWORM_QUEEN
+
    vrKocName = GroundWormQueen_koc_name_rsc
    vrName = GroundWormQueen_name_rsc
    vrIcon = GroundWormQueen_icon_rsc

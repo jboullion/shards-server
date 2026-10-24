@@ -32,6 +32,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_FALLEN_LIEUTENANT
+
    vrName = FallenLieutenant_name_rsc
    vrDesc = FallenLieutenant_desc_rsc
    vrDead_name = FallenLieutenant_dead_name_rsc

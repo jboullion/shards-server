@@ -38,6 +38,9 @@ resources:
 
  classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_XEOCHICATL
+
    vrName = XeoNeru_name_rsc
    vrDesc = XeoNeru_desc_rsc
    vrKocName = XeoNeru_koc_name_rsc

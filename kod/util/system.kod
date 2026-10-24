@@ -422,6 +422,8 @@ properties:
    poFactionWar = $
    // Ours: the guild halls the Order of Necromancers holds (util/fallenhalls.kod), made on demand
    poFallenHalls = $
+   // Ours: the guild trophies (util/guildtrophies.kod), made on demand
+   poGuildTrophies = $
    poCosmeticsBook = $
    // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
    poItemServiceBook = $
@@ -5323,6 +5325,17 @@ messages:
       }
 
       return poFactionWar;
+   }
+
+   GetGuildTrophies()
+   "Ours: the guild trophies (util/guildtrophies.kod), made on demand."
+   {
+      if poGuildTrophies = $
+      {
+         poGuildTrophies = Create(&GuildTrophies);
+      }
+
+      return poGuildTrophies;
    }
 
    GetFallenHalls()

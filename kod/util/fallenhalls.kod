@@ -73,11 +73,18 @@ messages:
 
    NewGameDay()
    {
-      local i;
+      local i, oRoom;
 
       foreach i in plHalls
       {
          Send(i,@NewGameDay);
+      }
+
+      // The Inner Sanctum's capstone resets with them (decision 26)
+      oRoom = Send(SYS,@FindRoomByNum,#num=RID_INNERSAN);
+      if oRoom <> $
+      {
+         Send(oRoom,@NewGameDay);
       }
 
       return;
@@ -128,7 +135,7 @@ messages:
    "STATE_*: 0 ready, 1 held, 2 its sanctum open, 3 cleared), who cleared it (a guild's name, "
    "else a player's, else blank), and the daily quest's id, its state for who (QuestBook."
    "BoardState: 0 not offered, 1 offered, 2 taken, 3 done) and seconds until it's offered "
-   "again."
+   "again. Then the trophies (phase 6, AppendTrophies)."
    {
       local i, oSession, lHalls, lDaily, oGuild, oBy, sBy, oQuests;
 
@@ -177,7 +184,56 @@ messages:
                    1,Send(i,@GetState),STRING_RESOURCE,sBy,
                    4,Send(i,@GetDailyQuest),1,First(lDaily),4,Nth(lDaily,2));
       }
+
+      Send(self,@AppendTrophies,#who=who);
       SendPacket(oSession);
+
+      return;
+   }
+
+   AppendTrophies(who = $)
+   "Ours (guild revamp phase 6): the Inner Sanctum capstone's state (InnerSanctum's "
+   "CAPSTONE_*: 0 sealed, 1 open, 2 cleared), then a count and every trophy, earned by "
+   "who's guild or not: its id, name, where it's slain, whether the guild holds it and how "
+   "many seconds ago it was earned, and a count and the names of the members who took part."
+   {
+      local i, j, oRoom, iCapstone, oGuild, lTrophies, lNames, bHeld, iAge;
+
+      iCapstone = 0;
+      oRoom = Send(SYS,@FindRoomByNum,#num=RID_INNERSAN);
+      if oRoom <> $
+      {
+         iCapstone = Send(oRoom,@GetCapstoneState);
+      }
+
+      oGuild = Send(who,@GetGuild);
+      lTrophies = Send(Send(SYS,@GetGuildTrophies),@GetTrophies);
+      AddPacket(1,iCapstone,1,Length(lTrophies));
+      foreach i in lTrophies
+      {
+         bHeld = FALSE;
+         iAge = 0;
+         lNames = $;
+         if oGuild <> $
+         {
+            foreach j in Send(oGuild,@GetTrophies)
+            {
+               if First(j) = First(i)
+               {
+                  bHeld = TRUE;
+                  iAge = Bound(GetTime() - Nth(j,2),0,$);
+                  lNames = Nth(j,3);
+               }
+            }
+         }
+
+         AddPacket(1,First(i),STRING_RESOURCE,Nth(i,2),STRING_RESOURCE,Nth(i,3),1,bHeld,
+                   4,iAge,1,Bound(Length(lNames),0,255));
+         foreach j in lNames
+         {
+            AddPacket(STRING_RESOURCE,j);
+         }
+      }
 
       return;
    }

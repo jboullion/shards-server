@@ -101,6 +101,11 @@ classvars:
    viNews_finerow
    viNews_finecol
 
+   // Ours (guild revamp, decision 19): the square beside the news globe where the trophy
+   // case stands (PlaceTrophyCase); 0 for none
+   viTrophy_row = 0
+   viTrophy_col = 0
+
    viFoyer_north
    viFoyer_south
    viFoyer_east
@@ -156,6 +161,9 @@ properties:
 
    plGuild_doors = $
    prNewsball = $
+
+   // Ours (guild revamp): the trophy case (PlaceTrophyCase)
+   poTrophyCase = $
 
    piLastDoorOpen = 0
 
@@ -237,7 +245,27 @@ messages:
       // The subclass has made its chests by now.
       Send(self,@AssignChestRanks);
 
+      Send(self,@PlaceTrophyCase);
+
       propagate;
+   }
+
+   PlaceTrophyCase()
+   "Ours (guild revamp, decision 19): the trophy case beside the news globe, once. An "
+   "older world's halls get theirs from the maintenance port: send object <hall> "
+   "PlaceTrophyCase."
+   {
+      if poTrophyCase <> $
+         OR viTrophy_row = 0
+      {
+         return;
+      }
+
+      poTrophyCase = Create(&TrophyCase);
+      Send(self,@NewHold,#what=poTrophyCase,#new_row=viTrophy_row,
+            #new_col=viTrophy_col,#fine_row=32,#fine_col=32);
+
+      return;
    }
 
    AssignChestRanks()

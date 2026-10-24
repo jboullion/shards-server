@@ -31,6 +31,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_FALLEN_THANE
+
    vrName = FallenThane_name_rsc
    vrDesc = FallenThane_desc_rsc
    vrDead_name = FallenThane_dead_name_rsc

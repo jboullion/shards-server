@@ -43,6 +43,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_QUEEN_SPIDER
+
    vrKocName = spiderqueen_koc_name_rsc
    vrName = spiderqueen_name_rsc
    vrIcon = spiderqueen_icon_rsc

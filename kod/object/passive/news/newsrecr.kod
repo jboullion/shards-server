@@ -30,6 +30,7 @@ resources:
    newsrecruit_open = " (open to visitors)"
    newsrecruit_no_hall = ".  No hall yet"
    newsrecruit_prestige = ".  Prestige: "
+   newsrecruit_trophies = ".  Trophies: "
    newsrecruit_end = "."
    newsrecruit_space = " "
    newsrecruit_title_join = ": "
@@ -186,6 +187,8 @@ messages:
 
       AppendTempString(newsrecruit_prestige);
       AppendTempString(Send(oGuild,@GetPrestige));
+      AppendTempString(newsrecruit_trophies);
+      AppendTempString(Length(Send(oGuild,@GetTrophies)));
       AppendTempString(newsrecruit_end);
       AppendTempString(newsrecruit_break);
       AppendTempString(sBody);

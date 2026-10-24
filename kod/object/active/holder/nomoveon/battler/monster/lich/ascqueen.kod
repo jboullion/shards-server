@@ -1,0 +1,71 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+AscendedQueen is Lich
+
+// Ours (guild revamp, ADR 0022 decision 26): Queen Venya'cyr risen in full,
+// the guild capstone. She rises in the Inner Sanctum's sealed lever room when a
+// member of a guild holding every Fallen Hall's trophy says "open" there
+// (InnerSanctum.OpenCapstone), at the room's strength (SetGarrisonStrength).
+// At two-thirds and one-third of her health she calls the Order to her
+// (InnerSanctum.QueenCallsGuard). She gives the capstone trophy, to a guild that
+// holds the eight (util/guildtrophies.kod), and kills of her still count as
+// Queen Venya'cyr's for quests. The Queen who walks the sanctum itself is the
+// plain Lich, as before.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   AscendedQueen_desc_rsc = \
+      "Queen Venya'cyr has cast off every disguise.  The power of the eight "
+      "Fallen Halls has fed her, and it pours from her in a cold and dreadful "
+      "light.  The Order of Necromancers answers her call."
+
+classvars:
+
+   vrDesc = AscendedQueen_desc_rsc
+   viTrophy = TROPHY_CAPSTONE
+   viCashmin = 8000
+   viCashmax = 12000
+
+properties:
+
+   // 0, then 1 once she's called the Order at three-fifths, 2 at two-fifths
+   piPhase = 0
+
+messages:
+
+   HitPointThresholdDamage()
+   "Her health crossed a fifth (Monster.AssessDamage; piHit_points is a hundred "
+   "times hers): at three-fifths and two-fifths she calls the Order to her."
+   {
+      local iPercent;
+
+      iPercent = piHit_points / Bound(piMax_hit_points,1,$);
+      if piPhase = 0 AND iPercent <= 60
+      {
+         piPhase = 1;
+         Post(poOwner,@QueenCallsGuard,#ascended=self,#wave=1);
+      }
+
+      if piPhase = 1 AND iPercent <= 40
+      {
+         piPhase = 2;
+         Post(poOwner,@QueenCallsGuard,#ascended=self,#wave=2);
+      }
+
+      propagate;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,161 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+TrophyCase is PassiveObject
+
+// Ours (guild revamp, ADR 0022 decision 19): the trophy case in every guild hall,
+// beside its news globe (GuildHall.PlaceTrophyCase). Looking at it lists the trophies
+// of the guild that holds the hall now: what fell, where, which members took part
+// and how long ago (Guild.plTrophies, util/guildtrophies.kod).
+
+constants:
+
+   include blakston.khd
+
+   SECONDS_PER_DAY = 86400
+
+resources:
+
+   trophycase_icon_rsc = guildaltar2.bgf
+   trophycase_name_rsc = "trophy case"
+   trophycase_desc_rsc = "%q"
+
+   trophycase_intro = \
+      "A marble plinth bearing a golden bowl, where a guild sets out the "
+      "proofs of its great hunts."
+   trophycase_no_guild = "  No guild holds this hall, and the bowl is empty."
+   trophycase_none = "  The bowl is empty: "
+   trophycase_none_end = " has won no trophies yet."
+   trophycase_header_1 = "\n\nThe trophies of "
+   trophycase_header_2 = " ("
+   trophycase_header_3 = " of "
+   trophycase_header_4 = "):"
+   trophycase_line = "\n"
+   trophycase_slain_in = ", slain in "
+   trophycase_by = ", by "
+   trophycase_comma = ", "
+   trophycase_today = " (today)"
+   trophycase_one_day = " (yesterday)"
+   trophycase_days_1 = " ("
+   trophycase_days_2 = " days ago)"
+   trophycase_end = "."
+
+classvars:
+
+   viMoveOn_type = MOVEON_NO
+
+   vrName = trophycase_name_rsc
+   vrIcon = trophycase_icon_rsc
+   vrDesc = trophycase_desc_rsc
+
+properties:
+
+messages:
+
+   ShowDesc()
+   {
+      local oGuild;
+
+      ClearTempString();
+      AppendTempString(trophycase_intro);
+
+      oGuild = $;
+      if poOwner <> $
+      {
+         oGuild = Send(poOwner,@GetGuildOwner);
+      }
+
+      if oGuild = $
+      {
+         AppendTempString(trophycase_no_guild);
+      }
+      else if Send(oGuild,@GetTrophies) = $
+      {
+         AppendTempString(trophycase_none);
+         AppendTempString(Send(oGuild,@GetCapDef));
+         AppendTempString(Send(oGuild,@GetName));
+         AppendTempString(trophycase_none_end);
+      }
+      else
+      {
+         Send(self,@AppendTrophies,#team=oGuild);
+      }
+
+      AddPacket(4,trophycase_desc_rsc,4,GetTempString());
+
+      return;
+   }
+
+   AppendTrophies(team = $)
+   {
+      local i, j, oTrophies, lTrophy, bFirst, iDays;
+
+      oTrophies = Send(SYS,@GetGuildTrophies);
+
+      AppendTempString(trophycase_header_1);
+      AppendTempString(Send(team,@GetDef));
+      AppendTempString(Send(team,@GetName));
+      AppendTempString(trophycase_header_2);
+      AppendTempString(Length(Send(team,@GetTrophies)));
+      AppendTempString(trophycase_header_3);
+      AppendTempString(Length(Send(oTrophies,@GetTrophies)));
+      AppendTempString(trophycase_header_4);
+
+      foreach i in Send(team,@GetTrophies)
+      {
+         lTrophy = Send(oTrophies,@FindTrophy,#id=First(i));
+         if lTrophy <> $
+         {
+            AppendTempString(trophycase_line);
+            AppendTempString(Nth(lTrophy,2));
+            AppendTempString(trophycase_slain_in);
+            AppendTempString(Nth(lTrophy,3));
+
+            if Nth(i,3) <> $
+            {
+               AppendTempString(trophycase_by);
+               bFirst = TRUE;
+               foreach j in Nth(i,3)
+               {
+                  if NOT bFirst
+                  {
+                     AppendTempString(trophycase_comma);
+                  }
+
+                  AppendTempString(j);
+                  bFirst = FALSE;
+               }
+            }
+
+            iDays = (GetTime() - Nth(i,2)) / SECONDS_PER_DAY;
+            if iDays <= 0
+            {
+               AppendTempString(trophycase_today);
+            }
+            else if iDays = 1
+            {
+               AppendTempString(trophycase_one_day);
+            }
+            else
+            {
+               AppendTempString(trophycase_days_1);
+               AppendTempString(iDays);
+               AppendTempString(trophycase_days_2);
+            }
+
+            AppendTempString(trophycase_end);
+         }
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

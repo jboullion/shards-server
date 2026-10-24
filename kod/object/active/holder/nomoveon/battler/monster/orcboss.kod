@@ -45,6 +45,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_ORC_PIT_BOSS
+
    viIndefinite = ARTICLE_AN
    vrKocName = OrcPitBoss_koc_name_rsc
    vrName = OrcPitBoss_name_rsc

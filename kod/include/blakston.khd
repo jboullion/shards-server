@@ -3024,6 +3024,35 @@
    RANK_SIR = 2
    RANK_APPRENTICE = 1
 
+   // Ours (guild revamp, ADR 0022 decisions 17-19 and 26): guild trophies (util/guildtrophies.kod),
+   //  one per guild for each, from a boss's class (Monster.viTrophy). The Fallen Halls' bosses,
+   //  by rank; the world's bosses; the Inner Sanctum's capstone.
+   TROPHY_FALLEN_ILLUSIONIST = 1
+   TROPHY_OLD_BLACKROOT = 2
+   TROPHY_FROSTWARDEN = 3
+   TROPHY_FALLEN_THANE = 4
+   TROPHY_SMUGGLER_CAPTAIN = 5
+   TROPHY_SEWER_KING = 6
+   TROPHY_FALLEN_MARSHAL = 7
+   TROPHY_FALLEN_LIEUTENANT = 8
+   TROPHY_FALLEN_FIRST = 1
+   TROPHY_FALLEN_LAST = 8
+   TROPHY_ORC_PIT_BOSS = 21
+   TROPHY_LUPOGG_KING = 22
+   TROPHY_VENYACYR = 23
+   TROPHY_FARNOHL = 24
+   TROPHY_QUEEN_SPIDER = 25
+   TROPHY_DRAGONFLY_QUEEN = 26
+   TROPHY_AVAR_CHIEFTAIN = 27
+   TROPHY_GROUNDWORM_QUEEN = 28
+   TROPHY_SPINEBEAST_BEHEMOTH = 29
+   TROPHY_ICE_DRAGON = 30
+   TROPHY_EARTH_DRAGON = 31
+   TROPHY_XEOCHICATL = 32
+   TROPHY_WORLD_FIRST = 21
+   TROPHY_WORLD_LAST = 32
+   TROPHY_CAPSTONE = 41
+
    // Ours (guild revamp): a Fallen Hall's garrison (room/ghall/fallenhall.kod):
    //  the main hall's guard, the sanctum's, and the boss.
    FALLEN_ROLE_HALL = 1

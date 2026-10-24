@@ -344,7 +344,9 @@ messages:
       }
 
       Send(self,@Rumble);
-      Send(self,@NewHold,#what=Create(&GiantRatKing),#new_row=21,#new_col=48);
+      // Ours (guild revamp): the behemoth the broadcast tells of, which this used to stand
+      // in for with a giant rat king (it gives a guild trophy: util/guildtrophies.kod)
+      Send(self,@NewHold,#what=Create(&SpinebeastBoss),#new_row=21,#new_col=48);
       Send(SYS,@SystemBroadcast,#what=$,#type=SAY_MESSAGE,
            #string=berg8_SpinebeastBoss);
 

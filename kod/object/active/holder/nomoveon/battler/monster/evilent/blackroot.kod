@@ -31,6 +31,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_OLD_BLACKROOT
+
    vrName = OldBlackroot_name_rsc
    vrDesc = OldBlackroot_desc_rsc
    vrDead_name = OldBlackroot_dead_name_rsc

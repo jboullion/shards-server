@@ -338,6 +338,10 @@ classvars:
 
    viWimpy = 0
 
+   // Ours (guild revamp): the guild trophy a boss gives (TROPHY_* in blakston.khd; 0 none;
+   //  GetTrophyId, util/guildtrophies.kod)
+   viTrophy = 0
+
    // If true, items that are sold actually come out of the monster's
    //inventory. If false, the items in the inventory are inexhaustible
    // templates, and copies are sold.
@@ -3948,6 +3952,20 @@ messages:
             // Ours: kill steps, shared with the killer's builder group (util/questbook.kod)
             Send(Send(SYS,@GetQuestBook),@MonsterKilled,#dead=self,#killer=what);
 
+            // Ours (guild revamp): a boss's guild trophy, to the guilds here who struck it
+            //  (util/guildtrophies.kod); never a copy, a minion or an event's or survival
+            //  room's spawn
+            if Send(self,@GetTrophyId) > 0
+               AND NOT pbIllusion
+               AND NOT Send(self,@IsMinion)
+               AND NOT poEventMob
+               AND poInvasionLeader = $
+               AND NOT IsClass(poOwner,&SurvivalRoom)
+               AND NOT IsClass(poOwner,&SurvivalArena)
+            {
+               Send(Send(SYS,@GetGuildTrophies),@BossDied,#slain=self,#where=poOwner);
+            }
+
             if (piReputationGroup <> REP_NEUTRAL
                AND Send(SETTINGS_OBJECT,@GetMonsterFactionEnabled))
             {
@@ -7184,6 +7202,12 @@ messages:
    IsCompanion()
    {
       return FALSE;
+   }
+
+   GetTrophyId()
+   "Ours (guild revamp): the guild trophy this boss gives (TROPHY_*, viTrophy), 0 for none."
+   {
+      return viTrophy;
    }
 
    GetShardsService()

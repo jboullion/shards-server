@@ -47,6 +47,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_FARNOHL
+
    vrKocName = ghost_koc_name_rsc
    vrName = ghost_generic_name_rsc
    vrIcon = ghost_icon_rsc
@@ -170,6 +173,18 @@ messages:
       }
 
       propagate;
+   }
+
+   GetTrophyId()
+   "Ours (guild revamp): only the ghost in the castle's throne room is Far'Nohl's, and gives "
+   "his trophy."
+   {
+      if poOwner <> $ AND Send(poOwner,@GetRoomNum) = RID_THRONE2
+      {
+         return viTrophy;
+      }
+
+      return 0;
    }
 
    GetName()

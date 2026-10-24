@@ -66,6 +66,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_DRAGONFLY_QUEEN
+
    viIndefinite = ARTICLE_A
    vrKocName = DragonFlyQueen_koc_name_rsc
    vrName = DragonFlyQueen_name_rsc

@@ -69,6 +69,9 @@ resources:
       "Enraged by %s%s, the lupogg king stomps down hard!"
 
 classvars:
+
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_LUPOGG_KING
    vrName = lupoggking_name_rsc
    vrIcon = lupoggking_icon_rsc
    vrDesc = lupoggking_desc_rsc

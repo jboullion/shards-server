@@ -441,6 +441,11 @@ properties:
    piPrestigeKillDay = 0
    piPrestigeKillPoints = 0
 
+   // Ours (guild revamp, ADR 0022 decisions 17-19): the trophies the guild has earned, each
+   // [ TROPHY_* id, when (GetTime), [ the names of the members who took part ] ], oldest
+   // first (util/guildtrophies.kod)
+   plTrophies = $
+
    // Information for suing for peace from a mutual guild war.
    ptSuingForPeace = $
    poGuildSuingForPeace = $
@@ -1701,6 +1706,60 @@ messages:
       }
 
       return;
+   }
+
+   //// Ours (guild revamp): trophies (util/guildtrophies.kod)
+
+   HasTrophy(id = 0)
+   {
+      local i;
+
+      foreach i in plTrophies
+      {
+         if First(i) = id
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   AddTrophy(id = 0,names = $)
+   "A new trophy, and when; its prestige comes from GuildTrophies.BossDied. FALSE if the "
+   "guild had it already."
+   {
+      if id <= 0 OR Send(self,@HasTrophy,#id=id)
+      {
+         return FALSE;
+      }
+
+      plTrophies = AppendListElem([ id, GetTime(), names ],plTrophies);
+
+      return TRUE;
+   }
+
+   GetTrophies()
+   {
+      return plTrophies;
+   }
+
+   CountTrophies(low = 0,high = 1000)
+   "How many of the guild's trophies have ids from low to high (the Fallen Halls': "
+   "TROPHY_FALLEN_FIRST to _LAST)."
+   {
+      local i, iCount;
+
+      iCount = 0;
+      foreach i in plTrophies
+      {
+         if First(i) >= low AND First(i) <= high
+         {
+            iCount = iCount + 1;
+         }
+      }
+
+      return iCount;
    }
 
    GuildBonusKill()

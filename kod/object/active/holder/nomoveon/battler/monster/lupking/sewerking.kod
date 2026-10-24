@@ -30,6 +30,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_SEWER_KING
+
    vrName = SewerKing_name_rsc
    vrDesc = SewerKing_desc_rsc
    vrDead_name = SewerKing_dead_name_rsc

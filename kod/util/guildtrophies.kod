@@ -1,0 +1,247 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+GuildTrophies is UtilityFunctions
+
+// Ours (guild revamp, ADR 0022 decisions 17-19 and 26): the guild trophies. One
+// object, SYS@GetGuildTrophies, made on demand.
+//
+// A boss's class names its trophy (Monster.viTrophy, TROPHY_* in blakston.khd).
+// When one dies for real (Monster.Killed: no copy, minion, event or survival
+// spawn), every guild with a member in the room who struck it (WasStruckBy)
+// earns the trophy, once (Guild.AddTrophy), with the names of those members.
+// It's worth TROPHY_PRESTIGE_* prestige: a Fallen Hall's boss 25, the world's
+// 10, the Inner Sanctum's capstone 50. The guild's online members are told.
+//
+// GetTrophies is the list every trophy case, notice and window shows, earned
+// or not: [ id, name, where ].
+
+constants:
+
+   include blakston.khd
+
+   TROPHY_PRESTIGE_FALLEN = 25
+   TROPHY_PRESTIGE_WORLD = 10
+   TROPHY_PRESTIGE_CAPSTONE = 50
+
+resources:
+
+   trophyname_fallen_illusionist = "Mistress Ysolde"
+   trophyname_old_blackroot = "Old Blackroot"
+   trophyname_frostwarden = "Hrimvald"
+   trophyname_fallen_thane = "Thane Durrek"
+   trophyname_smuggler_captain = "Captain Vesk"
+   trophyname_sewer_king = "Grisk, the Sewer King"
+   trophyname_fallen_marshal = "Marshal Corvane"
+   trophyname_fallen_lieutenant = "Lieutenant Morvaine"
+   trophyname_orc_pit_boss = "the Orc Pit Boss"
+   trophyname_lupogg_king = "the Lupogg King"
+   trophyname_venyacyr = "Queen Venya'cyr"
+   trophyname_farnohl = "the ghost of Far'Nohl"
+   trophyname_queen_spider = "the Queen Spider"
+   trophyname_dragonfly_queen = "the Dragonfly Queen"
+   trophyname_avar_chieftain = "the Avar Chieftain"
+   trophyname_groundworm_queen = "the Groundworm Queen"
+   trophyname_spinebeast_behemoth = "the Spinebeast Behemoth"
+   trophyname_ice_dragon = "the Ice Dragon"
+   trophyname_earth_dragon = "the Earth Dragon"
+   trophyname_xeochicatl = "the ne'xeochicatl"
+   trophyname_capstone = "Queen Venya'cyr Ascended"
+
+   trophy_where_den = "the Den of Shadows"
+   trophy_where_forest = "the home of the Friends of the Forest"
+   trophy_where_muskgate = "Muskgate Post"
+   trophy_where_dwarven = "the Old Dwarven Hall"
+   trophy_where_warehouse = "the Abandoned Warehouse"
+   trophy_where_sewer = "the Sewer Hideout"
+   trophy_where_command = "the Hall of the Slaughtered Command"
+   trophy_where_wetland = "the Wetland Fortress"
+   trophy_where_orcpit = "the orc pit"
+   trophy_where_sewerking = "the Sewer King's lair"
+   trophy_where_brax = "beneath Castle Brax"
+   trophy_where_throne = "the old throne room of Far'Nohl"
+   trophy_where_nest = "the spiders' nest"
+   trophy_where_kocforest = "the jungles of Ko'catan"
+   trophy_where_tunnels = "the tunnels"
+   trophy_where_berg = "Bergentaal"
+   trophy_where_desert = "the desert"
+   trophy_where_valley = "the Valley of the Xeochicatl"
+   trophy_where_sanctum = "the Inner Sanctum"
+
+   trophy_earned = \
+      "~B~k[Trophy]~n ~B%s%q has earned a trophy: %s, slain in %s, worth %i "
+      "prestige."
+   trophy_earned_you = "Your guild now holds that trophy."
+
+classvars:
+
+properties:
+
+messages:
+
+   GetTrophies()
+   "Every trophy, earned or not, in the order a trophy case lists them: [ id, name, where ]."
+   {
+      return [ [ TROPHY_FALLEN_ILLUSIONIST, trophyname_fallen_illusionist, trophy_where_den ],
+               [ TROPHY_OLD_BLACKROOT, trophyname_old_blackroot, trophy_where_forest ],
+               [ TROPHY_FROSTWARDEN, trophyname_frostwarden, trophy_where_muskgate ],
+               [ TROPHY_FALLEN_THANE, trophyname_fallen_thane, trophy_where_dwarven ],
+               [ TROPHY_SMUGGLER_CAPTAIN, trophyname_smuggler_captain, trophy_where_warehouse ],
+               [ TROPHY_SEWER_KING, trophyname_sewer_king, trophy_where_sewer ],
+               [ TROPHY_FALLEN_MARSHAL, trophyname_fallen_marshal, trophy_where_command ],
+               [ TROPHY_FALLEN_LIEUTENANT, trophyname_fallen_lieutenant, trophy_where_wetland ],
+               [ TROPHY_ORC_PIT_BOSS, trophyname_orc_pit_boss, trophy_where_orcpit ],
+               [ TROPHY_LUPOGG_KING, trophyname_lupogg_king, trophy_where_sewerking ],
+               [ TROPHY_VENYACYR, trophyname_venyacyr, trophy_where_brax ],
+               [ TROPHY_FARNOHL, trophyname_farnohl, trophy_where_throne ],
+               [ TROPHY_QUEEN_SPIDER, trophyname_queen_spider, trophy_where_nest ],
+               [ TROPHY_DRAGONFLY_QUEEN, trophyname_dragonfly_queen, trophy_where_kocforest ],
+               [ TROPHY_AVAR_CHIEFTAIN, trophyname_avar_chieftain, trophy_where_kocforest ],
+               [ TROPHY_GROUNDWORM_QUEEN, trophyname_groundworm_queen, trophy_where_tunnels ],
+               [ TROPHY_SPINEBEAST_BEHEMOTH, trophyname_spinebeast_behemoth, trophy_where_berg ],
+               [ TROPHY_ICE_DRAGON, trophyname_ice_dragon, trophy_where_desert ],
+               [ TROPHY_EARTH_DRAGON, trophyname_earth_dragon, trophy_where_desert ],
+               [ TROPHY_XEOCHICATL, trophyname_xeochicatl, trophy_where_valley ],
+               [ TROPHY_CAPSTONE, trophyname_capstone, trophy_where_sanctum ]
+             ];
+   }
+
+   FindTrophy(id = 0)
+   {
+      local i;
+
+      foreach i in Send(self,@GetTrophies)
+      {
+         if First(i) = id
+         {
+            return i;
+         }
+      }
+
+      return $;
+   }
+
+   GetPrestigeFor(id = 0)
+   {
+      if id = TROPHY_CAPSTONE
+      {
+         return TROPHY_PRESTIGE_CAPSTONE;
+      }
+
+      if id >= TROPHY_FALLEN_FIRST AND id <= TROPHY_FALLEN_LAST
+      {
+         return TROPHY_PRESTIGE_FALLEN;
+      }
+
+      return TROPHY_PRESTIGE_WORLD;
+   }
+
+   MayEarn(team = $,id = 0)
+   "The capstone is only for a guild that holds every Fallen Hall's trophy (decision 26)."
+   {
+      if id = TROPHY_CAPSTONE
+      {
+         return Send(team,@CountTrophies,#low=TROPHY_FALLEN_FIRST,
+                     #high=TROPHY_FALLEN_LAST) >= TROPHY_FALLEN_LAST - TROPHY_FALLEN_FIRST + 1;
+      }
+
+      return TRUE;
+   }
+
+   BossDied(slain = $,where = $)
+   "Monster.Killed: the trophy boss slain died for real in where. Each guild with a member there who "
+   "struck it earns the trophy, once, with those members' names."
+   {
+      local i, each_obj, iId, lTrophy, oGuild, lPairs, lPair, bFound, iPrestige;
+
+      if slain = $ OR where = $
+      {
+         return;
+      }
+
+      iId = Send(slain,@GetTrophyId);
+      lTrophy = Send(self,@FindTrophy,#id=iId);
+      if lTrophy = $
+      {
+         return;
+      }
+
+      // [ guild, [ names ] ] for each guild here that struck it
+      lPairs = $;
+      foreach i in Send(where,@GetHolderActive)
+      {
+         each_obj = First(i);
+         if IsClass(each_obj,&Player)
+            AND Send(slain,@WasStruckBy,#who=each_obj)
+         {
+            oGuild = Send(each_obj,@GetGuild);
+            if oGuild <> $
+               AND NOT Send(oGuild,@HasTrophy,#id=iId)
+               AND Send(self,@MayEarn,#team=oGuild,#id=iId)
+            {
+               bFound = FALSE;
+               foreach lPair in lPairs
+               {
+                  if First(lPair) = oGuild
+                  {
+                     SetNth(lPair,2,Cons(Send(each_obj,@GetTrueName),Nth(lPair,2)));
+                     bFound = TRUE;
+                  }
+               }
+
+               if NOT bFound
+               {
+                  lPairs = Cons([ oGuild, [ Send(each_obj,@GetTrueName) ] ],lPairs);
+               }
+            }
+         }
+      }
+
+      iPrestige = Send(self,@GetPrestigeFor,#id=iId);
+      foreach lPair in lPairs
+      {
+         oGuild = First(lPair);
+         if Send(oGuild,@AddTrophy,#id=iId,#names=Nth(lPair,2))
+         {
+            Send(oGuild,@AddPrestige,#amount=iPrestige);
+            Send(self,@TellGuild,#team=oGuild,#trophy=lTrophy,#prestige=iPrestige);
+         }
+      }
+
+      return;
+   }
+
+   TellGuild(team = $,trophy = $,prestige = 0)
+   "A guild's online members hear of its new trophy, and their guild windows get it."
+   {
+      local i, oMember;
+
+      if Send(team,@GetName) = $
+      {
+         return;
+      }
+
+      foreach i in Send(team,@GetMemberList)
+      {
+         oMember = First(i);
+         if Send(oMember,@IsLoggedOn)
+         {
+            Send(oMember,@MsgSendUser,#message_rsc=trophy_earned,
+                  #parm1=Send(team,@GetCapDef),#parm2=Send(team,@GetName),
+                  #parm3=Nth(trophy,2),#parm4=Nth(trophy,3),#parm5=prestige);
+            Send(Send(SYS,@GetFallenHalls),@SendHalls,#who=oMember);
+         }
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,9 @@ resources:
 
 classvars:
 
+   // Ours (guild revamp): the guild trophy it gives (util/guildtrophies.kod)
+   viTrophy = TROPHY_EARTH_DRAGON
+
    vrKocName = earth_dragon_koc_name_rsc
    vrName = earth_dragon_name_rsc
    vrIcon = earth_dragon_icon_rsc
