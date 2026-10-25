@@ -453,6 +453,8 @@ properties:
    piTrial = 1
    piStep = 0
    ptStep = $
+   // The trial's steps (TrialScript), kept while it's heard
+   plScript = $
    // Percent of the usual pauses, for testing over the maintenance port (100 to play)
    piPace = 100
 
@@ -713,7 +715,12 @@ messages:
          piStep = 1;
       }
 
-      lScript = Send(self,@TrialScript,#num=piTrial);
+      if plScript = $
+      {
+         plScript = Send(self,@TrialScript,#num=piTrial);
+      }
+
+      lScript = plScript;
       if piStep > Length(lScript)
       {
          Send(self,@EndTrial);
@@ -769,6 +776,7 @@ messages:
 
       plCast = lKeep;
       piStep = 0;
+      plScript = $;
 
       if poRoom = $ OR NOT Send(poRoom,@IsUserInRoom)
       {
