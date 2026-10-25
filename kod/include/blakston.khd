@@ -3099,6 +3099,32 @@ SID_ICEWALL             = 241
    TROPHY_WORLD_LAST = 32
    TROPHY_CAPSTONE = 41
 
+   // Ours (achievements, ADR 0025): player achievements (util/achievements.kod). A boss's
+   //  achievement has its guild trophy's id (1-8, 21-32, 41), so the rest start above 50.
+   ACH_HALL_DELVER = 50
+   ACH_WORLD_SLAYER = 51
+   ACH_JOIN_FACTION = 60
+   ACH_JOIN_DUKE = 61
+   ACH_JOIN_PRINCESS = 62
+   ACH_JOIN_REBEL = 63
+   ACH_CHAIN_DUKE = 64
+   ACH_CHAIN_PRINCESS = 65
+   ACH_CHAIN_REBEL = 66
+   ACH_GUILD_MASTER = 70
+   ACH_GUILD_MEMBER = 71
+   ACH_HP_50 = 80
+   ACH_HP_100 = 81
+   ACH_HP_150 = 82
+   // school n (SS_SHALILLE 1 to SS_JALA 6) is ACH_SCHOOL_BASE + n
+   ACH_SCHOOL_BASE = 90
+   ACH_QUEST_FIRST = 100
+   ACH_QUEST_10 = 101
+   ACH_QUEST_50 = 102
+   ACH_SOLDIER_ALL = 103
+   ACH_COUNT_10 = 110
+   ACH_COUNT_25 = 111
+   ACH_COUNT_ALL = 112
+
    // Ours (guild revamp): a Fallen Hall's garrison (room/ghall/fallenhall.kod):
    //  the main hall's guard, the sanctum's, and the boss.
    FALLEN_ROLE_HALL = 1

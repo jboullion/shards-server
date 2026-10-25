@@ -526,6 +526,9 @@ properties:
    // done as [ id, times, when last done ], and the NPC we last talked to about quests
    plQuestLog = $
    plQuestDone = $
+   // Ours (achievements, ADR 0025; util/achievements.kod): each achievement earned, as
+   // [ id, when ], newest first
+   plAchieved = $
    poQuestNpc = $
    // Ours (util/cosmeticsbook.kod): the tailor or barber we last talked to, and the
    // things its menu listed, in order (the commands name them by place)
@@ -981,6 +984,8 @@ messages:
       Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
       // Ours: the season, for our client's seasonal looks (System.SendSeason)
       Send(SYS,@SendSeason,#who=self);
+      // Ours: our achievements, caught up on and sent (util/achievements.kod)
+      Send(Send(SYS,@GetAchievements),@PlayerLoggedOn,#who=self);
       // Ours: a PvP lockout still running (logging off in one adds the phase time to it)
       if Send(self,@IsInPvP)
       {
@@ -4166,6 +4171,14 @@ messages:
          return;
       }
 
+      // Ours (achievements): our client's Achievements window
+      if StringEqual(sVerb,"achievements")
+      {
+         Send(Send(SYS,@GetAchievements),@AchievementsCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
       if StringEqual(sVerb,"war")
       {
          Send(Send(SYS,@GetFactionWar),@WarCommand,#who=self,#words=lWords);
@@ -4420,6 +4433,32 @@ messages:
    SetQuestLog(log = $)
    {
       plQuestLog = log;
+
+      return;
+   }
+
+   GetAchieved()
+   {
+      return plAchieved;
+   }
+
+   SetAchieved(lAch = $)
+   {
+      plAchieved = lAch;
+
+      return;
+   }
+
+   AdminAchieve(id = 0)
+   "Testing: earn an achievement now (send object <user> AdminAchieve id int N)."
+   {
+      return Send(Send(SYS,@GetAchievements),@Award,#who=self,#id=id);
+   }
+
+   AdminResetAchievements()
+   "Testing: forget every achievement."
+   {
+      Send(Send(SYS,@GetAchievements),@Reset,#who=self);
 
       return;
    }

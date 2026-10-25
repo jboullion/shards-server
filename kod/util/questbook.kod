@@ -1526,6 +1526,8 @@ messages:
          SetNth(lDone,QBD_LAST,GetTime());
       }
 
+      // Ours: quests done, and the factions' chains, are achievements (util/achievements.kod)
+      Send(Send(SYS,@GetAchievements),@QuestDone,#who=who);
       Send(who,@MsgSendUser,#message_rsc=quest_complete,#parm1=Nth(qrow,QB_NAME));
       Send(self,@Award,#who=who,#qrow=qrow);
       Send(self,@SendLog,#who=who);

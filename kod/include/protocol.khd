@@ -274,6 +274,9 @@
    //  the caster only (Spell.SendSpellRange): kind (SPELLRANGE_*), the centre object, the
    //  spell, the radius and an inner radius (fine units, 0 for none), colour (5:5:5)
    UC_SPELL_RANGE = 124
+   // Ours (achievements, ADR 0025): the achievements a player has earned, for our client's
+   //  window and toast (util/achievements.kod): kind 1 all of them, kind 2 one just earned
+   UC_ACHIEVEMENTS = 125
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

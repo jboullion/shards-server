@@ -438,6 +438,8 @@ properties:
    poFallenHalls = $
    // Ours: the guild trophies (util/guildtrophies.kod), made on demand
    poGuildTrophies = $
+   // Ours: the player achievements (util/achievements.kod), made on demand
+   poAchievements = $
    poCosmeticsBook = $
    // Ours: elders who reveal magic items and smiths who repair them (util/itemservicebook.kod)
    poItemServiceBook = $
@@ -5353,6 +5355,17 @@ messages:
       }
 
       return poGuildTrophies;
+   }
+
+   GetAchievements()
+   "Ours: the player achievements (util/achievements.kod), made on demand."
+   {
+      if poAchievements = $
+      {
+         poAchievements = Create(&Achievements);
+      }
+
+      return poAchievements;
    }
 
    GetFallenHalls()

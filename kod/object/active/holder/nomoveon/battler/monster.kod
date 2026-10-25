@@ -4122,6 +4122,19 @@ messages:
                Send(Send(SYS,@GetGuildTrophies),@BossDied,#slain=self,#where=poOwner);
             }
 
+            // Ours (achievements): and each player here who struck it earns its achievement
+            //  (util/achievements.kod), on the same test
+            if Send(self,@GetTrophyId) > 0
+               AND NOT pbIllusion
+               AND NOT Send(self,@IsMinion)
+               AND NOT poEventMob
+               AND poInvasionLeader = $
+               AND NOT IsClass(poOwner,&SurvivalRoom)
+               AND NOT IsClass(poOwner,&SurvivalArena)
+            {
+               Send(Send(SYS,@GetAchievements),@BossDied,#slain=self,#where=poOwner);
+            }
+
             if (piReputationGroup <> REP_NEUTRAL
                AND Send(SETTINGS_OBJECT,@GetMonsterFactionEnabled))
             {

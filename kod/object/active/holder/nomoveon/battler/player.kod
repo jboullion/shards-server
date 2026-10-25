@@ -6884,6 +6884,12 @@ messages:
                #dest_list=[self],#nest_list=[4,player_tutorial_mail]);
       }
 
+      // Ours: 50, 100 and 150 hit points are achievements (util/achievements.kod)
+      if IsClass(self,&User)
+      {
+         Post(Send(SYS,@GetAchievements),@CheckLevel,#who=self);
+      }
+
       Send(self,@PlayerIsIntriguing);
       Send(self,@GainMaxhealth,#amount=amount);
 
@@ -7591,6 +7597,12 @@ messages:
    SetGuild(guild_obj=$)
    "Sets the player's poGuild to be equal to the guild object."
    {
+      // Ours: a guild joined or founded is an achievement (util/achievements.kod)
+      if guild_obj <> $ AND IsClass(self,&User)
+      {
+         Post(Send(SYS,@GetAchievements),@CheckGuild,#who=self);
+      }
+
       poGuild = guild_obj;
       Send(self,@EvaluateNewbieStatus);
       Post(self,@NameColorsChanged);
@@ -8038,6 +8050,11 @@ messages:
                #change=iBoundAbility);
           // Ours: a quest step to learn it (util/questbook.kod QK_LEARN)
           Send(Send(SYS,@GetQuestBook),@SkillLearned,#who=self,#oSkill=oSpell);
+          // Ours: a level 6 spell in a school is an achievement (util/achievements.kod)
+          if IsClass(self,&User)
+          {
+             Post(Send(SYS,@GetAchievements),@CheckSchools,#who=self);
+          }
       }
 
       if poOwner <> $
@@ -13038,6 +13055,12 @@ messages:
       if piFaction = FACTION_REBEL
       {
          Post(self,@DrawOffense);
+      }
+
+      // Ours: joining a faction is an achievement (util/achievements.kod)
+      if IsClass(self,&User)
+      {
+         Post(Send(SYS,@GetAchievements),@CheckFaction,#who=self);
       }
 
       piFactionTimeUpdated = GetTime();

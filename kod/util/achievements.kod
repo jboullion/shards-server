@@ -1,0 +1,563 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+Achievements is UtilityFunctions
+
+// Ours (achievements, ADR 0025): the player achievements. One object,
+// SYS@GetAchievements, made on demand.
+//
+// A player's earned achievements are User.plAchievements, newest first: [ id, when ].
+// The ids are ACH_* in blakston.khd; a boss's has its guild trophy's id. The names,
+// descriptions and icons are our client's (it holds the catalogue); the server only
+// keeps who earned what, and the title some of them add to the player's look (honor
+// strings, the ones from ach_title_*).
+//
+// Things happen in one place each and call in here: Monster.Killed (BossDied), Player.
+// JoinFaction (CheckFaction), Player.SetGuild (CheckGuild), Player.GainBaseMaxHealth
+// (CheckLevel), Player.AddSpell (CheckSchools) and QuestBook.Complete (QuestDone). At
+// logon, PlayerLoggedOn checks all of them, quietly, so a character from before this
+// gets what it already has (boss kills can't be got back; they count from now on).
+//
+// UC_ACHIEVEMENTS: kind 1 the whole list (dword now, word count, then each word id and dword when),
+// kind 2 one just earned (word id, dword when), which is the client's toast. GetTime() is not
+// the clock's, so the client works a date out from the gap between now and when.
+
+constants:
+
+   include blakston.khd
+   include protocol.khd
+
+   ACH_QUEST_DUKE_CHAIN = 304
+   ACH_QUEST_PRINCESS_CHAIN = 309
+   ACH_QUEST_REBEL_CHAIN = 314
+   ACH_QUEST_SOLDIER_PRINCESS = 76
+   ACH_QUEST_SOLDIER_DUKE = 77
+   ACH_QUEST_SOLDIER_REBEL = 78
+
+   // the ids from ACH_COUNT_10 up are about the count, not a deed
+   ACH_FIRST_META = 110
+
+resources:
+
+   ach_title_hp150 = "Legend of the Realm"
+   ach_title_capstone = "Bane of Queen Venya'cyr Ascended"
+   ach_title_world_slayer = "Slayer of the World's Beasts"
+   ach_title_hall_delver = "Delver of the Fallen Halls"
+   ach_title_chain_duke = "Hero of Barloque"
+   ach_title_chain_princess = "Hero of Tos"
+   ach_title_chain_rebel = "Storm of the Keep"
+   ach_title_count_all = "Completionist"
+
+classvars:
+
+properties:
+
+messages:
+
+   GetAll()
+   "Every achievement there is (not in order)."
+   {
+      local i, lAll;
+
+      lAll = $;
+      foreach i in [ 1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 41 ]
+      {
+         lAll = Cons(i,lAll);
+      }
+
+      foreach i in [ 50, 51, 60, 61, 62, 63, 64, 65, 66, 70, 71, 80, 81, 82 ]
+      {
+         lAll = Cons(i,lAll);
+      }
+
+      foreach i in [ 91, 92, 93, 94, 95, 96, 100, 101, 102, 103, 110, 111, 112 ]
+      {
+         lAll = Cons(i,lAll);
+      }
+
+      return lAll;
+   }
+
+   GetTitle(id = 0)
+   "The honor string an achievement adds to its owner's look, or $ for none."
+   {
+      if id = ACH_HP_150
+      {
+         return ach_title_hp150;
+      }
+
+      if id = TROPHY_CAPSTONE
+      {
+         return ach_title_capstone;
+      }
+
+      if id = ACH_WORLD_SLAYER
+      {
+         return ach_title_world_slayer;
+      }
+
+      if id = ACH_HALL_DELVER
+      {
+         return ach_title_hall_delver;
+      }
+
+      if id = ACH_CHAIN_DUKE
+      {
+         return ach_title_chain_duke;
+      }
+
+      if id = ACH_CHAIN_PRINCESS
+      {
+         return ach_title_chain_princess;
+      }
+
+      if id = ACH_CHAIN_REBEL
+      {
+         return ach_title_chain_rebel;
+      }
+
+      if id = ACH_COUNT_ALL
+      {
+         return ach_title_count_all;
+      }
+
+      return $;
+   }
+
+   Has(who = $,id = 0)
+   {
+      local i;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      foreach i in Send(who,@GetAchieved)
+      {
+         if First(i) = id
+         {
+            return TRUE;
+         }
+      }
+
+      return FALSE;
+   }
+
+   Award(who = $,id = 0,quiet = FALSE)
+   "who has earned an achievement. Once only; TRUE if it's new. Quiet: no toast (the logon "
+   "check, which sends the whole list afterwards)."
+   {
+      local iWhen, rTitle;
+
+      if who = $ OR NOT IsClass(who,&User) OR id = 0
+      {
+         return FALSE;
+      }
+
+      if Send(self,@Has,#who=who,#id=id)
+      {
+         return FALSE;
+      }
+
+      iWhen = GetTime();
+      Send(who,@SetAchieved,#lAch=Cons([ id, iWhen ],Send(who,@GetAchieved)));
+
+      rTitle = Send(self,@GetTitle,#id=id);
+      if rTitle <> $
+      {
+         Send(who,@AddHonorString,#string=rTitle);
+      }
+
+      if NOT quiet
+      {
+         Send(self,@SendUnlock,#who=who,#id=id,#when=iWhen);
+      }
+
+      Send(self,@CheckMeta,#who=who,#quiet=quiet);
+
+      return TRUE;
+   }
+
+   CheckMeta(who = $,quiet = FALSE)
+   "The count of deeds earned, for the achievements about how many."
+   {
+      local i, iCount;
+
+      iCount = 0;
+      foreach i in Send(who,@GetAchieved)
+      {
+         if First(i) < ACH_FIRST_META
+         {
+            ++iCount;
+         }
+      }
+
+      if iCount >= 10
+      {
+         Send(self,@Award,#who=who,#id=ACH_COUNT_10,#quiet=quiet);
+      }
+
+      if iCount >= 25
+      {
+         Send(self,@Award,#who=who,#id=ACH_COUNT_25,#quiet=quiet);
+      }
+
+      // every deed there is: all of them but the three about the count
+      if iCount >= Length(Send(self,@GetAll)) - 3
+      {
+         Send(self,@Award,#who=who,#id=ACH_COUNT_ALL,#quiet=quiet);
+      }
+
+      return;
+   }
+
+   HasAll(who = $,low = 0,high = 0)
+   "Whether who has every achievement from low to high that there is."
+   {
+      local i;
+
+      foreach i in Send(self,@GetAll)
+      {
+         if i >= low AND i <= high
+            AND NOT Send(self,@Has,#who=who,#id=i)
+         {
+            return FALSE;
+         }
+      }
+
+      return TRUE;
+   }
+
+   BossDied(slain = $,where = $)
+   "Monster.Killed: the boss slain died for real in where (the same test as its guild "
+   "trophy). Each player there who struck it earns its achievement."
+   {
+      local i, each_obj, iId;
+
+      if slain = $ OR where = $
+      {
+         return;
+      }
+
+      iId = Send(slain,@GetTrophyId);
+      if iId <= 0
+      {
+         return;
+      }
+
+      foreach i in Send(where,@GetHolderActive)
+      {
+         each_obj = First(i);
+         if IsClass(each_obj,&User)
+            AND Send(slain,@WasStruckBy,#who=each_obj)
+         {
+            Send(self,@Award,#who=each_obj,#id=iId);
+            Send(self,@CheckBossSets,#who=each_obj);
+         }
+      }
+
+      return;
+   }
+
+   CheckBossSets(who = $,quiet = FALSE)
+   {
+      if Send(self,@HasAll,#who=who,#low=TROPHY_FALLEN_FIRST,#high=TROPHY_FALLEN_LAST)
+      {
+         Send(self,@Award,#who=who,#id=ACH_HALL_DELVER,#quiet=quiet);
+      }
+
+      if Send(self,@HasAll,#who=who,#low=TROPHY_WORLD_FIRST,#high=TROPHY_WORLD_LAST)
+      {
+         Send(self,@Award,#who=who,#id=ACH_WORLD_SLAYER,#quiet=quiet);
+      }
+
+      return;
+   }
+
+   CheckFaction(who = $,quiet = FALSE)
+   {
+      local iFaction;
+
+      iFaction = Send(who,@GetFaction);
+      if iFaction = FACTION_DUKE
+      {
+         Send(self,@Award,#who=who,#id=ACH_JOIN_DUKE,#quiet=quiet);
+      }
+      else if iFaction = FACTION_PRINCESS
+      {
+         Send(self,@Award,#who=who,#id=ACH_JOIN_PRINCESS,#quiet=quiet);
+      }
+      else if iFaction = FACTION_REBEL
+      {
+         Send(self,@Award,#who=who,#id=ACH_JOIN_REBEL,#quiet=quiet);
+      }
+      else
+      {
+         return;
+      }
+
+      Send(self,@Award,#who=who,#id=ACH_JOIN_FACTION,#quiet=quiet);
+
+      return;
+   }
+
+   CheckGuild(who = $,quiet = FALSE)
+   "In a guild: a member, and a guildmaster if it leads one (it founded it, or was handed it)."
+   {
+      local oGuild;
+
+      oGuild = Send(who,@GetGuild);
+      if oGuild = $
+      {
+         return;
+      }
+
+      Send(self,@Award,#who=who,#id=ACH_GUILD_MEMBER,#quiet=quiet);
+      if Send(oGuild,@GetRank,#who=who) = RANK_MASTER
+      {
+         Send(self,@Award,#who=who,#id=ACH_GUILD_MASTER,#quiet=quiet);
+      }
+
+      return;
+   }
+
+   CheckLevel(who = $,quiet = FALSE)
+   "Hit points are the level here."
+   {
+      local iLevel;
+
+      iLevel = Send(who,@GetBaseMaxHealth);
+      if iLevel >= 50
+      {
+         Send(self,@Award,#who=who,#id=ACH_HP_50,#quiet=quiet);
+      }
+
+      if iLevel >= 100
+      {
+         Send(self,@Award,#who=who,#id=ACH_HP_100,#quiet=quiet);
+      }
+
+      if iLevel >= 150
+      {
+         Send(self,@Award,#who=who,#id=ACH_HP_150,#quiet=quiet);
+      }
+
+      return;
+   }
+
+   CheckSchools(who = $,quiet = FALSE)
+   "A level 6 spell in a school is that school's achievement."
+   {
+      local i, iSchool;
+
+      iSchool = 0;
+      foreach i in Send(who,@GetSpellSchoolLevels)
+      {
+         ++iSchool;
+         if iSchool <= 6 AND i >= 6
+         {
+            Send(self,@Award,#who=who,#id=ACH_SCHOOL_BASE + iSchool,#quiet=quiet);
+         }
+      }
+
+      return;
+   }
+
+   QuestDone(who = $,quiet = FALSE)
+   "QuestBook.Complete, or the logon check: what the quests done add up to."
+   {
+      local i, iCount, bDuke, bPrincess, bRebel, bSoldierP, bSoldierD, bSoldierR;
+
+      bDuke = FALSE;
+      bPrincess = FALSE;
+      bRebel = FALSE;
+      bSoldierP = FALSE;
+      bSoldierD = FALSE;
+      bSoldierR = FALSE;
+      iCount = 0;
+      foreach i in Send(who,@GetQuestDone)
+      {
+         ++iCount;
+         if First(i) = ACH_QUEST_DUKE_CHAIN
+         {
+            bDuke = TRUE;
+         }
+
+         if First(i) = ACH_QUEST_PRINCESS_CHAIN
+         {
+            bPrincess = TRUE;
+         }
+
+         if First(i) = ACH_QUEST_REBEL_CHAIN
+         {
+            bRebel = TRUE;
+         }
+
+         if First(i) = ACH_QUEST_SOLDIER_PRINCESS
+         {
+            bSoldierP = TRUE;
+         }
+
+         if First(i) = ACH_QUEST_SOLDIER_DUKE
+         {
+            bSoldierD = TRUE;
+         }
+
+         if First(i) = ACH_QUEST_SOLDIER_REBEL
+         {
+            bSoldierR = TRUE;
+         }
+      }
+
+      if iCount >= 1
+      {
+         Send(self,@Award,#who=who,#id=ACH_QUEST_FIRST,#quiet=quiet);
+      }
+
+      if iCount >= 10
+      {
+         Send(self,@Award,#who=who,#id=ACH_QUEST_10,#quiet=quiet);
+      }
+
+      if iCount >= 50
+      {
+         Send(self,@Award,#who=who,#id=ACH_QUEST_50,#quiet=quiet);
+      }
+
+      if bDuke
+      {
+         Send(self,@Award,#who=who,#id=ACH_CHAIN_DUKE,#quiet=quiet);
+      }
+
+      if bPrincess
+      {
+         Send(self,@Award,#who=who,#id=ACH_CHAIN_PRINCESS,#quiet=quiet);
+      }
+
+      if bRebel
+      {
+         Send(self,@Award,#who=who,#id=ACH_CHAIN_REBEL,#quiet=quiet);
+      }
+
+      if bSoldierP AND bSoldierD AND bSoldierR
+      {
+         Send(self,@Award,#who=who,#id=ACH_SOLDIER_ALL,#quiet=quiet);
+      }
+
+      return;
+   }
+
+   CheckAll(who = $,quiet = FALSE)
+   {
+      Send(self,@CheckLevel,#who=who,#quiet=quiet);
+      Send(self,@CheckSchools,#who=who,#quiet=quiet);
+      Send(self,@CheckFaction,#who=who,#quiet=quiet);
+      Send(self,@CheckGuild,#who=who,#quiet=quiet);
+      Send(self,@QuestDone,#who=who,#quiet=quiet);
+      Send(self,@CheckBossSets,#who=who,#quiet=quiet);
+
+      return;
+   }
+
+   PlayerLoggedOn(who = $)
+   "User.UserLogon: catch up on what the character already has, quietly, then send the list."
+   {
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      Send(self,@CheckAll,#who=who,#quiet=TRUE);
+      Send(self,@SendAll,#who=who);
+
+      return;
+   }
+
+   AchievementsCommand(who = $,words = $)
+   "UC_SHARDS \"achievements\": our client's window asks for the list."
+   {
+      Send(self,@SendAll,#who=who);
+
+      return;
+   }
+
+   SendAll(who = $)
+   "UC_ACHIEVEMENTS kind 1: every achievement who has earned, and when."
+   {
+      local i, oSession, lList;
+
+      if who = $
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lList = Send(who,@GetAchieved);
+      AddPacket(1,BP_USERCOMMAND,1,UC_ACHIEVEMENTS,1,1,4,GetTime(),2,Length(lList));
+      foreach i in lList
+      {
+         AddPacket(2,First(i),4,Nth(i,2));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendUnlock(who = $,id = 0,when = 0)
+   "UC_ACHIEVEMENTS kind 2: one just earned."
+   {
+      local oSession;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND,1,UC_ACHIEVEMENTS,1,2,2,id,4,when);
+      SendPacket(oSession);
+
+      return;
+   }
+
+   Reset(who = $)
+   "Admin and testing: who has earned nothing, and wears none of the titles."
+   {
+      local i, rTitle;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      foreach i in Send(self,@GetAll)
+      {
+         rTitle = Send(self,@GetTitle,#id=i);
+         if rTitle <> $
+         {
+            Send(who,@RemoveHonorString,#string=rTitle);
+         }
+      }
+
+      Send(who,@SetAchieved,#lAch=$);
+      Send(self,@SendAll,#who=who);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////
