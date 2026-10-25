@@ -1,0 +1,42 @@
+{
+  "id": 346,
+  "key": "court-bounty-highway-bandits",
+  "name": "Highway Bandits",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 75,
+    "max": 100
+  },
+  "requires": {
+    "healthBelow": 100
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: bandits on the Queen's Path and around Bergholt have robbed travellers in the Princess's name. Six of them are to face the court's justice.\" She sets it down. \"Their camp is near the city of Berg, and they hold Kardde's pass. They're people, not beasts, and they fight like it.\"",
+    "progress": "The bandits hold their camp near Bergholt, the Queen's Path and Kardde's Path.",
+    "complete": "\"Six bandits. The roads are safer for it.\" Caramo stamps the warrant. \"The Office posts it again tomorrow. Bandits are like rats, only better armed.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Bandit",
+      "count": 6,
+      "exact": true,
+      "rooms": [
+        "RID_BANDIT_CAMP",
+        2820,
+        2815
+      ],
+      "objective": "Bandits brought to justice"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 1000
+  }
+}

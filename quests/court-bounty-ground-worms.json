@@ -1,0 +1,41 @@
+{
+  "id": 345,
+  "key": "court-bounty-ground-worms",
+  "name": "Worms of the Badlands",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 80,
+    "max": 100
+  },
+  "requires": {
+    "healthBelow": 100
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: ground worms have broken up the Badlands road and swallowed a surveyor of the Crown, instruments and all. Five are to be killed.\" She sighs. \"The Badlands are beyond Barloque, and the Rumbling Cavern under them. You'll feel them before you see them.\"",
+    "progress": "The ground worms tunnel through the Badlands and the Rumbling Cavern beyond Barloque.",
+    "complete": "\"Five worms. The surveyor's family will be glad of it, if not of what you found.\" Caramo stamps the warrant. \"Tomorrow, there'll be more.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GroundWorm",
+      "count": 5,
+      "exact": true,
+      "rooms": [
+        45,
+        860
+      ],
+      "objective": "Ground worms killed"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 900
+  }
+}

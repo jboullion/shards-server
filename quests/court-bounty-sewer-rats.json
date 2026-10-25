@@ -1,0 +1,50 @@
+{
+  "id": 339,
+  "key": "court-bounty-sewer-rats",
+  "name": "Rats Under the Court",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 40,
+    "max": 70
+  },
+  "requires": {
+    "healthBelow": 65
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo unrolls a warrant and reads it out. \"By order of the Office of the Justicar: the rat soldiers of the Barloque sewers have chewed through the floor of our own record room. Eight of them are to be put down, and the brute they call the Rat King with them. The Office pays on proof.\" She looks up. \"The sewers are under the city, down from the streets. Mind the dusk rats; they're no soldiers.\"",
+    "progress": "The rat soldiers and their king lurk in the Sewers of Barloque, below the city streets.",
+    "complete": "Caramo stamps the warrant. \"Discharged. The record room thanks you, and so does my ankle. Come back tomorrow; there are always more rats.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GiantRatSoldier",
+      "count": 8,
+      "rooms": [
+        "RID_BAR_SEWER",
+        "RID_BAR_SEWER2"
+      ],
+      "objective": "Rat soldiers put down"
+    },
+    {
+      "kind": "kill",
+      "target": "GiantRatKing",
+      "count": 1,
+      "rooms": [
+        "RID_BAR_SEWER2",
+        "RID_BAR_SEWER3"
+      ],
+      "objective": "The Rat King put down"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.45,
+    "shillings": 200
+  }
+}

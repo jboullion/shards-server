@@ -1,0 +1,41 @@
+{
+  "id": 343,
+  "key": "court-bounty-death-spiders",
+  "name": "Spiders in the Passes",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 55,
+    "max": 85
+  },
+  "requires": {
+    "healthBelow": 85
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: death spiders have taken two royal couriers in the Cragged Mountains. Five are to be destroyed before the next courier rides.\" She shudders. \"The mountains are on the way to Jasper, and the old ruins by the Sentinel. Watch the ceilings.\"",
+    "progress": "The death spiders haunt the Cragged Mountains, the ancient ruins nearby and the land under the Sentinel.",
+    "complete": "\"Five death spiders. The couriers will ride again.\" Caramo stamps the warrant. \"Back tomorrow, if you've the nerve for it.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DeathSpider",
+      "count": 5,
+      "rooms": [
+        "RID_CRAGGED",
+        579,
+        589
+      ],
+      "objective": "Death spiders destroyed"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 450
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": 341,
+  "key": "court-bounty-cave-orcs",
+  "name": "Orcs in the Deep Caves",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 40,
+    "max": 60
+  },
+  "requires": {
+    "healthBelow": 60
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: orc raiders out of the caves beyond Tos have robbed three carts bound for the royal city. Eight orcs are to answer for it.\" She taps the parchment. \"Their caves are in the woods past Tos, and the warren of Ugol near them. The Office does not ask you to bring back the carts.\"",
+    "progress": "The orcs keep to the dark caves beyond Tos and the entrance to Ugol's Warren.",
+    "complete": "\"Eight orcs, warrant served.\" Caramo stamps it. \"The carters will sleep easier. There will be another warrant tomorrow; orcs never learn.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Orc",
+      "count": 8,
+      "exact": true,
+      "rooms": [
+        "RID_CAVE2",
+        2500
+      ],
+      "objective": "Orc raiders slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "shillings": 200
+  }
+}

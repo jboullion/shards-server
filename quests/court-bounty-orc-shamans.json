@@ -1,0 +1,40 @@
+{
+  "id": 344,
+  "key": "court-bounty-orc-shamans",
+  "name": "The Orc Shaman Warrant",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 60,
+    "max": 90
+  },
+  "requires": {
+    "healthBelow": 90
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: the orc shamans in the caves beyond Tos have cursed a magistrate's well. Four of them are to be brought to justice, which in their case means the end of a blade.\" She adds, \"Their chambers are deep in the orc caves and Ugol's Warren. They throw fire.\"",
+    "progress": "The orc shamans keep to the depths of the orc caves beyond Tos and the enigmatic chamber of Ugol's Warren.",
+    "complete": "\"Four shamans. The well is already clearing, they say.\" Caramo stamps the warrant. \"The Office will have another for you tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "OrcWizard",
+      "count": 4,
+      "rooms": [
+        "RID_CAVE2",
+        "RID_ORC_CAVE2"
+      ],
+      "objective": "Orc shamans brought to justice"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.55,
+    "shillings": 600
+  }
+}

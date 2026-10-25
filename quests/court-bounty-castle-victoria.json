@@ -1,0 +1,40 @@
+{
+  "id": 342,
+  "key": "court-bounty-castle-victoria",
+  "name": "The Restless Dead of Castle Victoria",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 50,
+    "max": 90
+  },
+  "requires": {
+    "healthBelow": 90
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: the dead of Castle Victoria will not stay dead, and the court has sealed the graveyard at Tos for less. Six skeletons are to be laid to rest.\" She lowers her voice. \"The castle is far past Tos, through the woods. Go in daylight if you can.\"",
+    "progress": "The skeletons walk the halls of Castle Victoria, far beyond Tos.",
+    "complete": "Caramo stamps the warrant with a small shiver. \"Six laid to rest. The Office thanks you. They'll rise again, I'm afraid; the warrant goes up again tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Skeleton",
+      "count": 6,
+      "exact": true,
+      "rooms": [
+        "RID_VICTORIA"
+      ],
+      "objective": "Skeletons laid to rest"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 400
+  }
+}

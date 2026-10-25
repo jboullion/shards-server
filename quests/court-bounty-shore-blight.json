@@ -1,0 +1,39 @@
+{
+  "id": 340,
+  "key": "court-bounty-shore-blight",
+  "name": "Blight on the Shore",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueClerk"
+  },
+  "band": {
+    "min": 40,
+    "max": 60
+  },
+  "requires": {
+    "healthBelow": 60
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Caramo reads from a warrant. \"By order of the Office: the fishers of Barloque complain of fungus beasts on the sandy shores of the Great Ocean, spoiling nets and frightening children. Six are to be cleared.\" She sets it down. \"The shore is out past the city, by the sea. Bring a strong stomach. They smell.\"",
+    "progress": "The fungus beasts crawl on the sandy shores of the Great Ocean, near Barloque.",
+    "complete": "\"Six fewer beasts on the shore. The fishers will be glad of it.\" Caramo stamps the warrant. \"The Office posts it again tomorrow, as surely as the tide.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "FungusBeast",
+      "count": 6,
+      "rooms": [
+        562
+      ],
+      "objective": "Fungus beasts cleared"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.4,
+    "shillings": 150
+  }
+}
