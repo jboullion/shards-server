@@ -29,7 +29,9 @@ resources:
 classvars:
    vrName = smite_name_rsc
    vrIcon = smite_icon_rsc
-   vrProjectile_Icon = smite_icon_rsc
+   // Ours (spell revamp phase 9, V6): Lightning Bolt's bolt, not the spell's
+   //  icon flying (resource names are global).
+   vrProjectile_Icon = lightning_icon_rsc
    vrDesc = smite_desc_rsc
 
    viSpell_num = SID_SMITE
@@ -45,9 +47,9 @@ classvars:
    // Projectile lighting information.
    viProjectileLightFlags = LIGHT_FLAG_ON | LIGHT_FLAG_DYNAMIC
    // Intensity, out of 255.
-   viProjectileLightIntensity = 50
-   // Default color is bright red.
-   viProjectileLightColor = LIGHT_BRED
+   viProjectileLightIntensity = 120
+   // Ours (V6): a god's gold, as Shal'ille's light (it was bright red).
+   viProjectileLightColor = LIGHT_BYELLOW
 
 properties:
 
@@ -104,8 +106,9 @@ messages:
    }
 
    SendProjectileAnimation()
+   "Ours (V6): Lightning Bolt's crackle (lightnin.kod)."
    {
-      AddPacket(1,ANIMATE_NONE, 2,2);
+      AddPacket(1,ANIMATE_CYCLE, 4,40, 2,2, 2,3);
 
       return;
    }
