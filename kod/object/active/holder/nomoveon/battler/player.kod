@@ -1864,6 +1864,43 @@ messages:
       return FALSE;
    }
 
+   AppendForesightReading(who = $)
+   "Ours (25 October play test): who's Foresight reading of us, added to the "
+   "temp string (Foresight.AppendLookText builds it in the temp string too, "
+   "so what's there is kept and put back first)."
+   {
+      local oForesight, sBefore, sReading;
+
+      if who = $
+         OR who = self
+         OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oForesight = Send(SYS,@FindSpellByNum,#num=SID_FORESIGHT);
+      if oForesight = $
+      {
+         return;
+      }
+
+      sBefore = SetString($,GetTempString());
+      if Send(oForesight,@AppendLookText,#who=who,#oTarget=self)
+      {
+         sReading = SetString($,GetTempString());
+         ClearTempString();
+         AppendTempString(sBefore);
+         AppendTempString(sReading);
+      }
+      else
+      {
+         ClearTempString();
+         AppendTempString(sBefore);
+      }
+
+      return;
+   }
+
    AppendHonorStrings()
    "Appends all the honor strings to the temp string. Adds newline "
    "between strings."
@@ -1950,7 +1987,9 @@ messages:
       return;
    }
 
-   ShowExtraInfo()
+   ShowExtraInfo(who = $)
+   "Ours: who, the viewer (User.SendLookPlayer), sees their Foresight reading "
+   "after our honours."
    {
       local i, j, obj, year, rCargoNum;
 
@@ -2212,6 +2251,8 @@ messages:
       //
       ClearTempString();
       Send(self,@AppendHonorStrings);
+      // Ours (25 October play test): the viewer's Foresight reading of us
+      Send(self,@AppendForesightReading,#who=who);
       AddPacket(4,GetTempString());
 
       //

@@ -6470,7 +6470,7 @@ messages:
          }
 
          Send(what,@ShowDesc);
-         Send(what,@ShowExtraInfo);
+         Send(what,@ShowExtraInfo,#who=self);
 
          if Send(what,@GetURL) = $
          {

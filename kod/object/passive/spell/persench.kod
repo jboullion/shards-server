@@ -88,6 +88,29 @@ messages:
       return;
    }
 
+   GetTargets(who=$,lTargets=$)
+   "Ours (25 October play test): a personal enchantment (all of them help) "
+   "aimed at something it can't enchant, such as a monster or a training dummy "
+   "a player had selected, lands on the caster instead of failing."
+   {
+      local oTarget;
+
+      if vbCanCastOnOthers
+         AND lTargets <> $
+         AND Length(lTargets) = 1
+      {
+         oTarget = First(lTargets);
+         if oTarget <> who
+            AND NOT IsClass(oTarget,&User)
+            AND NOT (vbCanCastOnMonsters AND IsClass(oTarget,&Monster))
+         {
+            return [who];
+         }
+      }
+
+      propagate;
+   }
+
    CanPayCosts(who=$,lTargets=$,bItemCast=FALSE)
    {
       local oTarget, i;

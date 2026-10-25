@@ -29,10 +29,89 @@ classvars:
    //  while they hear it (it was a property nothing read).
    vrMusic = $
 
+   // Ours (25 October play test): how many songs one singer may keep up; a
+   //  new one past it ends the one they started first
+   viMaxSongs = 2
+
 properties:
 
+   // Ours: when each singer last started this song, [who, GetTickCount()]
+   plStarted = $
 
 messages:
+
+   CastSpell(who=$,iSpellPower=0,lTargets=$,bItemCast=FALSE)
+   "Ours (25 October play test): a singer keeps up at most viMaxSongs songs; "
+   "starting another ends the one they started first (it fades as a song "
+   "does). Singing one you already sing is RadiusEnchantment's (it starts over)."
+   {
+      local i, j, iSongs, oOldest, lOldest, iOldest, iStarted, bThis;
+
+      if who <> $
+         AND IsClass(who,&Player)
+      {
+         iSongs = 0;
+         bThis = FALSE;
+         oOldest = $;
+         foreach i in Send(who,@GetRadiusEnchantments)
+         {
+            if IsClass(Nth(i,2),&Jala)
+               AND First(Nth(i,3)) = who
+            {
+               if Nth(i,2) = self
+               {
+                  bThis = TRUE;
+               }
+               else
+               {
+                  ++iSongs;
+                  iStarted = Send(Nth(i,2),@GetStartedBy,#who=who);
+                  if oOldest = $
+                     OR iStarted < iOldest
+                  {
+                     oOldest = Nth(i,2);
+                     lOldest = Nth(i,3);
+                     iOldest = iStarted;
+                  }
+               }
+            }
+         }
+
+         if NOT bThis
+            AND iSongs >= viMaxSongs
+            AND oOldest <> $
+         {
+            Send(who,@RemoveRadiusEnchantment,#what=oOldest,#state=lOldest);
+         }
+
+         foreach j in plStarted
+         {
+            if First(j) = who
+            {
+               plStarted = DelListElem(plStarted,j);
+            }
+         }
+         plStarted = Cons([who,GetTickCount()],plStarted);
+      }
+
+      propagate;
+   }
+
+   GetStartedBy(who=$)
+   "Ours: when who last started this song (GetTickCount), or 0 if not known."
+   {
+      local i;
+
+      foreach i in plStarted
+      {
+         if First(i) = who
+         {
+            return Nth(i,2);
+         }
+      }
+
+      return 0;
+   }
 
    CalculateRange(who=$, iSpellPower=25)
    "Ours (spell revamp balance): a song reaches 8 squares, and up to 10 more "

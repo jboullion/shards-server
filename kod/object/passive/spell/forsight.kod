@@ -22,6 +22,9 @@ constants:
    MAX_PERCENT_PRACTITIONER = 80
    MAX_PERCENT_GREAT = 90
 
+   // Ours (25 October play test): how long a reading shows in the target's description
+   FORESIGHT_LOOK_SECONDS = 600
+
 resources:
 
    // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
@@ -61,7 +64,23 @@ resources:
    Foresight_GoodAt  = "is good at"
    Foresight_PractitionerOf = "is a practitioner of"
    Foresight_GreatAt = "is great at" 
-   Foresight_MasterOf = "is a master of" 
+   Foresight_MasterOf = "is a master of"
+
+   // Ours (25 October play test): the reading in the target's description
+   Foresight_look_title = "\n\nYour Foresight: "
+   Foresight_look_level = "level "
+   Foresight_look_health = ", with "
+   Foresight_look_health_end = "% of its health left."
+   Foresight_look_line = "\n   "
+   Foresight_look_space = " "
+   Foresight_look_percent = "%"
+   Foresight_look_weak = "% (a weakness)"
+   Foresight_look_noresist = "\n   No resistances or weaknesses."
+   Foresight_look_casts = "\n   Casts "
+   Foresight_look_comma = ", "
+   Foresight_look_nospells = "\n   Casts no spells."
+   Foresight_look_empty = "nothing worth knowing."
+
 
 classvars:
 
@@ -86,6 +105,10 @@ properties:
 
    viOutlaw = TRUE
    viHarmful = TRUE
+
+   // Ours (25 October play test): readings shown in the target's description,
+   //  [caster, target, until (GetTime), abilities read ([ability, compound])]
+   plReadings = $
 
 messages:
 
@@ -118,7 +141,7 @@ messages:
    {
       local iToList, iListed, i, oTarget, lAbilities, iCompound, iAbilityNum,
             oAbility, iAbilityLength, iMaxHopSize, iFrog, iCounter, iTemp,
-            iSkill;
+            iSkill, lRead;
 
       oTarget = First(lTargets);
       iToList = iSpellPower / 4;
@@ -130,6 +153,7 @@ messages:
       {
          Send(self,@ForesightMonster,#who=who,#oTarget=oTarget,
                #iSpellPower=iSpellPower);
+         Send(self,@RecordReading,#who=who,#oTarget=oTarget);
 
          propagate;
       }
@@ -172,6 +196,7 @@ messages:
          AddPacket(4,Send(oTarget,@GetDef));
          AddPacket(4,Send(oTarget,@GetName));
          SendPacket(Send(who,@GetSession));
+         Send(self,@RecordReading,#who=who,#oTarget=oTarget);
 
          propagate;
       }
@@ -221,12 +246,169 @@ messages:
 
             AddPacket(4,Send(self,@GetAbilityResource,#iAbility=iSkill));
             AddPacket(4,Send(oAbility,@GetName));
+            lRead = Cons([oAbility,iCompound],lRead);
          }
       }
 
       SendPacket(Send(who,@GetSession));
+      Send(self,@RecordReading,#who=who,#oTarget=oTarget,#lAbilities=lRead);
 
       propagate;
+   }
+
+   RecordReading(who=$,oTarget=$,lAbilities=$)
+   "Ours (25 October play test): what who read of oTarget shows in its "
+   "description for FORESIGHT_LOOK_SECONDS (a new reading replaces it)."
+   {
+      local i;
+
+      if who = $
+         OR oTarget = $
+      {
+         return;
+      }
+
+      foreach i in plReadings
+      {
+         if First(i) = who
+            AND Nth(i,2) = oTarget
+         {
+            plReadings = DelListElem(plReadings,i);
+         }
+      }
+      plReadings = Cons([who,oTarget,GetTime() + FORESIGHT_LOOK_SECONDS,
+                         lAbilities],plReadings);
+
+      return;
+   }
+
+   GetReading(who=$,oTarget=$)
+   "Ours: who's reading of oTarget while it lasts, else $ (and old ones go)."
+   {
+      local i, iNow, lFound;
+
+      iNow = GetTime();
+      lFound = $;
+      foreach i in plReadings
+      {
+         if Nth(i,3) < iNow
+         {
+            plReadings = DelListElem(plReadings,i);
+         }
+         else if First(i) = who
+            AND Nth(i,2) = oTarget
+         {
+            lFound = i;
+         }
+      }
+
+      return lFound;
+   }
+
+   AppendLookText(who=$,oTarget=$)
+   "Ours (25 October play test): the reading who has of oTarget, if any, put "
+   "in the temp string (cleared first) for its description; FALSE if none. A "
+   "monster's is read again now (its health changes); a player's is the "
+   "abilities the cast revealed."
+   {
+      local lReading, i, iMax, bAny, lSpellBook, iLength, oSpell, oAbility,
+            iSkill;
+
+      lReading = Send(self,@GetReading,#who=who,#oTarget=oTarget);
+      if lReading = $
+      {
+         return FALSE;
+      }
+
+      ClearTempString();
+      AppendTempString(Foresight_look_title);
+
+      if IsClass(oTarget,&Monster)
+      {
+         iMax = Bound(Send(oTarget,@GetMaxHealth),1,$);
+         AppendTempString(Foresight_look_level);
+         AppendTempString(Send(oTarget,@GetLevel));
+         AppendTempString(Foresight_look_health);
+         AppendTempString((Send(oTarget,@GetHealth) * 100) / iMax);
+         AppendTempString(Foresight_look_health_end);
+
+         bAny = FALSE;
+         foreach i in Send(oTarget,@GetResistances)
+         {
+            if Nth(i,2) <> 0
+            {
+               AppendTempString(Foresight_look_line);
+               AppendTempString(Send(SYS,@GetResistanceName,#type=First(i)));
+               AppendTempString(Foresight_look_space);
+               AppendTempString(Nth(i,2));
+               if Nth(i,2) < 0
+               {
+                  AppendTempString(Foresight_look_weak);
+               }
+               else
+               {
+                  AppendTempString(Foresight_look_percent);
+               }
+               bAny = TRUE;
+            }
+         }
+         if NOT bAny
+         {
+            AppendTempString(Foresight_look_noresist);
+         }
+
+         lSpellBook = Send(oTarget,@GetSpellBook);
+         if lSpellBook = $
+         {
+            AppendTempString(Foresight_look_nospells);
+         }
+         else
+         {
+            AppendTempString(Foresight_look_casts);
+            iLength = Length(lSpellBook);
+            for (i = 1; i <= iLength; ++i)
+            {
+               if i > 1
+               {
+                  AppendTempString(Foresight_look_comma);
+               }
+               oSpell = Send(SYS,@FindSpellByNum,#num=First(Nth(lSpellBook,i)));
+               if oSpell <> $
+               {
+                  AppendTempString(Send(oSpell,@GetName));
+               }
+            }
+         }
+
+         return TRUE;
+      }
+
+      // A player: the abilities the cast revealed, one a line
+      if Nth(lReading,4) = $
+      {
+         AppendTempString(Foresight_look_empty);
+
+         return TRUE;
+      }
+
+      foreach i in Nth(lReading,4)
+      {
+         oAbility = First(i);
+         if IsClass(oAbility,&Spell)
+         {
+            iSkill = Send(oTarget,@DecodeSpellAbility,#compound=Nth(i,2));
+         }
+         else
+         {
+            iSkill = Send(oTarget,@DecodeSkillAbility,#compound=Nth(i,2));
+         }
+         AppendTempString(Foresight_look_line);
+         AppendTempString(Send(self,@GetAbilityResource,#iAbility=iSkill));
+         AppendTempString(Foresight_look_space);
+         AppendTempString(Send(oAbility,@GetName));
+      }
+
+      return TRUE;
    }
 
    ForesightMonsterStats(who=$,oTarget=$)

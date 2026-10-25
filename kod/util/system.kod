@@ -308,6 +308,20 @@ resources:
    unholy_resistance_name = "unholy resistance"
    quake_resistance_name = "quake resistance"
    unknown_resistance_name = "unknown resistance"
+   // Ours (25 October play test): the weapon kinds Foresight read as unknown
+   nonmagic_resistance_name = "resistance to plain weapons"
+   enchanted_resistance_name = "resistance to enchanted weapons"
+   hit_resistance_name = "resistance to blows"
+   whip_resistance_name = "whip resistance"
+   claw_resistance_name = "claw resistance"
+   bite_resistance_name = "bite resistance"
+   sting_resistance_name = "sting resistance"
+   acidweap_resistance_name = "resistance to acid attacks"
+   unarmed_resistance_name = "resistance to unarmed attacks"
+   punch_resistance_name = "punch resistance"
+   kick_resistance_name = "kick resistance"
+   nerudite_resistance_name = "nerudite resistance"
+   silver_resistance_name = "silver resistance"
 
    weapon_damage_name = "weapon"
    pierce_damage_name = "pierce"
@@ -8353,6 +8367,20 @@ messages:
       case ATCK_WEAP_SLASH: return slash_resistance_name;
       case ATCK_WEAP_THRUST: return thrust_resistance_name;
       case ATCK_WEAP_BLUDGEON: return bludgeon_resistance_name;
+      // Ours (25 October play test): the rest of the weapon kinds
+      case ATCK_WEAP_NONMAGIC: return nonmagic_resistance_name;
+      case ATCK_WEAP_MAGIC: return enchanted_resistance_name;
+      case ATCK_WEAP_HIT: return hit_resistance_name;
+      case ATCK_WEAP_WHIP: return whip_resistance_name;
+      case ATCK_WEAP_CLAW: return claw_resistance_name;
+      case ATCK_WEAP_BITE: return bite_resistance_name;
+      case ATCK_WEAP_STING: return sting_resistance_name;
+      case ATCK_WEAP_ACID: return acidweap_resistance_name;
+      case ATCK_WEAP_UNARMED: return unarmed_resistance_name;
+      case ATCK_WEAP_PUNCH: return punch_resistance_name;
+      case ATCK_WEAP_KICK: return kick_resistance_name;
+      case ATCK_WEAP_NERUDITE: return nerudite_resistance_name;
+      case ATCK_WEAP_SILVER: return silver_resistance_name;
       case -ATCK_SPELL_ALL: return magic_resistance_name;
       case -ATCK_SPELL_FIRE: return fire_resistance_name;
       case -ATCK_SPELL_COLD: return cold_resistance_name;
