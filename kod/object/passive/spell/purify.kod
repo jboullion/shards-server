@@ -22,6 +22,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   purify_cast_sound = sreveal.ogg
+
    include purify.lkod
 
    purify_name_rsc = "purify"
@@ -38,6 +42,8 @@ resources:
       "Shal'ille Lv. 4: Removes harmful personal enchantments on the target."
 
 classvars:
+
+   vrSucceed_wav = purify_cast_sound
 
    vrName = purify_name_rsc
    vrIcon = purify_icon_rsc

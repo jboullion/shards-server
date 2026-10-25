@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   superstrength_cast_sound = khaste.ogg
+
    include strength.lkod
 
    superstrength_on_rsc = \
@@ -41,6 +45,8 @@ resources:
       "preparation for battle."
 
 classvars:
+
+   vrSucceed_wav = superstrength_cast_sound
    viPersonal_ench = True
    vrName = superstrength_name_rsc
    vrIcon = superstrength_icon_rsc

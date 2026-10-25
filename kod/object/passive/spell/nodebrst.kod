@@ -18,6 +18,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   nodeburst_cast_sound = qspblast.ogg
+
    include nodebrst.lkod
 
    Nodeburst_name_rsc = "nodeburst"
@@ -52,7 +56,7 @@ classvars:
 
    viCast_time = 3000
 
-   vrSucceed_wav = Nodeburst_sound
+   vrSucceed_wav = nodeburst_cast_sound
 
 properties:
 

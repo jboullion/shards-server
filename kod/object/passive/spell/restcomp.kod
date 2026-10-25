@@ -10,6 +10,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   restorecompanion_cast_sound = sraised.ogg
+
    restorecompanion_name_rsc = "restore companion"
    // Portal of Life's icon for now
    restorecompanion_icon_rsc = irasdead.bgf
@@ -19,6 +23,8 @@ resources:
    restorecompanion_not_corpse = "Only a fallen companion's body answers %s."
 
 classvars:
+
+   vrSucceed_wav = restorecompanion_cast_sound
 
    vrName = restorecompanion_name_rsc
    vrIcon = restorecompanion_icon_rsc

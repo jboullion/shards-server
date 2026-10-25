@@ -15,6 +15,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   blink_cast_sound = shadowstep.ogg
+
    include blink.lkod
 
    blink_name_rsc = "blink"
@@ -26,6 +30,8 @@ resources:
    blink_spell_intro = "Riija Level 1: The Trickster's most basic spell teleports you to the local place of power."
 
 classvars:
+
+   vrSucceed_wav = blink_cast_sound
 
    vrName = blink_name_rsc
    vrIcon = blink_icon_rsc

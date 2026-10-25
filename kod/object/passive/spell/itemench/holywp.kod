@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   holyweapon_cast_sound = sholytch.ogg
+
    include holywp.lkod
 
    holyweapon_cast_rsc = "Your %s is now dedicated to Shal'ille."
@@ -38,6 +42,8 @@ resources:
    holyweapon_label_rsc = "sanctifier"
 
 classvars:
+
+   vrSucceed_wav = holyweapon_cast_sound
 
    vrName = holyweapon_name_rsc
    vrIcon = holyweapon_icon_rsc

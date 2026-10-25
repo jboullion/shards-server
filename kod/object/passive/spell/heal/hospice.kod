@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   hospice_cast_sound = sbrthlf.ogg
+
    include hospice.lkod
 
    hospice_name_rsc = "hospice"
@@ -29,6 +33,8 @@ resources:
       "Shal'ille's holy magic rejuvenates you, restoring ~g~B%i~B~n hitpoints."
 
 classvars:
+
+   vrSucceed_wav = hospice_cast_sound
 
    vrName = hospice_name_rsc
    vrIcon = hospice_icon_rsc

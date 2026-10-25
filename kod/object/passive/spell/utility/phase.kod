@@ -18,6 +18,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   phase_cast_sound = illus11m.ogg
+
    include phase.lkod
 
    Phase_name_rsc = "phase"
@@ -62,6 +66,8 @@ resources:
       "\n\nYou have %r%r%r%r%r%r%r of %s time remaining."
 
 classvars:
+
+   vrSucceed_wav = phase_cast_sound
 
    vrName = Phase_name_rsc
    vrIcon = Phase_icon_rsc

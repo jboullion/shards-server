@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   dmdetectinvisible_cast_sound = kdetinv.ogg
+
    include dmdetinvis.lkod
 
    dm_det_invis_name_rsc = "greater detect invisible"
@@ -28,6 +32,8 @@ resources:
       "You remove the greater detect invisible enchantment from %s%s."
 
 classvars:
+
+   vrSucceed_wav = dmdetectinvisible_cast_sound
 
    vrName = dm_det_invis_name_rsc
    vrIcon = dm_det_invis_icon_rsc

@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistgood_cast_sound = karmalossevil.ogg
+
    include resgood.lkod
 
    resistgood_name_rsc = "unholy resolve"
@@ -32,6 +36,8 @@ resources:
    resistgood_off = "You no longer have resistance to good."
  
 classvars:
+
+   vrSucceed_wav = resistgood_cast_sound
 
    viPersonal_ench = TRUE
 

@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   hold_cast_sound = qparalyz.ogg
+
    include hold.lkod
 
    hold_name_rsc = "hold"
@@ -30,6 +34,8 @@ resources:
    hold_off = "The magical hold lifts and you are able to move once more."
 
 classvars:
+
+   vrSucceed_wav = hold_cast_sound
 
    vrName = hold_name_rsc
    vrIcon = hold_icon_rsc

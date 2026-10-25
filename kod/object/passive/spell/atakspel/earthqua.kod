@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   earthquake_cast_sound = fquake.ogg
+
    include earthqua.lkod
 
    earthquake_name_rsc = "earthquake"
@@ -47,6 +51,8 @@ resources:
    earthquake_sound = fquake.ogg
 
 classvars:
+
+   vrSucceed_wav = earthquake_cast_sound
 
    vrName = earthquake_name_rsc
    vrDesc = earthquake_desc_rsc

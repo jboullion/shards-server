@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   magicshield_cast_sound = shieldup.ogg
+
    include mshield.lkod
 
    magicshield_name_rsc = "magic shield"
@@ -34,6 +38,8 @@ resources:
       "A protective shield of magical energy forms around %s%s."
 
 classvars:
+
+   vrSucceed_wav = magicshield_cast_sound
 
    viPersonal_ench = TRUE
 

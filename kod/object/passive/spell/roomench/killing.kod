@@ -19,6 +19,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   killingfields_cast_sound = kblow1.ogg
+
    include killing.lkod
 
    killingfields_name_rsc = "killing fields"
@@ -40,6 +44,8 @@ resources:
       "shed blood."
 
 classvars:
+
+   vrSucceed_wav = killingfields_cast_sound
 
    vrName = killingfields_name_rsc
    vrIcon = killingfields_icon_rsc

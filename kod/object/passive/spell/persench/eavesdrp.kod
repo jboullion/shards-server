@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   eavesdrop_cast_sound = rartific.ogg
+
    include eavesdrp.lkod
 
    Eavesdrop_name_rsc = "eavesdrop"
@@ -56,7 +60,7 @@ classvars:
    
    viChance_To_Increase = 20
    viMeditate_ratio = 20
-   vrSucceed_wav = Eavesdrop_sound
+   vrSucceed_wav = eavesdrop_cast_sound
 
    vbCanCastOnOthers = FALSE
 

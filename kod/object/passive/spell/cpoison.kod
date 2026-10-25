@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   curepoison_cast_sound = healwand.ogg
+
    include cpoison.lkod
 
    curepoison_name_rsc = "cure poison"
@@ -32,6 +36,8 @@ resources:
       "through the target's body."
 
 classvars:
+
+   vrSucceed_wav = curepoison_cast_sound
 
    vrName = curepoison_name_rsc
    vrIcon = curepoison_icon_rsc

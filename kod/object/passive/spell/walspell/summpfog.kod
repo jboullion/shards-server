@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   summonpoisonfog_cast_sound = psncough.ogg
+
    include summpfog.lkod
 
    SummonPoisonFog_name_rsc = "poison gas"
@@ -47,7 +51,7 @@ classvars:
    viSpellExertion = 3
 
    viCast_time = 2000
-   vrSucceed_wav = SummonPoisonFog_sound
+   vrSucceed_wav = summonpoisonfog_cast_sound
    viChance_To_Increase = 20
    viMeditate_ratio = 30
 

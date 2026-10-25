@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   enchantweapon_cast_sound = katerup.ogg
+
    include enchwp.lkod
 
    enchantedweapon_cast_rsc = "Your %s is now dedicated to Kraanan."
@@ -38,6 +42,8 @@ resources:
    enchantweapon_label_rsc = "blood-letter"
 
 classvars:
+
+   vrSucceed_wav = enchantweapon_cast_sound
 
    vrName = enchantweapon_name_rsc
    vrIcon = enchantweapon_icon_rsc

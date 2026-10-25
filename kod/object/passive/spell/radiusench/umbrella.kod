@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   umbrella_cast_sound = shieldup.ogg
+
    include umbrella.lkod
 
    Umbrella_name_rsc = "umbrella"
@@ -42,6 +46,8 @@ resources:
    Umbrella_deflected = "%s%s's umbrella dampens the force of your attack."
 
 classvars:
+
+   vrSucceed_wav = umbrella_cast_sound
 
    vrEnchantmentOn = Umbrella_cast
    vrEnchantmentOnOther = Umbrella_starts

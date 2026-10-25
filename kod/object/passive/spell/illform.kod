@@ -19,6 +19,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   illusionaryform_cast_sound = rcountft.ogg
+
    include illform.lkod
 
    illusionaryform_name_rsc = "illusionary form"
@@ -35,6 +39,8 @@ resources:
       "Your illusionary form wears off; you appear to be yourself."
 
 classvars:
+
+   vrSucceed_wav = illusionaryform_cast_sound
 
    vrName = illusionaryform_name_rsc
    vrIcon = illusionaryform_icon_rsc

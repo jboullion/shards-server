@@ -20,6 +20,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistshock_cast_sound = kresistp.ogg
+
    include resshock.lkod
 
    resistshock_name_rsc = "resist shock"
@@ -34,6 +38,8 @@ resources:
    resistshock_off = "Faren's magic departs, leaving you vulnerable to shock attacks once more."
 
 classvars:
+
+   vrSucceed_wav = resistshock_cast_sound
 
    viPersonal_ench = True
 

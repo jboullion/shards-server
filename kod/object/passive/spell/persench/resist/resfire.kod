@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistfire_cast_sound = kresistp.ogg
+
    include resfire.lkod
 
    resistfire_name_rsc = "withstand fire"
@@ -33,6 +37,8 @@ resources:
    resistfire_spell_intro = "Faren Lv. 2: Decreases the amount of damage you take from fire based attacks."
 
 classvars:
+
+   vrSucceed_wav = resistfire_cast_sound
 
    vrName = resistfire_name_rsc
    vrIcon = resistfire_icon_rsc

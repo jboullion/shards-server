@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   truce_cast_sound = sident.ogg
+
    include truce.lkod
 
    truce_name_rsc = "truce"
@@ -43,7 +47,7 @@ classvars:
    vrIcon = truce_icon_rsc
    vrDesc = truce_desc_rsc
    vrName = truce_name_rsc
-   vrSucceed_wav = truce_sound
+   vrSucceed_wav = truce_cast_sound
    vrAlreadyEnchanted = truce_unnecessary
 
    viSpell_num = SID_TRUCE

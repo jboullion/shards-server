@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistacid_cast_sound = kresistp.ogg
+
    include resacid.lkod
 
    ResistAcid_name_rsc = "resist acid"
@@ -41,7 +45,7 @@ classvars:
    vrName = ResistAcid_name_rsc
    vrIcon = ResistAcid_icon_rsc
    vrDesc = ResistAcid_desc_rsc
-   vrSucceed_wav = ResistAcid_sound
+   vrSucceed_wav = resistacid_cast_sound
    vrSpell_intro = ResistAcid_intro
 
    viSpell_num = SID_RESIST_ACID

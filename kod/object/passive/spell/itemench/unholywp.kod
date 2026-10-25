@@ -18,6 +18,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   unholyweapon_cast_sound = qcurweap.ogg
+
    include unholywp.lkod
 
    unholyweapon_cast_rsc = "Your %s is now dedicated to Qor."
@@ -41,6 +45,8 @@ resources:
    unholyweapon_label_rsc = "supplicant of Qor"
 
 classvars:
+
+   vrSucceed_wav = unholyweapon_cast_sound
 
    vrName = unholyweapon_name_rsc
    vrIcon = unholyweapon_icon_rsc

@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   bless_cast_sound = kglow.ogg
+
    include bless.lkod
 
    bless_name_rsc = "bless"
@@ -38,6 +42,8 @@ resources:
       "combat abilities."
 
 classvars:
+
+   vrSucceed_wav = bless_cast_sound
 
    viPersonal_ench = True
 

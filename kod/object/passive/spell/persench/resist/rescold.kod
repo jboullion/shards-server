@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistcold_cast_sound = kresistp.ogg
+
    include rescold.lkod
 
    resistcold_name_rsc = "resist cold"
@@ -33,6 +37,8 @@ resources:
    resistcold_spell_intro = "Faren Lv. 2: Infuses your body with the magical fire of Faren, reducing damage from cold attacks."
 
 classvars:
+
+   vrSucceed_wav = resistcold_cast_sound
 
    viPersonal_ench = True
 

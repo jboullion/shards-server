@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistevil_cast_sound = karmalossgood.ogg
+
    include resevil.lkod
 
    resistevil_name_rsc = "holy resolve"
@@ -33,6 +37,8 @@ resources:
    resistevil_off = "You feel chilled as the fortifying spirit of Shal'ille departs."
 
 classvars:
+
+   vrSucceed_wav = resistevil_cast_sound
 
    viPersonal_ench = TRUE
 

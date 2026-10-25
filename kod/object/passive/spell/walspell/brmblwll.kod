@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   bramblewall_cast_sound = farenwala822m.ogg
+
    include brmblwll.lkod
 
    BrambleWall_name_rsc = "bramble wall"
@@ -48,7 +52,7 @@ classvars:
    viMeditate_ratio = 20
    viSpellExertion = 2
    viCast_time = 4000
-   vrSucceed_wav = BrambleWall_sound
+   vrSucceed_wav = bramblewall_cast_sound
 
    viHarmful = TRUE
 

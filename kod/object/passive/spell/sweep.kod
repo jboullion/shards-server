@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   sweep_cast_sound = fwinds.ogg
+
    include sweep.lkod
 
    Sweep_name_rsc = "sweep"
@@ -43,7 +47,7 @@ classvars:
    vrName = Sweep_name_rsc
    vrIcon = Sweep_icon_rsc
    vrDesc = Sweep_desc_rsc
-   vrSucceed_wav = Sweep_sound
+   vrSucceed_wav = sweep_cast_sound
 
    vrSpell_intro = Sweep_spell_intro_rsc
 

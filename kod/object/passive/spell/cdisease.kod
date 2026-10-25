@@ -21,6 +21,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   curedisease_cast_sound = healwand.ogg
+
    include cdisease.lkod
 
    curedisease_name_rsc = "cure disease"
@@ -33,6 +37,8 @@ resources:
    curedisease_abates = "You feel the disease grow weaker."
 
 classvars:
+
+   vrSucceed_wav = curedisease_cast_sound
 
    vrName = curedisease_name_rsc
    vrIcon = curedisease_icon_rsc

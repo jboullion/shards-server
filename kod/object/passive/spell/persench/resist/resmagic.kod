@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   resistmagic_cast_sound = kresistp.ogg
+
    include resmagic.lkod
 
    resistmagic_name_rsc = "resist magic"
@@ -30,6 +34,8 @@ resources:
    resistmagic_off = "Kraanan's magic departs, leaving you vulnerable to magic attacks once more."
 
 classvars:
+
+   vrSucceed_wav = resistmagic_cast_sound
 
    viPersonal_ench = TRUE
 

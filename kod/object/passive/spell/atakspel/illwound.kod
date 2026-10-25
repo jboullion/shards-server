@@ -15,6 +15,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   illusionarywounds_cast_sound = riluswnd.ogg
+
    include illwound.lkod
 
    illusionarywounds_name_rsc = "illusionary wounds"
@@ -47,7 +51,7 @@ classvars:
 
    viSpellExertion = 2
 
-   vrSucceed_wav = illusionarywounds_sound
+   vrSucceed_wav = illusionarywounds_cast_sound
 
    viHarmful = TRUE
    viOutlaw = TRUE

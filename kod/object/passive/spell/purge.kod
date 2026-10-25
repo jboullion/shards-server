@@ -18,6 +18,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   purge_cast_sound = sqrbane.ogg
+
    include purge.lkod
 
    Purge_name_rsc = "purge"
@@ -42,6 +46,8 @@ resources:
       "Shal'ille Lv. 5: Removes helpful personal enchantments on the target."
 
 classvars:
+
+   vrSucceed_wav = purge_cast_sound
 
    vrName = Purge_name_rsc
    vrIcon = Purge_icon_rsc

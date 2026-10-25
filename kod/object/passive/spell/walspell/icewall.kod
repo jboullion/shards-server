@@ -15,6 +15,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   icewall_cast_sound = frost.ogg
+
    IceWall_name_rsc = "icewall"
    IceWall_icon_rsc = iwallice.bgf
    IceWall_desc_rsc = \
@@ -40,7 +44,7 @@ classvars:
 
    viChance_To_Increase = 30
    viCast_time = 1000
-   vrSucceed_wav = IceWall_sound
+   vrSucceed_wav = icewall_cast_sound
    vrSuccess = IceWall_cast_rsc
 
    viHarmful = TRUE

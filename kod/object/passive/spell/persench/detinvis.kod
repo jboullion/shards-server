@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   detectinvisible_cast_sound = kdetinv.ogg
+
    include detinvis.lkod
 
    DetectInvisible_name_rsc = "detect invisible"
@@ -30,6 +34,8 @@ resources:
    DetectInvisible_Success_rsc = "%s%s eyes pulse briefly."
 
 classvars:
+
+   vrSucceed_wav = detectinvisible_cast_sound
 
    vrName = DetectInvisible_name_rsc
    vrIcon = DetectInvisible_icon_rsc

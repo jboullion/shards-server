@@ -16,6 +16,10 @@ constants:
 
 resources:
 
+   // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
+   //  (it played only its school's).
+   feigndeath_cast_sound = pdeath.ogg
+
    include fdeath.lkod
 
    feigndeath_name_rsc = "feign death"
@@ -35,6 +39,8 @@ resources:
    feigndeath_nuthin = ""
 
 classvars:
+
+   vrSucceed_wav = feigndeath_cast_sound
 
    vrName = feigndeath_name_rsc
    vrIcon = feigndeath_icon_rsc
