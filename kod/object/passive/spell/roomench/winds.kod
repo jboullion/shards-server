@@ -29,8 +29,8 @@ resources:
    winds_icon_rsc = iwinds.bgf
    winds_desc_rsc = \
       "Summons powerful winds which render ranged attacks more difficult "
-      "for a minute or more.  Each gust buffets your foes, monsters too, for "
-      "a little damage and spoils their aim.  Requires three elderberries "
+      "for a minute or more.  The gusts buffet your foes, monsters too, and "
+      "spoil their aim.  Requires three elderberries "
       "and a purple mushroom to cast."
    winds_already_enchanted = "Magical winds are already present."
    winds_on = "Violent winds suddenly sweep the area and buffet your limbs."
@@ -163,7 +163,7 @@ messages:
                   #state=First(state) % 100);
          }
 
-         Send(self,@RoomEnchantmentDamage,#oTarget=who,#state=state);
+         // Ours (25 October): the gusts no longer hurt, only spoil aim.
 
          return;
       }
@@ -175,17 +175,14 @@ messages:
          Send(who,@StartEnchantment,#what=self,#state=state);
       }
 
-      Send(self,@RoomEnchantmentDamage,#oTarget=who,#state=state);
-
       return;
    }
 
    ComputeDamage(who=$,oTarget=$,iDamage=$,iSpellPower=0)
-   "Ours (spell revamp D14): a buffeting, 1 to 3. It never kills."
+   "Ours (25 October, the user's call): Winds does no damage, only spoils aim "
+   "(D14 had it buffet for 1 to 3)."
    {
-      iDamage = 1 + (iSpellPower / 40);
-
-      return Bound(iDamage,0,Send(oTarget,@GetHealth) - 1);
+      return 0;
    }
 
    ModifyMonsterOffense(mob=$,iOffense=0,state=$)

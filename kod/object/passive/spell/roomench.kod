@@ -65,6 +65,17 @@ messages:
          return FALSE;
       }
 
+      // Ours (spell revamp, 25 October): no room spell at all in inns and
+      //  other no-combat rooms (only the harmful ones were refused, and only
+      //  after the trance).
+      if Send(oRoom,@CheckRoomFlag,#flag=ROOM_NO_COMBAT)
+         AND NOT IsClass(who,&DM)
+      {
+         Send(who,@MsgSendUser,#message_rsc=spell_bad_location,#parm1=vrName);
+
+         return FALSE;
+      }
+
       // Check for enchantment already applied.
       if Send(oRoom,@IsEnchanted,#what=self)
       {
@@ -93,9 +104,12 @@ messages:
 
       oRoom = Send(who,@GetOwner);
 
+      // Ours (25 October): any room spell in a no-combat room, not only the
+      //  harmful ones (moving into one during the trance).
       if (Send(oRoom,@CheckRoomFlag,#flag=ROOM_NO_COMBAT)
-           OR Send(oRoom,@CheckRoomFlag,#flag=ROOM_NO_MAGIC))
-         AND (viOutlaw OR viHarmful)
+          AND NOT IsClass(who,&DM))
+         OR (Send(oRoom,@CheckRoomFlag,#flag=ROOM_NO_MAGIC)
+             AND (viOutlaw OR viHarmful))
       {
          Send(who,@MsgSendUser,#message_rsc=spell_bad_location,#parm1=vrName);
 

@@ -211,7 +211,9 @@ messages:
       {
          Send(oTarget,@AddExertion,#amount=((iSpellPower + 1) / 25) * 10000);
       }
-      iDamage = 1 + (iSpellPower / 30);
+      // Ours (spell revamp, 25 October): 1 to 3 a gust by spellpower (1 below
+      //  40, 2 below 80, 3 from 80); it was 1 to 4.
+      iDamage = 1 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) / 40;
       // Don't let people die because of sandstorm.
       iDamage = Bound(iDamage,0,Send(oTarget,@GetHealth) - 1);
 
