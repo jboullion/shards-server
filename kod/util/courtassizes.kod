@@ -1,0 +1,1175 @@
+// Ours (Meridian Shards, docs/adr/0026-the-office-of-the-justicar.md): the Barloque Assizes,
+// the NPC court always in session in the Office of the Justicar (BarloqueCourt, room 115).
+//
+// The room makes one of us (CreateStandardObjects). We seat the court:
+//   - a judge, two advocates and a bailiff on the court side (rows 8 and up, behind the
+//     gallery wall);
+//   - six spectators in the gallery;
+//   - Caramo as clerk.
+// Then we play eight trials in turn, one line at a time. A trial brings its own accused and
+// witnesses (TrialCast), and they are led out at its end. A minute's recess separates the
+// trials.
+//
+// A trial (TrialScript) is a list of steps: [ role, line ] or [ role, line, act ].
+//   - The line is said by that role's NPC through the room (SomeoneSaid), as the townsfolk speak,
+//     so every client gets the chat line and ours the speech bubble.
+//   - The crowd's lines come from a random spectator. The narrator's lines (SAY_MESSAGE) have no
+//     speaker.
+//   - A step with no line ($) only does its act: a witness taking the stand or stepping down.
+//   - The pause after a line grows with its length (LineMs).
+//
+// We only run while someone is in the room. BarloqueCourt.FirstUserEntered calls ResumeCourt and
+// LastUserLeft calls PauseCourt, and a trial picks up where it stopped.
+
+////////////////////////////////////////////////////////////////////////////////
+CourtAssizes is UtilityFunctions
+
+constants:
+
+   include blakston.khd
+
+   // What a step does besides its line
+   COURT_ACT_NONE = 0
+   COURT_ACT_GAVEL = 1
+   COURT_ACT_POINT = 2
+   COURT_ACT_WAVE = 3
+   // The speaker takes the witness stand, or steps down to where they wait
+   COURT_ACT_STAND = 4
+   COURT_ACT_STEPDOWN = 5
+   // A late witness comes through the gallery gate (TrialCast's late ones aren't seated)
+   COURT_ACT_ENTER = 6
+
+   COURT_TRIALS = 8
+
+   // ms: a line's pause is about the speech bubble's time (3 s plus 60 ms a letter), within
+   // these bounds; a step with no line; the recess between trials; on resuming
+   COURT_LINE_BASE_MS = 3000
+   COURT_LINE_MS_PER_CHAR = 60
+   COURT_LINE_MIN_MS = 4500
+   COURT_LINE_MAX_MS = 11000
+   COURT_SILENT_MS = 2000
+   COURT_RECESS_MS = 60000
+   COURT_RESUME_MS = 3000
+
+resources:
+
+   ca_crowd_desc = "A citizen of Barloque, come to watch the Assizes."
+
+   ca_judge_name = "Justice Halvard Crane"
+   ca_judge_desc = \
+      "Justice Halvard Crane has sat on the bench of the Barloque Assizes for thirty years. "
+      "He has heard every excuse in the realm and believed perhaps three of them."
+   ca_pros_name = "Advocate Seraphine Moll"
+   ca_pros_desc = \
+      "Seraphine Moll argues for the Crown. Her red robes are pressed, her arguments sharper "
+      "still."
+   ca_def_name = "Advocate Tobias Wren"
+   ca_def_desc = \
+      "Tobias Wren defends whoever the court sets before him, and wins more often than the "
+      "Crown would like."
+   ca_bailiff_name = "Bailiff Gorm"
+   ca_bailiff_desc = "Bailiff Gorm keeps order in the court. He is very large, and very patient."
+
+   ca_crowd1 = "Old Hesta"
+   ca_crowd2 = "Pell the cooper"
+   ca_crowd3 = "Mirabel"
+   ca_crowd4 = "Dunstan"
+   ca_crowd5 = "Young Corin"
+   ca_crowd6 = "Widow Ash"
+
+   ca_recess = "~IThe court stands in recess.  The next case will be heard shortly."
+   ca_recess_crowd1 = "Did you see his face when the judge said 'guilty'?"
+   ca_recess_crowd2 = "I come every day.  Better than the theatre, and cheaper."
+   ca_recess_crowd3 = "My money's on the Crown in the next one."
+   ca_recess_crowd4 = "I hear the next case is a juicy one."
+
+   ////////////////////////////////////////////////////////////// 1: watered ale
+
+   ca_t1_accused = "Bartholomew Tanner"
+   ca_t1_accused_desc = "A stout tavern-keeper from the Barloque docks, sweating through his shirt."
+   ca_t1_w1 = "Mags Harrow"
+   ca_t1_w1_desc = "Bosun of the Gull's Wing, weathered as an old rope."
+   ca_t1_w2 = "Pip"
+   ca_t1_w2_desc = "An apprentice tavern boy, who would clearly rather be anywhere else."
+
+   ca_t1_01 = "All rise!  The Barloque Assizes are now in session, Justice Halvard Crane presiding."
+   ca_t1_02 = "~IThe gallery shuffles to its feet as the judge takes the bench."
+   ca_t1_03 = "Be seated.  Clerk, the first matter."
+   ca_t1_04 = \
+      "The Crown against Bartholomew Tanner, tavern-keeper of the docks, charged with watering "
+      "his ale and selling it at full price."
+   ca_t1_05 = "It's a lie, your honour!  My ale is the finest in Barloque!"
+   ca_t1_06 = "You will have your turn, Master Tanner.  Advocate Moll, for the Crown."
+   ca_t1_07 = \
+      "Your honour, the Crown will show that Master Tanner's ale is more harbour than hops.  I "
+      "call Mags Harrow, bosun of the Gull's Wing."
+   ca_t1_08 = "Aye, I'm here."
+   ca_t1_09 = "Mistress Harrow, you drank at the accused's tavern on the night in question?"
+   ca_t1_10 = \
+      "Six pints, your honour, and I walked home straight as a mast.  Never happened to me in my "
+      "life."
+   ca_t1_11 = "Ha!  Never!"
+   ca_t1_12 = "Order."
+   ca_t1_13 = \
+      "Mistress Harrow, is it not true you had eaten a whole roast goose beforehand?  That would "
+      "steady anyone."
+   ca_t1_14 = "...It were a small goose."
+   ca_t1_15 = "No further questions."
+   ca_t1_16 = "The Crown calls Pip, apprentice to the accused."
+   ca_t1_17 = "Um.  Hello, your honour."
+   ca_t1_18 = "Pip, what did your master have you do with the casks each morning?"
+   ca_t1_19 = "Top them up from the rain barrel, ma'am.  'To bring out the flavour,' he said."
+   ca_t1_20 = "Shame!"
+   ca_t1_21 = "Pip!  After all I've taught you!"
+   ca_t1_22 = "Silence!  Master Tanner, have you anything to say in your defence?"
+   ca_t1_23 = "...The rain in Barloque is very clean, your honour?"
+   ca_t1_24 = "~ILaughter ripples through the gallery."
+   ca_t1_25 = "Bartholomew Tanner, this court finds you guilty of watering your ale."
+   ca_t1_26 = \
+      "You will pay a fine of two hundred shillings and post an apology on your tavern door for "
+      "a month.  And Pip shall be paid his back wages."
+   ca_t1_27 = "Justice for the drinkers of Barloque!"
+
+   ////////////////////////////////////////////////////////////// 2: the Duke's signet
+
+   ca_t2_accused = "Edwin Fairleigh"
+   ca_t2_accused_desc = "A pale young page of the Duke's household, wringing his cap in his hands."
+   ca_t2_w1 = "Sir Roderic Vale"
+   ca_t2_w1_desc = "Steward to Duke Akardius, stiff as a new boot."
+   ca_t2_w2 = "Greta Cobb"
+   ca_t2_w2_desc = "A serving-woman from the inn at Tos, still in her apron."
+
+   ca_t2_01 = "All rise!  The Crown against Edwin Fairleigh, page to the household of the Duke."
+   ca_t2_02 = "Be seated.  The charge?"
+   ca_t2_03 = \
+      "That he did steal the signet ring of Duke Akardius from His Grace's own chambers in Tos."
+   ca_t2_04 = "The Duke's ring!  He'll hang for that."
+   ca_t2_05 = "I never touched it, your honour.  I swear it by Shal'ille."
+   ca_t2_06 = "The Crown calls Sir Roderic Vale, steward to the Duke."
+   ca_t2_07 = "Your honour."
+   ca_t2_08 = "Sir Roderic, who kept the Duke's chambers that night?"
+   ca_t2_09 = "The boy, Fairleigh.  He alone.  And in the morning the ring was gone."
+   ca_t2_10 = "Alone.  With the ring.  And by morning, gone.  The Crown need say no more."
+   ca_t2_11 = "Sir Roderic, where did the Duke dine the evening before?"
+   ca_t2_12 = "At the inn in Tos.  His Grace is fond of their stew."
+   ca_t2_13 = "And did His Grace wear the ring to supper?"
+   ca_t2_14 = "Naturally.  He never takes it off."
+   ca_t2_15 = "Then the defence calls a witness of its own.  Greta Cobb, of the inn at Tos."
+   ca_t2_16 = "Coming, coming!  Pardon me, sorry, mind your feet."
+   ca_t2_17 = "Mistress Cobb, what did you find when you cleared the Duke's table that night?"
+   ca_t2_18 = \
+      "This, sir.  At the bottom of the stew pot, it was.  I've kept it in my apron ever since, "
+      "waiting for someone to ask."
+   ca_t2_19 = "~IShe holds up a heavy gold ring.  The gallery gasps."
+   ca_t2_20 = "The ring!"
+   ca_t2_21 = "That is His Grace's signet!"
+   ca_t2_22 = "Order!  Order in my court."
+   ca_t2_23 = \
+      "It seems the ring went no further than the Duke's own supper.  Edwin Fairleigh, this court "
+      "finds you innocent."
+   ca_t2_24 = "Thank you, your honour!  Thank you, Mistress Cobb!"
+   ca_t2_25 = \
+      "The ring will go back to His Grace, with the court's advice that he eat more carefully."
+
+   ////////////////////////////////////////////////////////////// 3: the pamphleteer
+
+   ca_t3_accused = "Nell Sparrow"
+   ca_t3_accused_desc = "A wiry young woman with red paint still under her fingernails."
+   ca_t3_w1 = "Watchman Hobb"
+   ca_t3_w1_desc = "A watchman of the Barloque walls, tired of night duty."
+
+   ca_t3_01 = \
+      "All rise!  The Crown against Nell Sparrow, charged with painting sedition on the walls of "
+      "Barloque."
+   ca_t3_02 = "Be seated.  What was painted?"
+   ca_t3_03 = \
+      "'Jonas Kraanan for the people.  The Duke drinks while Barloque starves.'  In letters three "
+      "feet high, your honour, on the north gate."
+   ca_t3_04 = "~IA few in the gallery snicker, then think better of it."
+   ca_t3_05 = "The Crown calls Watchman Hobb."
+   ca_t3_06 = "Present, your honour."
+   ca_t3_07 = "Watchman, tell the court what you saw."
+   ca_t3_08 = \
+      "I was on the north wall at the second bell.  I saw her with a pot of red paint and a brush "
+      "as long as my arm."
+   ca_t3_09 = "And what did she do when you challenged her?"
+   ca_t3_10 = "She finished the 'S' in 'starves', your honour.  Then she ran."
+   ca_t3_11 = "Ha!  Brave lass."
+   ca_t3_12 = "The gallery will keep its admiration to itself."
+   ca_t3_13 = "Watchman, it was dark.  Could it have been anyone with a pot of paint?"
+   ca_t3_14 = \
+      "She had red paint on her hands, her face and her boots when we caught her.  And she was "
+      "singing."
+   ca_t3_15 = "...Singing what?"
+   ca_t3_16 = "'Jonas Kraanan for the people.'  Same as the wall."
+   ca_t3_17 = "Mistress Sparrow, do you deny it?"
+   ca_t3_18 = \
+      "Deny it?  I'm proud of it!  This war is bleeding the city dry, and somebody had to say so!"
+   ca_t3_19 = "You'll all see.  Jonas will come, and the walls will be painted with more than words!"
+   ca_t3_20 = "~IThe bailiff steps forward, one hand on his mace."
+   ca_t3_21 = "Mind your tongue in the court of the realm."
+   ca_t3_22 = \
+      "Nell Sparrow, this court finds you guilty of defacing the walls of the city, and of "
+      "sedition."
+   ca_t3_23 = \
+      "You are banished from Barloque for a year and a day.  Be found within its walls before "
+      "then, and it will go much harder for you."
+   ca_t3_24 = "Then I'll be in good company out there.  Long live the Rebellion!"
+   ca_t3_25 = "~IShe is led out, still singing."
+   ca_t3_26 = "...And someone fetch whitewash for the north gate."
+
+   ////////////////////////////////////////////////////////////// 4: the cemetery
+
+   ca_t4_accused = "Ambrose Mold"
+   ca_t4_accused_desc = "A grave-digger, stooped and earthy, his shovel confiscated at the door."
+   ca_t4_w1 = "Sister Imelda"
+   ca_t4_w1_desc = "A priestess of Shal'ille, calm as still water."
+   ca_t4_w2 = "Tilda Fenn"
+   ca_t4_w2_desc = "A widow in black, who keeps glancing over her shoulder."
+
+   ca_t4_01 = \
+      "All rise!  The Crown against Ambrose Mold, grave-digger, charged with necromancy: the "
+      "raising of the dead."
+   ca_t4_02 = "Necromancy!  In Barloque!"
+   ca_t4_03 = "Order.  Advocate Moll."
+   ca_t4_04 = \
+      "Your honour, the dead are walking near Tos, and this man digs their graves.  The Crown "
+      "calls Tilda Fenn."
+   ca_t4_05 = "Your honour.  I saw my late husband, sir.  Walking.  Without most of him."
+   ca_t4_06 = "Where, Mistress Fenn?"
+   ca_t4_07 = \
+      "In the graveyard by Tos, the night after Master Mold dug the new row.  Rattling, he was."
+   ca_t4_08 = "The grave-digger digs, and the dead walk.  Coincidence, your honour?"
+   ca_t4_09 = "I dig holes, your honour!  I put folk in them!  I don't get them out again!"
+   ca_t4_10 = "The defence calls Sister Imelda, of the temple of Shal'ille."
+   ca_t4_11 = "Peace be with this court."
+   ca_t4_12 = "Sister, what raises the dead near Tos?"
+   ca_t4_13 = \
+      "Nothing so simple as a grave-digger.  The ground there is old and sour with dark magic.  "
+      "The dead have risen near Tos since long before Master Mold was born."
+   ca_t4_14 = "Could a man with a shovel do such a thing?"
+   ca_t4_15 = \
+      "Necromancy takes years of study, rare reagents and a great deal of wickedness.  Master "
+      "Mold has none of these."
+   ca_t4_16 = "...I've got a very good shovel."
+   ca_t4_17 = "Ha!"
+   ca_t4_18 = \
+      "Mistress Fenn, I am sorry for your loss, and for your fright.  But this court cannot hang a "
+      "man for the nature of the soil."
+   ca_t4_19 = "Ambrose Mold, you are found innocent."
+   ca_t4_20 = \
+      "The court orders the graveyard at Tos sealed after dark.  Any brave soul who would put the "
+      "risen dead back in their graves may ask the clerk: the Office pays for such work."
+   ca_t4_21 = "Thank you, your honour.  I'll dig them deeper from now on."
+
+   ////////////////////////////////////////////////////////////// 5: the cow
+
+   ca_t5_accused = "Wenna Thorne"
+   ca_t5_accused_desc = "A farmer from Marion, arms folded, chin out."
+   ca_t5_w1 = "Joss Brindle"
+   ca_t5_w1_desc = "A farmer from Marion, red in the face and staying that way."
+   ca_t5_w2 = "Reeve Albin Croft"
+   ca_t5_w2_desc = "The reeve of Marion, who has clearly heard about this cow before."
+
+   ca_t5_01 = "All rise!  The matter of Brindle against Thorne, farmers of Marion, concerning a cow."
+   ca_t5_02 = "A cow."
+   ca_t5_03 = "Yes, your honour.  Her name is Buttercup."
+   ca_t5_04 = "Ha!  Buttercup!"
+   ca_t5_05 = "Proceed."
+   ca_t5_06 = "Your honour, Buttercup was born on my land, of my cow, and she's mine."
+   ca_t5_07 = "She's eaten my grass for three years!  Every drop of milk in her came out of my field!"
+   ca_t5_08 = "The fence is on your side of the brook!"
+   ca_t5_09 = "The brook moved!"
+   ca_t5_10 = "Order.  Advocate Wren, you speak for Mistress Thorne?"
+   ca_t5_11 = "I do, your honour, and I would like to call Buttercup herself as a witness."
+   ca_t5_12 = "~IThere is a long silence in the court."
+   ca_t5_13 = "...The cow is outside?"
+   ca_t5_14 = "Tied to the post by the door, your honour."
+   ca_t5_15 = "The court declines to hear the cow."
+   ca_t5_16 = "Let the cow speak!"
+   ca_t5_17 = "Perhaps the reeve of Marion can help, your honour.  We call Reeve Albin Croft."
+   ca_t5_18 = "Your honour, that brook has moved three times since I was a boy.  Floods."
+   ca_t5_19 = "So whose land is the cow's field?"
+   ca_t5_20 = "Both, your honour.  And neither.  It depends on the rain."
+   ca_t5_21 = "Then the court shall be as wise as the rain."
+   ca_t5_22 = \
+      "Buttercup will spend the summer in Master Brindle's barn and the winter in Mistress "
+      "Thorne's.  Her calves will be shared, one each, the elder of you first."
+   ca_t5_23 = "I'm the elder!"
+   ca_t5_24 = "By a week!"
+   ca_t5_25 = "And the two of you will mend the fence.  Together."
+   ca_t5_26 = "~IOutside, a cow moos, as if in agreement."
+
+   ////////////////////////////////////////////////////////////// 6: the forged writ
+
+   ca_t6_accused = "Captain Corwin Slate"
+   ca_t6_accused_desc = "Master of the ship Tide's Wager, with a smile that has sold a lot of brandy."
+   ca_t6_w1 = "Harbourmaster Ysolde Brack"
+   ca_t6_w1_desc = "The harbourmaster of Ko'catan, who has seen every trick a smuggler knows."
+   ca_t6_w2 = "Master Penwick"
+   ca_t6_w2_desc = "A scribe of the royal court, ink to the elbows."
+
+   ca_t6_01 = \
+      "All rise!  The Crown against Corwin Slate, master of the Tide's Wager, charged with "
+      "forging a writ of passage under the Princess's seal."
+   ca_t6_02 = "Be seated.  Advocate Moll."
+   ca_t6_03 = "The Crown calls Ysolde Brack, harbourmaster of Ko'catan."
+   ca_t6_04 = "Your honour."
+   ca_t6_05 = "Harbourmaster, what did the accused show you when his ship came in?"
+   ca_t6_06 = \
+      "A writ of passage, sealed by Princess Kateriina herself, saying his hold was to go "
+      "unsearched."
+   ca_t6_07 = "And did you search it?"
+   ca_t6_08 = \
+      "Not that day.  The next day I did.  Forty barrels of Jasper brandy, and not a coin of duty "
+      "paid on any of them."
+   ca_t6_09 = "Forty barrels!"
+   ca_t6_10 = "The Crown calls Master Penwick, scribe to the royal court."
+   ca_t6_11 = "Present."
+   ca_t6_12 = "Master Penwick, you have examined the writ.  Is the seal the Princess's?"
+   ca_t6_13 = "It is not.  The Princess's seal shows a rose of seven petals.  This one has eight."
+   ca_t6_14 = "Also, the writ spells 'Kateriina' with three i's."
+   ca_t6_15 = "Ha!"
+   ca_t6_16 = \
+      "Your honour, my client maintains he bought the writ in good faith, from a man in a tavern."
+   ca_t6_17 = "What man?"
+   ca_t6_18 = "A... tall one, your honour.  With a hat.  A very official hat."
+   ca_t6_19 = "Master Slate, did it not strike you as odd to buy a royal writ in a tavern?"
+   ca_t6_20 = "It was a very nice tavern."
+   ca_t6_21 = "Corwin Slate, this court finds you guilty of forgery and of smuggling."
+   ca_t6_22 = \
+      "Your ship is forfeit to the Crown, and the brandy with it, and you will spend three months "
+      "in the Barloque stocks."
+   ca_t6_23 = "The brandy too?  Your honour, that's the cruellest part."
+   ca_t6_24 = "The brandy will be put to good use."
+   ca_t6_25 = "~IThe judge glances, very briefly, at the bailiff."
+
+   ////////////////////////////////////////////////////////////// 7: the missing apprentice
+
+   ca_t7_accused = "Magus Orrin Vail"
+   ca_t7_accused_desc = "A mage of Shal'ille from Jasper, his robes singed at the hem."
+   ca_t7_w1 = "Hanna Quill"
+   ca_t7_w1_desc = "A mother from Jasper, frantic and furious in equal measure."
+   ca_t7_w2 = "Tam Quill"
+   ca_t7_w2_desc = "A dusty young apprentice, with a sack over his shoulder."
+
+   ca_t7_01 = \
+      "All rise!  The Crown against Orrin Vail, mage of Jasper, charged in the disappearance of "
+      "his apprentice, Tam Quill."
+   ca_t7_02 = "Be seated.  Advocate Moll."
+   ca_t7_03 = "The Crown calls Hanna Quill, the boy's mother."
+   ca_t7_04 = \
+      "Your honour, my Tam went to study with that man in the spring, and I've not had a word "
+      "from him in a month."
+   ca_t7_05 = "And when you went to Master Vail's tower?"
+   ca_t7_06 = "There was a scorch mark on the floor the shape of a boy, your honour.  A scorch mark!"
+   ca_t7_07 = "Gods have mercy..."
+   ca_t7_08 = "It was a practice circle!  Every apprentice leaves scorch marks!"
+   ca_t7_09 = "You will have your turn, Magus."
+   ca_t7_10 = "Magus Vail, tell the court where your apprentice went."
+   ca_t7_11 = \
+      "I sent him to fetch emeralds from the far mines.  A simple errand.  He should have been "
+      "back in a week."
+   ca_t7_12 = "A week.  It has been a month.  And there is a scorch mark."
+   ca_t7_13 = \
+      "Your honour, the mages of Jasper are known for their experiments.  The Crown fears this one "
+      "went wrong."
+   ca_t7_14 = "My art is light and mending!  I have never burned anyone in my life!"
+   ca_t7_15 = "Has the defence anything more?"
+   ca_t7_16 = "Only Master Vail's word, your honour."
+   ca_t7_17 = "Then the court must consider--"
+   ca_t7_18 = "Wait!  Wait!  Don't hang him!"
+   ca_t7_19 = "~IA dusty young man bursts through the gallery gate, a sack over his shoulder."
+   ca_t7_20 = "Tam!"
+   ca_t7_21 = \
+      "Sorry I'm late, master.  The emerald mine was full of trolls.  I had to wait for them to "
+      "leave.  They didn't leave for weeks."
+   ca_t7_22 = "Did you get the emeralds?"
+   ca_t7_23 = "...Two."
+   ca_t7_24 = "Ha!"
+   ca_t7_25 = \
+      "Order!  Orrin Vail, with your apprentice alive, well and standing in my court, you are "
+      "found innocent."
+   ca_t7_26 = "And Magus: in future, send your apprentices on errands they can survive."
+   ca_t7_27 = "Tam, you're coming home for supper.  Now."
+
+   ////////////////////////////////////////////////////////////// 8: the truce
+
+   ca_t8_accused = "Sergeant Brannoc Hale"
+   ca_t8_accused_desc = "A soldier of the war, boots worn through and head bowed."
+   ca_t8_w1 = "Quartermaster Lisbet Orme"
+   ca_t8_w1_desc = "The quartermaster of a field army, with a bruise on her cheek."
+   ca_t8_w2 = "Corporal Fenwick Dray"
+   ca_t8_w2_desc = "A corporal who marched with the sergeant, and wishes he hadn't been asked."
+
+   ca_t8_01 = \
+      "All rise!  The Crown against Sergeant Brannoc Hale, charged with striking the "
+      "quartermaster of his own army in time of war."
+   ca_t8_02 = "His own side!"
+   ca_t8_03 = "Be seated.  Advocate Moll."
+   ca_t8_04 = "The Crown calls the quartermaster, Lisbet Orme."
+   ca_t8_05 = "Your honour."
+   ca_t8_06 = "Quartermaster, what happened at the supply tent?"
+   ca_t8_07 = \
+      "The sergeant asked for new boots.  I told him the boots had gone to the front.  He struck "
+      "me with a ladle."
+   ca_t8_08 = "A ladle?"
+   ca_t8_09 = "It was what he had to hand, your honour.  It was a heavy ladle."
+   ca_t8_10 = "Ha!"
+   ca_t8_11 = "The defence calls Corporal Fenwick Dray, who was there."
+   ca_t8_12 = "Sir."
+   ca_t8_13 = "Corporal, had the sergeant marched far that day?"
+   ca_t8_14 = \
+      "From the flag at the river crossing, sir, two days without rest.  His boots were more hole "
+      "than boot."
+   ca_t8_15 = "So he was tired, sore and provoked?"
+   ca_t8_16 = "Very provoked, sir.  But... he did hit her with the ladle, sir.  Twice."
+   ca_t8_17 = "Sergeant Hale, what have you to say?"
+   ca_t8_18 = \
+      "I was wrong, your honour.  I've fought the enemy at every flag from here to Tos, and I "
+      "raised my hand to my own.  There's no excuse."
+   ca_t8_19 = "~IThe gallery falls quiet."
+   ca_t8_20 = "That is the most honest thing this court has heard all day."
+   ca_t8_21 = \
+      "A soldier who strikes his own side weakens his whole army.  Renown is built on loyalty, "
+      "and lost the same way."
+   ca_t8_22 = \
+      "Brannoc Hale, this court finds you guilty.  You are stripped of your rank, and will serve "
+      "as a common soldier until you earn it back."
+   ca_t8_23 = "...And the boots, your honour?"
+   ca_t8_24 = "The quartermaster will find you boots.  The court suggests you say please."
+   ca_t8_25 = "So recorded."
+
+classvars:
+
+properties:
+
+   poRoom = $
+   // [ role, NPC ] for the court, Caramo excepted; the spectators are kept apart
+   plCast = $
+   plCrowd = $
+   // The trial being heard (1 to COURT_TRIALS), and its next step (0: in recess, the trial
+   // not yet begun)
+   piTrial = 1
+   piStep = 0
+   ptStep = $
+   // Percent of the usual pauses, for testing over the maintenance port (100 to play)
+   piPace = 100
+
+messages:
+
+   Constructor(court_room = $)
+   {
+      poRoom = court_room;
+      Send(self,@SeatCourt);
+
+      return;
+   }
+
+   Delete()
+   {
+      local i;
+
+      if ptStep <> $
+      {
+         DeleteTimer(ptStep);
+         ptStep = $;
+      }
+
+      foreach i in plCast
+      {
+         if IsObject(Nth(i,2))
+         {
+            Send(Nth(i,2),@Delete);
+         }
+      }
+
+      foreach i in plCrowd
+      {
+         if IsObject(i)
+         {
+            Send(i,@Delete);
+         }
+      }
+
+      plCast = $;
+      plCrowd = $;
+      poRoom = $;
+
+      return;
+   }
+
+   SetPace(percent = 100)
+   "For testing: run the pauses at this percent of their length."
+   {
+      piPace = Bound(percent,1,1000);
+
+      return;
+   }
+
+   SkipToTrial(num = 1)
+   "For testing: end the trial being heard and hear this one next."
+   {
+      Send(self,@EndTrial);
+      piTrial = Bound(num,1,COURT_TRIALS);
+      Send(self,@Arm,#ms=COURT_RESUME_MS);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// seating the court
+
+   SeatCourt()
+   "The judge, the advocates, the bailiff and the gallery."
+   {
+      local oFolk, lCrowd, i;
+
+      plCast = $;
+      Send(self,@AddCast,#role=COURT_ROLE_JUDGE,#dress=COURT_LOOK_JUDGE,#female=FALSE,
+           #name=ca_judge_name,#desc=ca_judge_desc);
+      Send(self,@AddCast,#role=COURT_ROLE_PROSECUTOR,#dress=COURT_LOOK_PROSECUTOR,#female=TRUE,
+           #name=ca_pros_name,#desc=ca_pros_desc);
+      Send(self,@AddCast,#role=COURT_ROLE_DEFENDER,#dress=COURT_LOOK_DEFENDER,#female=FALSE,
+           #name=ca_def_name,#desc=ca_def_desc);
+      Send(self,@AddCast,#role=COURT_ROLE_BAILIFF,#dress=COURT_LOOK_BAILIFF,#female=FALSE,
+           #name=ca_bailiff_name,#desc=ca_bailiff_desc);
+
+      // The gallery: rows 3-5, south of the Book of Jala and clear of the town exits and the
+      //  gate (6,11)
+      plCrowd = $;
+      lCrowd = [ [ca_crowd1,TRUE,5,7], [ca_crowd2,FALSE,5,9], [ca_crowd3,TRUE,4,8],
+                 [ca_crowd4,FALSE,4,10], [ca_crowd5,FALSE,3,7], [ca_crowd6,TRUE,5,5] ];
+      foreach i in lCrowd
+      {
+         oFolk = Create(&CourtFolk,#role=COURT_ROLE_CROWD,#dress=COURT_LOOK_COMMONER,
+                        #female=Nth(i,2),#name=First(i),#desc=ca_crowd_desc);
+         Send(self,@PlaceAt,#what=oFolk,#row=Nth(i,3),#col=Nth(i,4),#angle=ANGLE_SOUTH);
+         plCrowd = Cons(oFolk,plCrowd);
+      }
+
+      return;
+   }
+
+   AddCast(role = 0,dress = COURT_LOOK_COMMONER,female = $,name = $,desc = $,seat = TRUE)
+   "One of the court, at their place unless seat is FALSE (a late witness: COURT_ACT_ENTER)."
+   {
+      local oFolk, lHome;
+
+      oFolk = Create(&CourtFolk,#role=role,#dress=dress,#female=female,#name=name,#desc=desc);
+      plCast = Cons([role,oFolk],plCast);
+      if seat
+      {
+         lHome = Send(self,@Home,#role=role);
+         Send(self,@PlaceAt,#what=oFolk,#row=First(lHome),#col=Nth(lHome,2),
+              #angle=Nth(lHome,3));
+      }
+
+      return oFolk;
+   }
+
+   Home(role = 0)
+   "[ row, col, angle ]: where each of the court stands. The bench is along the south wall, "
+   "the witness stand beside it; the advocates and the accused face it."
+   {
+      if role = COURT_ROLE_JUDGE
+      {
+         return [ 14, 7, ANGLE_NORTH ];
+      }
+
+      if role = COURT_ROLE_BAILIFF
+      {
+         return [ 13, 5, ANGLE_NORTH ];
+      }
+
+      if role = COURT_ROLE_PROSECUTOR
+      {
+         return [ 10, 5, ANGLE_SOUTH ];
+      }
+
+      if role = COURT_ROLE_DEFENDER
+      {
+         return [ 10, 9, ANGLE_SOUTH ];
+      }
+
+      if role = COURT_ROLE_ACCUSED
+      {
+         return [ 11, 7, ANGLE_SOUTH ];
+      }
+
+      if role = COURT_ROLE_WITNESS1
+      {
+         return [ 9, 3, ANGLE_EAST ];
+      }
+
+      // The second witness
+      return [ 10, 3, ANGLE_EAST ];
+   }
+
+   PlaceAt(what = $,row = 1,col = 1,angle = ANGLE_SOUTH)
+   {
+      if poRoom = $ OR what = $
+      {
+         return;
+      }
+
+      Send(SYS,@UtilGoNearSquare,#what=what,#where=poRoom,#new_row=row,#new_col=col,
+           #new_angle=angle,#mob_override=TRUE);
+
+      return;
+   }
+
+   SpeakerFor(role = 0)
+   "Who speaks for a role: one of the court, Caramo as clerk, or a random spectator."
+   {
+      local i;
+
+      if role = COURT_ROLE_CLERK
+      {
+         if poRoom = $
+         {
+            return $;
+         }
+
+         return Send(poRoom,@GetClerk);
+      }
+
+      if role = COURT_ROLE_CROWD
+      {
+         if plCrowd = $
+         {
+            return $;
+         }
+
+         return Nth(plCrowd,Random(1,Length(plCrowd)));
+      }
+
+      if role = COURT_ROLE_NARRATOR
+      {
+         role = COURT_ROLE_JUDGE;
+      }
+
+      foreach i in plCast
+      {
+         if First(i) = role
+         {
+            return Nth(i,2);
+         }
+      }
+
+      return $;
+   }
+
+   ////////////////////////////////////////////////////////////// running
+
+   ResumeCourt()
+   "Someone came in: the court sits again."
+   {
+      if ptStep = $
+      {
+         Send(self,@Arm,#ms=COURT_RESUME_MS);
+      }
+
+      return;
+   }
+
+   PauseCourt()
+   "The room is empty: nobody to hear it, so the court waits."
+   {
+      if ptStep <> $
+      {
+         DeleteTimer(ptStep);
+         ptStep = $;
+      }
+
+      return;
+   }
+
+   Arm(ms = 1000)
+   {
+      if ptStep <> $
+      {
+         DeleteTimer(ptStep);
+      }
+
+      ptStep = CreateTimer(self,@NextStep,Bound(ms * piPace / 100,100,$));
+
+      return;
+   }
+
+   NextStep()
+   "The next line of the trial being heard, or the next trial after a recess."
+   {
+      local lScript, iMs;
+
+      ptStep = $;
+      if poRoom = $ OR NOT Send(poRoom,@IsUserInRoom)
+      {
+         return;
+      }
+
+      if piStep = 0
+      {
+         Send(self,@BeginTrial);
+         piStep = 1;
+      }
+
+      lScript = Send(self,@TrialScript,#num=piTrial);
+      if piStep > Length(lScript)
+      {
+         Send(self,@EndTrial);
+         piTrial = (piTrial % COURT_TRIALS) + 1;
+         Send(self,@Arm,#ms=COURT_RECESS_MS);
+
+         return;
+      }
+
+      iMs = Send(self,@PlayStep,#step=Nth(lScript,piStep));
+      piStep = piStep + 1;
+      Send(self,@Arm,#ms=iMs);
+
+      return;
+   }
+
+   BeginTrial()
+   "The trial's accused and witnesses come in."
+   {
+      local i, bLate;
+
+      foreach i in Send(self,@TrialCast,#num=piTrial)
+      {
+         bLate = (Length(i) >= 6 AND Nth(i,6));
+         Send(self,@AddCast,#role=First(i),#name=Nth(i,2),#desc=Nth(i,3),#dress=Nth(i,4),
+              #female=Nth(i,5),#seat=NOT bLate);
+      }
+
+      return;
+   }
+
+   EndTrial()
+   "The trial's accused and witnesses are led out, and the court rises for a recess."
+   {
+      local i, lKeep, oSpeaker;
+
+      lKeep = $;
+      foreach i in plCast
+      {
+         if First(i) = COURT_ROLE_ACCUSED OR First(i) = COURT_ROLE_WITNESS1
+            OR First(i) = COURT_ROLE_WITNESS2
+         {
+            if IsObject(Nth(i,2))
+            {
+               Send(Nth(i,2),@Delete);
+            }
+         }
+         else
+         {
+            lKeep = Cons(i,lKeep);
+         }
+      }
+
+      plCast = lKeep;
+      piStep = 0;
+
+      if poRoom = $ OR NOT Send(poRoom,@IsUserInRoom)
+      {
+         return;
+      }
+
+      Send(self,@Say,#role=COURT_ROLE_NARRATOR,#line=ca_recess);
+      oSpeaker = Send(self,@SpeakerFor,#role=COURT_ROLE_CROWD);
+      if oSpeaker <> $
+      {
+         Send(poRoom,@SomeoneSaid,#what=oSpeaker,#type=SAY_RESOURCE,
+              #string=Nth([ ca_recess_crowd1, ca_recess_crowd2, ca_recess_crowd3,
+                            ca_recess_crowd4 ],Random(1,4)));
+      }
+
+      return;
+   }
+
+   PlayStep(step = $)
+   "Says a step's line and does its act. Returns the ms until the next step."
+   {
+      local iRole, rLine, iAct, oActor, lHome;
+
+      iRole = First(step);
+      rLine = Nth(step,2);
+      iAct = COURT_ACT_NONE;
+      if Length(step) >= 3
+      {
+         iAct = Nth(step,3);
+      }
+
+      oActor = Send(self,@SpeakerFor,#role=iRole);
+      if oActor <> $ AND iRole <> COURT_ROLE_CLERK AND iRole <> COURT_ROLE_NARRATOR
+      {
+         if iAct = COURT_ACT_GAVEL
+         {
+            Send(oActor,@Gavel);
+         }
+         else if iAct = COURT_ACT_POINT
+         {
+            Send(oActor,@DoPoint);
+         }
+         else if iAct = COURT_ACT_WAVE
+         {
+            Send(oActor,@DoWave);
+         }
+         else if iAct = COURT_ACT_STAND
+         {
+            Send(self,@PlaceAt,#what=oActor,#row=13,#col=9,#angle=ANGLE_NORTH);
+         }
+         else if iAct = COURT_ACT_STEPDOWN
+         {
+            lHome = Send(self,@Home,#role=iRole);
+            Send(self,@PlaceAt,#what=oActor,#row=First(lHome),#col=Nth(lHome,2),
+                 #angle=Nth(lHome,3));
+         }
+         else if iAct = COURT_ACT_ENTER
+         {
+            Send(self,@PlaceAt,#what=oActor,#row=8,#col=11,#angle=ANGLE_SOUTH);
+         }
+      }
+
+      if rLine = $
+      {
+         return COURT_SILENT_MS;
+      }
+
+      Send(self,@Say,#role=iRole,#line=rLine);
+
+      return Bound(COURT_LINE_BASE_MS + COURT_LINE_MS_PER_CHAR * StringLength(rLine),
+                   COURT_LINE_MIN_MS,COURT_LINE_MAX_MS);
+   }
+
+   Say(role = 0,line = $)
+   {
+      local oActor;
+
+      oActor = Send(self,@SpeakerFor,#role=role);
+      if oActor = $ OR poRoom = $ OR line = $
+      {
+         return;
+      }
+
+      if role = COURT_ROLE_NARRATOR
+      {
+         Send(poRoom,@SomeoneSaid,#what=oActor,#type=SAY_MESSAGE,#string=line);
+
+         return;
+      }
+
+      Send(poRoom,@SomeoneSaid,#what=oActor,#type=SAY_RESOURCE,#string=line);
+
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// the trials
+
+   TrialCast(num = 1)
+   "[ role, name, description, look, female, late ] for a trial's accused and witnesses."
+   {
+      if num = 2
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t2_accused,ca_t2_accused_desc,COURT_LOOK_COMMONER,FALSE],
+                  [COURT_ROLE_WITNESS1,ca_t2_w1,ca_t2_w1_desc,COURT_LOOK_NOBLE,FALSE],
+                  [COURT_ROLE_WITNESS2,ca_t2_w2,ca_t2_w2_desc,COURT_LOOK_COMMONER,TRUE,TRUE] ];
+      }
+
+      if num = 3
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t3_accused,ca_t3_accused_desc,COURT_LOOK_COMMONER,TRUE],
+                  [COURT_ROLE_WITNESS1,ca_t3_w1,ca_t3_w1_desc,COURT_LOOK_SOLDIER,FALSE] ];
+      }
+
+      if num = 4
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t4_accused,ca_t4_accused_desc,COURT_LOOK_COMMONER,FALSE],
+                  [COURT_ROLE_WITNESS1,ca_t4_w1,ca_t4_w1_desc,COURT_LOOK_MAGE,TRUE],
+                  [COURT_ROLE_WITNESS2,ca_t4_w2,ca_t4_w2_desc,COURT_LOOK_COMMONER,TRUE] ];
+      }
+
+      if num = 5
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t5_accused,ca_t5_accused_desc,COURT_LOOK_COMMONER,TRUE],
+                  [COURT_ROLE_WITNESS1,ca_t5_w1,ca_t5_w1_desc,COURT_LOOK_COMMONER,FALSE],
+                  [COURT_ROLE_WITNESS2,ca_t5_w2,ca_t5_w2_desc,COURT_LOOK_NOBLE,FALSE] ];
+      }
+
+      if num = 6
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t6_accused,ca_t6_accused_desc,COURT_LOOK_SOLDIER,FALSE],
+                  [COURT_ROLE_WITNESS1,ca_t6_w1,ca_t6_w1_desc,COURT_LOOK_SOLDIER,TRUE],
+                  [COURT_ROLE_WITNESS2,ca_t6_w2,ca_t6_w2_desc,COURT_LOOK_MAGE,FALSE] ];
+      }
+
+      if num = 7
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t7_accused,ca_t7_accused_desc,COURT_LOOK_MAGE,FALSE],
+                  [COURT_ROLE_WITNESS1,ca_t7_w1,ca_t7_w1_desc,COURT_LOOK_COMMONER,TRUE],
+                  [COURT_ROLE_WITNESS2,ca_t7_w2,ca_t7_w2_desc,COURT_LOOK_COMMONER,FALSE,TRUE] ];
+      }
+
+      if num = 8
+      {
+         return [ [COURT_ROLE_ACCUSED,ca_t8_accused,ca_t8_accused_desc,COURT_LOOK_SOLDIER,FALSE],
+                  [COURT_ROLE_WITNESS1,ca_t8_w1,ca_t8_w1_desc,COURT_LOOK_SOLDIER,TRUE],
+                  [COURT_ROLE_WITNESS2,ca_t8_w2,ca_t8_w2_desc,COURT_LOOK_SOLDIER,FALSE] ];
+      }
+
+      return [ [COURT_ROLE_ACCUSED,ca_t1_accused,ca_t1_accused_desc,COURT_LOOK_COMMONER,FALSE],
+               [COURT_ROLE_WITNESS1,ca_t1_w1,ca_t1_w1_desc,COURT_LOOK_SOLDIER,TRUE],
+               [COURT_ROLE_WITNESS2,ca_t1_w2,ca_t1_w2_desc,COURT_LOOK_COMMONER,FALSE] ];
+   }
+
+   TrialScript(num = 1)
+   "A trial's steps: [ role, line ] or [ role, line, act ] (see the top of the file)."
+   {
+      if num = 2
+      {
+         return [ [COURT_ROLE_CLERK,ca_t2_01],
+                  [COURT_ROLE_JUDGE,ca_t2_02,COURT_ACT_GAVEL],
+                  [COURT_ROLE_CLERK,ca_t2_03],
+                  [COURT_ROLE_CROWD,ca_t2_04],
+                  [COURT_ROLE_ACCUSED,ca_t2_05],
+                  [COURT_ROLE_PROSECUTOR,ca_t2_06],
+                  [COURT_ROLE_WITNESS1,ca_t2_07,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t2_08],
+                  [COURT_ROLE_WITNESS1,ca_t2_09],
+                  [COURT_ROLE_PROSECUTOR,ca_t2_10,COURT_ACT_POINT],
+                  [COURT_ROLE_DEFENDER,ca_t2_11],
+                  [COURT_ROLE_WITNESS1,ca_t2_12],
+                  [COURT_ROLE_DEFENDER,ca_t2_13],
+                  [COURT_ROLE_WITNESS1,ca_t2_14],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_DEFENDER,ca_t2_15],
+                  [COURT_ROLE_WITNESS2,ca_t2_16,COURT_ACT_ENTER],
+                  [COURT_ROLE_WITNESS2,$,COURT_ACT_STAND],
+                  [COURT_ROLE_DEFENDER,ca_t2_17],
+                  [COURT_ROLE_WITNESS2,ca_t2_18],
+                  [COURT_ROLE_NARRATOR,ca_t2_19],
+                  [COURT_ROLE_CROWD,ca_t2_20],
+                  [COURT_ROLE_WITNESS1,ca_t2_21,COURT_ACT_POINT],
+                  [COURT_ROLE_JUDGE,ca_t2_22,COURT_ACT_GAVEL],
+                  [COURT_ROLE_JUDGE,ca_t2_23],
+                  [COURT_ROLE_ACCUSED,ca_t2_24,COURT_ACT_WAVE],
+                  [COURT_ROLE_JUDGE,ca_t2_25,COURT_ACT_GAVEL] ];
+      }
+
+      if num = 3
+      {
+         return [ [COURT_ROLE_CLERK,ca_t3_01],
+                  [COURT_ROLE_JUDGE,ca_t3_02,COURT_ACT_GAVEL],
+                  [COURT_ROLE_CLERK,ca_t3_03],
+                  [COURT_ROLE_NARRATOR,ca_t3_04],
+                  [COURT_ROLE_PROSECUTOR,ca_t3_05],
+                  [COURT_ROLE_WITNESS1,ca_t3_06,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t3_07],
+                  [COURT_ROLE_WITNESS1,ca_t3_08],
+                  [COURT_ROLE_PROSECUTOR,ca_t3_09],
+                  [COURT_ROLE_WITNESS1,ca_t3_10],
+                  [COURT_ROLE_CROWD,ca_t3_11],
+                  [COURT_ROLE_JUDGE,ca_t3_12,COURT_ACT_GAVEL],
+                  [COURT_ROLE_DEFENDER,ca_t3_13],
+                  [COURT_ROLE_WITNESS1,ca_t3_14],
+                  [COURT_ROLE_DEFENDER,ca_t3_15],
+                  [COURT_ROLE_WITNESS1,ca_t3_16],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_JUDGE,ca_t3_17],
+                  [COURT_ROLE_ACCUSED,ca_t3_18],
+                  [COURT_ROLE_ACCUSED,ca_t3_19,COURT_ACT_POINT],
+                  [COURT_ROLE_NARRATOR,ca_t3_20],
+                  [COURT_ROLE_BAILIFF,ca_t3_21],
+                  [COURT_ROLE_JUDGE,ca_t3_22,COURT_ACT_GAVEL],
+                  [COURT_ROLE_JUDGE,ca_t3_23],
+                  [COURT_ROLE_ACCUSED,ca_t3_24,COURT_ACT_WAVE],
+                  [COURT_ROLE_NARRATOR,ca_t3_25],
+                  [COURT_ROLE_JUDGE,ca_t3_26,COURT_ACT_GAVEL] ];
+      }
+
+      if num = 4
+      {
+         return [ [COURT_ROLE_CLERK,ca_t4_01],
+                  [COURT_ROLE_CROWD,ca_t4_02],
+                  [COURT_ROLE_JUDGE,ca_t4_03,COURT_ACT_GAVEL],
+                  [COURT_ROLE_PROSECUTOR,ca_t4_04],
+                  [COURT_ROLE_WITNESS2,ca_t4_05,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t4_06],
+                  [COURT_ROLE_WITNESS2,ca_t4_07],
+                  [COURT_ROLE_PROSECUTOR,ca_t4_08,COURT_ACT_POINT],
+                  [COURT_ROLE_ACCUSED,ca_t4_09],
+                  [COURT_ROLE_WITNESS2,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_DEFENDER,ca_t4_10],
+                  [COURT_ROLE_WITNESS1,ca_t4_11,COURT_ACT_STAND],
+                  [COURT_ROLE_DEFENDER,ca_t4_12],
+                  [COURT_ROLE_WITNESS1,ca_t4_13],
+                  [COURT_ROLE_DEFENDER,ca_t4_14],
+                  [COURT_ROLE_WITNESS1,ca_t4_15],
+                  [COURT_ROLE_ACCUSED,ca_t4_16],
+                  [COURT_ROLE_CROWD,ca_t4_17],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_JUDGE,ca_t4_18],
+                  [COURT_ROLE_JUDGE,ca_t4_19,COURT_ACT_GAVEL],
+                  [COURT_ROLE_JUDGE,ca_t4_20],
+                  [COURT_ROLE_ACCUSED,ca_t4_21,COURT_ACT_WAVE] ];
+      }
+
+      if num = 5
+      {
+         return [ [COURT_ROLE_CLERK,ca_t5_01],
+                  [COURT_ROLE_JUDGE,ca_t5_02],
+                  [COURT_ROLE_CLERK,ca_t5_03],
+                  [COURT_ROLE_CROWD,ca_t5_04],
+                  [COURT_ROLE_JUDGE,ca_t5_05,COURT_ACT_GAVEL],
+                  [COURT_ROLE_WITNESS1,ca_t5_06,COURT_ACT_STAND],
+                  [COURT_ROLE_ACCUSED,ca_t5_07,COURT_ACT_POINT],
+                  [COURT_ROLE_WITNESS1,ca_t5_08],
+                  [COURT_ROLE_ACCUSED,ca_t5_09],
+                  [COURT_ROLE_JUDGE,ca_t5_10,COURT_ACT_GAVEL],
+                  [COURT_ROLE_DEFENDER,ca_t5_11],
+                  [COURT_ROLE_NARRATOR,ca_t5_12],
+                  [COURT_ROLE_JUDGE,ca_t5_13],
+                  [COURT_ROLE_DEFENDER,ca_t5_14],
+                  [COURT_ROLE_JUDGE,ca_t5_15,COURT_ACT_GAVEL],
+                  [COURT_ROLE_CROWD,ca_t5_16],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_PROSECUTOR,ca_t5_17],
+                  [COURT_ROLE_WITNESS2,ca_t5_18,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t5_19],
+                  [COURT_ROLE_WITNESS2,ca_t5_20],
+                  [COURT_ROLE_WITNESS2,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_JUDGE,ca_t5_21],
+                  [COURT_ROLE_JUDGE,ca_t5_22,COURT_ACT_GAVEL],
+                  [COURT_ROLE_WITNESS1,ca_t5_23,COURT_ACT_WAVE],
+                  [COURT_ROLE_ACCUSED,ca_t5_24],
+                  [COURT_ROLE_JUDGE,ca_t5_25,COURT_ACT_GAVEL],
+                  [COURT_ROLE_NARRATOR,ca_t5_26] ];
+      }
+
+      if num = 6
+      {
+         return [ [COURT_ROLE_CLERK,ca_t6_01],
+                  [COURT_ROLE_JUDGE,ca_t6_02,COURT_ACT_GAVEL],
+                  [COURT_ROLE_PROSECUTOR,ca_t6_03],
+                  [COURT_ROLE_WITNESS1,ca_t6_04,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t6_05],
+                  [COURT_ROLE_WITNESS1,ca_t6_06],
+                  [COURT_ROLE_PROSECUTOR,ca_t6_07],
+                  [COURT_ROLE_WITNESS1,ca_t6_08],
+                  [COURT_ROLE_CROWD,ca_t6_09],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_PROSECUTOR,ca_t6_10],
+                  [COURT_ROLE_WITNESS2,ca_t6_11,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t6_12],
+                  [COURT_ROLE_WITNESS2,ca_t6_13],
+                  [COURT_ROLE_WITNESS2,ca_t6_14],
+                  [COURT_ROLE_CROWD,ca_t6_15],
+                  [COURT_ROLE_WITNESS2,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_DEFENDER,ca_t6_16],
+                  [COURT_ROLE_JUDGE,ca_t6_17],
+                  [COURT_ROLE_ACCUSED,ca_t6_18],
+                  [COURT_ROLE_JUDGE,ca_t6_19],
+                  [COURT_ROLE_ACCUSED,ca_t6_20],
+                  [COURT_ROLE_JUDGE,ca_t6_21,COURT_ACT_GAVEL],
+                  [COURT_ROLE_JUDGE,ca_t6_22],
+                  [COURT_ROLE_ACCUSED,ca_t6_23],
+                  [COURT_ROLE_JUDGE,ca_t6_24,COURT_ACT_GAVEL],
+                  [COURT_ROLE_NARRATOR,ca_t6_25] ];
+      }
+
+      if num = 7
+      {
+         return [ [COURT_ROLE_CLERK,ca_t7_01],
+                  [COURT_ROLE_JUDGE,ca_t7_02,COURT_ACT_GAVEL],
+                  [COURT_ROLE_PROSECUTOR,ca_t7_03],
+                  [COURT_ROLE_WITNESS1,ca_t7_04,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t7_05],
+                  [COURT_ROLE_WITNESS1,ca_t7_06,COURT_ACT_POINT],
+                  [COURT_ROLE_CROWD,ca_t7_07],
+                  [COURT_ROLE_ACCUSED,ca_t7_08],
+                  [COURT_ROLE_JUDGE,ca_t7_09,COURT_ACT_GAVEL],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_DEFENDER,ca_t7_10],
+                  [COURT_ROLE_ACCUSED,ca_t7_11],
+                  [COURT_ROLE_PROSECUTOR,ca_t7_12],
+                  [COURT_ROLE_PROSECUTOR,ca_t7_13,COURT_ACT_POINT],
+                  [COURT_ROLE_ACCUSED,ca_t7_14],
+                  [COURT_ROLE_JUDGE,ca_t7_15],
+                  [COURT_ROLE_DEFENDER,ca_t7_16],
+                  [COURT_ROLE_JUDGE,ca_t7_17],
+                  [COURT_ROLE_WITNESS2,ca_t7_18,COURT_ACT_ENTER],
+                  [COURT_ROLE_NARRATOR,ca_t7_19],
+                  [COURT_ROLE_WITNESS1,ca_t7_20,COURT_ACT_WAVE],
+                  [COURT_ROLE_WITNESS2,ca_t7_21,COURT_ACT_STAND],
+                  [COURT_ROLE_ACCUSED,ca_t7_22],
+                  [COURT_ROLE_WITNESS2,ca_t7_23],
+                  [COURT_ROLE_CROWD,ca_t7_24],
+                  [COURT_ROLE_JUDGE,ca_t7_25,COURT_ACT_GAVEL],
+                  [COURT_ROLE_JUDGE,ca_t7_26],
+                  [COURT_ROLE_WITNESS1,ca_t7_27,COURT_ACT_POINT] ];
+      }
+
+      if num = 8
+      {
+         return [ [COURT_ROLE_CLERK,ca_t8_01],
+                  [COURT_ROLE_CROWD,ca_t8_02],
+                  [COURT_ROLE_JUDGE,ca_t8_03,COURT_ACT_GAVEL],
+                  [COURT_ROLE_PROSECUTOR,ca_t8_04],
+                  [COURT_ROLE_WITNESS1,ca_t8_05,COURT_ACT_STAND],
+                  [COURT_ROLE_PROSECUTOR,ca_t8_06],
+                  [COURT_ROLE_WITNESS1,ca_t8_07],
+                  [COURT_ROLE_PROSECUTOR,ca_t8_08],
+                  [COURT_ROLE_WITNESS1,ca_t8_09],
+                  [COURT_ROLE_CROWD,ca_t8_10],
+                  [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_DEFENDER,ca_t8_11],
+                  [COURT_ROLE_WITNESS2,ca_t8_12,COURT_ACT_STAND],
+                  [COURT_ROLE_DEFENDER,ca_t8_13],
+                  [COURT_ROLE_WITNESS2,ca_t8_14],
+                  [COURT_ROLE_DEFENDER,ca_t8_15],
+                  [COURT_ROLE_WITNESS2,ca_t8_16],
+                  [COURT_ROLE_WITNESS2,$,COURT_ACT_STEPDOWN],
+                  [COURT_ROLE_JUDGE,ca_t8_17],
+                  [COURT_ROLE_ACCUSED,ca_t8_18],
+                  [COURT_ROLE_NARRATOR,ca_t8_19],
+                  [COURT_ROLE_JUDGE,ca_t8_20],
+                  [COURT_ROLE_JUDGE,ca_t8_21],
+                  [COURT_ROLE_JUDGE,ca_t8_22,COURT_ACT_GAVEL],
+                  [COURT_ROLE_ACCUSED,ca_t8_23],
+                  [COURT_ROLE_JUDGE,ca_t8_24],
+                  [COURT_ROLE_CLERK,ca_t8_25] ];
+      }
+
+      return [ [COURT_ROLE_CLERK,ca_t1_01],
+               [COURT_ROLE_NARRATOR,ca_t1_02],
+               [COURT_ROLE_JUDGE,ca_t1_03,COURT_ACT_GAVEL],
+               [COURT_ROLE_CLERK,ca_t1_04],
+               [COURT_ROLE_ACCUSED,ca_t1_05],
+               [COURT_ROLE_JUDGE,ca_t1_06,COURT_ACT_GAVEL],
+               [COURT_ROLE_PROSECUTOR,ca_t1_07],
+               [COURT_ROLE_WITNESS1,ca_t1_08,COURT_ACT_STAND],
+               [COURT_ROLE_PROSECUTOR,ca_t1_09],
+               [COURT_ROLE_WITNESS1,ca_t1_10],
+               [COURT_ROLE_CROWD,ca_t1_11],
+               [COURT_ROLE_JUDGE,ca_t1_12,COURT_ACT_GAVEL],
+               [COURT_ROLE_DEFENDER,ca_t1_13],
+               [COURT_ROLE_WITNESS1,ca_t1_14],
+               [COURT_ROLE_DEFENDER,ca_t1_15],
+               [COURT_ROLE_WITNESS1,$,COURT_ACT_STEPDOWN],
+               [COURT_ROLE_PROSECUTOR,ca_t1_16],
+               [COURT_ROLE_WITNESS2,ca_t1_17,COURT_ACT_STAND],
+               [COURT_ROLE_PROSECUTOR,ca_t1_18],
+               [COURT_ROLE_WITNESS2,ca_t1_19],
+               [COURT_ROLE_CROWD,ca_t1_20],
+               [COURT_ROLE_ACCUSED,ca_t1_21,COURT_ACT_POINT],
+               [COURT_ROLE_WITNESS2,$,COURT_ACT_STEPDOWN],
+               [COURT_ROLE_JUDGE,ca_t1_22,COURT_ACT_GAVEL],
+               [COURT_ROLE_ACCUSED,ca_t1_23],
+               [COURT_ROLE_NARRATOR,ca_t1_24],
+               [COURT_ROLE_JUDGE,ca_t1_25],
+               [COURT_ROLE_JUDGE,ca_t1_26,COURT_ACT_GAVEL],
+               [COURT_ROLE_CROWD,ca_t1_27] ];
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

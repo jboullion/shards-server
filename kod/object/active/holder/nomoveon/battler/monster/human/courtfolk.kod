@@ -1,0 +1,357 @@
+// Ours (Meridian Shards, docs/adr/0026-the-office-of-the-justicar.md): one of the Barloque
+// Assizes, the NPC court in the Office of the Justicar (util/courtassizes.kod). The judge, the
+// two advocates, the bailiff, the accused, the witnesses and the spectators in the gallery are
+// all this class: a Human (so dressed as a player is) with its own name, description, sex and
+// look. It never fights, moves or can be fought, and is heard across the room
+// (MOB_FULL_TALK), so the gallery hears the bench. The assizes put it in the room, speak for it
+// and take it away.
+
+////////////////////////////////////////////////////////////////////////////////
+CourtFolk is Human
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   courtfolk_name_rsc = "member of the court"
+   courtfolk_desc_rsc = "One of the Barloque Assizes."
+   courtfolk_dead_name_rsc = "member of the court"
+
+   // What they say when someone talks to them (SayNoQuests)
+   courtfolk_talk_judge = \
+      "~kThe judge peers down at you.~n  Order in my court.  Kindly take your place in the "
+      "gallery."
+   courtfolk_talk_advocate = \
+      "~kThe advocate waves you off.~n  Not now, please, I'm in the middle of a case."
+   courtfolk_talk_bailiff = \
+      "~kThe bailiff glowers.~n  Keep behind the rail and keep your voice down."
+   courtfolk_talk_accused = \
+      "~kThe accused looks at you hopefully.~n  You believe me, don't you?"
+   courtfolk_talk_witness = \
+      "~kThe witness fidgets.~n  I'm only here to tell what I saw."
+   courtfolk_talk_crowd = \
+      "~kThe spectator whispers.~n  Shh!  This is the best part."
+
+classvars:
+
+   vrName = courtfolk_name_rsc
+   vrDesc = courtfolk_desc_rsc
+   vrDead_name = courtfolk_dead_name_rsc
+
+   viIndefinite = ARTICLE_NONE
+   viDefinite = ARTICLE_NONE
+
+   viTreasure_type = TID_NONE
+   viAttributes = MOB_NOFIGHT | MOB_NOMOVE | MOB_FULL_TALK
+   viDefault_behavior = AI_NPC | AI_NOMOVE | AI_NOFIGHT
+   viObject_flags = OF_DISPLAY_NAME | OF_NPC
+   viCashMin = 0
+   viCashMax = 0
+
+properties:
+
+   piRole = COURT_ROLE_CROWD
+   piLook = COURT_LOOK_COMMONER
+   pbFemale = FALSE
+   prName = $
+   prDesc = $
+
+messages:
+
+   Constructor(role = COURT_ROLE_CROWD,dress = COURT_LOOK_COMMONER,female = $,name = $,
+               desc = $)
+   {
+      piRole = role;
+      piLook = dress;
+      prName = name;
+      prDesc = desc;
+
+      if female = $
+      {
+         pbFemale = (Random(1,100) <= 50);
+      }
+      else
+      {
+         pbFemale = female;
+      }
+
+      propagate;
+   }
+
+   Constructed()
+   {
+      pbDontDispose = TRUE;
+
+      propagate;
+   }
+
+   GetRole()
+   {
+      return piRole;
+   }
+
+   ////////////////////////////////////////////////////////////// looks
+
+   SetGender()
+   "Our sex is chosen for the part (Constructor), not at random."
+   {
+      if NOT pbFemale
+      {
+         return;
+      }
+
+      viGender = GENDER_FEMALE;
+      vrIcon = human_female_icon_rsc;
+      prHead = human_head_female_icon;
+      prEyes = human_eyes_kx_icon;
+      prMouth = human_mouth_kx_icon;
+      prNose = human_nose_kx_icon;
+      prToupee = human_hair_ca_icon;
+      prLegs = human_legs_b_rsc;
+      prRight_arm = human_rightarm_b_rsc;
+      prLeft_arm = human_leftarm_b_rsc;
+      vrDead_Icon = human_dead_female_icona_rsc;
+      vrDead_Legs = human_dead_female_iconb_rsc;
+      vrSound_death = human_female_sound_death;
+
+      return;
+   }
+
+   SetHair()
+   "A judge's hair is grey, as befits the bench: the hairdo's own grey, untranslated."
+   {
+      if piLook = COURT_LOOK_JUDGE
+      {
+         // Human's HUMAN_TRANSLATION2_HAIR_MASK
+         piBody_translations2 &= ~0xff;
+
+         return;
+      }
+
+      propagate;
+   }
+
+   SetShield()
+   {
+      return;
+   }
+
+   SetEquipment()
+   "What the part wears: robes for the bench and the advocates, mail for the bailiff."
+   {
+      if piLook = COURT_LOOK_JUDGE
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&Robe,#color=XLAT_TO_BLACK));
+
+         return;
+      }
+
+      if piLook = COURT_LOOK_PROSECUTOR
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&Robe,#color=XLAT_TO_RED));
+
+         return;
+      }
+
+      if piLook = COURT_LOOK_DEFENDER
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&Robe,#color=XLAT_TO_BLUE));
+
+         return;
+      }
+
+      if piLook = COURT_LOOK_BAILIFF
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&ChainArmor));
+         Send(self,@AddEquipmentObject,#what=Create(&SimpleHelm));
+         Send(self,@AddEquipmentObject,#what=Create(&Mace));
+
+         return;
+      }
+
+      if piLook = COURT_LOOK_NOBLE
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&Robe,#color=XLAT_TO_PURPLE));
+         Send(self,@AddEquipmentObject,#what=Create(&Circlet));
+
+         return;
+      }
+
+      if piLook = COURT_LOOK_SOLDIER
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&LeatherArmor));
+
+         return;
+      }
+
+      if piLook = COURT_LOOK_MAGE
+      {
+         Send(self,@AddEquipmentObject,#what=Create(&Robe,#color=XLAT_TO_GREEN));
+         Send(self,@AddEquipmentObject,#what=Create(&Circlet));
+
+         return;
+      }
+
+      // A commoner wears their own clothes (Human.SetClothes)
+      return;
+   }
+
+   ////////////////////////////////////////////////////////////// acting
+
+   Gavel()
+   "The judge's gavel: an arm raised and brought down."
+   {
+      Send(self,@DoCast);
+
+      return;
+   }
+
+   DoPoint()
+   {
+      if poOwner = $
+      {
+         return;
+      }
+
+      piAnimation = PANM_POINT;
+      Send(poOwner,@SomethingChanged,#what=self);
+      piAnimation = PANM_NONE;
+
+      return;
+   }
+
+   DoWave()
+   {
+      if poOwner = $
+      {
+         return;
+      }
+
+      piAnimation = PANM_WAVE;
+      Send(poOwner,@SomethingChanged,#what=self);
+      piAnimation = PANM_NONE;
+
+      return;
+   }
+
+   Face(angle = ANGLE_NORTH)
+   {
+      if poOwner = $
+      {
+         return;
+      }
+
+      Send(poOwner,@SomethingTurned,#what=self,#new_angle=angle);
+
+      return;
+   }
+
+   SayNoQuests(who = $)
+   "Talked to: a line in character, in place of the plain \"no work for you\"."
+   {
+      local rLine;
+
+      rLine = courtfolk_talk_crowd;
+      if piRole = COURT_ROLE_JUDGE
+      {
+         rLine = courtfolk_talk_judge;
+      }
+      else if piRole = COURT_ROLE_PROSECUTOR OR piRole = COURT_ROLE_DEFENDER
+      {
+         rLine = courtfolk_talk_advocate;
+      }
+      else if piRole = COURT_ROLE_BAILIFF
+      {
+         rLine = courtfolk_talk_bailiff;
+      }
+      else if piRole = COURT_ROLE_ACCUSED
+      {
+         rLine = courtfolk_talk_accused;
+      }
+      else if piRole = COURT_ROLE_WITNESS1 OR piRole = COURT_ROLE_WITNESS2
+      {
+         rLine = courtfolk_talk_witness;
+      }
+
+      Send(self,@SayToOne,#target=who,#message_rsc=rLine);
+
+      return TRUE;
+   }
+
+   ////////////////////////////////////////////////////////////// what others see
+
+   GetName()
+   {
+      if prName = $
+      {
+         propagate;
+      }
+
+      return prName;
+   }
+
+   GetTrueName()
+   {
+      return Send(self,@GetName);
+   }
+
+   GetApparentName()
+   {
+      return Send(self,@GetName);
+   }
+
+   IsNamedMob()
+   {
+      return TRUE;
+   }
+
+   ShowDesc()
+   {
+      if prDesc = $
+      {
+         AddPacket(4,courtfolk_desc_rsc);
+
+         return;
+      }
+
+      AddPacket(4,prDesc);
+
+      return;
+   }
+
+   GetPlayerNameColor(rgb = FALSE)
+   "An NPC's grey, as the townsfolk's."
+   {
+      if rgb
+      {
+         return [200, 200, 200];
+      }
+
+      return NC_NPC;
+   }
+
+   GetObjectFlags(what = $)
+   "Its name always shows, and nobody can attack it."
+   {
+      return (viObject_flags | piDrawEffectFlag | OF_DISPLAY_NAME) & ~OF_ATTACKABLE;
+   }
+
+   CanMorphTo()
+   {
+      return FALSE;
+   }
+
+   CanPlayerAdvanceOnMe()
+   {
+      return FALSE;
+   }
+
+   DestroyDisposable()
+   {
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

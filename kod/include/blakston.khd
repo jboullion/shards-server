@@ -218,6 +218,30 @@
    ARENA_FIGHTER_BRAWLER = 5
    ARENA_FIGHTER_ADEPT = 6
 
+   // Ours (docs/adr/0026-the-office-of-the-justicar.md): the Barloque Assizes, the NPC court
+   // in the Office of the Justicar (util/courtassizes.kod). Who speaks a line of a trial: the
+   // court (battler/monster/human/courtfolk.kod), Caramo as clerk, a spectator in the gallery,
+   // or nobody (narration)
+   COURT_ROLE_JUDGE = 1
+   COURT_ROLE_PROSECUTOR = 2
+   COURT_ROLE_DEFENDER = 3
+   COURT_ROLE_ACCUSED = 4
+   COURT_ROLE_WITNESS1 = 5
+   COURT_ROLE_WITNESS2 = 6
+   COURT_ROLE_BAILIFF = 7
+   COURT_ROLE_CROWD = 8
+   COURT_ROLE_CLERK = 9
+   COURT_ROLE_NARRATOR = 10
+   // How one of the court is dressed
+   COURT_LOOK_COMMONER = 1
+   COURT_LOOK_JUDGE = 2
+   COURT_LOOK_PROSECUTOR = 3
+   COURT_LOOK_DEFENDER = 4
+   COURT_LOOK_BAILIFF = 5
+   COURT_LOOK_NOBLE = 6
+   COURT_LOOK_SOLDIER = 7
+   COURT_LOOK_MAGE = 8
+
    // Player name color sent as hex RGB value. Define constants
    // for ease of use as needed. Requires OF_PLAYER boolean flag
    // to be set to draw a name.

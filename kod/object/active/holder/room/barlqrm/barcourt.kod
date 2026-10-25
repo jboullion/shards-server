@@ -61,6 +61,8 @@ properties:
 
    poCaramo = $
    poBookOfJala = $
+   // Ours: the Barloque Assizes, the NPC court always in session (util/courtassizes.kod)
+   poAssizes = $
 
 messages:
 
@@ -142,7 +144,36 @@ messages:
       Send(self,@NewHold,#what=Create(&Candelabra),#new_row=13,#new_col=12,
            #fine_row=00,#fine_col=00);
 
+      // The court: a judge, advocates, a bailiff and a gallery, hearing trials while anyone
+      //  is here to watch
+      poAssizes = Create(&CourtAssizes,#court_room=self);
+
       propagate;
+   }
+
+   FirstUserEntered()
+   {
+      if poAssizes <> $
+      {
+         Send(poAssizes,@ResumeCourt);
+      }
+
+      propagate;
+   }
+
+   LastUserLeft()
+   {
+      if poAssizes <> $
+      {
+         Send(poAssizes,@PauseCourt);
+      }
+
+      propagate;
+   }
+
+   GetAssizes()
+   {
+      return poAssizes;
    }
 
    CreateJusticarSign()
@@ -206,6 +237,12 @@ messages:
       }
 
       poBookofJala = $;
+
+      if poAssizes <> $
+      {
+         Send(poAssizes,@Delete);
+         poAssizes = $;
+      }
 
       propagate;
    }
