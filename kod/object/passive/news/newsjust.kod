@@ -24,6 +24,9 @@ classvars:
 
 properties:
 
+   // Ours (ADR 0026): the register of name changes keeps more than a globe's 75 posts
+   piMax_messages = 200
+
 messages:
 
    GetNewsPermission(what = $)

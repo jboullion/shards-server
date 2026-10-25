@@ -4163,8 +4163,10 @@ messages:
          return;
       }
 
-      // Ours (the magic item revamp): an elder's reveal, a smith's repair
+      // Ours (the magic item revamp): an elder's reveal, a smith's repair; and (ADR 0026)
+      //  Caramo's rename
       if StringEqual(sVerb,"reveal") OR StringEqual(sVerb,"repair")
+         OR StringEqual(sVerb,"rename")
       {
          Send(Send(SYS,@GetItemServiceBook),@ServiceCommand,#who=self,#words=lWords);
 

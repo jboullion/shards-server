@@ -26,36 +26,28 @@ resources:
       "Duke's money, filing the former Queen's taxation scrolls, and more "
       "recently, serving as clerk for the Office of the Justicar."
 
-   // Ours (no random PvP, 2026-10-21): the Office of the Justicar pardoned
-   // murderers and outlaws, through an elected Justicar or an indulgence, and
-   // kept their records. With nobody a murderer or an outlaw any more, Caramo
-   // only changes names by deed poll and keeps the Book of Jala.
+   // Ours (docs/adr/0026-the-office-of-the-justicar.md): the Office of the Justicar once
+   // pardoned murderers and outlaws. With random PvP gone (2026-10-21), Caramo:
+   //   - changes names, through our client's window (UC_ITEM_SERVICE kind 3 and the `rename`
+   //     command: util/itemservicebook.kod), with no deed-poll scroll any more;
+   //   - records each change in the Book of Jala;
+   //   - posts the court's bounties (quests 339-346);
+   //   - is clerk of the Barloque Assizes (util/courtassizes.kod).
 
-   // Name changing.
-
-   bq_clerk_trigger_change = "change"
-   bq_clerk_trigger_name = "name"
-   bq_clerk_change_name = \
-      "Yes, I can change your legal name by deed poll.  Simply fill out your "
-      "new name on this scroll and return it. If it is available and not "
-      "obscene, it shall be yours.  I must warn you, there is a fee of %i "
-      "shillings for providing this service, which will be deducted from "
-      "your bank account."
-   bq_clerk_cant_hold = \
-      "I can change your legal name by deed poll, but you have no room in "
-      "your inventory to hold the scroll you would need to fill out."
-   bq_clerk_warning_cost = \
-      "~BI must warn you again before I complete this process, that you "
-      "will be charged %i shillings for this service.  If you are positive "
-      "you wish to pay the fee, I will accept your scroll."
+   bq_clerk_same_name = "That is already your name."
+   bq_clerk_bad_name = \
+      "I can't record that name.  It may be taken, or too long or short, or simply not fit for "
+      "the Book of Jala."
    bq_clerk_not_enough = \
-      "You do not have enough money in your bank account for this service."
-   bq_clerk_bad_name = "Sorry, that username is not valid."
-   bq_clerk_name_changed = "Your name has been changed."
+      "The fee is %i shillings, from your purse or your account at the bank in Tos, and you "
+      "don't have it."
+   bq_clerk_name_changed = \
+      "~kCaramo dips her quill and writes in the Book of Jala.~n  It is done.  From this day "
+      "you are %s."
 
    bq_clerk_name_post_1 = "'s name has been changed"
    bq_clerk_name_post_2 = "Let it be known that "
-   bq_clerk_name_post_3 = "'s name has been changed by deed poll to "
+   bq_clerk_name_post_3 = " has changed their name before the Office of the Justicar, to "
    bq_clerk_name_post_4 = \
       ". So it has been spoken, so shall it be done. \n\n-- Caramo"
 
@@ -65,167 +57,87 @@ classvars:
    vrIcon = bq_clerk_icon_rsc
    vrDesc = bq_clerk_desc_rsc
 
-   viAttributes = \
-      MOB_NOFIGHT | MOB_LISTEN | MOB_SELLER | MOB_NOMOVE \
-      | MOB_LAWFUL | MOB_FULL_TALK | MOB_RECEIVE
+   // FULL_TALK: the gallery hears her as clerk of the Assizes
+   viAttributes = MOB_NOFIGHT | MOB_NOMOVE | MOB_LAWFUL | MOB_FULL_TALK
    viGender = GENDER_FEMALE
 
 properties:
 
    piAnimation = ANIM_NONE
 
-   // A list containing players who have received the name change cost
-   // warning, to avoid players obtaining a scroll and giving it to
-   // Caramo "accidentally".
-   plNameChangeWarn = $
-
 messages:
 
    Recreate()
-   "Delete outstanding scrolls, verify wanted items and clear warn list."
    {
-      Send(self,@SetWantedItems);
-
-      // Clear the name change warning list and delete outstanding scrolls.
-      Send(&NameChangeScroll,@Delete);
-      plNameChangeWarn = $;
-
       return;
    }
 
    Constructor()
    {
-      Send(self,@SetWantedItems);
       Send(SYS,@SetCaramo,#oCaramo=self);
 
-      plNameChangeWarn = $;
-
       propagate;
    }
 
-   SetWantedItems()
+   GetShardsService()
+   "Ours: our client's name-change window opens when she's talked to "
+   "(ItemServiceBook.ServiceActivated, SendRenameMenu). With bounties for them too, the "
+   "quest window comes first, with a button for it."
    {
-      plWantedItems = [ &NameChangeScroll ];
-
-      return;
-   }
-
-   SetForSale()
-   {
-      plFor_sale = $;
-
-      return;
-   }
-
-   GotWantedItem(obj=$,who=$)
-   {
-      if IsClass(obj,&NameChangeScroll)
-      {
-         // Deed poll can be used to change a player's name.
-         // Returns TRUE if successful, otherwise give the scroll back.
-         Send(self,@TryChangePlayerName,#who=who,#oItem=obj);
-
-         return;
-      }
-
-      propagate;
+      return SERVICE_NAMECHANGE;
    }
 
 #region Name Change
 
-   TryChangePlayerName(who=$,oItem=$)
-   "Attempts to change a player's name. If they've been warned, and they can "
-   "pay the fee, will check with System to see if the name is valid. If it "
-   "is, name will be changed."
+   ChangeName(who = $,sName = $)
+   "The window's Confirm (`rename <name>`). The name is checked first, so a refused one costs "
+   "nothing. Then the fee, from the purse or else the Tos bank. Then the Book of Jala, and "
+   "System renames them; blakserv sends every client the new name (BP_CHANGE_RESOURCE)."
    {
-      local i, iAmount, oBank;
+      local iFee, oMoney, oBank, sOld;
 
-      if who = $
-         OR oItem = $
+      if who = $ OR sName = $
       {
          return;
       }
 
-      iAmount = Send(SETTINGS_OBJECT,@GetNameChangeCost);
-
-      // No existing list, add player and warn.
-      if plNameChangeWarn = $
+      if StringEqual(sName,Send(who,@GetTrueName))
       {
-         plNameChangeWarn = [who];
-         Send(self,@SayToOne,#message_rsc=bq_clerk_warning_cost,#target=who,
-               #parm1=iAmount);
+         Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_same_name);
 
          return;
       }
 
-      foreach i in plNameChangeWarn
+      if NOT Send(SYS,@ValidateUserName,#oUser=who,#sName=sName)
       {
-         if i <> who
-         {
-            continue;
-         }
-         // Check if name is valid.
-         if NOT Send(SYS,@ValidateUserName,#oUser=who,
-                     #sName=Send(oItem,@GetInscription))
-         {
-            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_bad_name);
+         Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_bad_name);
 
-            return;
-         }
-
-         // Get player's bank account.
-         oBank = Send(SYS,@FindBankByNum,#num=BID_TOS);
-         if Send(oBank,@GetAccount,#what=who) >= iAmount
-         {
-            // Player has enough money, change their name and take the
-            // money.
-            Send(oBank,@WithdrawAccount,#what=who,#amount=iAmount);
-            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_changed);
-            // Record the name change in the Book of Jala.
-            Send(self,@RecordNameChangeBook,#parm1=Send(who,@GetTrueName),
-                  #parm2=Send(oItem,@GetInscription));
-            // System will handle changing the name.
-            Send(SYS,@ChangeUserName,#oUser=who,
-                  #sName=Send(oItem,@GetInscription));
-            // Scroll handles removing player from plNameChangeWarn list.
-            Send(oItem,@Delete);
-
-            return;
-         }
-         else
-         {
-            // Not enough money.
-            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_not_enough);
-
-            return;
-         }
-      }
-
-      // Player wasn't in list, add them.
-      plNameChangeWarn = Cons(who,plNameChangeWarn);
-      Send(self,@SayToOne,#message_rsc=bq_clerk_warning_cost,#target=who,
-            #parm1=iAmount);
-
-      return;
-   }
-
-   RemoveFromWarnList(who=$)
-   {
-      local i;
-
-      if who = $
-         OR plNameChangeWarn = $
-      {
          return;
       }
 
-      foreach i in plNameChangeWarn
+      iFee = Send(SETTINGS_OBJECT,@GetNameChangeCost);
+      oMoney = Send(who,@GetMoneyObject,#type=&Shillings);
+      oBank = Send(SYS,@FindBankByNum,#num=BID_TOS);
+      if oMoney <> $ AND Send(oMoney,@GetNumber) >= iFee
       {
-         if i = who
-         {
-            plNameChangeWarn = DelListElem(plNameChangeWarn,who);
-         }
+         Send(oMoney,@SubtractNumber,#number=iFee);
       }
+      else if oBank <> $ AND Send(oBank,@GetAccount,#what=who) >= iFee
+      {
+         Send(oBank,@WithdrawAccount,#what=who,#amount=iFee);
+      }
+      else
+      {
+         Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_not_enough,#parm1=iFee);
+
+         return;
+      }
+
+      sOld = SetString($,Send(who,@GetTrueName));
+      Send(self,@RecordNameChangeBook,#parm1=sOld,#parm2=sName);
+      Send(SYS,@ChangeUserName,#oUser=who,#sName=sName);
+      Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_changed,
+           #parm1=Send(who,@GetTrueName));
 
       return;
    }
@@ -248,57 +160,21 @@ messages:
       AppendTempString(bq_clerk_name_post_4);
       sString2 = SetString($,GetTempString());
 
+      if poOwner = $
+      {
+         return;
+      }
+
       oBook = Send(poOwner,@GetBook);
-      Send(oBook,@PostNews,#what=self,#title=sString,#body=sString2);
+      if oBook <> $
+      {
+         Send(oBook,@PostNews,#what=self,#title=sString,#body=sString2);
+      }
 
       return;
    }
 
 #endregion Name Change
-
-   SomeoneSaid(what=$,type=$,string=$)
-   {
-      local iAmount, oScroll;
-
-      if what = $
-         OR NOT IsClass(what,&Player)
-         OR type <> SAY_NORMAL
-      {
-         propagate;
-      }
-
-      if (StringContain(string,bq_clerk_trigger_change)
-         AND StringContain(string,bq_clerk_trigger_name))
-      {
-         iAmount = Send(SETTINGS_OBJECT,@GetNameChangeCost);
-         oScroll = Create(&NameChangeScroll);
-
-         if Send(what,@ReqNewHold,#what=oScroll)
-         {
-            Send(self,@SayToOne,#target=what,#message_rsc=bq_clerk_change_name,
-                  #parm1=iAmount);
-
-            // Don't give out multiple scrolls.
-            if Send(what,@FindHolding,#class=&NameChangeScroll) = $
-            {
-               Send(what,@NewHold,#what=oScroll);
-            }
-            else
-            {
-               Send(oScroll,@Delete);
-            }
-         }
-         else
-         {
-            Send(self,@SayToOne,#target=what,#message_rsc=bq_clerk_cant_hold);
-            Send(oScroll,@Delete);
-         }
-
-         return;
-      }
-
-      propagate;
-   }
 
    ResetBrain()
    {
@@ -309,8 +185,6 @@ messages:
 
    Delete()
    {
-      plNameChangeWarn = $;
-
       Send(SYS,@DeleteCaramo);
 
       propagate;

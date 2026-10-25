@@ -3336,6 +3336,9 @@ SID_ICEWALL             = 241
    // the item's base value (Item.GetInitValue), never less than REPAIR_MIN_PRICE
    SERVICE_REVEAL = 3
    SERVICE_REPAIR = 4
+   // ...and (ADR 0026) Caramo, who changes names before the Office of the Justicar
+   //  (towns/barlqtwn/bqclerk.kod), for Settings.piNameChangeCost
+   SERVICE_NAMECHANGE = 5
    REPAIR_PRICE_PERCENT = 50
    REPAIR_MIN_PRICE = 10
    COSMETIC_DYE_PRICE = 250

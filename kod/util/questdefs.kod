@@ -1018,7 +1018,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 81397182;
+      return 6304020;
    }
 
    GetQuests()
@@ -2648,7 +2648,7 @@ messages:
                0, $, $, $, 719 ] ],
            17342, 4500, $, 0, 2, $, $, 64, [ [ 6, 9 ] ], $, $, $ ],
          // court-bounty-sewer-rats
-         [ 339, qd_339_name, &BarloqueClerk, 0, 40, 70, $,
+         [ 339, qd_339_name, &BarloqueClerk, 0, 40, 65, $,
            $, $, 86400, $,
            [ [ 1, &GiantRatSoldier, 8, 0, &BarloqueClerk, 0, qd_339_s1, $, $, qd_339_t1,
                0, $, $, $, 0 ],

@@ -6014,7 +6014,6 @@ messages:
       plItemTemplates = cons(create(&Letter),plItemTemplates);
       plItemTemplates = cons(create(&InscriptionItem),plItemTemplates);
       plItemTemplates = cons(create(&BallotItem),plItemTemplates);
-      plItemTemplates = cons(create(&NameChangeScroll),plItemTemplates);
 
       plItemTemplates = cons(create(&RoomKeyCopy),plItemTemplates);
       plItemTemplates = cons(create(&RoomKey),plItemTemplates);

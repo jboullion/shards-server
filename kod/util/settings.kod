@@ -178,8 +178,8 @@ properties:
    // How many summoned objects can be in a room
    piPlayerSummonedObjectLimit = 18
 
-   // Cost for Caramo to change a player's name.
-   piNameChangeCost = 3000000
+   // Cost for Caramo to change a player's name (ours, ADR 0026: was 3,000,000).
+   piNameChangeCost = 50000
 
    // Number of reflections allowed per caster.
    piPlayerReflectionLimit = 2

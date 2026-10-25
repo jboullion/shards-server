@@ -9,6 +9,9 @@
 //            REVEAL_FEE shillings: all its hidden properties, as the Reveal spell does.
 //   Repair   a smith makes one weapon or piece of armor we carry or wear as good as new, broken
 //            or not, for up to REPAIR_PRICE_PERCENT of its base value (less the less it's worn).
+//   Rename   (ADR 0026) Caramo, in the Office of the Justicar, changes our name for
+//            Settings.piNameChangeCost (UC_ITEM_SERVICE kind 3, SendRenameMenu). `rename <new
+//            name>` is checked for reach here, then goes to her (BarloqueClerk.ChangeName).
 
 ////////////////////////////////////////////////////////////////////////////////
 ItemServiceBook is UtilityFunctions
@@ -20,6 +23,8 @@ constants:
 
    ITEM_SERVICE_PKT_REVEAL = 1
    ITEM_SERVICE_PKT_REPAIR = 2
+   // Ours (ADR 0026): Caramo's name change: her, and the fee
+   ITEM_SERVICE_PKT_RENAME = 3
 
 resources:
 
@@ -70,6 +75,15 @@ messages:
          return TRUE;
       }
 
+      // Ours (ADR 0026): Caramo's name-change window
+      if iService = SERVICE_NAMECHANGE
+      {
+         Send(who,@SetServiceNpc,#what=npc);
+         Send(self,@SendRenameMenu,#who=who);
+
+         return TRUE;
+      }
+
       return FALSE;
    }
 
@@ -93,8 +107,8 @@ messages:
    ////////////////////////////////////////////////////////////// the client's commands
 
    ServiceCommand(who = $,words = $)
-   "reveal <item> | reveal menu | repair <item> | repair menu. <item> is a slot in the last "
-   "menu (from 1)."
+   "reveal <item> | reveal menu | repair <item> | repair menu | rename <new name>. <item> is a "
+   "slot in the last menu (from 1)."
    {
       local sVerb, sWhat;
 
@@ -140,7 +154,72 @@ messages:
          }
 
          Send(self,@RepairItem,#who=who,#slot=StringToNumber(sWhat));
+
+         return;
       }
+
+      if StringEqual(sVerb,"rename")
+      {
+         Send(self,@Rename,#who=who,#words=words);
+      }
+
+      return;
+   }
+
+   SendRenameMenu(who = $)
+   "UC_ITEM_SERVICE kind 3 (ADR 0026): Caramo and the fee. Our client knows our name."
+   {
+      local oSession, oNpc;
+
+      oSession = Send(who,@GetShardsSession);
+      oNpc = Send(who,@GetServiceNpc);
+      if oSession = $ OR oNpc = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_ITEM_SERVICE, 1,ITEM_SERVICE_PKT_RENAME, 4,oNpc,
+                4,Send(SETTINGS_OBJECT,@GetNameChangeCost));
+      SendPacket(oSession);
+
+      return;
+   }
+
+   Rename(who = $,words = $)
+   "rename <new name>, from Caramo's window (ADR 0026): the words after the verb, joined by "
+   "single spaces, are the name she's asked to record."
+   {
+      local oNpc, i, bFirst, bVerb, sName;
+
+      oNpc = Send(self,@ServiceNpc,#who=who,#service=SERVICE_NAMECHANGE);
+      if oNpc = $ OR Length(words) < 2
+      {
+         return;
+      }
+
+      ClearTempString();
+      bVerb = TRUE;
+      bFirst = TRUE;
+      foreach i in words
+      {
+         if bVerb
+         {
+            bVerb = FALSE;
+
+            continue;
+         }
+
+         if NOT bFirst
+         {
+            AppendTempString(" ");
+         }
+
+         AppendTempString(i);
+         bFirst = FALSE;
+      }
+
+      sName = SetString($,GetTempString());
+      Send(oNpc,@ChangeName,#who=who,#sName=sName);
 
       return;
    }

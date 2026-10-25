@@ -79,7 +79,6 @@ messages:
 
       if IsClass(self,&BallotItem)
          OR IsClass(self,&Book)
-         OR IsClass(self,&NameChangeScroll)
       {
          return FALSE;
       }

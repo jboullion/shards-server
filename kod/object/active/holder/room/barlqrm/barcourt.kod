@@ -22,20 +22,26 @@ resources:
    room_barloque_court = barcourt.roo
 
    news_justicar = "Book of Jala"
+   // Ours (ADR 0026): the register of name changes
    news_justicar_desc = \
-      "Chronicling the history of the office of the Justicar."
+      "The register of every name lawfully changed before the Office of the Justicar."
 
    BarloqueCourt_sign_name = "Justicar information"
    BarloqueCourt_sign_icon = newbsign.bgf
 
+   // Ours (ADR 0026): what the Office does now
    BarloqueCourt_sign_desc = \
       "Etched into the sign is the following text:\n\n"
       "By decree of the Council and Princess Kateriina, the position of the "
-      "Justicar has been eliminated due to a long history of excessive corruption. "
-      "\n\n"
-      "The office still keeps the Book of Jala, and citizens can ask for a legal "
-      "\"name change\" by deed poll, for a high cost.  Caramo will provide more "
-      "information if asked.\n"
+      "Justicar has been eliminated due to a long history of excessive corruption.  "
+      "The Office remains, and serves the citizens of the realm.\n\n"
+      "NAMES.  Any citizen may take a new name before the Office, for a fee of 50,000 "
+      "shillings.  Speak with Caramo, the clerk.  Every change is entered in the Book "
+      "of Jala, for all to read.\n\n"
+      "BOUNTIES.  The clerk posts the Office's warrants each day, for those still "
+      "making their name.\n\n"
+      "THE ASSIZES.  The court is in session whenever there are citizens to hear it.  "
+      "Spectators keep to the gallery.\n"
 
 
 
@@ -66,9 +72,9 @@ properties:
 
 messages:
 
-   // The gallery is separated from the official courtroom by a wall.
-   // Only those who are in the courtroom area are subject to Justicar
-   // commands.  This allows others to watch a trial and not be abused.
+   // The gallery is separated from the official courtroom by a wall. Once only
+   // those in the courtroom area were subject to the Justicar's commands, so
+   // others could watch a trial; now the gallery watches the Assizes.
 
    ReqInSpecialArea(row = $, col = $, obj = $)
    {
