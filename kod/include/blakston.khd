@@ -2620,7 +2620,17 @@
    // Ours (spell revamp D36): Riija's mind games leave a target bewildered
    //  (spell/bewilder.kod), an effect nobody learns
    SID_BEWILDERED = 207
-   SID_ICEWALL             = 241
+
+   // Ours (spell revamp phase 9): what UC_SPELL_FX asks our client to draw
+   SPELLFX_IMPACT = 1      // a hit on the target
+   SPELLFX_DRAIN = 2       // life drawn from the target back to the source
+   SPELLFX_CAST = 3        // a glow about the caster
+   SPELLFX_BUFF = 4        // a pulse about the target (a blessing)
+   SPELLFX_CURSE = 5       // a darker pulse (a harmful enchantment)
+   SPELLFX_ROOMFLASH = 6   // the whole room lights up (Lightning Bolt)
+   SPELLFX_QUAKE = 7       // dust rises about the source (Earthquake)
+   SPELLFX_HEAL = 8        // healing light about the target
+SID_ICEWALL             = 241
    SID_INDEST              = 242
    SID_NODROP              = 253
    SID_ADDPETOITEM         = 254

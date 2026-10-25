@@ -266,6 +266,9 @@
    UC_FALLEN_HALLS = 121
    // Ours (guild revamp phase 8): the guild window's Hall tab (guild.kod SendHallInfo)
    UC_GUILD_HALL = 122
+   // Ours (spell revamp phase 9, visuals): a spell effect for our client to draw
+   //  (Room.SendSpellFx): kind, source, target, colour (5:5:5), size
+   UC_SPELL_FX = 123
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

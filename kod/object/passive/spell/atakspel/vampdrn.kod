@@ -70,6 +70,12 @@ properties:
 
 messages:
 
+   SendsImpactFx()
+   "Ours (spell revamp phase 9): it shows as a drain (DoSideEffect)."
+   {
+      return FALSE;
+   }
+
    ResetReagents()
    {
       plReagents = $;
@@ -88,6 +94,10 @@ messages:
       {
          propagate;
       }
+
+      // Ours (spell revamp phase 9): the life flows back to the caster.
+      Send(self,@SendSpellFx,#kind=SPELLFX_DRAIN,#source=who,#target=victim,
+           #color=LIGHT_BLOOD);
 
       // Take some of that damage and add it to our health!
       if damage <> $

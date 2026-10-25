@@ -70,6 +70,15 @@ properties:
 
 messages:
 
+   CastSpell(who=$,lTargets=$)
+   "Ours (spell revamp phase 9): the room flashes with the bolt."
+   {
+      Send(self,@SendSpellFx,#kind=SPELLFX_ROOMFLASH,#source=who,
+           #color=LIGHT_LIGHTNING,#size=2);
+
+      propagate;
+   }
+
 
    ResetReagents()
    {

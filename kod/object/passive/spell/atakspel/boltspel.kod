@@ -45,6 +45,12 @@ properties:
 
 messages:
 
+   SendsImpactFx()
+   "Ours (spell revamp phase 9): the projectile shows where it lands."
+   {
+      return FALSE;
+   }
+
    CastSpell(who=$,lTargets=$)
    {
       local oOwner, i;

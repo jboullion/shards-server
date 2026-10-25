@@ -58,6 +58,12 @@ properties:
 
 messages:
 
+   SendsImpactFx()
+   "Ours (spell revamp phase 9): the projectile shows where it lands."
+   {
+      return FALSE;
+   }
+
    CanPayCosts(who=$,lTargets=$,bItemCast=FALSE)
    "Ours: Fire Storm and Ice Nova checked for Jig in CastSpell, after the "
    "mana and reagents were spent."

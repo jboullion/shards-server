@@ -85,6 +85,25 @@ messages:
       return (8 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) / 10) * FINENESS;
    }
 
+   GetSongFxColor(iSpell=0)
+   "Ours (spell revamp phase 9): holy gold, unholy violet, else Jala blue."
+   {
+      if iSpell & ATCK_SPELL_HOLY
+      {
+         return LIGHT_BYELLOW;
+      }
+      if iSpell & ATCK_SPELL_UNHOLY
+      {
+         return LIGHT_BPURPLE;
+      }
+      if iSpell & ATCK_SPELL_QUAKE
+      {
+         return LIGHT_DORANGE;
+      }
+
+      return LIGHT_BBLUE;
+   }
+
    GetSongPower(state=$)
    "The spellpower the song was cast at."
    {
@@ -110,6 +129,9 @@ messages:
       local oCaster, iDealt;
 
       oCaster = Send(self,@GetCaster,#state=state);
+      // Ours (spell revamp phase 9): a small flicker on the foe.
+      Send(self,@SendSpellFx,#kind=SPELLFX_IMPACT,#source=oCaster,#target=who,
+           #color=Send(self,@GetSongFxColor,#iSpell=iSpell),#size=1);
       iDealt = Send(who,@AssessDamage,#what=oCaster,#damage=iDamage * 100,
                     #aspell=ATCK_SPELL_ALL+iSpell,#precision=TRUE,
                     #report=FALSE,#report_resistance=FALSE);

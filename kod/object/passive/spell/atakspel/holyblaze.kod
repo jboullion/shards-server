@@ -140,6 +140,9 @@ messages:
       iHeal = (100 + bound(iSpellpower/4,0,50))*iHeal/200;
 
       iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
+      // Ours (spell revamp phase 9)
+      Send(self,@SendSpellFx,#kind=SPELLFX_HEAL,#source=who,#target=oTarget,
+           #color=LIGHT_BYELLOW);
 
       Send(who,@MsgSendUser,#message_rsc=holyblaze_cast_on_other,
             #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName),

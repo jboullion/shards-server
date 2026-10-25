@@ -144,6 +144,9 @@ messages:
                         #aspell=ATCK_SPELL_HOLY);
          // Ours (spell revamp playtest): the hit line, as attack spells give.
          Send(who,@AssessHit,#what=oUndead,#damage=iDamage,#use_weapon=self);
+         // Ours (spell revamp phase 9)
+         Send(self,@SendSpellFx,#kind=SPELLFX_IMPACT,#source=who,
+              #target=oUndead,#color=LIGHT_BYELLOW);
          if iDamage = $
          {
             Send(who,@KilledSomething,#what=oUndead,#use_weapon=self);

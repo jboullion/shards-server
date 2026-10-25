@@ -186,6 +186,10 @@ messages:
       // Call DoEarthQuake to handle special messages
       Send(self,@DoEarthQuake,#who=who,#lTargets=lTargets,#oRoom=oRoom);
 
+      // Ours (spell revamp phase 9): dust rises about the caster.
+      Send(self,@SendSpellFx,#kind=SPELLFX_QUAKE,#source=who,
+           #color=LIGHT_DORANGE,#size=3);
+
       propagate;
    }
 

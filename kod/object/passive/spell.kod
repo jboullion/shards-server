@@ -3140,6 +3140,79 @@ messages:
       return FALSE;
    }
 
+   SendSpellFx(kind=0,source=$,target=$,color=$,size=2)
+   "Ours (spell revamp phase 9): a visual for our client (Room.SendSpellFx), in "
+   "the room of the target, or else the source. The colour defaults to the "
+   "spell's school's (GetSchoolFxColor)."
+   {
+      local oRoom;
+
+      oRoom = $;
+      if target <> $
+      {
+         oRoom = Send(target,@GetOwner);
+      }
+      if oRoom = $
+         AND source <> $
+      {
+         if IsClass(source,&Room)
+         {
+            oRoom = source;
+         }
+         else
+         {
+            oRoom = Send(source,@GetOwner);
+         }
+      }
+      if oRoom = $
+         OR NOT IsClass(oRoom,&Room)
+      {
+         return;
+      }
+
+      if color = $
+      {
+         color = Send(self,@GetSchoolFxColor);
+      }
+
+      Send(oRoom,@SendSpellFx,#kind=kind,#source=source,#target=target,
+           #color=color,#size=size);
+
+      return;
+   }
+
+   GetSchoolFxColor()
+   "Ours (spell revamp phase 9): Shal'ille gold, Qor violet, Kraanan red, "
+   "Faren orange, Riija green, Jala blue (5:5:5)."
+   {
+      if viSchool = SS_SHALILLE
+      {
+         return LIGHT_BYELLOW;
+      }
+      if viSchool = SS_QOR
+      {
+         return LIGHT_BPURPLE;
+      }
+      if viSchool = SS_KRAANAN
+      {
+         return LIGHT_BRED;
+      }
+      if viSchool = SS_FAREN
+      {
+         return LIGHT_BORANGE;
+      }
+      if viSchool = SS_RIIJA
+      {
+         return LIGHT_BGREEN;
+      }
+      if viSchool = SS_JALA
+      {
+         return LIGHT_BBLUE;
+      }
+
+      return LIGHT_BWHITE;
+   }
+
    GetManaCostExtra(who=$)
    "Ours (spell revamp balance): mana added to the cost (AttackSpell under "
    "Mana Focus)."
