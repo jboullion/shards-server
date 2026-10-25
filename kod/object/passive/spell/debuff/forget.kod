@@ -33,7 +33,7 @@ resources:
    forgetspell_off = \
       "You suddenly recall what it was that you had forgotten."
    forgetspell_caster = \
-      "You glare at %s%s and they appear momentarily confused."
+      "You glare at %s%s, who appears momentarily confused."
    forgetspell_cast_self = \
       "It occurs to you that casting forget on yourself may cause you to "
        "forget forgetting what you had forgotten, and thus you might forget "

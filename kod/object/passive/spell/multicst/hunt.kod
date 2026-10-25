@@ -29,6 +29,7 @@ resources:
       "must be spoken during the initial trance.  When the enchantment "
       "is completed, for the duration of the spell the hunters will receive "
       "periodic notification of the hunted player's whereabouts.  "
+      "The prism must stand near the casters, not in a pack.  "
       "Requires all of the claws from one kriipa paw, and the casters' "
       "mystical energies must be focused through a prism."
 
@@ -42,6 +43,8 @@ resources:
       "~IImmortals leave no trail that can be followed by this spell.  "
       "Try another target."
    hunt_is_on = "~BThe hunt is on!"
+   hunt_no_such_prey = "You find no trail for anyone called %s."
+   hunt_prey_offline = "%s%s isn't in the lands just now; there is no trail to follow."
 
    hunt_lost_trackers = "You seem to have managed to lose your trackers!"
    hunt_gain_trackers = "You sense that someone knows where you are..."
@@ -161,8 +164,19 @@ messages:
 
       oPrey = Send(SYS,@FindUserByString,#string=string);
 
+      // Ours (spell revamp playtest): say why nothing happens.
       if (oPrey = $)
       {
+         Send(who,@MsgSendUser,#message_rsc=hunt_no_such_prey,#parm1=string);
+
+         return;
+      }
+
+      if NOT Send(oPrey,@IsLoggedOn)
+      {
+         Send(who,@MsgSendUser,#message_rsc=hunt_prey_offline,
+              #parm1=Send(oPrey,@GetCapDef),#parm2=Send(oPrey,@GetUserName));
+
          return;
       }
 

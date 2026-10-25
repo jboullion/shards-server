@@ -26,6 +26,10 @@ resources:
       "monster's wounds don't heal back.  "
       "Requires rainbow ferns and firesand to cast."
 
+   IllusionaryFireWall_effect_rsc = \
+      "The flames stand about %i seconds.  Each touch wounds for up to what "
+      "Illusionary Wounds would, never below 10 health."
+
    IllusionaryFireWall_cast_rsc = \
       "An illusionary wall of fire appears before you!"
    IllusionaryFireWall_failed_rsc = \
@@ -62,6 +66,20 @@ properties:
 
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp playtest): how long the wall stands."
+   {
+      AddPacket(4,IllusionaryFireWall_effect_rsc,
+                4,Bound((iSpellPower * 2) + 30,30,180));
+
+      return;
+   }
 
    ResetReagents()
    {

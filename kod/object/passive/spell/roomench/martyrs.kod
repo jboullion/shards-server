@@ -210,9 +210,12 @@ messages:
          return;
       }
 
+      // Ours (spell revamp playtest): those it blessed hear it go.
       if IsClass(who,&Player)
+         AND Send(who,@IsAttackModifier,#what=self)
       {
          Send(who,@RemoveAttackModifier,#what=self);
+         Send(who,@MsgSendUser,#message_rsc=martyrsbg_ally_off);
       }
 
       return;

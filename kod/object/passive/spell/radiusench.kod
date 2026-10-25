@@ -110,6 +110,11 @@ properties:
 
 messages:
 
+   GetManaUpkeep(iSpellPower=0)
+   {
+      return [viManaDrain, viDrainTime];
+   }
+
 #region Casting Infrastructure
    GetNumSpellTargets()
    {
@@ -436,9 +441,11 @@ messages:
       {
          each_obj = First(i);
 
-         // Range check.
-         if (Send(who,@SquaredFineDistanceToLocation3D,#row=iRow,#col=iCol,
-                  #fine_row=iFineRow,#fine_col=iFineCol) > iRange)
+         // Range check. Ours (spell revamp playtest): each occupant's own
+         //  distance; this measured 'who', the caster, so it reached the
+         //  whole room.
+         if (Send(each_obj,@SquaredFineDistanceToLocation3D,#row=iRow,
+                  #col=iCol,#fine_row=iFineRow,#fine_col=iFineCol) > iRange)
          {
             continue;
          }

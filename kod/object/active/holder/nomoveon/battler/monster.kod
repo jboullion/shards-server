@@ -475,7 +475,11 @@ properties:
    pbIllusion = FALSE
    // Ours (spell revamp D39): made by Transmogrify Monster, so no loot.
    pbTransmogrified = FALSE
-   vbSummoned = FALSE
+   // Ours (spell revamp playtest): who we were fighting when Conciliation
+   //  calmed us, and how much we hated them (CalmFor, WaitTimer).
+   poCalmedFrom = $
+   piCalmedHatred = 0
+vbSummoned = FALSE
 
    // Apparition object (caster)
    poApparitionCaster = $
@@ -1819,8 +1823,46 @@ messages:
 
    WaitTimer( timer = $ )
    {
+      local oFoe;
+
       Send(self,@ClearBehavior,#timer=timer);
+
+      // Ours (spell revamp playtest): a calm passes, and we go back to the
+      //  foe we were fighting, if they're still here.
+      if poCalmedFrom <> $
+      {
+         oFoe = poCalmedFrom;
+         poCalmedFrom = $;
+         if poOwner <> $
+            AND IsObject(oFoe)
+            AND Send(oFoe,@GetOwner) = poOwner
+            AND NOT (IsClass(oFoe,&User)
+                     AND Send(oFoe,@IsInCannotInteractMode))
+         {
+            Send(self,@TargetSwitch,#what=oFoe,#iHatred=piCalmedHatred);
+            Send(self,@EnterStateChase);
+
+            return;
+         }
+      }
+
       Send(poBrain,@PostWaitTimer,#mob=self);
+
+      return;
+   }
+
+   CalmFor(delay=4000)
+   "Ours (spell revamp playtest): Conciliation. We stop fighting for delay "
+   "ms, then take up the same foe again (WaitTimer). EnterStateWait alone "
+   "forgot the foe for good."
+   {
+      if poTarget <> $
+      {
+         poCalmedFrom = poTarget;
+         piCalmedHatred = piHatred;
+      }
+
+      Send(self,@EnterStateWait,#delay=delay);
 
       return;
    }

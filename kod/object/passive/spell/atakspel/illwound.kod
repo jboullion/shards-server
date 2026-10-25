@@ -29,7 +29,10 @@ resources:
    illusionarywounds_cast = "Your illusion takes the form of %s."
 
    illusionarywounds_off = "Hey!  Some of those wounds were illusionary!"
-   illusionarywounds_sound = riija.ogg
+   illusionarywounds_effect_rsc = \
+      "Wounds a monster for %i to %i health, a third of its health at most "
+      "and never below 10; a player's wounds heal back after %i seconds."
+illusionarywounds_sound = riija.ogg
 
 classvars:
 
@@ -114,6 +117,9 @@ messages:
       Send(who,@MsgSendUser,#message_rsc=illusionarywounds_cast,
             #parm1=Send(oSpell,@GetName));
 
+      // Ours (spell revamp playtest): this cast never reaches Spell.CastSpell.
+      Send(self,@ShowSpellPower,#who=who,#iSpellPower=iSpellPower);
+
       iDuration = Send(self,@GetDuration,#iSpellPower=iSpellPower);
       iDamage = Send(self,@GetHPLoss,#who=who,#victim=First(lTargets),#iSpellPower=iSpellPower);
 
@@ -175,6 +181,25 @@ messages:
       }
 
       // DON'T PROPAGATE!  This way, events will be handled in the proper order.
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp playtest): the GetHPLoss formula for the easiest and "
+   "hardest monsters (base 29 and 10)."
+   {
+      AddPacket(4,illusionarywounds_effect_rsc,
+         4,Send(self,@DamageFactors,#damage=1000,#who=who) * iSpellPower
+              / SPELLPOWER_MAXIMUM / 100,
+         4,Send(self,@DamageFactors,#damage=2900,#who=who) * iSpellPower
+              / SPELLPOWER_MAXIMUM / 100,
+         4,Send(self,@GetDuration,#iSpellPower=iSpellPower) / 1000);
+
       return;
    }
 

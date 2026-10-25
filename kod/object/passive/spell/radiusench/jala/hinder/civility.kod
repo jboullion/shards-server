@@ -28,7 +28,25 @@ resources:
 
    Civility_song = jala3.ogg
 
+   // Ours (spell revamp playtest): its own lines (every foe song used
+   //  hinder.kod's).
+   Civility_cast = "You begin a soothing, courtly air against your foes."
+   Civility_starts = "%s%s begins a soothing, courtly air!"
+   Civility_ends = "The courtly air played by %s%s fades."
+   Civility_caster_ends = "Your courtly air fades."
+   Civility_caster_enter = "You feel your courtly air reaching for your foes."
+   Civility_enter = "A courtly air played by %s%s fills your mind."
+   Civility_leave = "You can no longer hear the courtly air played by %s%s."
+
 classvars:
+
+   vrEnchantmentOn = Civility_cast
+   vrEnchantmentOnOther = Civility_starts
+   vrEnchantmentOff = Civility_caster_ends
+   vrEnchantmentOffOther = Civility_ends
+   vrEnterRadiusCaster = Civility_caster_enter
+   vrEnterRadius = Civility_enter
+   vrLeaveRadius = Civility_leave
 
    vrMusic = civility_song
 

@@ -6978,10 +6978,20 @@ messages:
       }
 
       if piFlags & PFLAG_TRANCE
-      {  
+      {
          if piFlags & PFLAG_MANA_FOCUS AND IsClass(oSpell,&AttackSpell)
          {
-            
+
+         }
+         else if Send(self,@IsHoldingSilence)
+         {
+            // Ours (spell revamp playtest): Silence's caster may cast.
+         }
+         else if Send(self,@IsEnchanted,#byClass=&Fade)
+         {
+            // Ours (spell revamp playtest): a cast breaks Fade and still goes
+            //  off; it used to be lost.
+            Send(self,@BreakTrance,#event=EVENT_CAST,#what=oSpell);
          }
          else
          {

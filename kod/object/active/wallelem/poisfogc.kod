@@ -80,8 +80,32 @@ messages:
 
    DoEffect(what = $)
    {
-      local bPoison, oSpell;
-      
+      local bPoison, oSpell, iDamage;
+
+      // Ours (spell revamp playtest): the cloud hurts the caster's monster
+      //  foes too; poison itself is a player's ailment.
+      if IsClass(what,&Monster)
+      {
+         if Random(1,100) < piOdds
+            AND poCaster <> $
+            AND (NOT IsClass(poCaster,&Battler)
+                 OR Send(poCaster,@AllowBattlerAttack,#victim=what,
+                         #report=FALSE))
+         {
+            iDamage = Send(what,@AssessDamage,#what=poCaster,
+                           #damage=Random(2,4),#aspell=ATCK_SPELL_ALL,
+                           #report=FALSE,#report_resistance=FALSE);
+            Send(poOwner,@SomethingAttacked,#what=poCaster,#victim=what,
+                 #use_weapon=self,#stroke_obj=self);
+            if iDamage = $
+            {
+               Send(poCaster,@KilledSomething,#what=what,#use_weapon=self);
+            }
+         }
+
+         propagate;
+      }
+
       if Random(1,100) < piOdds
       {
      

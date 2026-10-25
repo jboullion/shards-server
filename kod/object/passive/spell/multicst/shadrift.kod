@@ -27,6 +27,8 @@ resources:
       "is cast.  Subsequent castings with the same prism cause a mystical "
       "portal to form which will transport all who enter it to the exact spot "
       "to which the prism was bound.  "
+      "Several casters must pour their power into a prism set on the ground "
+      "nearby; one alone is rarely enough.  "
       "Requires the feathers of a dark angel and a prism. "
    
    DeathsDoor_sound = qdthdoor.ogg

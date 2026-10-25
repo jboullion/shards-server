@@ -22,10 +22,12 @@ resources:
    Silence_icon_rsc = isilence.bgf
    Silence_desc_rsc = \
       "Muffles all speech in the room for as long as the caster holds the "
-      "trance: nobody else can cast a spell or speak, monsters and players "
-      "alike.  It draws ten mana every one to two seconds, less often the "
-      "stronger the caster.  Requires dark angel feathers and a purple "
-      "mushroom."
+      "trance: the caster's foes, monsters and players alike, can't cast a "
+      "spell or speak.  The caster may still speak, cast and fight, and a "
+      "blow doesn't break the curtain; walking away, resting or a flash "
+      "of light does.  It draws ten mana every one to two seconds, less "
+      "often the stronger the caster.  Requires dark angel feathers and a "
+      "purple mushroom."
    Silence_unnecessary = "This area already is already silenced."
    Silence_on = "A curtain of silence falls across the room."
    Silence_off = "The curtain of silence is lifted."
@@ -68,6 +70,11 @@ properties:
 
 messages:
 
+   GetManaUpkeep(iSpellPower=0)
+   {
+      return [viManaDrain, Send(self,@GetDuration,#iSpellPower=iSpellPower)];
+   }
+
    ResetReagents()
    {
       plReagents = $;
@@ -98,7 +105,11 @@ messages:
    {
       local oRoom;
 
+      // Ours (spell revamp playtest): the caster may fight, cast and take
+      //  blows under the curtain; any hit used to lift it at once.
       if event = EVENT_ATTACK
+         OR event = EVENT_CAST
+         OR event = EVENT_DAMAGE
       {
          return FALSE;
       }

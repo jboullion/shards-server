@@ -28,7 +28,25 @@ resources:
 
    Disharmony_song = bridge.ogg
 
+   // Ours (spell revamp playtest): its own lines (every foe song used
+   //  hinder.kod's).
+   Disharmony_cast = "You begin a jarring, broken melody against your foes."
+   Disharmony_starts = "%s%s begins a jarring, broken melody!"
+   Disharmony_ends = "The jarring melody played by %s%s fades."
+   Disharmony_caster_ends = "Your jarring melody fades."
+   Disharmony_caster_enter = "You feel your jarring melody reaching for your foes."
+   Disharmony_enter = "A jarring melody played by %s%s fills your mind."
+   Disharmony_leave = "You can no longer hear the jarring melody played by %s%s."
+
 classvars:
+
+   vrEnchantmentOn = Disharmony_cast
+   vrEnchantmentOnOther = Disharmony_starts
+   vrEnchantmentOff = Disharmony_caster_ends
+   vrEnchantmentOffOther = Disharmony_ends
+   vrEnterRadiusCaster = Disharmony_caster_enter
+   vrEnterRadius = Disharmony_enter
+   vrLeaveRadius = Disharmony_leave
 
    vrMusic = Disharmony_song
 

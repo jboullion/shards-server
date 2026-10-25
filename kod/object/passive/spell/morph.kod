@@ -297,7 +297,9 @@ messages:
       if iForm <> -1
       {
          // Use EVENT_STEER so we don't print fizzle message.
-         Send(who,@BreakTrance,#event=EVENT_STEER);  
+         Send(who,@BreakTrance,#event=EVENT_STEER);
+         // Ours (spell revamp playtest): naming a form skips Spell.CastSpell.
+         Send(self,@ShowSpellPower,#who=who,#iSpellPower=iSpellPower);
          Send(self,@PerformMorph,#caster=who,#victim=who,#iIllusion_type=iForm,
               #iSpellpower=iSpellpower);
       }

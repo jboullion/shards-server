@@ -22,8 +22,8 @@ resources:
    martyrsgrace_icon_rsc = imargrace.bgf
    martyrsgrace_desc_rsc = \
       "In a display of limitless compassion and empathy, the caster shares in "
-      "the visible suffering of his allies, compelling Shal'ille to come to "
-      "their aid and heal their injuries.  The experience of martyrdom may free "
+      "the visible suffering of his allies and their companions, compelling "
+      "Shal'ille to come to their aid and heal their injuries.  The experience of martyrdom may free "
       "and rejuvenate the caster's mind.  Requires polished seraphym to cast."
 
    martyrsgrace_cast_rsc = \
@@ -38,14 +38,14 @@ resources:
 
    martyrsgrace_notargetshurt_rsc = \
       "All of your allies seem to be perfectly healthy. You might want to reconsider "
-      "your matyrdom."
+      "your martyrdom."
 
    martyrsgrace_notargetsworthy_rsc = \
       "You are quite sure that none of the despicable creatures around you are worthy "
-      "of your matyrdom."
+      "of your martyrdom."
 
    martyrsgrace_notargetsaround_rsc = \
-      "Your matyrdom would be quite pointless with no one around to see it."
+      "Your martyrdom would be quite pointless with no one around to see it."
 
 classvars:
 
@@ -90,6 +90,19 @@ messages:
 
          if each_obj = who
          {
+            continue;
+         }
+
+         // Ours (spell revamp playtest): companions share in the grace, as
+         //  the other heals let them (Heal.IsHealableCompanion).
+         if IsClass(each_obj,&Monster)
+         {
+            if Send(self,@IsHealableCompanion,#who=who,#target=each_obj)
+               AND Send(oRoom,@LineOfSight,#obj1=who,#obj2=each_obj)
+            {
+               lPlayers = Cons(each_obj,lPlayers);
+            }
+
             continue;
          }
 
@@ -192,6 +205,19 @@ messages:
 
          if each_obj = who
          {
+            continue;
+         }
+
+         // Ours (spell revamp playtest): companions share in the grace, as
+         //  the other heals let them (Heal.IsHealableCompanion).
+         if IsClass(each_obj,&Monster)
+         {
+            if Send(self,@IsHealableCompanion,#who=who,#target=each_obj)
+               AND Send(oRoom,@LineOfSight,#obj1=who,#obj2=each_obj)
+            {
+               lFinalTargets = Cons(each_obj,lFinalTargets);
+            }
+
             continue;
          }
 

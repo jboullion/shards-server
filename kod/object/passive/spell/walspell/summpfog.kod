@@ -21,7 +21,10 @@ resources:
    SummonPoisonFog_name_rsc = "poison gas"
    SummonPoisonFog_icon_rsc = ipoiscld.bgf
    SummonPoisonFog_desc_rsc = \
-      "Creates a pungent cloud of poisonous fog.  "
+      "Creates a pungent cloud of poisonous fog.  A player who breathes it "
+      "may be poisoned; the caster's monster foes in it take a little "
+      "damage again and again.  It fails where too many clouds and walls "
+      "already stand.  "
       "Requires entroot berries to cast."
                               
    SummonPoisonFog_cast_rsc = \

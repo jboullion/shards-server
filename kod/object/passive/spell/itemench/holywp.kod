@@ -28,8 +28,8 @@ resources:
    holyweapon_name_rsc = "holy weapon"
    holyweapon_icon_rsc = iholywpn.bgf
    holyweapon_desc_rsc = \
-      "Dedicates your weapon to Shal'ille, enhancing its "
-      "effectiveness against the unholy.  "
+      "Dedicates your weapon to Shal'ille for a time: its blows deal holy "
+      "damage, which hurts every foe and the undead most of all.  "
       "Requires two fairy wings and an orc tooth to cast."
 
    holyweapon_spell_intro = \

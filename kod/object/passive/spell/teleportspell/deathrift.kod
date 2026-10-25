@@ -33,8 +33,8 @@ resources:
    DeathRift_sound = qdthdoor.ogg
 
    DeathRift_no_angeled = \
-      "You cannot call upon such an evil pact while your guardian "
-      "angel watches over you."
+      "You cannot call upon such an evil pact while you are still "
+      "under the protection given to newcomers."
    DeathRift_bind = \
       "You leave a smattering of blood at the ground beneath your "
       "feet, binding a small part of your soul to this location."

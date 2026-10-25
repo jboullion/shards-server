@@ -127,11 +127,14 @@ messages:
       propagate;
    }
 
-   DoSpell(what=$,oTarget=$)
+   DoSpell(what=$,oTarget=$,report=TRUE)
    {
       local i, iDuration, oList;
 
-      if Send(SETTINGS_OBJECT,@DisplaySpellData)
+      // Ours (spell revamp playtest): a quiet use (Flash, the lightning wall)
+      //  doesn't announce each target's duration.
+      if report
+         AND Send(SETTINGS_OBJECT,@DisplaySpellData)
          AND oTarget <> $
       {
          oList = Send(oTarget,@GetEnchantmentList);

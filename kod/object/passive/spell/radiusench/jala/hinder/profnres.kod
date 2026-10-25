@@ -28,7 +28,25 @@ resources:
 
    ProfaneResonance_song = nec02.ogg
 
+   // Ours (spell revamp playtest): its own lines (every foe song used
+   //  hinder.kod's).
+   ProfaneResonance_cast = "You begin a profane dirge against your foes."
+   ProfaneResonance_starts = "%s%s begins a profane dirge!"
+   ProfaneResonance_ends = "The dirge played by %s%s fades."
+   ProfaneResonance_caster_ends = "Your dirge fades."
+   ProfaneResonance_caster_enter = "You feel your dirge reaching for your foes."
+   ProfaneResonance_enter = "A dirge played by %s%s fills your mind."
+   ProfaneResonance_leave = "You can no longer hear the dirge played by %s%s."
+
 classvars:
+
+   vrEnchantmentOn = ProfaneResonance_cast
+   vrEnchantmentOnOther = ProfaneResonance_starts
+   vrEnchantmentOff = ProfaneResonance_caster_ends
+   vrEnchantmentOffOther = ProfaneResonance_ends
+   vrEnterRadiusCaster = ProfaneResonance_caster_enter
+   vrEnterRadius = ProfaneResonance_enter
+   vrLeaveRadius = ProfaneResonance_leave
 
    vrMusic = ProfaneResonance_song
 
@@ -77,7 +95,9 @@ messages:
               #iSpell=ATCK_SPELL_UNHOLY) <> 0
          AND IsClass(oCaster,&Player)
       {
-         Send(oCaster,@GainHealth,#amount=1);
+         // Ours (spell revamp playtest): never past full health (GainHealth
+         //  let it climb to twice the maximum).
+         Send(oCaster,@GainHealthNormal,#amount=1);
       }
 
       return;

@@ -23,8 +23,8 @@ resources:
    FinalRites_desc_rsc = \
       "This is the lengthy formal ceremony performed at funerals to help the "
       "recently departed soul pass smoothly on to the Underworld.  It may "
-      "also be used to force nearby undead back in their graves where they "
-      "belong.  "
+      "also be used to force every undead creature in the area back into "
+      "its grave, where it belongs.  "
       "Requires emeralds and dried elderberries, which during the ceremony "
       "are crushed together into a symbolic handful of dust and scattered "
       "into the air."
@@ -140,7 +140,11 @@ messages:
          // Ours (spell revamp phase 5): 12 to 20, and up to 16 more with
          //  spellpower. It was 1 to 5 plus a karma gap players no longer have.
          iDamage = Random(12,20) + (iSpellpower/6);
-         if Send(oUndead,@AssessDamage,#what=who,#damage=iDamage,#aspell=ATCK_SPELL_HOLY) = $
+         iDamage = Send(oUndead,@AssessDamage,#what=who,#damage=iDamage,
+                        #aspell=ATCK_SPELL_HOLY);
+         // Ours (spell revamp playtest): the hit line, as attack spells give.
+         Send(who,@AssessHit,#what=oUndead,#damage=iDamage,#use_weapon=self);
+         if iDamage = $
          {
             Send(who,@KilledSomething,#what=oUndead,#use_weapon=self);
          }

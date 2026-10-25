@@ -30,6 +30,13 @@ resources:
       "You have cast a touch attack on another player.  This is a bug.  "
       "Please report it.  Have a nice day."
 
+   touchattack_effect_rsc = \
+      "Your bare-handed blows deal %i to %i %s damage for %i minutes (a "
+      "wielded weapon ignores it).  A new touch spell replaces it."
+   touchattack_effect_day_rsc = \
+      "Your bare-handed blows deal %i to %i %s damage until the day turns "
+      "(a wielded weapon ignores it).  A new touch spell replaces it."
+
    touchattack_enchantment_rsc = \
       "\n\nYour current %s enchantment will deal %i - %i base %s damage."
 
@@ -473,6 +480,36 @@ messages:
    "Allow mages to switch elements despite antagonistic conditions."
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp playtest): the touch's damage and how long it lasts."
+   {
+      local iTime, rEffect;
+
+      iTime = Send(self,@GetDuration,#iSpellPower=iSpellPower);
+      rEffect = touchattack_effect_rsc;
+      if iTime >= 3600000
+      {
+         rEffect = touchattack_effect_day_rsc;
+      }
+
+      AddPacket(4,rEffect,
+                4,Send(self,@FindMinDamage,#who=who),
+                4,Send(self,@FindMaxDamage,#who=who),
+                4,Send(SYS,@GetSpellDamageTypeName,
+                       #type=(viSpellType & ~ATCK_SPELL_ALL)));
+      if rEffect = touchattack_effect_rsc
+      {
+         AddPacket(4,iTime / 60000);
+      }
+
+      return;
    }
 
    EffectDesc(who=$)

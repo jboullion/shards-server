@@ -28,7 +28,25 @@ resources:
 
    Conciliation_song = neutfor.ogg
 
+   // Ours (spell revamp playtest): its own lines (every foe song used
+   //  hinder.kod's).
+   Conciliation_cast = "You begin a gentle song of peace against your foes."
+   Conciliation_starts = "%s%s begins a gentle song of peace!"
+   Conciliation_ends = "The song of peace played by %s%s fades."
+   Conciliation_caster_ends = "Your song of peace fades."
+   Conciliation_caster_enter = "You feel your song of peace reaching for your foes."
+   Conciliation_enter = "A song of peace played by %s%s fills your mind."
+   Conciliation_leave = "You can no longer hear the song of peace played by %s%s."
+
 classvars:
+
+   vrEnchantmentOn = Conciliation_cast
+   vrEnchantmentOnOther = Conciliation_starts
+   vrEnchantmentOff = Conciliation_caster_ends
+   vrEnchantmentOffOther = Conciliation_ends
+   vrEnterRadiusCaster = Conciliation_caster_enter
+   vrEnterRadius = Conciliation_enter
+   vrLeaveRadius = Conciliation_leave
 
    vrMusic = Conciliation_song
 
@@ -69,9 +87,10 @@ messages:
          return;
       }
 
+      // Ours (spell revamp playtest): CalmFor, so it fights again after.
       if Random(1,100) <= 20 + (Send(self,@GetSongPower,#state=state) / 3)
       {
-         Send(who,@EnterStateWait,#delay=4000);
+         Send(who,@CalmFor,#delay=4000);
       }
 
       return;

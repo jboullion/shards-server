@@ -4532,7 +4532,9 @@ messages:
       oSpell = Send(SYS,@FindSpellByNum,#num=SID_SILENCE);
 
       lState = Send(self,@GetEnchantmentState,#what=oSpell);
+      // Ours (spell revamp playtest): never the caster.
       if (lState <> $)
+         AND First(lState) <> who
          AND Send(First(lState),@AllowBattlerAttack,#victim=who,#stroke_obj=self)
       {
          Send(who,@MsgSendUser,#message_rsc=room_silenced_rsc);

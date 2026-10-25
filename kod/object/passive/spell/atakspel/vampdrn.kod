@@ -30,6 +30,9 @@ resources:
    VampiricDrain_death = "You drain the last bit of %s%s's life force."
    VampiricDrain_health_gain = \
       "You siphon your victim's life force, gaining ~g~B%i~B~n health."
+   VampiricDrain_marked = \
+      "You siphon your victim's life force, but your mark of dishonor lets "
+      "none of it heal you."
 
    VampiricDrain_sound = qvtouch.ogg
 
@@ -100,7 +103,17 @@ messages:
               #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName));
       }
 
-      Send(who,@MsgSendUser,#message_rsc=VampiricDrain_health_gain,#parm1=iToHeal/100);
+      // Ours (spell revamp playtest): Mark of Dishonor blocks the heal, so
+      //  don't claim it.
+      if Send(who,@IsEnchanted,#byClass=&MarkOfDishonor)
+      {
+         Send(who,@MsgSendUser,#message_rsc=VampiricDrain_marked);
+      }
+      else
+      {
+         Send(who,@MsgSendUser,#message_rsc=VampiricDrain_health_gain,
+              #parm1=iToHeal/100);
+      }
       Send(who,@GainHealth,#amount=iToHeal,#precision=TRUE);
 
       propagate;

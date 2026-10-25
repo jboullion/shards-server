@@ -36,7 +36,7 @@ resources:
       "%s%s%s shrinks away from the dark energy of Qor."
 
    UnholyTouch_player_killed_something = \
-      "Dark evil energy escapes from %s%s, ripping apart their soul."
+      "Dark evil energy escapes from %s%s, ripping its soul apart."
    UnholyTouch_player_was_killed = \
       "The touch of %s%s separates body from soul, dragging %s%s to "
       "the Underworld."

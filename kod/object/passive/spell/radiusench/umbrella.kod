@@ -21,8 +21,9 @@ resources:
    Umbrella_name_rsc = "umbrella"
    Umbrella_icon_rsc = iumbrela.bgf
    Umbrella_desc_rsc = \
-      "Creates a dome of magical energy around the caster that shields "
-      "those within, above all against attacks from outside the dome.  The "
+      "Creates a dome of magical energy around the caster.  Everyone inside, "
+      "foes included, resists a little of all damage, and attacks from "
+      "outside the dome find it much harder to land.  The "
       "caster sustains it with mana drained every few seconds, and it fades "
       "when the caster rests or runs out of mana.  Requires two emeralds to "
       "cast."

@@ -28,7 +28,25 @@ resources:
 
    SacredResonance_song = goodfor.ogg
 
+   // Ours (spell revamp playtest): its own lines (every foe song used
+   //  hinder.kod's).
+   SacredResonance_cast = "You begin a sacred hymn against your foes."
+   SacredResonance_starts = "%s%s rings out a sacred hymn!"
+   SacredResonance_ends = "The hymn played by %s%s fades."
+   SacredResonance_caster_ends = "Your hymn fades."
+   SacredResonance_caster_enter = "You feel your hymn reaching for your foes."
+   SacredResonance_enter = "A hymn played by %s%s fills your mind."
+   SacredResonance_leave = "You can no longer hear the hymn played by %s%s."
+
 classvars:
+
+   vrEnchantmentOn = SacredResonance_cast
+   vrEnchantmentOnOther = SacredResonance_starts
+   vrEnchantmentOff = SacredResonance_caster_ends
+   vrEnchantmentOffOther = SacredResonance_ends
+   vrEnterRadiusCaster = SacredResonance_caster_enter
+   vrEnterRadius = SacredResonance_enter
+   vrLeaveRadius = SacredResonance_leave
 
    vrMusic = SacredResonance_song
 

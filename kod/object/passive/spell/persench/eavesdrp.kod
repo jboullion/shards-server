@@ -22,7 +22,9 @@ resources:
    Eavesdrop_icon_rsc = ieavesdr.bgf
    Eavesdrop_desc_rsc = \
       "Riija grants the ability to hear distant conversations, allowing you "
-      "to spy on others.  Requires two dragonfly eyes."
+      "to spy on others.  You listen for as long as you hold the trance, "
+      "and it costs a point of mana every second or so.  "
+      "Requires two dragonfly eyes."
    
    Eavesdrop_on_rsc = "The sounds of a nearby room fill your mind."
    Eavesdrop_off_rsc = "The distant sounds become impossible to hear."
@@ -67,6 +69,11 @@ properties:
 
 messages:
 
+   GetManaUpkeep(iSpellPower=0)
+   {
+      return [viManaDrain, Send(self,@GetDuration,#iSpellPower=iSpellPower)];
+   }
+
    ResetReagents()
    {
       plReagents = $;
@@ -102,8 +109,10 @@ messages:
       }
       else
       {
+         // Ours (spell revamp playtest): keep listening; this was the last
+         //  call too, so it ended after one pulse (about 2 seconds).
          Send(who,@StartEnchantment,#what=self,#time=First(state),
-               #state=state,#addicon=FALSE,#lastcall=TRUE,
+               #state=state,#addicon=FALSE,#lastcall=FALSE,
                #iSpellPower=iSpellPower);
       }
 

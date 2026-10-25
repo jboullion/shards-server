@@ -23,10 +23,14 @@ resources:
 
    MarkOfDishonor_name_rsc = "mark of dishonor"
    MarkOfDishonor_icon_rsc = imarkdis.bgf
+   MarkOfDishonor_effect_rsc = \
+      "The mark lasts %i to %i seconds on a player, half that on a monster."
+
    MarkOfDishonor_desc_rsc = \
       "Allows caster to cast Shal'ille's displeasure upon a target.  While "
       "the mark lasts, nothing heals the target, not even rest, and every "
-      "blow against it lands a tenth harder.  "
+      "blow against it lands a tenth harder.  On a monster the mark lasts "
+      "half as long.  "
       "Requires an emerald to cast."
 
    MarkOfDishonor_sound = smarkdis.ogg
@@ -71,6 +75,23 @@ properties:
    piDeviation = 10
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp playtest): its length on a player."
+   {
+      local iTime;
+
+      iTime = piBaseDuration + (iSpellPower+1) * piSpellPowerModifier;
+      AddPacket(4,MarkOfDishonor_effect_rsc,
+                4,iTime * (100 - piDeviation) / 100000, 4,iTime / 1000);
+
+      return;
+   }
 
    ResetReagents()
    {

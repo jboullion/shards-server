@@ -22,8 +22,9 @@ resources:
    forcesoflight_icon_rsc = ifrclite.bgf
    forcesoflight_desc_rsc = \
       "Summons Shal'ille to infuse her power into the caster's allies in the "
-      "room, making their attacks far more accurate and her spells more "
-      "potent.  Those who follow Qor get nothing from it.  "
+      "room, companions among them, making their attacks far more accurate "
+      "and her spells more potent.  Those who follow Qor get nothing from "
+      "it.  "
       "Requires elderberries and emeralds to cast."
 
    forcesoflight_already_enchanted = \
@@ -82,13 +83,26 @@ messages:
 
       Send(oRoom,@RoomStartEnchantment,#what=self,#state=[iSpellpower,who],
             #time=Send(self,@GetDuration,#iSpellpower=iSpellpower));
-      Send(oRoom,@EnchantAllOccupants,#what=self);
+      Send(oRoom,@EnchantAllOccupants,#what=self,#state=[iSpellpower,who]);
 
       propagate;
    }
 
    StartEnchantmentNewOccupant(who = $, state = $)
    "Called on new occupants of the enchanted room."
+   {
+      Send(self,@StartEnchantment,#who=who,#state=state);
+
+      return;
+   }
+
+   AffectsMonsters()
+   "Ours (spell revamp playtest): allied monsters (companions) too."
+   {
+      return TRUE;
+   }
+
+   StartEnchantmentNewMonster(who = $, state = $)
    {
       Send(self,@StartEnchantment,#who=who,#state=state);
 
@@ -108,6 +122,19 @@ messages:
          oCaster = Nth(state,2);
       }
 
+      if IsClass(who,&Monster)
+      {
+         if state <> $
+            AND oCaster <> $
+            AND Send(self,@IsCasterAlly,#oCaster=oCaster,#who=who)
+            AND NOT Send(who,@IsEnchanted,#what=self)
+         {
+            Send(who,@StartEnchantment,#what=self,#state=First(state));
+         }
+
+         return;
+      }
+
       if Send(self,@KarmaCheck,#who=who)
          AND (oCaster = $
               OR Send(self,@IsCasterAlly,#oCaster=oCaster,#who=who))
@@ -123,25 +150,71 @@ messages:
    "Called when spell expires."
    {
       Send(where,@SomeoneSaid,#type=SAY_MESSAGE,#string=forcesoflight_off,#what=self);
-      Send(where,@UnenchantAllOccupants,#what=self,#state=state);
-      
+      Send(where,@UnenchantAllOccupants,#what=self,#state=state,
+           #monsters=TRUE);
+
       return;
    }
 
    EndRoomEnchantment(who = $, state = $)
    "Remove enchantment effects on this occupant"
    {
-      Send(who,@RemoveAttackModifier,#what=self);
-      Send(who,@MsgSendUser,#message_rsc=forcesoflight_player_off);
-      
+      if IsClass(who,&Monster)
+      {
+         Send(who,@RemoveEnchantment,#what=self);
+
+         return;
+      }
+
+      // Ours (spell revamp playtest): only those it blessed hear it go.
+      if Send(who,@IsAttackModifier,#what=self)
+      {
+         Send(who,@RemoveAttackModifier,#what=self);
+         Send(who,@MsgSendUser,#message_rsc=forcesoflight_player_off);
+      }
+
       return;
+   }
+
+   EndEnchantment(who = $, state = $)
+   "A monster's blessing: nothing to undo."
+   {
+      return;
+   }
+
+   ModifyMonsterOffense(mob=$,iOffense=0,state=$)
+   "Ours (spell revamp playtest): an allied monster hits more often, by a "
+   "share like Martyr's Battleground's."
+   {
+      if state = $
+      {
+         return iOffense;
+      }
+
+      return iOffense * (110 + Bound(state,0,99) / 5) / 100;
    }
 
    // stuff we handle to be an attack modifier
 
    ModifyHitRoll(who = $, what = $, hit_roll = $)
+   "Ours (spell revamp playtest): what the description says, 50 plus the "
+   "spellpower (it was a flat 150)."
    {
-      return hit_roll + 150;
+      local oRoom, lState;
+
+      oRoom = Send(who,@GetOwner);
+      lState = $;
+      if oRoom <> $
+      {
+         lState = Send(oRoom,@GetEnchantedState,#what=self);
+      }
+
+      if lState = $
+      {
+         return hit_roll + 50;
+      }
+
+      return hit_roll + 50 + Bound(First(lState),0,99);
    }
    
    ModifyDamage(who = $, what = $, damage = $)

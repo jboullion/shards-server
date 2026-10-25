@@ -23,7 +23,8 @@ resources:
    feigndeath_desc_rsc = \
       "Makes you appear to be deceased, that hopefully someone won't "
       "really make you as such.  Monsters lose interest in a corpse, and "
-      "your defense rises while you hold the trance.  "
+      "your defense rises while you hold the trance, which costs five mana "
+      "every five seconds.  "
       "Requires nothing but a devious mind."
 
    feigndeath_user_killed = "~B~U~k[###]~n ~B~v%s was just killed by %s%s."
@@ -55,6 +56,11 @@ classvars:
 properties:
 
 messages:
+
+   GetManaUpkeep(iSpellPower=0)
+   {
+      return [viManaDrain, viDrainTime];
+   }
 
    ResetReagents()
    {

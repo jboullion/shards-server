@@ -22,7 +22,9 @@ resources:
    ManaShield_desc_rsc = \
       "Kraanan wraps the caster in a ward of their own mana.  While it "
       "lasts, the blows you take drain your mana instead of your health, one "
-      "and a half mana for each point of damage, until your mana runs out.  "
+      "and a half mana for each point of damage, until your mana runs out "
+      "or the ward fades: one minute, and a minute more for every 8 "
+      "spellpower.  You may cast other spells under it.  "
       "Requires a blue dragon scale and a kriipa claw to cast."
    ManaShield_enchantment_rsc = \
       "\n\nYour mana shield enchantment reduces damage as long as you have mana"

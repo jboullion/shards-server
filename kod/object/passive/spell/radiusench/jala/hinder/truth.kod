@@ -29,7 +29,25 @@ resources:
 
    truth_song = song.ogg
 
+   // Ours (spell revamp playtest): its own lines (every foe song used
+   //  hinder.kod's).
+   truth_cast = "You begin a clear, piercing song of truth against your foes."
+   truth_starts = "%s%s begins a clear, piercing song of truth!"
+   truth_ends = "The song of truth played by %s%s fades."
+   truth_caster_ends = "Your song of truth fades."
+   truth_caster_enter = "You feel your song of truth reaching for your foes."
+   truth_enter = "A song of truth played by %s%s fills your mind."
+   truth_leave = "You can no longer hear the song of truth played by %s%s."
+
 classvars:
+
+   vrEnchantmentOn = truth_cast
+   vrEnchantmentOnOther = truth_starts
+   vrEnchantmentOff = truth_caster_ends
+   vrEnchantmentOffOther = truth_ends
+   vrEnterRadiusCaster = truth_caster_enter
+   vrEnterRadius = truth_enter
+   vrLeaveRadius = truth_leave
 
    vrMusic = truth_song
 

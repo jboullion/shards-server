@@ -220,7 +220,7 @@ messages:
       // Announce and remove old
       Send(caster,@MsgSendUser,#message_rsc=transmon_cast_rsc,
             #parm1=Send(victim,@GetCapDef),#parm2=Send(victim,@GetName),
-            #parm3=Send(oNewMonster,@GetCapDef),#parm4=Send(oNewMonster,@GetName));
+            #parm3=Send(oNewMonster,@GetIndef),#parm4=Send(oNewMonster,@GetName));
 
       Post(victim,@Delete);
 

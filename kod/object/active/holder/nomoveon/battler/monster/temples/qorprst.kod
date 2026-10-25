@@ -44,8 +44,9 @@ resources:
       "hinders the magics of our enemy, even if your tin ear will "
       "undoubtedly be unable to comprehend its full beauty."
    qorpriestess_not_powerful = \
-      "~bCome back when you have rid yourself of that pathetic guardian angel "
-      "and are ready to kill others for the glory of the Dark Mistress.~n~k"
+      "~bCome back when you are no longer a fledgling under the guards' "
+      "protection, and are ready to kill for the glory of the Dark "
+      "Mistress.~n~k"
 
    qorpriestess_teach = \
       "Through the darkness of Qor, you can learn %s%s%s%s%s%s%s%s%s%s%s%s "

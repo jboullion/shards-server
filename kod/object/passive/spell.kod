@@ -86,7 +86,8 @@ resources:
 
    spell_costs_rsc = "%r~BCosts:~B %r%r%r%r%r%r%r%r.%r%r"
    spell_costs_mana = "%i mana"
-   spell_costs_no_mana = "no mana"
+   spell_costs_mana_upkeep = "%i mana, then %i more every %i.%i seconds while it lasts"
+spell_costs_no_mana = "no mana"
    spell_costs_vigor = ", %i vigor"
    spell_costs_reagent = ", %i %s"
    spell_costs_reagent_unknown = ", %i other reagents"
@@ -467,7 +468,7 @@ messages:
    "Ours (spell revamp D1): mana, vigor, reagents, cast time and recovery, "
    "as they are for who."
    {
-      local i, iCount, iExertion, iTime, oReagent, iNumber;
+      local i, iCount, iExertion, iTime, oReagent, iNumber, lUpkeep;
 
       AddPacket(4,spell_costs_rsc);
       if bAfterEffect
@@ -480,7 +481,15 @@ messages:
       }
 
       iNumber = Send(self,@GetManaCost,#who=who,#iSpellPower=iSpellPower);
-      if iNumber > 0
+      // Ours (spell revamp playtest): a song or held trance's upkeep too.
+      lUpkeep = Send(self,@GetManaUpkeep,#iSpellPower=iSpellPower);
+      if lUpkeep <> $
+         AND First(lUpkeep) > 0
+      {
+         AddPacket(4,spell_costs_mana_upkeep, 4,iNumber, 4,First(lUpkeep),
+                   4,Nth(lUpkeep,2) / 1000, 4,(Nth(lUpkeep,2) % 1000) / 100);
+      }
+      else if iNumber > 0
       {
          AddPacket(4,spell_costs_mana, 4,iNumber);
       }
@@ -908,7 +917,9 @@ messages:
       {
          oSpell = Send(SYS,@FindSpellByNum,#num=SID_SILENCE);
          lState = Send(where,@GetEnchantmentState,#what=oSpell);
+         // Ours (spell revamp playtest): never the caster.
          if (lState <> $)
+            AND First(lState) <> who
          {
             if IsClass(who,&Player)
                AND Send(First(lState),@AllowBattlerAttack,#victim=who,
@@ -2462,6 +2473,7 @@ messages:
       }
 
       oRoom = Send(who,@GetOwner);
+      iAbilityGain = 0;
 
       // Let immortals cast at full potency.
       if IsClass(who,&DM)
@@ -2535,14 +2547,17 @@ messages:
                                     lParts);
          }
 
-         // Forces of Light boosts Shal'ille
-         if Send(oRoom,@IsEnchanted,#what=SID_FORCES_OF_LIGHT)
+         // Forces of Light boosts Shal'ille. Ours (spell revamp playtest):
+         //  ask about the spell itself (the number never matched), and count
+         //  it beside the light bonus, not inside its cap.
+         oModifierSpell = Send(SYS,@FindSpellByNum,#num=SID_FORCES_OF_LIGHT);
+         if oModifierSpell <> $
+            AND Send(oRoom,@IsEnchanted,#what=oModifierSpell)
          {
             // Add a function of the spellpower.
             iAbilityGain = First(Send(oRoom,@GetEnchantmentState,
-                                 #what=SID_FORCES_OF_LIGHT));
+                                 #what=oModifierSpell));
             iAbilityGain /= 10;
-            iSecondaryBonus += iAbilityGain;
             if bParts
             {
                lParts = AppendListElem([spell_pp_room_ench, iAbilityGain,
@@ -2692,7 +2707,7 @@ messages:
       }
 
       iSpellPower = iPrimaryBonus + iSecondaryBonus + iPowerBonus + iBase
-                    + iAttune;
+                    + iAttune + iAbilityGain;
 
       if Send(oRoom,@CheckRoomFlag,#flag=ROOM_ANTI_MAGIC)
       {
@@ -3131,6 +3146,28 @@ messages:
    "as well as players (Room.EnchantAllOccupants)."
    {
       return FALSE;
+   }
+
+   GetManaUpkeep(iSpellPower=0)
+   "Ours (spell revamp playtest): [mana, every so many ms] a spell keeps "
+   "taking while it lasts (songs, held trances), or $."
+   {
+      return $;
+   }
+
+   ShowSpellPower(who=$,iSpellPower=0)
+   "Ours (spell revamp playtest): the 'Spellpower for X is N.' line, for a "
+   "spell whose cast doesn't reach Spell.CastSpell."
+   {
+      if who <> $
+         AND IsClass(who,&Player)
+         AND Send(who,@CheckPlayerPreference,#flag=CF_SPELLPOWER)
+      {
+         Send(who,@MsgSendUser,#message_rsc=spell_display_spellpower,
+              #parm1=Send(self,@GetName),#parm2=iSpellPower);
+      }
+
+      return;
    }
 
    IsRiijaGuise()

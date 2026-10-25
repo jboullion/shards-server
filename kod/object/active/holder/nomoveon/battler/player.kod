@@ -3818,9 +3818,31 @@ messages:
       return;
    }
 
+   IsHoldingSilence()
+   "Ours (spell revamp playtest): TRUE if we hold this room's Silence."
+   {
+      local lState;
+
+      if poOwner = $
+      {
+         return FALSE;
+      }
+
+      lState = Send(poOwner,@GetEnchantmentState,
+                    #what=Send(SYS,@FindSpellByNum,#num=SID_SILENCE));
+
+      return lState <> $ AND First(lState) = self;
+   }
+
+   IsAttackModifier(what = $)
+   "Ours (spell revamp playtest): TRUE if <what> modifies our attacks."
+   {
+      return what <> $ AND FindListElem(plAttack_modifiers,what) <> 0;
+   }
+
    RemoveAttackModifier(what = $)
    "Removes <what> from plAttack_modifiers."
-   {
+{
       local i;
 
       foreach i in plAttack_modifiers

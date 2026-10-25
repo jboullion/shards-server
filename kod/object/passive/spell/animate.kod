@@ -30,9 +30,9 @@ resources:
    Animate_human_cast_rsc ="%s's corpse pulls itself up off the ground."
    Animate_human_failed_rsc ="%s's corpse remains inanimate on the ground."
    Animate_mob_failed_rsc = \
-      "The %s's remains still lay lifeless and inanimate."
+      "The %s still lies lifeless and inanimate."
    Animate_mob_cast_rsc = \
-      "The %s's remains come alive and rise up from the ground."
+      "The %s stirs, and its remains rise up from the ground."
    Animate_failed_rsc = "The remains are unable to be animated."
    Animate_too_many_rsc = "You are unable to control another minion."
    Animate_failed_full_rsc = \

@@ -22,9 +22,10 @@ resources:
    fade_icon_rsc = ifade.bgf
    fade_desc_rsc = \
       "Temporarily dissolves your physical form leaving "
-      "you invisible.  The spell lasts as long as your trance "
-      "is maintained, and while it holds no monster can find you; "
-      "doing anything at all breaks it.  "
+      "you invisible for two to ten minutes, longer the stronger the "
+      "caster.  While it holds no monster can find you.  You may walk, but "
+      "casting, fighting or using anything breaks it; the spell you cast "
+      "still goes off.  "
       "Requires a dark angel feather to cast."
    
    fade_already_enchanted = "You are already invisible."
@@ -138,7 +139,8 @@ messages:
    {
       /// clean up trance
       Send(who,@ClearTranceFlag);
-      Send(who,@RemoveEnchantment,#what=self);
+      // Ours (spell revamp playtest): one message, not fade_off as well.
+      Send(who,@RemoveEnchantment,#what=self,#report=FALSE);
       Send(who,@MsgSendUser,#message_rsc=fade_broke_trance);
       
       return;

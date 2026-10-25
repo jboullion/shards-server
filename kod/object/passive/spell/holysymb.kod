@@ -35,6 +35,11 @@ resources:
 
    HolySymbol_sound = sholysym.ogg
 
+   HolySymbol_turned = "~B%i~B undead cower and flee from the holy symbol."
+   HolySymbol_enraged = "~B%i~B undead are enraged by your clumsy tracery!"
+   HolySymbol_unmoved = "The undead here are unmoved."
+   HolySymbol_none = "There are no undead here to frighten."
+
    holysymbol_intro = \
       "Shal'ille Lv. 1: Weaves a holy symbol in the air which repels any nearby undead."
 
@@ -79,7 +84,12 @@ messages:
 
    CastSpell(who=$,iSpellPower=0)
    {
-      local oRoom, oObject, oMonster, iChance, iRoll;
+      local oRoom, oObject, oMonster, iChance, iRoll, iUndead, iTurned,
+            iEnraged;
+
+      iUndead = 0;
+      iTurned = 0;
+      iEnraged = 0;
 
       Send(who,@MsgSendUser,#message_rsc=HolySymbol_success);
       oRoom = Send(who,@GetOwner);
@@ -92,6 +102,8 @@ messages:
             AND NOT (Send(oMonster,@GetBehavior) & AI_NPC)
             AND (Send(oMonster,@IsUndead))
          {
+            iUndead = iUndead + 1;
+
             // Use the "detect" option for the monster's karma in case we're trying to turn an event monster.
             iChance = (iSpellPower*3/4) + (Send(who,@GetBaseMaxHealth) - Send(oMonster,@GetLevel)/2)
                                         + (Send(who,@GetKarma) + Send(oMonster,@GetKarma,#detect=TRUE));
@@ -107,17 +119,43 @@ messages:
 
             if iRoll < iChance
             {
-               // they're scared and will now run away
+               // they're scared and will now run away. Ours (spell revamp
+               //  playtest): a real fear, not the caster's karma (always 0).
                Send(oMonster,@TurnedBy,#who=who);
-               Send(oMonster,@TargetSwitch,#what=who,#iHatred=Send(who,@GetKarma));
+               Send(oMonster,@TargetSwitch,#what=who,#iHatred=100);
+               iTurned = iTurned + 1;
             }
 
             if iRoll > (iChance + HATE_MARGIN)
             {
                // oops!  since you failed, now they really hate you!
-               Send(oMonster,@TargetSwitch,#what=who,#iHatred=Send(who,@GetKarma));
+               Send(oMonster,@TargetSwitch,#what=who,#iHatred=150);
                Send(oMonster,@EnterStateChase,#target=who,#actnow=TRUE);
+               iEnraged = iEnraged + 1;
             }
+         }
+      }
+
+      if iUndead = 0
+      {
+         Send(who,@MsgSendUser,#message_rsc=HolySymbol_none);
+      }
+      else
+      {
+         if iTurned > 0
+         {
+            Send(who,@MsgSendUser,#message_rsc=HolySymbol_turned,#parm1=iTurned);
+         }
+
+         if iEnraged > 0
+         {
+            Send(who,@MsgSendUser,#message_rsc=HolySymbol_enraged,
+                 #parm1=iEnraged);
+         }
+
+         if iTurned = 0 AND iEnraged = 0
+         {
+            Send(who,@MsgSendUser,#message_rsc=HolySymbol_unmoved);
          }
       }
 
