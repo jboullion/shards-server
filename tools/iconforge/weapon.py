@@ -22,6 +22,11 @@ The weapons and their sprites are listed in data/iconforge/weapons.json.
    - `pov` (first person): a close-up, the head as wide as the original's and the shaft running off
      the edge. In `cut` frames the head is out of the picture: it sits just past the far end, at the
      last frame's scale. `sink` pushes the head that share of its length past its end in the others.
+     `fit` lists frames that show the whole weapon: each is scaled so it reaches the frame's far end
+     (from the sunk head), rather than drawing its head as wide as the original's, and the other
+     frames take the `scale_from` frame's scale. `scale` multiplies them all. `grow` lets a frame
+     grow up and left to hold it (first-person frames hang from the bottom right corner, so they
+     stay put).
 4. Colour: the head's neutral greys (`tint`) go to the grey ramp D0-DF, which the game recolours
    per school of magic (basewand.kod ResetColors, the same xlat on all three sprites); everything
    else to the nearest palette colour outside that ramp, so it never changes colour.
@@ -63,6 +68,7 @@ BROWSER = Path(os.environ.get("MERIDIAN_BROWSER", r"E:\2026_Experiments\meridian
 
 BODY_SHRINK = 4  # the player body (bta.bgf) that held weapons hang from
 SS = 4  # supersampling
+GROW = 256  # how far a pov frame may grow up and left (`grow`), in its pixels
 GREY = list(range(0xD0, 0xE0))
 # basewand.kod viPT_*_master: Faren, Kraanan, Shal'ille, Qor, Riija
 SCHOOLS = [("Faren", 0x21), ("Kraanan", 0x20), ("Shal'ille", 0x30), ("Qor", 0x2C), ("Riija", 0x18)]
@@ -297,13 +303,25 @@ def build_sprite(d: Drawing, sp: dict, pal) -> BGF:
         p["butt"] = p["butt"] * f + pad
         p["length"] *= f
     s_full = max(p["length"] for p in poses) / d.h
+    sink = sp.get("sink", 0)
     for p in poses:  # the scale that draws the head as wide as the original's
         p["s_head"] = p["head_width"] * f / d.head_w
-    s_ref = poses[sp.get("scale_from", len(poses) - 1)]["s_head"]
+    fit = sp.get("fit")
+    for i, p in enumerate(poses):
+        # `fit` (pov): frames that show the whole weapon take the scale that reaches the frame's far
+        # end from the sunk head; the others that of the `scale_from` frame
+        p["s_pov"] = p["length"] / (d.h - sink * d.head_rows) if fit is not None and i in fit else p["s_head"]
+        p["s_pov"] *= sp.get("scale", 1.0)  # and then drawn this much bigger or smaller
+    s_ref = poses[sp.get("scale_from", len(poses) - 1)]["s_pov" if kind == "pov" else "s_head"]
+    if fit is not None:
+        for i, p in enumerate(poses):
+            if i not in fit:
+                p["s_pov"] = s_ref
     sw = s_full * sp.get("shaft", 1.0)  # a shaft can be drawn thicker than the drawing's proportion
     bitmaps = []
     for i, (bm, p) in enumerate(zip(orig.bitmaps, poses)):
         w, h = round(bm.w * f) + 2 * pad, round(bm.h * f) + 2 * pad
+        grow = GROW if kind == "pov" and sp.get("grow") else 0
         if kind == "icon" and i in sp.get("broken", []):
             pieces = broken_pieces(d, p["head"], p["butt"], sp.get("shaft", 1.0))
         elif kind in ("held", "icon"):
@@ -319,12 +337,18 @@ def build_sprite(d: Drawing, sp: dict, pal) -> BGF:
             v = p["head"] - p["butt"]
             u = v / (float(np.hypot(*v)) or 1.0)
             cut = i in sp.get("cut", [])
-            s = s_ref if cut else p["s_head"]
-            tip = p["head"] + u * d.head_rows * s * (1.1 if cut else sp.get("sink", 0))
+            s = s_ref if cut else p["s_pov"]
+            tip = p["head"] + u * d.head_rows * s * (1.1 if cut else sink) + grow
             pieces = [(0, d.h, s, s, tip, u)]
         else:
             raise SystemExit("%s: unknown kind %r" % (sp["file"], kind))
-        idx = to_indices(d, render(d, (w, h), pieces), pal)
+        idx = to_indices(d, render(d, (w + grow, h + grow), pieces), pal)
+        if grow:
+            # drawn with room above and to the left; the frame grows only that way, as far as the
+            # weapon reaches: it hangs from the screen's bottom right corner (HS_SE)
+            ys, xs = np.nonzero(idx != TRANSPARENT)
+            idx = idx[min(grow, ys.min()):, min(grow, xs.min()):] if len(xs) else idx[grow:, grow:]
+            h, w = idx.shape
         xoff, yoff = (bm.xoff - int(shift), bm.yoff - int(shift)) if kind == "held" else (bm.xoff, bm.yoff)
         bitmaps.append(Bitmap(w, h, xoff, yoff, list(bm.hotspots), idx.tobytes()))
     return BGF(name=orig.name, shrink=shrink, groups=[list(g) for g in orig.groups], bitmaps=bitmaps)

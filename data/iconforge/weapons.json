@@ -1,5 +1,5 @@
 {
- "about": "Weapons drawn once and posed into all their sprites by tools/iconforge/weapon.py. ref: the current sprite frame the model sees (file:frame). what/head/describe: the prompt. head_rows: the top share of the drawing kept full size when a held weapon is foreshortened; tint_rows: the top share whose neutral greys take the school colour (0: fixed colours). upright and flip: the model draws it as `upright` says and the drawing is turned over, so its head (the wider end the frames are measured by: a sword's hilt) is at the top. sprites: kind icon (broken: frames drawn in pieces), held (shrink, pad, shaft: how much thicker than the drawing's proportion; head_max: the head at most that many times the shaft's scale, 2.5), pov (cut: frames whose head is off the top, or off the bottom with cut_head; sink: the share of the head past its end in the other frames).",
+ "about": "Weapons drawn once and posed into all their sprites by tools/iconforge/weapon.py. ref: the current sprite frame the model sees (file:frame). what/head/describe: the prompt. head_rows: the top share of the drawing kept full size when a held weapon is foreshortened; tint_rows: the top share whose neutral greys take the school colour (0: fixed colours). upright and flip: the model draws it as `upright` says and the drawing is turned over, so its head (the wider end the frames are measured by: a sword's hilt) is at the top. sprites: kind icon (broken: frames drawn in pieces), held (shrink, pad, shaft: how much thicker than the drawing's proportion; head_max: the head at most that many times the shaft's scale, 2.5), pov (cut: frames whose head is off the top, or off the bottom with cut_head; sink: the share of the head past its end in the other frames; fit: the frames that show the whole weapon, scaled to reach the frame's far end, the rest at scale_from's scale; scale: all of them times this; grow: frames may grow up and left).",
  "weapons": {
   "wand": {
    "ref": "wand.bgf:0",
@@ -39,7 +39,7 @@
    "sprites": [
     {"file": "lightsw.bgf", "kind": "icon", "shrink": 5, "broken": [1], "head_max": 1},
     {"file": "lightswov.bgf", "kind": "held", "shrink": 8, "pad": 4, "head_max": 1},
-    {"file": "povlightsw.bgf", "kind": "pov", "cut": [0], "cut_head": "bottom", "sink": 0.8}
+    {"file": "povlightsw.bgf", "kind": "pov", "cut": [0], "cut_head": "bottom", "sink": 0.8, "fit": [2, 3, 4], "scale": 0.8, "grow": true}
    ]
   }
  }
