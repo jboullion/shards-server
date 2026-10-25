@@ -46,7 +46,7 @@ classvars:
    viMana = 10
    viSchool = SS_FAREN
    viFarenElement = FAREN_ELEMENT_STORM
-   viSpell_level = 5
+   viSpell_level = 3   // Ours (spell revamp grids): was 5
 
    viChance_To_Increase = 15
    viMeditate_ratio = 50

@@ -38,7 +38,7 @@ resources:
    winds_new_entrant = "Violent winds sweep the area and buffet your limbs."
    winds_miss_rsc = "The powerful winds snatch your shot away."
    winds_spell_intro = \
-      "Faren Level 3: Summons violent winds, which make ranged "
+      "Faren Level 4: Summons violent winds, which make ranged "
       "combat less effective."
    winds_sound = fwinds.ogg
 
@@ -55,7 +55,7 @@ classvars:
    viNoNewbieOffense = TRUE
    viSpell_num = SID_WINDS
    viMana = 10
-   viSpell_level = 3
+   viSpell_level = 4   // Ours (spell revamp grids): was 3
    viSchool = SS_FAREN
    // Ours (spell revamp D13, D14): only foes, not the caster.
    vbRoomEnchHitCaster = FALSE

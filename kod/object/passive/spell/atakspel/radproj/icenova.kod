@@ -52,7 +52,7 @@ classvars:
    viSpell_num = SID_ICE_NOVA
    viSchool = SS_FAREN
    viFarenElement = FAREN_ELEMENT_FROST
-   viSpell_level = 5
+   viSpell_level = 6   // Ours (spell revamp grids): was 5
    viMana = 15
 
    viChance_to_increase = 15

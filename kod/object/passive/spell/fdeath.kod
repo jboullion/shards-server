@@ -48,7 +48,7 @@ classvars:
    viMeditate_ratio = 10
 
    viSchool = SS_RIIJA
-   viSpell_level = 1
+   viSpell_level = 2   // Ours (spell revamp grids): was 1
 
    viHarmful = FALSE
 

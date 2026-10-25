@@ -58,7 +58,7 @@ classvars:
 
    viSpell_num = SID_CRYSTALIZE_MANA
    viSchool = SS_JALA
-   viSpell_level = 6
+   viSpell_level = 5   // Ours (spell revamp grids): was 6
 
    viMana = 20
 

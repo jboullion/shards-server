@@ -50,7 +50,7 @@ classvars:
    viSpell_num = SID_MANA_BOMB
    viMana = 0
    viSchool = SS_KRAANAN
-   viSpell_level = 4
+   viSpell_level = 6   // Ours (spell revamp grids): was 4
 
    viHarmful = TRUE
    viOutlaw = TRUE

@@ -63,7 +63,7 @@ classvars:
    // Ours (spell revamp D13, D14): only foes, not the caster.
    vbRoomEnchHitCaster = FALSE
    viFarenElement = FAREN_ELEMENT_FROST
-   viSpell_level = 3
+   viSpell_level = 4   // Ours (spell revamp grids): was 3
    viMana = 8
 
    viHarmful = TRUE

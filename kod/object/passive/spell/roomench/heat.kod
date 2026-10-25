@@ -65,7 +65,7 @@ classvars:
    viFarenElement = FAREN_ELEMENT_FLAME
    // It burns over time already: an attuned mage gets 15% more instead.
    vbAttunementBurns = FALSE
-   viSpell_level = 3
+   viSpell_level = 4   // Ours (spell revamp grids): was 3
    viMana = 8
 
    viHarmful = TRUE

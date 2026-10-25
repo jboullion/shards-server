@@ -46,7 +46,7 @@ classvars:
 
    viSchool = SS_FAREN
    viFarenElement = FAREN_ELEMENT_STORM
-   viSpell_level = 3
+   viSpell_level = 4   // Ours (spell revamp grids): was 3
    viMana = 8
 
    vrSucceed_wav = ShockingFury_sound

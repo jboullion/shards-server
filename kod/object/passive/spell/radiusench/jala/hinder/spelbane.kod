@@ -72,7 +72,7 @@ classvars:
 
    viSpell_num = SID_SPELLBANE
    viSchool = SS_JALA
-   viSpell_level = 5
+   viSpell_level = 6   // Ours (spell revamp grids): was 5
 
    viMana = 12          // Mana is amount used upon inititiation
    viManaDrain = 8      // Drain is amount used every viDrainTime milliseconds

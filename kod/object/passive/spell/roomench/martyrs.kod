@@ -70,7 +70,7 @@ classvars:
    viSpell_num = SID_MARTYRS_BATTLEGROUND
    viSchool = SS_KRAANAN
    viMana = 10
-   viSpell_level = 3
+   viSpell_level = 6   // Ours (spell revamp grids): was 3
 
    viChance_To_Increase = 15
    viMeditate_ratio = 30

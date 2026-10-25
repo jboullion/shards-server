@@ -33,7 +33,7 @@ classvars:
    viSpell_num = SID_ICEWALL
    viSchool = SS_FAREN
    viFarenElement = FAREN_ELEMENT_FROST
-   viSpell_level = 4
+   viSpell_level = 5   // Ours (spell revamp grids): was 4
    viMana = 15
    viSpellExertion = 3
    viMeditate_ratio = 40

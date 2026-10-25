@@ -51,7 +51,7 @@ classvars:
 
    viSpell_num = SID_BRITTLE
    viSchool = SS_FAREN
-   viSpell_level = 4
+   viSpell_level = 5   // Ours (spell revamp grids): was 4
    viMana = 8
    viSpellExertion = 3
 

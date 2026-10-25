@@ -158,7 +158,9 @@ messages:
          return TRUE;
       }
 
-      return Send(who,@PlayerCanLearn,#spell_num=SID_FIREBALL)
+      // Ours (spell revamp grids): Blast of Fire stays at level 4; Fireball
+      //  moved to 3.
+      return Send(who,@PlayerCanLearn,#spell_num=SID_BLAST_OF_FIRE)
                = PLAYER_LEARN_SUCCESS;
    }
 

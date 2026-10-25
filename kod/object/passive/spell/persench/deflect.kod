@@ -35,7 +35,7 @@ resources:
    Deflect_off_rsc = "The magical barrier protecting you seems to be waning."
 
    Deflect_spell_intro = \
-      "Kraanan Level 4: Forms a magical barrier around the target, protecting "
+      "Kraanan Level 5: Forms a magical barrieraround the target, protecting "
       "them from harm of magics that damage directly."
 
    Deflect_sound = kdeflect.ogg
@@ -69,7 +69,7 @@ classvars:
 
    viMana = 20
    viCast_time = 0
-   viSpell_level = 4
+   viSpell_level = 5   // Ours (spell revamp grids): was 4
    viSchool = SS_KRAANAN
 
    viChance_To_Increase = 20

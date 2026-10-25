@@ -27,7 +27,7 @@ classvars:
    viSpell_num = SID_RESTORE_COMPANION
    viSchool = SS_SHALILLE
    viMana = 15
-   viSpell_level = 4
+   viSpell_level = 3   // Ours (spell revamp grids): was 4
 
    viChance_To_Increase = 30
    viMeditate_ratio = 40
