@@ -3148,10 +3148,11 @@ messages:
       return FALSE;
    }
 
-   SendSpellFx(kind=0,source=$,target=$,color=$,size=2)
+   SendSpellFx(kind=0,source=$,target=$,color=$,size=2,fxlook=$)
    "Ours (spell revamp phase 9): a visual for our client (Room.SendSpellFx), in "
    "the room of the target, or else the source. The colour defaults to the "
-   "spell's school's (GetSchoolFxColor)."
+   "spell's school's (GetSchoolFxColor), and the look, its particles' shape, "
+   "to the school's (GetFxLook)."
    {
       local oRoom;
 
@@ -3182,9 +3183,13 @@ messages:
       {
          color = Send(self,@GetSchoolFxColor);
       }
+      if fxlook = $
+      {
+         fxlook = Send(self,@GetFxLook);
+      }
 
       Send(oRoom,@SendSpellFx,#kind=kind,#source=source,#target=target,
-           #color=color,#size=size);
+           #color=color,#size=size,#fxlook=fxlook);
 
       return;
    }
@@ -3259,9 +3264,116 @@ messages:
       return;
    }
 
+   GetFxLook()
+   "Ours (spell revamp, 25 October): the school's look for our client's "
+   "particles (SPELLFX_LOOK_*): Shal'ille stars, Qor smoke, Kraanan "
+   "diamonds, Faren embers, Riija swirls, Jala music notes."
+   {
+      if viSchool = SS_SHALILLE
+      {
+         return SPELLFX_LOOK_SHALILLE;
+      }
+      if viSchool = SS_QOR
+      {
+         return SPELLFX_LOOK_QOR;
+      }
+      if viSchool = SS_KRAANAN
+      {
+         return SPELLFX_LOOK_KRAANAN;
+      }
+      if viSchool = SS_FAREN
+      {
+         return SPELLFX_LOOK_FIRE;
+      }
+      if viSchool = SS_RIIJA
+      {
+         return SPELLFX_LOOK_RIIJA;
+      }
+      if viSchool = SS_JALA
+      {
+         return SPELLFX_LOOK_JALA;
+      }
+
+      return SPELLFX_LOOK_PLAIN;
+   }
+
+   ElementFxColor(iType=0)
+   "Ours (spell revamp phase 9): the colour of a damage type (ATCK_SPELL_*, "
+   "5:5:5), or the school's."
+   {
+      if iType & ATCK_SPELL_FIRE
+      {
+         return LIGHT_FIRE;
+      }
+      if iType & ATCK_SPELL_COLD
+      {
+         return 0x331F;   // pale ice blue
+      }
+      if iType & ATCK_SPELL_SHOCK
+      {
+         return LIGHT_LIGHTNING;
+      }
+      if iType & ATCK_SPELL_ACID
+      {
+         return LIGHT_BGREEN;
+      }
+      if iType & ATCK_SPELL_HOLY
+      {
+         return LIGHT_BYELLOW;
+      }
+      // (unholy is Qor's: green, as Qor's effects are)
+      if iType & ATCK_SPELL_UNHOLY
+      {
+         return LIGHT_BGREEN;
+      }
+      if iType & ATCK_SPELL_QUAKE
+      {
+         return LIGHT_DORANGE;
+      }
+
+      return Send(self,@GetSchoolFxColor);
+   }
+
+   ElementFxLook(iType=0)
+   "Ours (25 October): the look of a damage type, beside ElementFxColor: fire "
+   "embers, ice flakes, lightning sparks, acid drops, holy stars, unholy "
+   "smoke, earth dust; else the school's."
+   {
+      if iType & ATCK_SPELL_FIRE
+      {
+         return SPELLFX_LOOK_FIRE;
+      }
+      if iType & ATCK_SPELL_COLD
+      {
+         return SPELLFX_LOOK_ICE;
+      }
+      if iType & ATCK_SPELL_SHOCK
+      {
+         return SPELLFX_LOOK_LIGHTNING;
+      }
+      if iType & ATCK_SPELL_ACID
+      {
+         return SPELLFX_LOOK_ACID;
+      }
+      if iType & ATCK_SPELL_HOLY
+      {
+         return SPELLFX_LOOK_SHALILLE;
+      }
+      if iType & ATCK_SPELL_UNHOLY
+      {
+         return SPELLFX_LOOK_QOR;
+      }
+      if iType & ATCK_SPELL_QUAKE
+      {
+         return SPELLFX_LOOK_EARTH;
+      }
+
+      return Send(self,@GetFxLook);
+   }
+
    GetSchoolFxColor()
-   "Ours (spell revamp phase 9): Shal'ille gold, Qor violet, Kraanan red, "
-"Faren orange, Riija green, Jala blue (5:5:5)."
+   "Ours (spell revamp phase 9): Shal'ille gold, Qor green, Kraanan red, "
+"Faren orange, Riija violet, Jala blue (5:5:5). Qor and Riija swapped 25 October."
    {
       if viSchool = SS_SHALILLE
       {
@@ -3269,7 +3381,7 @@ messages:
       }
       if viSchool = SS_QOR
       {
-         return LIGHT_BPURPLE;
+         return LIGHT_BGREEN;
       }
       if viSchool = SS_KRAANAN
       {
@@ -3281,7 +3393,7 @@ messages:
       }
       if viSchool = SS_RIIJA
       {
-         return LIGHT_BGREEN;
+         return LIGHT_BPURPLE;
       }
       if viSchool = SS_JALA
       {

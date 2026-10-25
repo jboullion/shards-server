@@ -301,6 +301,13 @@ messages:
          AND victim <> $
       {
          Send(self,@TryAttunementBurn,#who=who,#victim=victim,#iDamage=damage);
+
+         // Ours (spell revamp, 25 October): a small hit in the touch's
+         //  element, for our client (touch blows showed nothing).
+         Send(self,@SendSpellFx,#kind=SPELLFX_IMPACT,#source=who,
+              #target=victim,#size=1,
+              #color=Send(self,@ElementFxColor,#iType=viSpellType),
+              #fxlook=Send(self,@ElementFxLook,#iType=viSpellType));
       }
 
       return;

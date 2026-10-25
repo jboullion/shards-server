@@ -2635,6 +2635,20 @@
    SPELLRANGE_PREVIEW = 1  // how far a spell would reach, asked for (UC_SHARDS_OBJECT "range")
    SPELLRANGE_ON = 2       // a song (a radius enchantment) starts: its ring follows its centre
    SPELLRANGE_OFF = 3      // and ends
+
+   // Ours (spell revamp, 25 October): UC_SPELL_FX's look, which our client draws
+   //  its particles' shape by: a school, or the damage's element
+   SPELLFX_LOOK_PLAIN = 0
+   SPELLFX_LOOK_SHALILLE = 1     // and holy
+   SPELLFX_LOOK_QOR = 2          // and unholy
+   SPELLFX_LOOK_ACID = 3
+   SPELLFX_LOOK_KRAANAN = 4
+   SPELLFX_LOOK_FIRE = 5         // and Faren
+   SPELLFX_LOOK_ICE = 6
+   SPELLFX_LOOK_LIGHTNING = 7
+   SPELLFX_LOOK_RIIJA = 8
+   SPELLFX_LOOK_JALA = 9
+   SPELLFX_LOOK_EARTH = 10
 SID_ICEWALL             = 241
    SID_INDEST              = 242
    SID_NODROP              = 253

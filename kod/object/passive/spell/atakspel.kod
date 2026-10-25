@@ -296,7 +296,8 @@ messages:
          if Send(self,@SendsImpactFx)
          {
             Send(self,@SendSpellFx,#kind=SPELLFX_IMPACT,#source=who,#target=i,
-                 #color=Send(self,@GetElementFxColor));
+                 #color=Send(self,@GetElementFxColor),
+                 #fxlook=Send(self,@GetElementFxLook));
          }
 
          Send(self,@DoSideEffect,#who=who,#victim=i,#damage=iDamage,
@@ -359,36 +360,22 @@ messages:
       {
          return Send(self,@GetSchoolFxColor);
       }
-      if iType & ATCK_SPELL_FIRE
+
+      return Send(self,@ElementFxColor,#iType=iType);
+   }
+
+   GetElementFxLook()
+   "Ours (25 October): the look of the damage, its particles' shape."
+   {
+      local iType;
+
+      iType = Send(self,@GetAttackSpell);
+      if iType = $
       {
-         return LIGHT_FIRE;
-      }
-      if iType & ATCK_SPELL_COLD
-      {
-         return 0x331F;   // pale ice blue
-      }
-      if iType & ATCK_SPELL_SHOCK
-      {
-         return LIGHT_LIGHTNING;
-      }
-      if iType & ATCK_SPELL_ACID
-      {
-         return LIGHT_BGREEN;
-      }
-      if iType & ATCK_SPELL_HOLY
-      {
-         return LIGHT_BYELLOW;
-      }
-      if iType & ATCK_SPELL_UNHOLY
-      {
-         return LIGHT_BPURPLE;
-      }
-      if iType & ATCK_SPELL_QUAKE
-      {
-         return LIGHT_DORANGE;
+         return Send(self,@GetFxLook);
       }
 
-      return Send(self,@GetSchoolFxColor);
+      return Send(self,@ElementFxLook,#iType=iType);
    }
 
    GetManaCostExtra(who=$)

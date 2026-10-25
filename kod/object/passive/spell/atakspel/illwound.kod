@@ -149,7 +149,8 @@ messages:
       Send(who,@AssessHit,#what=oTarget,#damage=iDamage,#use_weapon=self);
       // Ours (spell revamp phase 9): a flicker of false fire on the victim.
       Send(self,@SendSpellFx,#kind=SPELLFX_IMPACT,#source=who,#target=oTarget,
-           #color=Send(self,@GetElementFxColor));
+           #color=Send(self,@GetElementFxColor),
+           #fxlook=Send(self,@GetElementFxLook));
 
       if iDamage = $
       {

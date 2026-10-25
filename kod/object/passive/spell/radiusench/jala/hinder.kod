@@ -79,7 +79,7 @@ messages:
    }
 
 GetSongFxColor(iSpell=0)
-   "Ours (spell revamp phase 9): holy gold, unholy violet, else Jala blue."
+   "Ours (spell revamp phase 9): holy gold, unholy green (Qor's), else Jala blue."
    {
       if iSpell & ATCK_SPELL_HOLY
       {
@@ -87,7 +87,7 @@ GetSongFxColor(iSpell=0)
       }
       if iSpell & ATCK_SPELL_UNHOLY
       {
-         return LIGHT_BPURPLE;
+         return LIGHT_BGREEN;
       }
       if iSpell & ATCK_SPELL_QUAKE
       {
