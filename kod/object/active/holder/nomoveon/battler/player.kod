@@ -655,9 +655,8 @@ resources:
       "\n\n"
       "Should you desire to join any of these factions, seek the Liege. "
       "As a faction member, you can help to influence the Council yourself, "
-      "and share in the benefits of belonging to the party in power. You will "
-      "need to demonstrate fealty to your Liege on a regular basis to "
-      "keep your name on the rolls. Even if you join neither faction, you "
+      "and share in the benefits of belonging to the party in power. Once sworn, "
+      "you stay on the rolls for as long as you wish. Even if you join no faction, you "
       "will still be influenced by the Council's decisions - as are all."
       "\n\n"
       "Fair partings, and perhaps we will someday meet at the court."
@@ -12679,6 +12678,12 @@ messages:
       {
          Send(self,@ClearFactionRenown);
          Post(self,@NameColorsChanged);
+
+         // ...and the old liege's shield is gone, so its soldier quest can be done again
+         if piFaction <> FACTION_NEUTRAL
+         {
+            Send(Send(SYS,@GetQuestBook),@ForgetSoldierQuest,#who=self,#faction=piFaction);
+         }
       }
 
       piFaction = faction;

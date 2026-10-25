@@ -121,6 +121,9 @@ properties:
 
    ptNext = $
    ptStage = $
+   // Ours: when the last regular battle was called (GetTime()), so the next is called
+   // piBattleMinutes after it, not after it ends (Resolve); 0 before the first
+   piCalledAt = 0
    ptTick = $
 
    poRoom = $
@@ -538,6 +541,7 @@ messages:
       poAttackCaptain = $;
       poDefendCaptain = $;
       piState = STATE_MUSTER;
+      piCalledAt = GetTime();
 
       if pbOpenGround
       {
@@ -1504,9 +1508,21 @@ messages:
       piAttacker = FACTION_NEUTRAL;
       piDefender = FACTION_NEUTRAL;
 
-      // A siege leaves the regular schedule as it was
+      // A siege leaves the regular schedule as it was. Ours: a regular battle's next one is
+      // called piBattleMinutes after it was, so the muster and the fight don't push it back.
       if NOT pbSiege
-         OR ptNext = $
+      {
+         if piCalledAt > 0
+         {
+            Send(self,@ScheduleNext,
+                 #minutes=piBattleMinutes - (GetTime() - piCalledAt) / 60);
+         }
+         else
+         {
+            Send(self,@ScheduleNext);
+         }
+      }
+      else if ptNext = $
       {
          Send(self,@ScheduleNext);
       }

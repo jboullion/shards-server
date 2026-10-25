@@ -32,38 +32,26 @@ resources:
    PrincessShield_emblem_drop = gshpr.bgf
    PrincessShield_emblem_back = gshprbk.bgf
 
-   PrincessShield_welcome_mail = "Subject: Welcome to the Royal army.\n"
-      "Greetings.  I welcome you as a new ally in our fight to keep the throne from the "
-      "forces that would see us come to harm.\n\n"
-      "There are a few rules you must observe while acting as a soldier.\n\n"
+   PrincessShield_welcome_mail = "Subject: Welcome to the Royal army.\nGreetings. I welcome you as a new ally in "
+      "our fight to keep the throne from the forces that would see us come to harm.\n\n"
       "SOLDIER SHIELD: Your shield is the sign that you are an official part of the "
-      "Royal army.  You must keep this equipped at all times in order to demonstrate "
-      "your position.\n\n"
-      "ENEMY SOLDIERS: As agreed, you can be attacked by any enemy soldier in any place "
-      "that is not a haven (such as a inn or hall).  Your attacker will not be recognized "
-      "as a criminal for attacking or killing you.  Likewise, you can attack enemies "
-      "without fear of penalty.  Note that attacking any fellow soldiers will vex me "
-      "greatly, and I will remove you as a soldier and a member of my faction.  Also, our "
-      "righteousness allows you to do additional damage with all your attacks to these "
-      "enemy soldiers.  Please realize that deaths at the hands of enemy soldiers are "
-      "real, and you will suffer the usual penalties.\n\n"
-      "RANKS: Your position within the army is determined by your actions.  Killing enemy "
-      "soldiers will allow you promotion within the ranks of the army.  Being killed or "
-      "remaining inactive for long periods of time will show you a decrease in rank.  "
-      "Do not try to escape combat by leaving this world in unsafe areas as this will "
-      "also lower your rank.\n\n"
-      "ABILITIES: With your status as a faction soldier, I will show you additional ways "
-      "to increase your power.  I will make you more intelligent and able to comprehend "
-      "all things mystical.  I will also teach you ways to reduce the mana cost of your "
-      "spells.  The potence of these abilities will increase as you gain ranks.\n\n"
-      "THE COUNCILORS: The councilors have declared that the tokens are too delicate to "
-      "be entrusted to the hands of soldiers.  Therefore, you are instructed not to pick "
-      "up any tokens you may find.  I encourage you to find an ally to take the token to "
-      "the proper councilor should you find one.  Likewise, the councilos have declared "
-      "that only faction soldiers may claim territory now.  The flags in my chambers may "
-      "now only be carried by recognized soldiers of my faction.\n\n"
-      "LOYALTY: While in the service of the royal army, I will not ask you to prove your "
-      "loyalty as before.  You should concentrate on maintaining your rank.\n\n"
+      "Royal army. While you wear it, the Duke's soldiers and the rebels may attack you "
+      "anywhere but a guild hall, and you may attack them, without fear of penalty. You "
+      "may put it away when you are not fighting, though not in the midst of a fight.\n\n"
+      "DEATH IN BATTLE: A soldier who falls loses nothing but a little renown, though "
+      "their weapon and armour break: any smith can mend them. You will have ten "
+      "minutes to regroup before the enemy may strike you again. Attacking a fellow "
+      "soldier of the Crown will vex me greatly: it costs you renown, and with none "
+      "left, your place in my service.\n\n"
+      "RANKS: Your rank is the renown you have earned. Win battles, claim flagpoles for "
+      "the Crown and defeat enemy soldiers, and you will be promoted. Your renown will "
+      "not fade while you serve me.\n\n"
+      "ABILITIES: As a soldier of the Crown, you will grow wiser and more attuned to "
+      "all things mystical, steadier of aim, and better defended, and I will teach you "
+      "to spend less mana on your spells. These gifts grow with your rank.\n\n"
+      "THE WAR: Our army takes the field every two hours. Stand with it, shield on, and "
+      "you will be rewarded whether we win or lose. Only soldiers may carry the flags "
+      "in my chambers and claim territory for the Crown.\n\n"
       "May Shal'ille guide your actions to ensure our victory!\n\n"
       "Signed, The Princess Kateriina, regent to Meridian."
 
@@ -165,6 +153,11 @@ messages:
       local iReduction;
 
       iReduction = ((piFactionRank / 3) - 1);
+      // Ours: ranks 1 and 2 came to -1, which made every spell cost a point more
+      if iReduction < 0
+      {
+         iReduction = 0;
+      }
 
       return iReduction;
    }

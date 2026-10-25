@@ -1169,9 +1169,11 @@ messages:
       local iBonus, iFaction;
 
       // Rationale behind the numbers:
-      // The "bonus" is the percent change in prices.  IE, if buying, you get the bonus
-      // subtracted from 100 to get the percent of the price you pay, and vice versa.
-      // Princess gets a 5// bonus.
+      // The "bonus" is the percent change in prices: buying, you pay 100 less the bonus,
+      // percent. The Princess's people get 5% off.
+      // Ours: selling gets no bonus. The old 5% better selling price for the Princess's people
+      // let a merchant with no markup buy back for more than it sold (Monster.Offer took it
+      // out long ago, and nothing asked for it since), so it's gone here too.
 
       if who = $
       {
@@ -1179,29 +1181,23 @@ messages:
          return FALSE;
       }
 
+      if NOT buying
+      {
+         return 100;
+      }
+
       iFaction = send(who,@GetFaction);
 
       // Ours (the faction revamp's phase 3): members pay less in a town their liege holds,
-      //  and less again while it celebrates there (util/factionworld.kod). Only when buying.
-      iBonus = 0;
-      if buying
-      {
-         iBonus = Send(Send(Send(SYS,@GetFactionWar),@GetWorld),@GetPriceBonus,#who=who);
-      }
+      //  and less again while it celebrates there (util/factionworld.kod).
+      iBonus = Send(Send(Send(SYS,@GetFactionWar),@GetWorld),@GetPriceBonus,#who=who);
 
       if (iFaction <> FACTION_PRINCESS)
       {
          return 100 - iBonus;
       }
 
-      if buying
-      {
-         iBonus = -(iBonus + 5);
-      }
-      else
-      {
-         iBonus = 5;
-      }
+      iBonus = -(iBonus + 5);
 
       if Random(0,100) = 0
       {

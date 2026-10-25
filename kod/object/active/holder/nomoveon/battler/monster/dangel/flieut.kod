@@ -41,6 +41,8 @@ classvars:
    vbNamedMob = TRUE
    viIndefinite = ARTICLE_NONE
    viDefinite = ARTICLE_NONE
+   // Ours: the boss pays this range itself, not the level formula
+   vbCashRange = TRUE
    viCashmin = 5000
    viCashmax = 7000
 

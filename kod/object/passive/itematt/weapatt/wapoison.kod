@@ -28,11 +28,12 @@ constants:
 resources:
 
    weapattPoison_desc = \
-      "\n\nD's mark is ooz's a pungent toxin that seeps down the metal of the weapon."
+      "\n\nA pungent toxin seeps down the metal of the weapon."
    Poison_fail_use = "You are not yet ready to use %s%s."
    Poison_worked = "%s%s grasp the wound, screaming as the venom enters!"
+   Poison_burned = "Your venom burns into %s%s!"
    Poison_dm = "Poison"
-   Poison_info_desc = "15%% chance on hit to poison the target\n"
+   Poison_info_desc = "15%% chance on hit to poison a player, or to burn a monster for 10 to 30 more damage\n"
    weapattpoison_name = "%s of venom"
 
 classvars:
@@ -63,7 +64,8 @@ messages:
 ////////////////////////////////////////////////
 
    ModifyDamage(damage=0,target=$,wielder=$,lData=$)
-   "Wielder has a 1% chance of blinding target with any hit."
+   "Wielder has a piEffect_percent chance with any hit of poisoning a player. Ours: poison is "
+   "players' alone (Poison.MakePoisoned), so a monster takes the venom as more damage at once."
    {
       local oSpell, iduration, iamount;
 
@@ -75,6 +77,14 @@ messages:
 
       if Random(1,100) <= piEffect_percent
       {
+         if NOT IsClass(target,&Player)
+         {
+            Send(wielder,@MsgSendUser,#message_rsc=Poison_burned,
+                 #parm1=Send(target,@GetDef),#parm2=Send(target,@GetName));
+
+            return damage + Random(10,30);
+         }
+
          iamount     = Random(2500,6500);
          iduration   = Random(80000,180000);
 

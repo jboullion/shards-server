@@ -5903,8 +5903,8 @@ messages:
          return TRUE;
       }
 
+      // Ours: whoever may set it may clear it, an officer as well as the leader (ADR 0022)
       if StringContain(string,guild_clear_motd_command)
-         AND Send(poGuild,@GetGuildMaster) = self
          AND (Send(poGuild,@GetRank,#who=self) = RANK_MASTER
             OR Send(poGuild,@GetRank,#who=self) = RANK_LIEUTENANT)
       {

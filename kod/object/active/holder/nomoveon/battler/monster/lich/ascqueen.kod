@@ -35,6 +35,8 @@ classvars:
 
    vrDesc = AscendedQueen_desc_rsc
    viTrophy = TROPHY_CAPSTONE
+   // Ours: the boss pays this range itself, not the level formula
+   vbCashRange = TRUE
    viCashmin = 8000
    viCashmax = 12000
 

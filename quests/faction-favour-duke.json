@@ -23,7 +23,7 @@
     "cooldownHours": 12
   },
   "text": {
-    "offer": "Ah, my loyal servant. I require you to collect all taxes due from Frisconar, the apothecary of Tos. Return within the hour.",
+    "offer": "Ah, my loyal servant. I require you to collect all taxes due from Frisconar, the apothecary of Tos, and bring them back to me.",
     "progress": "Duke Akardius has commanded you to collect taxes from Frisconar. Return quickly with the full amount.",
     "complete": "You have done well. You have carried out my task, and remain in my favor."
   },

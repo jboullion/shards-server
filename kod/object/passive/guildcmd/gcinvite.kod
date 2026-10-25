@@ -23,7 +23,7 @@ resources:
    guildInvite_icon_rsc = light.bgf
    guildinvite_desc_text_rsc = \
       "Used to invite prospective members into the guild.  Invited person "
-      "has 1 minute to accept the invitation."
+      "has 2 minutes to accept the invitation."
    guildinvite_already_your_guild = "This person already belongs to your guild."
    invite_cant_invite_self = "You cannot invite yourself to join your guild!"
    invite_non_user = "%s%s respectfully declines your tempting offer."

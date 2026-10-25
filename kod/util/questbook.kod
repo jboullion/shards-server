@@ -212,6 +212,11 @@ constants:
    // A quest shows a grey "!" this much health below its band
    QUEST_SOON_HEALTH = 10
 
+   // Each liege's soldier quest (quests/soldier-*.json), which gives their soldier shield
+   SOLDIER_QUEST_PRINCESS = 76
+   SOLDIER_QUEST_DUKE = 77
+   SOLDIER_QUEST_REBEL = 78
+
 resources:
 
    // Ours: a signet ring's owner who stands in no room (UC_SIGNETS)
@@ -427,6 +432,44 @@ messages:
       }
 
       return $;
+   }
+
+   ForgetSoldierQuest(who = $,faction = $)
+   "Ours: who has left faction, and its soldier shield with it (Player.ResetFaction), so its "
+   "soldier quest is forgotten: coming back, they can earn the shield again."
+   {
+      local id, lDone;
+
+      if NOT IsClass(who,&User)
+      {
+         return FALSE;
+      }
+
+      id = $;
+      if faction = FACTION_DUKE
+      {
+         id = SOLDIER_QUEST_DUKE;
+      }
+      else if faction = FACTION_PRINCESS
+      {
+         id = SOLDIER_QUEST_PRINCESS;
+      }
+      else if faction = FACTION_REBEL
+      {
+         id = SOLDIER_QUEST_REBEL;
+      }
+
+      lDone = Send(self,@DoneEntry,#who=who,#id=id);
+      if id = $ OR lDone = $
+      {
+         return FALSE;
+      }
+
+      Send(who,@SetQuestDone,#done=DelListElem(Send(who,@GetQuestDone),lDone));
+      Send(self,@SendLog,#who=who);
+      Send(self,@RefreshMarkers,#who=who);
+
+      return TRUE;
    }
 
    DoneEntry(who = $,id = $)
