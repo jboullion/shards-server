@@ -35,7 +35,7 @@ resources:
    AcidTouch_player_killed_something = "%s%s screams and melts into an unobtrusive puddle."
    AcidTouch_player_was_killed = "At the touch of %s%s, you let out a final scream and die."
 
-   acidtouch_spell_intro = "Qor Lv. 2: Covers caster's hands a powerful acid which penetrates armor, clothing, and flesh."
+   acidtouch_spell_intro = "Qor Lv. 2: Covers caster's hands with a powerful acid which penetrates armor, clothing, and flesh."
 
    acidtouch_sound = qacid.ogg
   

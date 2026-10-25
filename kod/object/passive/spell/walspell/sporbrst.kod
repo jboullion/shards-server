@@ -21,7 +21,7 @@ resources:
    SporeBurst_name_rsc = "spore burst"
    SporeBurst_icon_rsc = isporecl.bgf
    SporeBurst_desc_rsc = \
-      "Summons forth noxious clouds that paralyze any within it's bounds.  "
+      "Summons forth noxious clouds that paralyze any within its bounds.  "
       "Requires two purple mushrooms and one shaman blood."
       
    SporeBurst_cast_rsc = \

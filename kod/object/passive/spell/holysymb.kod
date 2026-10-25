@@ -25,7 +25,8 @@ resources:
    HolySymbol_icon_rsc = iholysym.bgf
    HolySymbol_desc_rsc = \
       "This spell involves weaving your hands in a holy tracery which "
-      "frightens nearby unholy beings.  Requires two elderberries to be "
+      "frightens nearby undead, though a botched tracery may enrage them "
+      "instead.  Requires two elderberries to be "
       "crushed onto the skin of your hands to ritually cleanse them."
 
    HolySymbol_success = \

@@ -319,6 +319,23 @@ messages:
       return (viHarmful OR viOutlaw) AND piDamageMax > 0;
    }
 
+   SetDamageRange(iMin=$,iMax=$)
+   "Ours (spell revamp D28): a saved spell keeps its old damage range, so a "
+   "running world takes a rebalance through this."
+   {
+      if iMin <> $
+      {
+         piDamageMin = iMin;
+      }
+
+      if iMax <> $
+      {
+         piDamageMax = iMax;
+      }
+
+      return;
+   }
+
    SendEffectSummary(who=$,iSpellPower=0)
    "Ours (spell revamp D3): the damage range at this spellpower."
    {

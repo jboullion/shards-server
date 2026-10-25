@@ -103,7 +103,9 @@ messages:
             SID_ARMOR_OF_GORT,
             SID_MANA_SHIELD,
             SID_EAGLE_EYES,
-            SID_RELAY 
+            SID_RELAY,
+            // Ours (spell revamp D25, D29): Kraanan's ally blessing (the Heretic too).
+            SID_MARTYRS_BATTLEGROUND
          ],
       $];
 

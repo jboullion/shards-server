@@ -24,8 +24,8 @@ resources:
    Nodeburst_icon_rsc = icanniba.bgf
    Nodeburst_desc_rsc = \
       "You tap all of your mana nodes to the maximum, giving you "
-      "an instant burst of mana and health, but destroying your bonds.  "
-      "May only be cast once per day.  "
+      "an instant burst of mana and health, but one of your mana node "
+      "links is torn away.  May only be cast once per Meridian day.  "
       "Requires fairy wings and entroot berries and is very tiring to cast."
 
    Nodeburst_fail = "You have no links to any mana nodes which you can burst."

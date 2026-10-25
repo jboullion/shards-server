@@ -21,7 +21,7 @@ resources:
    AddPEtoItem_name_rsc = "add personal enchantment to item"
    AddPEtoItem_icon_rsc = light.bgf
    AddPEtoItem_desc_rsc = \
-      "Makes a personal enchantment to a item."
+      "Adds a personal enchantment to an item."
 
    AddPEtoItem_casting = "Say the name of the personal enchantment to assign the item."
 

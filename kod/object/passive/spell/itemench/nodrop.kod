@@ -18,7 +18,7 @@ resources:
    NotDroppable_name_rsc = "Not Droppable"
    NotDroppable_icon_rsc = light.bgf
    NotDroppable_desc_rsc = \
-      "Makes a item un-droppable."
+      "Makes an item un-droppable."
 
    NotDroppable_cast  = "You make the %s not droppable."
    NotDroppable_fails = "You can't cast not droppable on %s%s."

@@ -22,8 +22,7 @@ resources:
    majorheal_icon_rsc = imajheal.bgf
    majorheal_desc_rsc = \
       "The compassionate power of Shal'ille heals severe wounds in the "
-      "caster or another player.  Shal'ille gives a small reward toward the "
-      "karma of the mage who heals another good soul.  Requires four "
+      "caster, another player or a companion.  Requires four "
       "emeralds to cast."
    majorheal_cast_rsc = \
       "%s%s's spell floods you with pure healing energy, "

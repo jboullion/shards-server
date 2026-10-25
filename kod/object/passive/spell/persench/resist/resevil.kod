@@ -24,7 +24,7 @@ resources:
       "Shal'ille is summoned to fortify the soul against unholy damage.  "
       "Requires a single fairy wing to cast."
 
-   resistevil_spell_intro = "Shal'ille Level 1: Protects you from damage from unholy sources."
+   resistevil_spell_intro = "Shal'ille Level 3: Protects you from damage from unholy sources."
 
    resistevil_success = "You fortify %s%s against evil."
    resistevil_already_enchanted = "You already have holy resolve."

@@ -18,7 +18,7 @@ resources:
    SwarmSpell_name_rsc = "make swarm"
    SwarmSpell_icon_rsc = lightnin.bgf
 
-   SwarmSpell_desc_rsc = "This will set a mob to the swarm brain ignoring the agro limit .  "
+   SwarmSpell_desc_rsc = "This will set a mob to the swarm brain ignoring the aggro limit."
 
 classvars:
    vrName = SwarmSpell_name_rsc

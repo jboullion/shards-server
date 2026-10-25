@@ -26,8 +26,8 @@ resources:
    anonymity_icon_rsc = ianonymo.bgf
    anonymity_desc_rsc = \
       "Makes you indistinct, and unrecognizable to all but those who you'd "
-      "like to know its you.  Note that Shal'ille can not punish "
-      "transgressors against you when you are anonymous.  "
+      "like to know it's you.  While you are anonymous, your Riija spells "
+      "grow stronger.  "
       "Requires two rainbow ferns and one firesand to cast."
 
    anonymity_sound = ranonym.ogg

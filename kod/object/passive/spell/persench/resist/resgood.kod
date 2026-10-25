@@ -24,7 +24,7 @@ resources:
       "Summons the vile force of Qor to protect the user from holy damage.  "
       "Requires a single fairy wing to cast."
 
-   resistgood_spell_intro = "Qor Level 1: Protects you from damage from holy sources."
+   resistgood_spell_intro = "Qor Level 3: Protects you from damage from holy sources."
 
    resistgood_already_enchanted = "You already have unholy resolve."
    resistgood_success = "The spirt of Qor enters %s%s's body, protecting them from the forces of good."

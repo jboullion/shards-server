@@ -22,8 +22,10 @@ resources:
    truce_icon_rsc = itruce.bgf
    truce_desc_rsc = \
       "The spirit of Shal'ille descends upon the area and calms the minds of "
-      "all present, preventing combat for several minutes. Requires two "
-      "emeralds and two vials of yrxl sap to cast."
+      "all present.  For up to about two minutes no one there can fight "
+      "monsters, nor can monsters fight back, though players may still "
+      "fight each other.  Requires two emeralds and two vials of yrxl sap "
+      "to cast."
    truce_unnecessary = "Combat with monsters is already impossible here."
    truce_on = \
       "A numbing calm settles upon your mind. You find yourself unable "

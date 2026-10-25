@@ -27,8 +27,8 @@ resources:
    deathlink_icon_rsc = ideathli.bgf
    deathlink_desc_rsc = \
       "This dark spell feeds off the souls of any poor creature that should "
-      "happen to fall in your vicinity.  Any lives you take are merely "
-      "transfers of energy - good and evil mean nothing.  Requires a vial "
+      "happen to fall in your vicinity.  Each death nearby restores a little "
+      "of your health and mana, more for mightier victims.  Requires a vial "
       "of shaman blood and a dark angel feather to cast."
    
    deathlink_already_enchanted_rsc = \

@@ -21,8 +21,8 @@ resources:
    Iceshard_icon_rsc = icebolt.bgf
    Iceshard_look_icon = iiceshrd.bgf
    Iceshard_desc_rsc = \
-      "Sends a ice shard at the target.  "
-      "Requires two blue mushrooms and orc teeth to cast."
+      "Sends an ice shard at the target.  "
+      "Requires two blue mushrooms and an orc tooth to cast."
 
    Iceshard_hit_rsc = "A shard of ice strikes %s%s!"
 

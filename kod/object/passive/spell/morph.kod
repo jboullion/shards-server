@@ -25,7 +25,10 @@ resources:
    morph_name_rsc = "morph"
    morph_icon_rsc = imorph.bgf
    morph_desc_rsc = \
-      "The touch of Riija shifts you into another beast!  "
+      "The touch of Riija shifts you into another beast, your health "
+      "shifting toward its own.  Say the name of a creature during the "
+      "trance to choose it, if you are skilled enough.  While morphed you "
+      "cannot use your gear, but your Riija spells grow stronger.  "
       "Requires web moss and dragonfly eyes to cast."
 
    morph_already_enchanted = "You already have been affected by %s%s."
@@ -37,10 +40,8 @@ resources:
    morph_off = "Your alternate form wears off; you return to your normal self."
 
    Morph_attackable = \
-      "\nNOTE: While you are in the form of a monster, Shal'ille's protection "
-      "will not apply to you.  You can be attacked by others freely, even in "
-      "towns, but you will take the appropriate penalties for attacking other "
-      "innocents."
+      "\nNOTE: While you are in the form of a monster, other players who "
+      "attack you suffer none of the usual penalties for it."
 
    morph_sound = rmorph.ogg
    

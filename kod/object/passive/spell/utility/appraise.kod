@@ -21,8 +21,8 @@ resources:
    Appraise_name_rsc = "appraise"
    Appraise_icon_rsc = iappraise.bgf
    Appraise_desc_rsc = \
-      "Appraise a item to asign it your desired price to be sold at the citizen's market. "
-      "Cast again on a item to remove any appraisal. "
+      "Appraise an item to assign it your desired price to be sold at the citizen's market.  "
+      "Cast again on an item to remove any appraisal."
 
    Appraise_casting = "Say the value you wish to assign the item."
 

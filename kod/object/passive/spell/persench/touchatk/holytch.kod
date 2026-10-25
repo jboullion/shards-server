@@ -22,7 +22,7 @@ resources:
    HolyTouch_icon_rsc = iholyt.bgf
    HolyTouch_desc_rsc = \
       "Pure energy from Shal'ille sears your target.  More effective on evil "
-      "and undead targets.   "
+      "and undead targets.  "
       "Requires emeralds."
 
    HolyTouch_already_enchanted_rsc = \

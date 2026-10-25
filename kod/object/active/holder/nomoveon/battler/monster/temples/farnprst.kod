@@ -197,7 +197,9 @@ messages:
             SID_SAND_STORM,
             SID_FOG,
             SID_MYSTIC_TOUCH,
-            SID_ICEWALL
+            SID_ICEWALL,
+            // Ours (spell revamp D29): enabled again in phase 2, taught by nobody.
+            SID_SHATTER
          ],
       $];
 

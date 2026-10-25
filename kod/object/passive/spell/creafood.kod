@@ -23,7 +23,7 @@ resources:
       "The power of Kraanan is summoned to materialize various nourishing foods.  "
       "Requires nothing but free will to cast."
 
-   createfood_spell_intro = "Kraanan Lv. 1: Turns basic elderberries into food for you to eat and increase your vigor."
+   createfood_spell_intro = "Kraanan Lv. 1: Conjures food for you to eat."
 
    createfood_sound = kcreatef.ogg
 

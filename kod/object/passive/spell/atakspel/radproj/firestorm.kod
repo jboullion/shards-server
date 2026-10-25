@@ -53,7 +53,9 @@ classvars:
    viSchool = SS_FAREN
    viFarenElement = FAREN_ELEMENT_FLAME
    viSpell_level = 6
-   viMana = 30
+   // Ours (spell revamp D28): the level 6 storm costs and hits like one;
+   //  at 30 mana for 12-28 it did less a cast than Earthquake at 12.
+   viMana = 22
 
    viChance_to_increase = 10
    viMeditate_ratio = 60
@@ -81,8 +83,8 @@ properties:
 
    piSpeed = 6
 
-   piDamageMin = 12
-   piDamageMax = 28
+   piDamageMin = 16
+   piDamageMax = 30
 
    piNumber = 16
 

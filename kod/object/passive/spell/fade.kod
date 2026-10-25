@@ -25,7 +25,7 @@ resources:
       "you invisible.  The spell lasts as long as your trance "
       "is maintained, and while it holds no monster can find you; "
       "doing anything at all breaks it.  "
-      "Requires dark angel feather."
+      "Requires a dark angel feather to cast."
    
    fade_already_enchanted = "You are already invisible."
 

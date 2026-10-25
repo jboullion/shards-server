@@ -22,8 +22,8 @@ resources:
    manabomb_icon_rsc = imanabom.bgf
    manabomb_desc_rsc = \
       "Initiates a white hot explosion which burns all of the "
-      "caster's mana and consumes half of that amount from all "
-      "others in the room.  "
+      "caster's mana and drains half that much from all others nearby, "
+      "up to the full amount with greater skill.  "
       "Requires two sapphires to cast."
 
    manabomb_cast = "%s%s's mana violently detonates!"

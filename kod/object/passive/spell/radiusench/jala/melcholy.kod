@@ -22,9 +22,11 @@ resources:
    Melancholy_icon_rsc = imlnchly.bgf
    Melancholy_desc_rsc = \
       "This is a sad song, invoking feelings of loss and sorrow.  It causes "
-      "most people hearing it to experience overwhemling sadness, often "
+      "most people hearing it to experience overwhelming sadness, often "
       "leading to foul moods.  This music is appropriate for funerals and "
-      "fighting against the forces of good.  Requires one sapphire to cast."
+      "fighting against the forces of good: those who hear it strike truer "
+      "and harder against good creatures and followers of Shal'ille.  "
+      "Requires one sapphire to cast."
 
    Melancholy_song = ksong.ogg
 

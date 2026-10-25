@@ -24,9 +24,9 @@ resources:
    Phase_icon_rsc = iphase.bgf
    Phase_desc_rsc = \
       "By phasing partially out of existence, one may become temporarily "
-      "immune to danger... but, adventurers be warned: staying out of phase "
-      "too long will result in physical and mental damage, as well as "
-      "potential loss of carried items. Time spent phased out is "
+      "immune to danger... but, adventurers be warned: stay out of phase "
+      "too long and you will be hurled back to the last safe place you "
+      "visited.  Time spent phased out is "
       "cumulative until you reach a safe place in which to recover."
 
    Phase_no_danger = "The protective magics here prevent phasing out."

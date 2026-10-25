@@ -25,7 +25,8 @@ resources:
    illusionaryform_icon_rsc = iillufrm.bgf
    illusionaryform_desc_rsc = \
       "The touch of Riija shifts your appearance to another at random.  "
-      "Requires web moss and rainbow fern to cast."
+      "While it lasts, your Riija spells grow stronger.  "
+      "Requires two web moss and three rainbow ferns to cast."
 
    illusionaryform_already_affected = "Your form is already modified."
 

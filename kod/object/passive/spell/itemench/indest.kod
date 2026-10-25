@@ -18,7 +18,7 @@ resources:
    Indestructible_name_rsc = "Indestructible"
    Indestructible_icon_rsc = light.bgf
    Indestructible_desc_rsc = \
-      "Makes a item indestructible."
+      "Makes an item indestructible."
 
    Indestructible_cast  = "You make the %s indestructible."
    Indestructible_fails = "You can't cast indestructible on %s%s."

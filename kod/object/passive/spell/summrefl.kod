@@ -22,7 +22,7 @@ resources:
    summonreflection_icon_rsc = ireflect.bgf
    summonreflection_desc_rsc = \
       "Summons a creature which mirrors your own appearance.  Note that you "
-      "are responsible for any of your reflections actions, and that they are "
+      "are responsible for any of your reflections' actions, and that they are "
       "notoriously hard to control.  Requires two firesand and two uncut "
       "seraphym to cast."
 

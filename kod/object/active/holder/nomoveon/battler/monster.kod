@@ -3647,29 +3647,27 @@ messages:
       lAvailable = $;
 
       iNum = 0;
+      // Ours (spell revamp D29): an old list can name a spell or skill that
+      //  is gone, so look before asking its level.
       foreach i in nth(plFor_Sale,2)
-      {         
+      {
          oAbility = Send(SYS,@FindSkillByNum,#num=i);
-         if iLevel = Send(oAbility,@GetLevel)
+         if oAbility <> $
+            AND iLevel = Send(oAbility,@GetLevel)
             AND Send(oAbility,@IsAccessible)
          {
-            if oAbility <> $
-            {
-               lAvailable = Cons(oAbility,lAvailable);
-            }
+            lAvailable = Cons(oAbility,lAvailable);
          }
       }
 
       foreach i in nth(plFor_Sale,3)
-      {         
+      {
          oAbility = Send(SYS,@FindSpellByNum,#num=i);
-         if iLevel = Send(oAbility,@GetLevel)
+         if oAbility <> $
+            AND iLevel = Send(oAbility,@GetLevel)
             AND Send(oAbility,@IsAccessible)
          {
-            if oAbility <> $
-            {
-               lAvailable = Cons(oAbility,lAvailable);
-            }
+            lAvailable = Cons(oAbility,lAvailable);
          }
       }
 
@@ -7901,13 +7899,14 @@ if isClass(self,&Reflection)
       {
          // skills first
          oAbility = Send(SYS,@FindSkillByNum,#num=sid);
+         // Ours (spell revamp D29): a gone skill gets no advice, rather than
+         //  the name before it.
          if oAbility <> $
          {
             oName = Send(oAbility,@GetName);
+            lDialogue = cons([[oName],0,[LIBACT_LEARN, sid, TRUE]],lDialogue);
          }
-         
-         lDialogue = cons([[oName],0,[LIBACT_LEARN, sid, TRUE]],lDialogue);
-      }
+}
       
       foreach sid in nth(plFor_sale,3)
       {
@@ -7916,10 +7915,9 @@ if isClass(self,&Reflection)
          if oAbility <> $
          {
             oName = Send(oAbility,@GetName);
+            lDialogue = cons([[oName],0,[LIBACT_LEARN, sid, FALSE]],lDialogue);
          }
-         
-         lDialogue = cons([[oName],0,[LIBACT_LEARN, sid, FALSE]],lDialogue);
-      }
+}
       
       lFinal = [ GetClass(self), lDialogue ];
 

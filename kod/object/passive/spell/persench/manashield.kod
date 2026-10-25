@@ -36,7 +36,7 @@ resources:
       "%s%s's skin tingles as the mana shield forms."
 
    ManaShield_spell_intro = \
-      "Kraanan Level 5: Magical armor that protects the caster."
+      "Kraanan Level 5: Your mana absorbs the blows you take."
 
 classvars:
 

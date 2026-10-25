@@ -68,6 +68,14 @@ messages:
       return FALSE;
    }
 
+   SetServerAccessibility(iServer=SERVER_NORMAL)
+   "Ours (spell revamp D29): an effect, never a spell anyone may learn."
+   {
+      pbAccessible = FALSE;
+
+      return;
+   }
+
    GetChillTime(iSpellPower=0)
    "Four to six seconds."
    {

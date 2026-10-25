@@ -23,7 +23,7 @@ resources:
    LightningWall_desc_rsc = \
       "Creates a crackling barrier of electricity.  One who entered such a "
       "field would certainly feel more than thunder.  "
-      "Requires blue mushrooms and yxrl to cast."
+      "Requires blue mushrooms and yrxl sap to cast."
 
    LightningWall_cast_rsc = "A wall of lightning appears before you!"
    LightningWall_failed_rsc = \

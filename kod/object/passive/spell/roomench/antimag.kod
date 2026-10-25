@@ -22,7 +22,7 @@ resources:
    AntiMagicAura_icon_rsc = iantimag.bgf
    AntiMagicAura_desc_rsc = \
       "Sends a shock wave of magical energy coursing through the room which "
-      "reduces the spellpower of other spells cast for several minutes.  "
+      "reduces the spellpower of other spells cast for a minute or two.  "
       "More powerful mages are more effective at casting this spell.  "
       "Requires two sapphires and a polished seraphym to cast."
    
