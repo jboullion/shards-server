@@ -348,25 +348,13 @@ messages:
          }
          else
          {
-            iAbility = Send(who,@GetSpellAbility,#spell_num=SID_CRYSTALIZE_MANA);
-            if iAbility > 0
-               AND NOT Send(who,@IsCrystalizeManaSurging)
-            {
-               oSpell = Send(SYS,@FindSpellByNum,#num=SID_CRYSTALIZE_MANA);
-               Send(oSpell,@DoManaSurge,#who=who,#triggered=TRUE);
-               if Send(who,@GetMana) >= viManaDrain
-               {
-                  Send(who,@LoseMana,#amount=viManaDrain);
-               }
-            }
-            else
-            {
-               Send(who,@StartEnchantment,#what=self,#time=iDuration,
-                     #who=oCaster,#state=state,#addicon=FALSE,#lastcall=TRUE,
-                     #bRadiusEnchant=TRUE,#iSpellPower=iSpellPower);
+            // Ours (spell revamp balance): out of mana, the song ends; no
+            //  Crystalize Mana surge to fall back on any more.
+            Send(who,@StartEnchantment,#what=self,#time=iDuration,
+                  #who=oCaster,#state=state,#addicon=FALSE,#lastcall=TRUE,
+                  #bRadiusEnchant=TRUE,#iSpellPower=iSpellPower);
 
-               return;
-            }
+            return;
          }
       }
 

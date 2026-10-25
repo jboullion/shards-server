@@ -24,7 +24,8 @@ resources:
    manafocus_desc_rsc = \
       "Focuses your magical energy, "
       "regenerating your mana at an accelerated rate and "
-      "increasing the damage of natural elemental attack spells. "
+      "increasing the damage of natural elemental attack spells; each "
+      "spell it strengthens costs two mana more. "
       "Dissipates if your concentration is broken.  "
       "Requires one mushroom to cast."
    manafocus_enchantment_rsc = \
@@ -45,8 +46,9 @@ classvars:
    vrSuccess = manafocus_on
 
    viSpell_num = SID_MANA_FOCUS
-   viMana = 1
-   viSchool = SS_FAREN
+   // Ours (spell revamp balance): 4, and +2 on each spell it boosts.
+   viMana = 4
+viSchool = SS_FAREN
    viSpell_level = 3
 
    viCast_time = 3000            /// 3 seconds

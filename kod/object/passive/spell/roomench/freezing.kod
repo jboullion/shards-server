@@ -30,6 +30,10 @@ resources:
       "Monsters freeze too.  "
       "Requires blue mushroom and firesand to cast."
    
+   freezing_effect_rsc = \
+      "Every 5 seconds for %i seconds it strikes each foe in the room: a "
+      "monster for %i, a player the harder the lighter their armor."
+
    freezing_already_enchanted = "This place already has a freezing enchantment."
 
    freezing_on = \
@@ -76,6 +80,20 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (spell revamp balance): the pulse, the length and a monster's hurt."
+   {
+      AddPacket(4,freezing_effect_rsc, 4,60 + Bound(iSpellPower,0,99),
+                4,2 + (Bound(iSpellPower,0,99) / 25));
+
+      return;
+   }
 
    ResetReagents()
    {
@@ -125,8 +143,8 @@ messages:
 
       Send(oRoom,@SomeoneSaid,#type=SAY_MESSAGE,#string=freezing_on,#what=self);
 
-      // ranges from 7 to 17 seconds
-      iPeriod = (170-iSpellPower)/10;
+      // Ours: every 5 seconds
+      iPeriod = 5;   // Ours (spell revamp balance): every 5 seconds (was 7 to 17)
       // can't store in greater fineness - value stores state too!
       iPeriod = iPeriod * 1000;
 
@@ -140,25 +158,28 @@ messages:
    "Sends enchantment message to room like CastSpell for most room enchantments, "
    "but silent, and done as often as necessary"
    {
-      local iNext_time, iCombined, iPower, iPeriod;
+      local iNext_time, iCombined, iPower, iPeriod, iTotal;
 
       // First, extract the spellpower from the state
       iCombined = First(state);
       iPower = iCombined % 100;
       iCombined = iCombined - iPower;
 
-      // Ranges from 7 to 17 seconds
-      iPeriod = (170-iPower)/10;
+      // Ours: every 5 seconds
+      iPeriod = 5;   // Ours (spell revamp balance): every 5 seconds (was 7 to 17)
       // Can't store in greater fineness - value stores state too!
       iPeriod = iPeriod * 1000;
       
       // Global effects of the enchantment
       // State is elapsed time in ms
+      // Ours (spell revamp balance): 60 + spellpower seconds in all (it was
+      //  five minutes).  The state packs the spellpower under 100.
+      iTotal = (60 + iPower) * 1000;
       iNext_time = iCombined + iPeriod;
-      if iNext_time >= FREEZING_TIME
+      if iNext_time >= iTotal
       {
-         Send(where,@RoomStartEnchantment,#what=self,#time=FREEZING_TIME-iCombined,
-               #state=[FREEZING_TIME + iPower, Nth(state,2)],#addicon=False,
+         Send(where,@RoomStartEnchantment,#what=self,#time=iTotal-iCombined,
+               #state=[iTotal + iPower, Nth(state,2)],#addicon=False,
                #lastcall=TRUE);
 
          return;

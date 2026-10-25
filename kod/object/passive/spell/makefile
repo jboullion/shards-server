@@ -20,7 +20,6 @@ BOFS = animate.bof \
        creafood.bof \
        creasphm.bof \
        creaweap.bof \
-       crysmana.bof \
        debuff.bof \
        defile.bof \
        discord.bof \

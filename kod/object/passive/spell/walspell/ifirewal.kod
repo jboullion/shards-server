@@ -27,8 +27,8 @@ resources:
       "Requires rainbow ferns and firesand to cast."
 
    IllusionaryFireWall_effect_rsc = \
-      "The flames stand about %i seconds.  Each touch wounds for up to what "
-      "Illusionary Wounds would, never below 10 health."
+      "The flames stand about %i seconds.  Each touch wounds for 0 to %i, "
+      "as Faren's fire wall burns, but never below 10 health."
 
    IllusionaryFireWall_cast_rsc = \
       "An illusionary wall of fire appears before you!"
@@ -76,7 +76,7 @@ messages:
    "Ours (spell revamp playtest): how long the wall stands."
    {
       AddPacket(4,IllusionaryFireWall_effect_rsc,
-                4,Bound((iSpellPower * 2) + 30,30,180));
+                4,Bound((iSpellPower * 2) + 30,30,180), 4,iSpellPower / 6);
 
       return;
    }

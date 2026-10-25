@@ -95,7 +95,10 @@ messages:
          {
             // We technically don't have a damage type, but we count as spell damage.
             //  Also, don't lower damage based on resistances.
-            iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=Random(0,iDamage),
+            // Ours (spell revamp balance): as hard as Faren's fire wall
+            //  (0 to spellpower/6 a touch), still never below 10 health.
+            iDamage = Bound(Random(0,piMaxDamage / 6) * 100,0,iDamage);
+            iDamage = Send(what,@AssessDamage,#what=poCaster,#damage=iDamage,
                            #aspell=ATCK_SPELL_ALL,#absolute=TRUE,#report=FALSE,
                            #report_resistance=FALSE,#precision=TRUE);
             Send(poOwner,@SomethingAttacked,#what=poCaster,#victim=what,

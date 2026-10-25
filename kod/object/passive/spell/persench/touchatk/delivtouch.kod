@@ -64,6 +64,11 @@ properties:
 
 messages:
 
+   GetManaPerBlow()
+   {
+      return 0;
+   }
+
    ResetReagents()
    {
       plReagents = $;

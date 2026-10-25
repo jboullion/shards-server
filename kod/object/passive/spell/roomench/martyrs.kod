@@ -11,9 +11,10 @@
 MartyrsBattleground is RoomEnchantment
 
 // Ours (spell revamp D25): revenants are long gone, so this is now Kraanan's
-//  blessing on the caster's side of a fight.  Allies here (players, their
-//  companions and minions, the caster's faction's soldiers) hit more often
-//  and harder, and each death here heals them, an ally's death twice over.
+//  blessing on a battle.  Every player here (25 October: whatever their
+//  faction, so one cast serves all), their companions and minions, and
+//  faction soldiers hit more often and harder, and each death here heals
+//  them, a blessed one's death twice over.  Monsters get nothing.
 
 constants:
 
@@ -27,19 +28,20 @@ resources:
    martyrsbg_icon_rsc = imartyrs.bgf
 
    martyrsbg_desc_rsc = \
-      "Calls the gaze of Kraanan down upon the battle.  While it lasts, the "
-      "caster's allies in the area, their companions and their faction's "
-      "soldiers among them, strike truer and harder, and every death here "
-      "renews them; the fall of one of their own renews them twice over.  "
-      "Foes get nothing from it.  "
+      "Calls the gaze of Kraanan down upon the battle.  While it lasts, "
+      "every player in the area, friend or foe, strikes truer and harder, "
+      "and so do their companions and the faction soldiers here; every "
+      "death renews them, and the fall of one of them renews them twice "
+      "over.  Monsters get nothing from it.  Only one can be called on a "
+      "place at a time.  "
       "Requires elderberry and mushroom to cast."
 
    martyrsbg_effect_rsc = \
-      "Allies gain %i to hit and %i damage a blow (monsters %i%% more "
-      "offense), and heal %i health at each death here (%i at an ally's), "
+      "Every player gains %i to hit and %i damage a blow (companions %i%% more "
+      "offense), and heals %i health at each death here (%i at a player's), "
       "for %i seconds."
    martyrsbg_enchantment_rsc = \
-      "\n\nThe %s enchantment gives the caster's allies here %i to hit and "
+      "\n\nThe %s enchantment gives every player here %i to hit and "
       "%i damage a blow, and heals them %i at each death."
 
    martyrsbg_unnecessary = "You already feel the presence of the gods here."
@@ -154,6 +156,45 @@ messages:
       return 2 + Bound(iSpellPower,1,99) / 20;
    }
 
+   IsBlessed(who=$)
+   "Ours (spell revamp balance): players, whatever their side, their "
+   "companions and minions, and faction soldiers."
+   {
+      local oLeader;
+
+      if who = $
+      {
+         return FALSE;
+      }
+
+      if IsClass(who,&Player)
+      {
+         return NOT (IsClass(who,&User)
+                     AND Send(who,@IsInCannotInteractMode));
+      }
+
+      if NOT IsClass(who,&Monster)
+      {
+         return FALSE;
+      }
+
+      if IsClass(who,&FactionTroop)
+      {
+         return TRUE;
+      }
+
+      if Send(who,@IsCompanion)
+      {
+         oLeader = Send(who,@GetSworn);
+      }
+      else
+      {
+         oLeader = Send(who,@GetMaster);
+      }
+
+      return oLeader <> $ AND IsClass(oLeader,&Player);
+   }
+
    StartEnchantmentNewOccupant(who = $, state = $)
    "Called on new occupants of the enchanted room."
    {
@@ -174,7 +215,7 @@ messages:
    "The caster's allies are blessed; nobody else is."
    {
       if state = $
-         OR NOT Send(self,@IsCasterAlly,#oCaster=Nth(state,2),#who=who)
+         OR NOT Send(self,@IsBlessed,#who=who)
       {
          return;
       }
@@ -251,7 +292,7 @@ messages:
 
       iHeal = Send(self,@GetDeathHeal,
                    #iSpellPower=Send(self,@GetPower,#state=state));
-      if Send(self,@IsCasterAlly,#oCaster=Nth(state,2),#who=victim)
+      if Send(self,@IsBlessed,#who=victim)
       {
          iHeal = iHeal * 2;
       }
@@ -261,8 +302,7 @@ messages:
          each_obj = First(i);
          if each_obj = victim
             OR NOT IsClass(each_obj,&Battler)
-            OR NOT Send(self,@IsCasterAlly,#oCaster=Nth(state,2),
-                        #who=each_obj)
+            OR NOT Send(self,@IsBlessed,#who=each_obj)
          {
             continue;
          }

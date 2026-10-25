@@ -136,7 +136,8 @@ messages:
 
       iHeal = Random(piDamageMin*100,piDamageMax*100)*(iSpellpower+101)/100;
       // Ours: up to a quarter more with spellpower (it was a fixed 25%).
-      iHeal = (100 + bound(iSpellpower/4,0,50))*iHeal/100;
+      // Ours (spell revamp balance): half (it out-healed Major Heal).
+      iHeal = (100 + bound(iSpellpower/4,0,50))*iHeal/200;
 
       iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
 

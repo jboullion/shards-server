@@ -303,12 +303,28 @@ messages:
    "Ours: a player's damage before Mana Focus, shared by CastSpell and the "
    "description (SendEffectSummary)."
    {
+      local lConv;
+
       // Myst and Int boost base damage
       iDamage = Send(self,@DamageFactors,#damage=iDamage,#who=who,
                      #lTargets=lTargets);
 
       // Reduce damage based on spell power.
       iDamage = (iDamage * (50 + (iSpellPower / 2))) / SPELLPOWER_MAXIMUM;
+
+      // Ours (spell revamp balance): Mana Convergence, up to a fifth more.
+      if who <> $
+         AND IsClass(who,&Player)
+      {
+         lConv = Send(who,@GetRadiusEnchantmentState,
+                      #byClass=&ManaConvergence);
+         if lConv <> $
+         {
+            iDamage = iDamage
+                      * (100 + Bound(Nth(lConv,5),0,SPELLPOWER_MAXIMUM) * 20
+                               / SPELLPOWER_MAXIMUM) / 100;
+         }
+      }
 
       // Ours (spell revamp D10): a Faren mage attuned to our element.
       return Send(self,@ApplyAttunementDamage,#who=who,#iDamage=iDamage);
@@ -317,6 +333,20 @@ messages:
    HasEffectSummary()
    {
       return (viHarmful OR viOutlaw) AND piDamageMax > 0;
+   }
+
+   GetManaCostExtra(who=$)
+   "Ours (spell revamp balance): Mana Focus adds two to each spell it boosts."
+   {
+      if piManaFocusBonus > 0
+         AND who <> $
+         AND IsClass(who,&Player)
+         AND Send(who,@CheckPlayerFlag,#flag=PFLAG_MANA_FOCUS)
+      {
+         return 2;
+      }
+
+      return 0;
    }
 
    SetDamageRange(iMin=$,iMax=$)

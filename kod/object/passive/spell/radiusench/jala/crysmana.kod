@@ -1,0 +1,168 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+/////////////////////////////////////////////////////////////////////////////////
+CrystalizeMana is Jala
+
+// Ours (spell revamp balance, 25 October): a song now. Every 30 seconds it
+//  gives the singer and their allies in hearing 10 plus the spellpower in
+//  mana, past their maximum if need be (up to twice it). It was a one-off
+//  surge with a fatigue period that also fired by itself, for free, whenever
+//  a cost couldn't be paid.
+
+constants:
+
+   include blakston.khd
+
+   // How often the song's mana arrives.
+   CRYSTALIZE_PULSE = 30000
+
+resources:
+
+   include crysmana.lkod
+
+   CrystalizeMana_name_rsc = "crystalize mana"
+   CrystalizeMana_icon_rsc = icrysman.bgf
+   CrystalizeMana_desc_rsc = \
+      "This song taps directly into the energies of sound and vibration "
+      "itself, crystallizing them into raw magical energy.  Every thirty "
+      "seconds the singer and their allies in hearing gain mana, even past "
+      "their limits, up to twice what they could normally hold.  "
+      "Requires one sapphire and one uncut seraphym to begin."
+   CrystalizeMana_effect_rsc = \
+      "Every 30 seconds, you and your allies in hearing gain %i mana."
+
+   CrystalizeMana_song = song06.ogg
+
+   CrystalizeMana_cast = "You begin a crystalline, ringing song."
+   CrystalizeMana_starts = "%s%s begins a crystalline, ringing song."
+   CrystalizeMana_ends = "The crystalline song played by %s%s fades away."
+   CrystalizeMana_caster_ends = "Your crystalline song fades."
+   CrystalizeMana_caster_enter = "Raw magic gathers in the air around you."
+   CrystalizeMana_enter = "%s%s's crystalline song fills you with raw magic."
+   CrystalizeMana_leave = \
+      "You can no longer hear the crystalline notes of %s%s's song."
+   CrystalizeMana_surge = "~bIncredible energies roar through you!"
+
+   Surge_sound = wscndwnd.ogg
+
+classvars:
+
+   vrMusic = CrystalizeMana_song
+
+   vrEnchantmentOn = CrystalizeMana_cast
+   vrEnchantmentOnOther = CrystalizeMana_starts
+   vrEnchantmentOff = CrystalizeMana_caster_ends
+   vrEnchantmentOffOther = CrystalizeMana_ends
+   vrEnterRadiusCaster = CrystalizeMana_caster_enter
+   vrEnterRadius = CrystalizeMana_enter
+   vrLeaveRadius = CrystalizeMana_leave
+
+   vrName = CrystalizeMana_name_rsc
+   vrIcon = CrystalizeMana_icon_rsc
+   vrDesc = CrystalizeMana_desc_rsc
+
+   viSpell_num = SID_CRYSTALIZE_MANA
+   viSchool = SS_JALA
+   viSpell_level = 5   // Ours (spell revamp grids): was 6
+
+   viMana = 20          // Mana is amount used upon inititiation
+   viManaDrain = 0      // No upkeep: it pays its own way
+   viDrainTime = CRYSTALIZE_PULSE
+
+   viSpellExertion = 10
+   viChance_To_Increase = 20
+   viMeditate_ratio = 60
+
+   // The singer and their side: guildmates, allied guilds, and players the
+   //  singer may not attack.
+   viAffectsCaster = TRUE
+   viAffectsGuildmates = TRUE
+   viAffectsAllies = TRUE
+   viAffectsInnocents = TRUE
+   viAffectsNewbies = TRUE
+   viAffectsEnemies = FALSE
+
+properties:
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+      plReagents = Cons([&Sapphire,1],plReagents);
+      plReagents = Cons([&UncutSeraphym,1],plReagents);
+
+      return;
+   }
+
+   GetDuration(iSpellPower=0)
+   "The pulse: every 30 seconds."
+   {
+      return CRYSTALIZE_PULSE;
+   }
+
+   GetManaGift(iSpellPower=0)
+   {
+      return 10 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM);
+   }
+
+   PeriodicEffect(who = $, state = $)
+   "10 plus the spellpower in mana, up to twice the listener's maximum."
+   {
+      local iAmount;
+
+      if who = $
+         OR state = $
+         OR NOT IsClass(who,&Player)
+      {
+         return;
+      }
+
+      iAmount = Send(self,@GetManaGift,
+                     #iSpellPower=Bound(Nth(state,5),0,SPELLPOWER_MAXIMUM));
+      iAmount = Bound(iAmount,0,
+                      (2 * Send(who,@GetMaxMana)) - Send(who,@GetMana));
+      if iAmount > 0
+      {
+         Send(who,@GainMana,#amount=iAmount);
+         Send(who,@MsgSendUser,#message_rsc=CrystalizeMana_surge);
+         Send(who,@WaveSendUser,#wave_rsc=Surge_sound);
+      }
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   {
+      AddPacket(4,CrystalizeMana_effect_rsc,
+                4,Send(self,@GetManaGift,#iSpellPower=iSpellPower));
+
+      return;
+   }
+
+   // Ours: the old surge's hooks, so callers that remain find no surge.
+   DoManaSurge(who=$,triggered=FALSE)
+   {
+      return;
+   }
+
+   GetManaBonus(spell_ability=0)
+   "It no longer raises maximum mana by itself."
+   {
+      return 0;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

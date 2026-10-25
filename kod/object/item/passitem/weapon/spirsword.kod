@@ -20,8 +20,11 @@ resources:
    SpiritSword_icon_rsc = spirsword.bgf
    SpiritSword_desc_rsc = \
       "Inherently having holy blessings, this sword is even more powerful "
-      "than the standard variation."
-   SpiritSword_window_overlay_rsc = povspirsword.bgf
+      "than the standard variation.  Its blows deal holy damage, and now and "
+      "then it flares with a holy touch that sears its victim, the undead "
+      "twice as badly.  It also strengthens its wielder's Shal'ille spells."
+   SpiritSword_flare = "~gYour spiritual sword flares with holy light, searing %s%s for %i!"
+SpiritSword_window_overlay_rsc = povspirsword.bgf
    SpiritSword_player_overlay = spirswordov.bgf
 
    SS_not_qor = "Qor will not allow you to wield a holy weapon."
@@ -117,9 +120,40 @@ messages:
       propagate;
    }
 
-   WeaponHitTarget()
+   WeaponHitTarget(who=$,victim=$,damage=$)
+   "Ours (spell revamp balance): one blow in seven flares with a holy touch "
+   "(6 to 12 holy damage, twice that to the undead). Returning here keeps "
+   "the sword from wearing down."
    {
-      // Return here so that spiritual hammers don't get damaged.
+      local iDamage;
+
+      if who = $
+         OR victim = $
+         OR NOT IsObject(victim)
+         OR NOT IsClass(victim,&Battler)
+         OR Send(victim,@GetOwner) = $
+         OR Send(victim,@GetHealth) <= 0
+         OR Random(1,100) > 15
+      {
+         return;
+      }
+
+      iDamage = Random(6,12);
+      if Send(victim,@IsUndead)
+      {
+         iDamage = iDamage * 2;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=SpiritSword_flare,
+           #parm1=Send(victim,@GetDef),#parm2=Send(victim,@GetName),
+           #parm3=iDamage);
+      if Send(victim,@AssessDamage,#what=who,#damage=iDamage,
+              #aspell=ATCK_SPELL_ALL+ATCK_SPELL_HOLY,#report=FALSE,
+              #report_resistance=FALSE) = $
+      {
+         Send(who,@KilledSomething,#what=victim,#use_weapon=self);
+      }
+
       return;
    }
 

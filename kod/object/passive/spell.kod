@@ -1000,21 +1000,8 @@ messages:
       if Send(who,@GetMana)
             < Send(self,@GetManaCost,#who=who,#iSpellpower=iSpellpower)
       {
-         iCrystalizeManaAbility = Send(who,@GetSpellAbility,
-                                       #spell_num=SID_CRYSTALIZE_MANA);
-         if iCrystalizeManaAbility > 0
-            AND NOT Send(who,@IsCrystalizeManaSurging)
-            AND NOT IsClass(self,&CrystalizeMana)
-         {
-            oCrystalizeMana = Send(SYS,@FindSpellByNum,#num=SID_CRYSTALIZE_MANA);
-            Send(oCrystalizeMana,@DoManaSurge,#who=who,#triggered=TRUE);
-            if Send(who,@GetMana)
-                  > Send(self,@GetManaCost,#who=who,#iSpellpower=iSpellpower)
-            {
-               return TRUE;
-            }
-         }
-
+         // Ours (spell revamp balance): Crystalize Mana no longer surges by
+         //  itself when a cost can't be paid; it's a song now.
          Send(who,@WaveSendUser,#wave_rsc=spell_fail_wav);
          Send(who,@MsgSendUser,#message_rsc=spell_insufficient_magic,
                #parm1=vrName);
@@ -1941,6 +1928,9 @@ messages:
          --iCost;
       }
 
+      // Ours (spell revamp balance): Mana Focus and the like.
+      iCost = iCost + Send(self,@GetManaCostExtra,#who=who);
+
       // Up to -2 for being a Princess soldier
       oPrincessShield = Send(who,@FindUsing,#class=&PrincessShield);
       if oPrincessShield <> $
@@ -2568,8 +2558,10 @@ messages:
       }
       else if viSchool = SS_QOR
       {
-         // Qor strength determined by day or night.
-         iPrimaryBonus =  (2 + Send(SYS,@GetHour));
+         // Qor strength determined by day or night. Ours (spell revamp
+         //  balance): strongest at midnight (26), weakest at noon (2); it was
+         //  2 + the hour, so weakest just after midnight.
+         iPrimaryBonus = 2 + 2 * abs(Send(SYS,@GetHour) - 12);
          // Ours (spell revamp D31): the darker the room, the stronger (it was
          //  karma, plus a bonus for Darkness, which now simply darkens it).
          iSecondaryBonus = 10 - Send(self,@GetLightBonus,#oRoom=oRoom);
@@ -3146,6 +3138,13 @@ messages:
    "as well as players (Room.EnchantAllOccupants)."
    {
       return FALSE;
+   }
+
+   GetManaCostExtra(who=$)
+   "Ours (spell revamp balance): mana added to the cost (AttackSpell under "
+   "Mana Focus)."
+   {
+      return 0;
    }
 
    GetManaUpkeep(iSpellPower=0)

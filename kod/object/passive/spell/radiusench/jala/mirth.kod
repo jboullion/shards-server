@@ -131,12 +131,12 @@ messages:
 
          if oFound = TRUE
          {
-            return hit_roll + Nth(state,5);
+            return hit_roll + 2 * Nth(state,5);   // Ours (spell revamp balance): doubled
          }
 		}
       else if Send(what,@GetKarma,#detect=TRUE) < 0
       {
-         return hit_roll + Nth(state,5);
+         return hit_roll + 2 * Nth(state,5);   // Ours (spell revamp balance): doubled
       }
 
       return hit_roll;
@@ -171,14 +171,14 @@ messages:
          {
             iPower = Bound(Nth(state,5) / 24,1,4);
 
-            return damage + Random(1,iPower);
+            return damage + 2 * Random(1,iPower);   // Ours (spell revamp balance): doubled
          }
 		}
       else if Send(what,@GetKarma,#detect=TRUE) < 0
       {
          iPower = Bound(Nth(state,5) / 24,1,4);
 
-         return damage + Random(1,iPower);
+         return damage + 2 * Random(1,iPower);   // Ours (spell revamp balance): doubled
       }
 
       return damage;

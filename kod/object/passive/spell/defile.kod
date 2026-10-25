@@ -22,8 +22,9 @@ resources:
    defile_desc_rsc = \
       "In this darkest of rituals, the very spirit of Qor is summoned to "
       "defile the corpse of a monster or player, transforming flesh and blood "
-      "into magical energy for the caster: a player's corpse yields twice what "
-      "a creature's does.  Requires a fairy wing "
+      "into magical energy for the caster: a player's corpse yields the "
+      "most, and a creature's a share by how mighty it was, all of it at "
+      "level 100.  Requires a fairy wing "
       "and the slain."
    defile_cast_rsc = "Your nausea betokens the imminence of Qor."
    defile_corpse_gone = \
@@ -121,7 +122,9 @@ messages:
       }
       else
       {
-         Send(who,@GainMana,#amount=(viMana_bonus+(iSpellPower/3))/2);
+         // Ours (spell revamp balance): by the creature's level.
+         Send(who,@GainMana,#amount=(viMana_bonus+(iSpellPower/3))
+              * Bound(Send(oTarget,@GetVictimLevel),5,100) / 100);
       }
 
       // Don't let them defile to over-max

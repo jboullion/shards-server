@@ -88,7 +88,8 @@ messages:
    {
       if (who <> $)
       {
-         Send(who,@GainMana,#amount=1,#bRespectMax=TRUE);
+         // Ours (spell revamp balance): doubled.
+         Send(who,@GainMana,#amount=2,#bRespectMax=TRUE);
       }
 
       return;

@@ -31,11 +31,15 @@ resources:
       "Please report it.  Have a nice day."
 
    touchattack_effect_rsc = \
-      "Your bare-handed blows deal %i to %i %s damage for %i minutes (a "
-      "wielded weapon ignores it).  A new touch spell replaces it."
+      "Your bare-handed blows deal %i to %i %s damage, %i mana a blow, for "
+      "%i minutes (a wielded weapon ignores it).  A new touch spell "
+      "replaces it."
    touchattack_effect_day_rsc = \
-      "Your bare-handed blows deal %i to %i %s damage until the day turns "
-      "(a wielded weapon ignores it).  A new touch spell replaces it."
+      "Your bare-handed blows deal %i to %i %s damage, %i mana a blow, "
+      "until the day turns (a wielded weapon ignores it).  A new touch "
+      "spell replaces it."
+   touchattack_no_mana_rsc = \
+      "Your hands tingle, but you lack the mana to strike with your %s."
 
    touchattack_enchantment_rsc = \
       "\n\nYour current %s enchantment will deal %i - %i base %s damage."
@@ -142,14 +146,39 @@ messages:
       return 0;
    }
 
+   GetManaPerBlow()
+   "Ours (spell revamp balance): each blow costs this much mana (Zap 1)."
+   {
+      return 2;
+   }
+
    CheckWeaponAndDoAnimation(who=$,weapon_used=$,victim=$)
    "Spell does not require a weapon, but a player may use this spell even"
    "if they are armed."
    "Also does the cast animation.  In future, may provide different grfx"
    "for different touch spells."
    {
+      local iCost;
+
+      // Ours (spell revamp balance): a touch spell is a mage's weapon, as
+      //  strong as a good one, so each blow takes a little mana.
+      iCost = Send(self,@GetManaPerBlow);
+      if iCost > 0
+         AND IsClass(who,&Player)
+      {
+         if Send(who,@GetMana) < iCost
+         {
+            Send(who,@MsgSendUser,#message_rsc=touchattack_no_mana_rsc,
+                 #parm1=Send(self,@GetName));
+
+            return FALSE;
+         }
+
+         Send(who,@LoseMana,#amount=iCost);
+      }
+
       Send(who,@DoCast);
-      
+
       return TRUE;
    }
 
@@ -503,7 +532,8 @@ messages:
                 4,Send(self,@FindMinDamage,#who=who),
                 4,Send(self,@FindMaxDamage,#who=who),
                 4,Send(SYS,@GetSpellDamageTypeName,
-                       #type=(viSpellType & ~ATCK_SPELL_ALL)));
+                       #type=(viSpellType & ~ATCK_SPELL_ALL)),
+                4,Send(self,@GetManaPerBlow));
       if rEffect = touchattack_effect_rsc
       {
          AddPacket(4,iTime / 60000);

@@ -17,7 +17,7 @@ constants:
    // What number do we divide the true hps by in order to get the hps of
    //  the apparition?
    // Ours (spell revamp D38): a quarter of its health, not a tenth.
-   APPARITION_FRACTION = 4
+   APPARITION_FRACTION = 3   // Ours (spell revamp balance): a third
 
 resources:
 

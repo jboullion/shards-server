@@ -173,7 +173,8 @@ messages:
       // All duration calculations now use class properties, modifiable in game
       // By default, base duration 2000ms, total time 2000-6000ms using 40x
       // spellpower multiplier, with the final duration 50-100// max
-      iDuration = piBaseDuration + iSpellPower * piSpellPowerModifier;
+      // Ours (spell revamp balance): 4 to 8 seconds (it was 2 to 5).
+      iDuration = 4000 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) * 40;
       iDuration = Random(iDuration * (100 - piDeviation) / 100,iDuration);
 
       return iDuration;

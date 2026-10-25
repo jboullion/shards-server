@@ -62,6 +62,9 @@ properties:
 
    pbResurrected = FALSE
 
+   // Ours (spell revamp balance): the monster's level, for Defile.
+   piVictimLevel = 0
+
 messages:
 
    Constructor(victim = $,killer = $,oRoom = $, assassinated = FALSE,
@@ -71,6 +74,10 @@ messages:
       vrName = Send(victim,@GetDeadName);
       vrIcon = Send(victim,@GetDeadIcon);
       pbMob = IsClass(victim,&Monster);
+      if pbMob
+      {
+         piVictimLevel = Send(victim,@GetLevel);
+      }
       piDrawfx = drawfx;
       pbAssassinated = assassinated;
       prPlayerBodyOverlay = PlayerBodyOverlay;
@@ -220,6 +227,11 @@ messages:
       }
 
       return pbWas_good_player;
+   }
+
+   GetVictimLevel()
+   {
+      return piVictimLevel;
    }
 
    WasPlayer()

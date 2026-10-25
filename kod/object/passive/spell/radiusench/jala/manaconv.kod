@@ -22,7 +22,9 @@ resources:
    ManaConvergence_icon_rsc = imanacon.bgf
    ManaConvergence_desc_rsc = \
       "The words of this song form an enchantment which increases the "
-      "effectiveness of magical attack spells.  Requires one perfect polished "
+      "effectiveness of magical attack spells: those who hear it, the "
+      "singer's foes excepted, deal up to a fifth more damage with them.  "
+      "Requires one perfect polished "
       "seraphym."
 
    ManaConvergence_song = jala5.ogg
@@ -54,7 +56,8 @@ classvars:
    vrDesc = ManaConvergence_desc_rsc
 
    viMana = 10          // Mana is amount used upon inititiation
-   viManaDrain = 9      // Drain is amount used every viDrainTime milliseconds
+   // Ours (spell revamp balance): half its old 9.
+   viManaDrain = 4      // Drain is amount used every viDrainTime milliseconds
    viDrainTime = 5000    // Drain some mana every viDrainTime milliseconds
    viSpell_num = SID_MANA_CONVERGENCE
 
@@ -63,7 +66,8 @@ classvars:
    viMeditate_ratio = 50
 
    viAffectsGuildmates = TRUE
-   viAffectsEnemies = TRUE
+   // Ours (spell revamp balance): a song for the singer's side, not foes.
+   viAffectsEnemies = FALSE
 
 properties:
 
@@ -80,11 +84,9 @@ messages:
 
    ModifySpellPower(who=$,oSpell=$,state=$,iSpellPower=0)
    {
-      if state <> $
-         AND IsClass(oSpell,&AttackSpell)
-      {
-         return iSpellPower + Nth(state,5);
-      }
+      // Ours (spell revamp balance): its power goes to damage instead
+      //  (AttackSpell.ScaleDamage, up to a fifth more); added spellpower
+      //  barely moved the damage.
 
       return iSpellPower;
    }
