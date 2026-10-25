@@ -1715,6 +1715,14 @@ messages:
          }
       }
 
+      // Ours (spell revamp phase 9): a glow of the school's colour about the
+      //  caster, for our client.
+      if who <> $
+         AND IsClass(who,&Battler)
+      {
+         Send(self,@SendSpellFx,#kind=SPELLFX_CAST,#source=who);
+      }
+
       // Let players see the spellpower their spells are cast at, if they
       // have the setting enabled in their preference menu.
       if who <> $

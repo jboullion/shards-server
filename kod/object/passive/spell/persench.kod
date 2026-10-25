@@ -202,6 +202,16 @@ messages:
 
       Send(oTarget,@MsgSendUser,#message_rsc=vrEnchantment_On);
 
+      // Ours (spell revamp phase 9): a pulse about the target, for our client.
+      if viHarmful
+      {
+         Send(self,@SendSpellFx,#kind=SPELLFX_CURSE,#source=who,#target=oTarget);
+      }
+      else
+      {
+         Send(self,@SendSpellFx,#kind=SPELLFX_BUFF,#source=who,#target=oTarget);
+      }
+
       if SpecialItem
       {
                Send(oTarget,@StartEnchantment,#what=self,

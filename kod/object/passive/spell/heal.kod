@@ -145,6 +145,8 @@ messages:
 
       // Ours: no extra healing for new players (it was 2-5 more).
       iHeal = Send(oTarget,@GainHealthNormal,#amount=iHeal,#precision=TRUE);
+      // Ours (spell revamp phase 9): healing light about the target, for our client.
+      Send(self,@SendSpellFx,#kind=SPELLFX_HEAL,#source=who,#target=oTarget);
 
       if who <> oTarget
       {

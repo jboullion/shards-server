@@ -131,6 +131,13 @@ messages:
    {
       local i, iDuration, oList;
 
+      // Ours (spell revamp phase 9): a dark pulse about the victim, for our client.
+      if report
+         AND oTarget <> $
+      {
+         Send(self,@SendSpellFx,#kind=SPELLFX_CURSE,#source=what,#target=oTarget);
+      }
+
       // Ours (spell revamp playtest): a quiet use (Flash, the lightning wall)
       //  doesn't announce each target's duration.
       if report

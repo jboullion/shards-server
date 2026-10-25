@@ -65,6 +65,14 @@ properties:
 
 messages:
 
+   GetMagicShowFlags()
+   "Ours (spell revamp phase 9): Shal'ille's hammer glows gold, as a magic weapon of "
+   "that might would, in the hand and in the world (our client's ring)."
+   {
+      return (MAGIC_SHOW_SLIGHT + MAGIC_TIER_POTENT) * OF_MAGIC_SHOW_MUL
+             + MAGIC_COLOUR_GOLD * OF_MAGIC_COLOUR_MUL;
+   }
+
    Constructor(iLongevity=$, iToHitBonus=$)
    {
       local oWeapAtt;
