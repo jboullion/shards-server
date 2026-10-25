@@ -78,14 +78,7 @@ messages:
                   #stroke_obj=self);
    }
 
-   CalculateRange(who=$, iSpellPower=25)
-   "Ours (spell revamp balance): a foe song reaches 8 squares, and up to 10 "
-   "more with spellpower (Jala's 40 to 80 covered whole rooms)."
-   {
-      return (8 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) / 10) * FINENESS;
-   }
-
-   GetSongFxColor(iSpell=0)
+GetSongFxColor(iSpell=0)
    "Ours (spell revamp phase 9): holy gold, unholy violet, else Jala blue."
    {
       if iSpell & ATCK_SPELL_HOLY

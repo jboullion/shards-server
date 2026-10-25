@@ -269,6 +269,10 @@
    // Ours (spell revamp phase 9, visuals): a spell effect for our client to draw
    //  (Room.SendSpellFx): kind, source, target, colour (5:5:5), size
    UC_SPELL_FX = 123
+   // Ours (spell revamp phase 9, V5): an area spell's reach, for our client's range ring, to
+   //  the caster only (Spell.SendSpellRange): kind (SPELLRANGE_*), the centre object, the
+   //  spell, the radius and an inner radius (fine units, 0 for none), colour (5:5:5)
+   UC_SPELL_RANGE = 124
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

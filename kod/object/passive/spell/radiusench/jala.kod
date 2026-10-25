@@ -25,8 +25,6 @@ classvars:
 
    vrSucceed_wav = Jala_sound
 
-   viBaseRange = 40 * FINENESS
-
    // Ours (spell revamp D20): the song's music, played to its listeners
    //  while they hear it (it was a property nothing read).
    vrMusic = $
@@ -36,9 +34,17 @@ properties:
 
 messages:
 
+   CalculateRange(who=$, iSpellPower=25)
+   "Ours (spell revamp balance): a song reaches 8 squares, and up to 10 more "
+   "with spellpower (Jala's 40 to 80 covered whole rooms). The foe songs "
+   "first; every song since the range rings (25 October)."
+   {
+      return (8 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) / 10) * FINENESS;
+   }
+
    AddEnchantmentEffects(who=$,state=$)
    "Ours: a listener hears the song."
-   {
+{
       if vrMusic <> $
          AND IsClass(who,&User)
       {

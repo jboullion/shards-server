@@ -3189,9 +3189,79 @@ messages:
       return;
    }
 
+   GetAreaRange(who=$,iSpellPower=0)
+   "Ours (spell revamp phase 9, V5): how far an area spell reaches from its "
+   "centre, in fine units, for our client's range ring; $ for a spell that "
+   "isn't one. Each area spell answers from the same numbers it casts by."
+   {
+      return $;
+   }
+
+   GetAreaInnerRange(who=$,iSpellPower=0)
+   "Ours (V5): an inner ring, in fine units (Earthquake's full damage), or 0."
+   {
+      return 0;
+   }
+
+   SendRangePreview(who=$)
+   "Ours (V5): our client asks how far this spell would reach if cast now "
+   "(UC_SHARDS_OBJECT range, util/shardsabilities.kod), while the player "
+   "points at it. Only for a spell they know."
+   {
+      local iSpellPower, iRange;
+
+      if who = $
+         OR NOT IsClass(who,&User)
+         OR NOT Send(who,@HasSpell,#num=viSpell_num)
+      {
+         return;
+      }
+
+      iSpellPower = Send(self,@GetSpellPower,#who=who);
+      iRange = Send(self,@GetAreaRange,#who=who,#iSpellPower=iSpellPower);
+      if iRange = $
+      {
+         return;
+      }
+
+      Send(self,@SendSpellRange,#who=who,#kind=SPELLRANGE_PREVIEW,#source=who,
+           #iRange=iRange,
+           #iInner=Send(self,@GetAreaInnerRange,#who=who,#iSpellPower=iSpellPower));
+
+      return;
+   }
+
+   SendSpellRange(who=$,kind=0,source=$,iRange=0,iInner=0)
+   "Ours (V5): UC_SPELL_RANGE to who alone (players see only their own "
+   "rings): kind, the centre, this spell, the radii in fine units, the "
+   "school's colour."
+   {
+      local oSession;
+
+      if who = $
+         OR source = $
+         OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_SPELL_RANGE, 1,kind, 4,source, 4,self,
+                2,Bound(iRange,0,65535), 2,Bound(iInner,0,65535),
+                2,Send(self,@GetSchoolFxColor));
+      SendPacket(oSession);
+
+      return;
+   }
+
    GetSchoolFxColor()
    "Ours (spell revamp phase 9): Shal'ille gold, Qor violet, Kraanan red, "
-   "Faren orange, Riija green, Jala blue (5:5:5)."
+"Faren orange, Riija green, Jala blue (5:5:5)."
    {
       if viSchool = SS_SHALILLE
       {

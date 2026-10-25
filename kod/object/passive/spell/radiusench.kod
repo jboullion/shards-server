@@ -322,6 +322,10 @@ messages:
       // Add spell effects to target.
       Send(self,@AddEnchantmentEffects,#who=oTarget,#state=lState);
 
+      // Ours (spell revamp phase 9, V5): the caster's ring, about its centre.
+      Send(self,@SendSpellRange,#who=who,#kind=SPELLRANGE_ON,#source=oTarget,
+           #iRange=iRange);
+
       // Initial cast, enchant anyone in range.
       Send(self,@StartNewRadiusEnchantment,#who=who,#oSource=oTarget,
             #iSpellPower=iSpellPower,#state=lState);
@@ -781,6 +785,10 @@ messages:
             Send(who,@RecalcFlickerFlag);
          }
 
+         // Ours (V5): the caster's ring goes.
+         Send(self,@SendSpellRange,#who=Send(self,@GetCaster,#state=state),
+              #kind=SPELLRANGE_OFF,#source=oSource);
+
          // Original spell is ending, unenchant all in range.
          foreach i in Send(Send(oSource,@GetOwner),@GetHolderActive)
          {
@@ -892,6 +900,12 @@ messages:
    CalculatePower(who=$, iSpellPower=25)
    {
       return iSpellPower;
+   }
+
+   GetAreaRange(who=$,iSpellPower=0)
+   "Ours (V5): the range ring, before a song is sung."
+   {
+      return Send(self,@CalculateRange,#who=who,#iSpellPower=iSpellPower);
    }
 
    // Replace this to modify range by spellpower calculations

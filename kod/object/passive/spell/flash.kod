@@ -94,6 +94,12 @@ messages:
       return 1000 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) * 20;
    }
 
+   GetAreaRange(who=$,iSpellPower=0)
+   "Ours (V5): the range ring."
+   {
+      return Send(self,@GetFlashRange,#iSpellPower=iSpellPower);
+   }
+
    GetFlashRange(iSpellPower=0)
    "Fine units: 6 squares, and up to 4 more with spellpower."
    {

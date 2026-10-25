@@ -236,6 +236,18 @@ messages:
       return;
    }
 
+   GetAreaRange(who=$,iSpellPower=0)
+   "Ours (V5): the range ring: nothing past here."
+   {
+      return viZero_damage_distance * FINENESS;
+   }
+
+   GetAreaInnerRange(who=$,iSpellPower=0)
+   "Ours (V5): full damage within this."
+   {
+      return viMax_damage_distance * FINENESS;
+   }
+
    ComputeDamage(who=$,target=$,iDamage=$)
    "Return the damage to be applied to the given target, taking into account "
    "distance."

@@ -156,6 +156,18 @@ messages:
 
       // Ours (the magic item revamp, phase 2): a revealed magic item's full name, for our
       // client's lists (UC_MAGIC_NAME back)
+      // Ours (spell revamp phase 9, V5): how far a spell we point at would reach, for our
+      // client's range ring (UC_SPELL_RANGE back)
+      if StringEqual(sVerb,"range")
+      {
+         if IsClass(what,&Spell)
+         {
+            Send(what,@SendRangePreview,#who=who);
+         }
+
+         return;
+      }
+
       if StringEqual(sVerb,"magicname")
       {
          Send(Send(SYS,@GetItemServiceBook),@SendMagicName,#who=who,#oItem=what);

@@ -138,6 +138,12 @@ messages:
       return piSpeed;
    }
 
+   GetAreaRange(who=$,iSpellPower=0)
+   "Ours (V5): the range ring (Fire Storm, Ice Nova)."
+   {
+      return piRange;
+   }
+
    GetProjectileRange()
    "Returns projectile range, in row/col units."
    {

@@ -88,10 +88,22 @@ messages:
 
       oRoom = Send(who,@GetOwner);
       lFinalTargets = Send(oRoom,@EnchantAllInRange,#what=self,
-                           #range=(6+(iSpellpower+1)/20),#center=who,
-                           #monsters=TRUE);
+                           #range=Send(self,@GetBombRange,#iSpellPower=iSpellPower),
+                           #center=who,#monsters=TRUE);
 
       return lFinalTargets;
+   }
+
+   GetBombRange(iSpellPower=0)
+   "Ours (V5): how far it reaches, in squares (the casting and the ring both)."
+   {
+      return 6 + (iSpellPower + 1) / 20;
+   }
+
+   GetAreaRange(who=$,iSpellPower=0)
+   "Ours (V5): the range ring."
+   {
+      return Send(self,@GetBombRange,#iSpellPower=iSpellPower) * FINENESS;
    }
 
    CanPayCosts(who = $, lTargets = $)

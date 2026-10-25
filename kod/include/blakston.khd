@@ -2630,6 +2630,11 @@
    SPELLFX_ROOMFLASH = 6   // the whole room lights up (Lightning Bolt)
    SPELLFX_QUAKE = 7       // dust rises about the source (Earthquake)
    SPELLFX_HEAL = 8        // healing light about the target
+
+   // Ours (spell revamp phase 9, V5): UC_SPELL_RANGE kinds
+   SPELLRANGE_PREVIEW = 1  // how far a spell would reach, asked for (UC_SHARDS_OBJECT "range")
+   SPELLRANGE_ON = 2       // a song (a radius enchantment) starts: its ring follows its centre
+   SPELLRANGE_OFF = 3      // and ends
 SID_ICEWALL             = 241
    SID_INDEST              = 242
    SID_NODROP              = 253
