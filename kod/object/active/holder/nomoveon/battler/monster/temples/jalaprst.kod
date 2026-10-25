@@ -40,6 +40,10 @@ resources:
       "unique.  When your spirit is ready to learn, my guidance will "
       "await you.  Until then, may inspiration guide your steps!"
 
+   jalapriestess_not_a_bard = \
+      "Invigorate is a song for those who already know the bard's craft.  "
+      "Learn another of our songs first."
+
    jalapriestess_forget_potion_sale = \
       "I offer %s%s, a potent draught. Drink it, and all rogue skills "
       "will fade from memory."
@@ -55,14 +59,107 @@ classvars:
       MOB_RECEIVE | MOB_TEACHER | MOB_COND_SELLER
    viOccupation = MOB_ROLE_PRIESTESS
 
-   // TODO: Add a simple bard-related quest here
-   viQuestID = 0
+   // Ours: Truth, Mirth and Melancholy wait on the Pupil of Truth quest, as
+   //  they do at the Minstrel.
+   viQuestID = QST_ID_TRUTH_SPELL
 
 messages:
 
    IsExpansionNPC()
    {
       return TRUE;
+   }
+
+   SetForSale()
+   "Ours: she teaches every Jala song (she taught nothing)."
+   {
+      plFor_Sale = [
+         $,$,
+         [
+            SID_INVIGORATE,
+            SID_MIRTH,
+            SID_MELANCHOLY,
+            SID_WARP_TIME,
+            SID_CIVILITY,
+            SID_CONCILIATION,
+            SID_DISTILL,
+            SID_RESTORATE,
+            SID_SACRED_RESONANCE,
+            SID_PROFANE_RESONANCE,
+            SID_TRUTH,
+            SID_JIG,
+            SID_DISHARMONY,
+            SID_MANA_CONVERGENCE,
+            SID_REJUVENATE,
+            SID_CRYSTALIZE_MANA,
+            SID_SPELLBANE
+         ],
+      $];
+
+      return;
+   }
+
+   CanDoTeach(who=$,sid=0,bSkill=FALSE)
+   {
+      if NOT bSkill
+         AND NOT Send(self,@CanAddSpell,#who=who,#num=sid,#report=TRUE)
+      {
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   CanAddSpell(who=$,num=0,report=FALSE)
+   "The same gates as the other Jala teachers: the Pupil of Truth quest for "
+   "Truth, Mirth and Melancholy (the Minstrel), and another Jala song first "
+   "for Invigorate (D'Franco)."
+   {
+      local i, oSpell, bFound;
+
+      if (num = SID_TRUTH
+            OR num = SID_MIRTH
+            OR num = SID_MELANCHOLY)
+         AND NOT Send(self,@HasDoneLearnQuest,#who=who)
+      {
+         if report
+         {
+            Post(self,@SayToOne,#target=who,
+                 #message_rsc=jalapriestess_teach_quest_needed);
+         }
+
+         return FALSE;
+      }
+
+      if num = SID_INVIGORATE
+      {
+         bFound = FALSE;
+         foreach i in Send(who,@GetSpellList)
+         {
+            oSpell = Send(SYS,@FindSpellByNum,
+                          #num=Send(who,@DecodeSpellNum,#compound=i));
+            if oSpell <> $
+               AND Send(oSpell,@GetSchool) = SS_JALA
+            {
+               bFound = TRUE;
+
+               break;
+            }
+         }
+
+         if NOT bFound
+         {
+            if report
+            {
+               Post(self,@SayToOne,#target=who,
+                    #message_rsc=jalapriestess_not_a_bard);
+            }
+
+            return FALSE;
+         }
+      }
+
+      propagate;
    }
 
 end
