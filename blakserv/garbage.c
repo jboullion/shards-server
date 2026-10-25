@@ -637,13 +637,25 @@ void RenumberObject(object_node *o)
 
 void RenumberBlockerObjects(room_node *r)
 {
-   BlockerNode *b;
+   BlockerNode *b, *next;
+   object_node *o;
 
    b = r->data.Blocker;
    while (b)
    {
-      b->ObjectID = GetObjectByID(b->ObjectID)->garbage_ref;
-      b = b->Next;
+      next = b->Next;
+      o = GetObjectByID(b->ObjectID);
+      if (o == NULL)
+      {
+         // An object deleted without leaving its room. Drop its blocker rather than
+         // crash the save (2026-10-24).
+         eprintf("RenumberBlockerObjects dropping blocker for missing object %i in room data %i (resource %i)\n",
+            b->ObjectID, r->data.roomdata_id, r->data.resource_id);
+         BSPBlockerRemove(&r->data, b->ObjectID);
+      }
+      else
+         b->ObjectID = o->garbage_ref;
+      b = next;
    }
 }
 

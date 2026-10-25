@@ -51,6 +51,15 @@ int eventengine_obj_id;
 // in blakod, but can be called by constant (e.g. SYSTEM).
 void CreateBuiltInObjects()
 {
+   // Start from the IDs a clean start has. The System object is created first, as
+   // object 0, and its constructor sends to SYS before CreateObject returns. When a
+   // save failed to load (loadall.c), these still held the old save's IDs, so those
+   // messages went to an object that didn't exist (2026-10-24).
+   system_obj_id = 0;
+   settings_obj_id = 0;
+   realtime_obj_id = 0;
+   eventengine_obj_id = 0;
+
    SetSystemObjectID(CreateObject(SYSTEM_CLASS, 0, NULL));
    SetSettingsObjectID(CreateObject(SETTINGS_CLASS, 0, NULL));
    SetRealTimeObjectID(CreateObject(REALTIME_CLASS, 0, NULL));

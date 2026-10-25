@@ -1,5 +1,5 @@
 {
- "about": "Weapons drawn once and posed into all their sprites by tools/iconforge/weapon.py. ref: the current sprite frame the model sees (file:frame). what/head/describe: the prompt. head_rows: the top share of the drawing kept full size when a held weapon is foreshortened; tint_rows: the top share whose neutral greys take the school colour. sprites: kind icon (broken: frames drawn in pieces), held (shrink, pad, shaft: how much thicker than the drawing's proportion), pov (cut: frames whose head is off the top).",
+ "about": "Weapons drawn once and posed into all their sprites by tools/iconforge/weapon.py. ref: the current sprite frame the model sees (file:frame). what/head/describe: the prompt. head_rows: the top share of the drawing kept full size when a held weapon is foreshortened; tint_rows: the top share whose neutral greys take the school colour (0: fixed colours). upright and flip: the model draws it as `upright` says and the drawing is turned over, so its head (the wider end the frames are measured by: a sword's hilt) is at the top. sprites: kind icon (broken: frames drawn in pieces), held (shrink, pad, shaft: how much thicker than the drawing's proportion; head_max: the head at most that many times the shaft's scale, 2.5), pov (cut: frames whose head is off the top, or off the bottom with cut_head; sink: the share of the head past its end in the other frames).",
  "weapons": {
   "wand": {
    "ref": "wand.bgf:0",
@@ -25,6 +25,21 @@
     {"file": "masterwand.bgf", "kind": "icon", "broken": [1], "shaft": 1.5},
     {"file": "masterwandov.bgf", "kind": "held", "pad": 3, "shaft": 2},
     {"file": "povmastwand.bgf", "kind": "pov", "cut": [0, 1]}
+   ]
+  },
+  "lightsword": {
+   "ref": "lightsw.bgf:2",
+   "what": "sword of light",
+   "head": "the hilt",
+   "flip": true,
+   "upright": "the blade pointing straight up with its tip at the top, the hilt at the bottom",
+   "describe": "A holy longsword: a straight, double-edged blade of near-white steel, shaded only in white and the palest warm silver, with a narrow fuller down its middle and a sharp point. A soft glow of holy light surrounds the whole blade: a hard-edged band of pale golden-yellow light a few pixels wide hugging the blade's outline, not blurred into the background. A simple gold crossguard, a grip bound in cream-white leather and a round gold pommel set with a small white gem. No blue anywhere.",
+   "head_rows": 0.3,
+   "tint_rows": 0,
+   "sprites": [
+    {"file": "lightsw.bgf", "kind": "icon", "shrink": 5, "broken": [1], "head_max": 1},
+    {"file": "lightswov.bgf", "kind": "held", "shrink": 8, "pad": 4, "head_max": 1},
+    {"file": "povlightsw.bgf", "kind": "pov", "cut": [0], "cut_head": "bottom", "sink": 0.8}
    ]
   }
  }

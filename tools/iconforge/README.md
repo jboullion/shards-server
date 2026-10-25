@@ -121,6 +121,7 @@ python tools/iconforge/weapon.py masterwand --install
 - The weapons and their sprites are listed in `data/iconforge/weapons.json` (first the apprentice and master wands).
 - Each frame of the original sprite gives the pose: its axis, its two ends, the head (the wider end) and the head's size. The drawing is scaled, rotated and placed on those, 4x finer, then area-averaged down.
 - The head's neutral greys go to the grey ramp (`D0`–`DF`), which the wands' school xlat recolours on all three sprites. Nothing else may use that ramp.
+- A weapon in fixed colours sets `tint_rows` to 0 and gives `upright`, how the model should stand it, with `flip` when that puts its head (the wider end, which the frames are measured by) at the bottom. The sword of light (`lightsword`) is drawn tip up and turned over, so its hilt is the head. Its in-hand sprite sets `head_max` 1, so the hilt isn't drawn bigger than the blade's scale. Its first-person sprite sets `sink`, so the grip runs off the bottom of the screen.
 - In-hand overlays can change shrink (`wandov.bgf` went from 30 to 6): the offsets are in the player body's pixels, so they stay put.
 - Outputs go to `build/iconforge/weapon/<name>/`. `preview.png` shows the old frames, the new ones, and the new ones in each school's colour. `raw.png` is cached; `--force` asks the model again.
 - `--install` also replaces the copies `forge.py install` would otherwise copy back over these.

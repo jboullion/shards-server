@@ -112,6 +112,12 @@ Bool LoadAllButAccountAtTime(char *time_str)
 		ClearTimer();
 		ClearUser();
 		CreateBuiltInObjects();
+
+		/* It's a new game, not the saved one: callers must not send it
+		   LoadedFromDisk. That reloads every room's data on top of the data the
+		   new rooms just made, and the old copies kept blockers for monsters
+		   that later died, which crashed every save (2026-10-24). */
+		load_ok = False;
 	}
 	
 	return load_ok;

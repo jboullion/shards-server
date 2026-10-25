@@ -18,10 +18,10 @@ The weapons and their sprites are listed in data/iconforge/weapons.json.
    - `held` (the overlay in the player's hand): the shaft keeps one width for every frame (`shaft`
      times the drawing's own proportion) and only shortens, and the head is drawn as wide as the
      original's, so a weapon pointing at the viewer is a short shaft behind a big head, not a
-     squashed one.
+     squashed one. `head_max` caps the head's scale at that many times the shaft's (2.5).
    - `pov` (first person): a close-up, the head as wide as the original's and the shaft running off
      the edge. In `cut` frames the head is out of the picture: it sits just past the far end, at the
-     last frame's scale.
+     last frame's scale. `sink` pushes the head that share of its length past its end in the others.
 4. Colour: the head's neutral greys (`tint`) go to the grey ramp D0-DF, which the game recolours
    per school of magic (basewand.kod ResetColors, the same xlat on all three sprites); everything
    else to the nearest palette colour outside that ramp, so it never changes colour.
@@ -74,6 +74,14 @@ PROMPT = (
     "image to near the bottom without touching the edges. {describe} Draw {head} in pure neutral "
     "greys only (white highlight, light, mid and dark greys, no tint of any colour at all): the game "
     "recolours it for each school of magic. Everything else keeps its own colours, with no grey. {style}"
+)
+# A weapon in fixed colours (no school tint) whose drawing is posed upside down (`flip`): a sword's
+# wider end, which the frames' measures call the head, is its hilt, but the model draws it tip up.
+PROMPT_FIXED = (
+    "The image shows {what} from a 1996 fantasy RPG, stood upright. Redraw this {what} as one large "
+    "sprite, perfectly straight and vertical: {upright}, seen from the side with no perspective, centred "
+    "and reaching from near the top of the image to near the bottom without touching the edges. "
+    "{describe} {style}"
 )
 
 
@@ -137,6 +145,8 @@ def reference(spec: dict, pal) -> Image.Image:
     name, frame = spec["ref"].split(":")
     bm = BGF.read(served(name)).bitmaps[int(frame)]
     im = upright(np.asarray(bm.rgba(pal)), frame_pose(bm), Image.NEAREST)
+    if spec.get("flip"):
+        im = im.rotate(180)
     s = 0.86 * 1024 / im.height
     im = im.resize((max(1, round(im.width * s)), round(im.height * s)), Image.NEAREST)
     canvas = Image.new("RGBA", (1024, 1024), KEY_COLOR + (255,))
@@ -148,6 +158,8 @@ class Drawing:
     """The model's drawing, upright and matted: premultiplied RGBA floats, the tint mask, the axis column."""
 
     def __init__(self, raw: Image.Image, spec: dict):
+        if spec.get("flip"):  # drawn tip up: its head (a sword's hilt) goes to the top
+            raw = raw.rotate(180)
         rgba = clean_edges(np.asarray(matte(raw, KEY_COLOR)), KEY_COLOR)
         solid = rgba[..., 3] >= ALPHA_CUT
         im = upright(rgba, self._up(solid))
@@ -276,9 +288,9 @@ def build_sprite(d: Drawing, sp: dict, pal) -> BGF:
     if kind == "held" and shift != int(shift):
         raise SystemExit("%s: pad %d moves the offsets by %.2f body pixels" % (sp["file"], pad, shift))
     poses = [frame_pose(bm) for bm in orig.bitmaps]
-    for i in sp.get("cut", []):  # no head to find: it's off the top
+    for i in sp.get("cut", []):  # no head to find: it's off the top (or the bottom, `cut_head`)
         p = poses[i]
-        if p["head"][1] > p["butt"][1]:
+        if (p["head"][1] > p["butt"][1]) == (sp.get("cut_head", "top") == "top"):
             p["head"], p["butt"] = p["butt"], p["head"]
     for p in poses:
         p["head"] = p["head"] * f + pad
@@ -299,15 +311,16 @@ def build_sprite(d: Drawing, sp: dict, pal) -> BGF:
             # than the shaft's scale. An icon is never foreshortened: its own length sets the scale
             s = s_full if kind == "held" else p["length"] / d.h
             thick = sw if kind == "held" else s * sp.get("shaft", 1.0)
-            pieces = held_pieces(d, p["head"], p["butt"], thick, float(np.clip(p["s_head"], thick, 2.5 * s)))
+            pieces = held_pieces(d, p["head"], p["butt"], thick, float(np.clip(p["s_head"], thick, sp.get("head_max", 2.5) * s)))
         elif kind == "pov":
             # a close-up: the head as big as the original's, the shaft running off the edge. In a cut
-            # frame the head is just past the far end, at the held frame's scale
+            # frame the head is just past the far end, at the held frame's scale; otherwise `sink` of it
+            # runs off past its end (a sword's grip below the screen, its crossguard showing)
             v = p["head"] - p["butt"]
             u = v / (float(np.hypot(*v)) or 1.0)
             cut = i in sp.get("cut", [])
             s = s_ref if cut else p["s_head"]
-            tip = p["head"] + u * d.head_rows * s * 1.1 if cut else p["head"]
+            tip = p["head"] + u * d.head_rows * s * (1.1 if cut else sp.get("sink", 0))
             pieces = [(0, d.h, s, s, tip, u)]
         else:
             raise SystemExit("%s: unknown kind %r" % (sp["file"], kind))
@@ -328,9 +341,9 @@ def xlats() -> dict:
     return json.loads(path.read_text())
 
 
-def preview(name: str, sprites: list, path: Path):
+def preview(name: str, sprites: list, path: Path, schools: bool = True):
     """Each sprite at its in-game size (scaled by 1/shrink alike, so old and new compare): the old
-    frames, the new ones, then the new ones' first frames in each school's colour."""
+    frames, the new ones, then (for a tinted weapon) the new ones' first frames in each school's colour."""
     X = xlats()
     rgb = np.array(X["rgb"], np.uint8).reshape(256, 3)
     rows = []
@@ -357,7 +370,7 @@ def preview(name: str, sprites: list, path: Path):
 
         rows.append(("%s old" % file, frames(old)))
         rows.append(("%s new" % file, frames(new)))
-        for school, x in SCHOOLS:
+        for school, x in SCHOOLS if schools else []:
             rows.append(("  %s" % school, frames(new, np.array(X[str(x)], np.uint8), 8)))
     W = 150 + max(sum(c.width + 4 for c in cells) for _, cells in rows)
     hs = [max((c.height for c in cells), default=10) + 6 for _, cells in rows]
@@ -386,19 +399,21 @@ def build(name: str, force: bool) -> list:
         ref = reference(spec, pal)
         ref.save(d / "ref.png")
         style, _ = style_text()
-        text = PROMPT.format(what=spec["what"], head=spec["head"], describe=spec["describe"], style=style)
+        text = (PROMPT_FIXED if "upright" in spec else PROMPT).format(
+            what=spec["what"], head=spec["head"], upright=spec.get("upright"), describe=spec["describe"], style=style)
         img, info = providers.run("openai", [ref], text)
         img.save(raw)
         (d / "request.json").write_text(json.dumps({"prompt": text, "usage": info.get("usage")}, indent=1))
     drawing = Drawing(Image.open(raw).convert("RGB"), spec)
-    print("%s: drawing %dx%d, %.0f%% of it in the school colour" % (name, drawing.w, drawing.h, 100 * drawing.tint_frac))
+    print("%s: drawing %dx%d, %.0f%% of it in the school colour, head %d rows by %d" % (
+        name, drawing.w, drawing.h, 100 * drawing.tint_frac, drawing.head_rows, drawing.head_w))
     out = []
     for sp in spec["sprites"]:
         new = build_sprite(drawing, sp, pal)
         new.write(d / sp["file"])
         out.append((sp["file"], BGF.read(served(sp["file"])), new))
         print("  %s: %d frames (%s)" % (sp["file"], len(new.bitmaps), sp["kind"]))
-    preview(name, out, d / "preview.png")
+    preview(name, out, d / "preview.png", schools=spec.get("tint_rows", 0.25) > 0)
     print("  preview:", d / "preview.png")
     return [d / sp["file"] for sp in spec["sprites"]]
 
