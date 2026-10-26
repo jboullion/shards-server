@@ -33,6 +33,12 @@ constants:
    APPRAISE_MIN_VALUE = 5000
    // Skipping the tutorial: the purse a new character sets out with (StartCity)
    START_SHILLINGS = 1000
+   // ...the base health it starts at
+   START_HEALTH = 40
+   // ...the training points for the kills it skipped on the way there (Train window)
+   START_TRAINING = 1000
+   // ...the main quest it's on: Word to Cor Noth (quests/marion-word-to-cor-noth.json)
+   START_QUEST = 128
    // ...and the portals it's attuned to, which the tutorial's road would have passed
    // (util/travelnet.kod GetPoints: Raza, Marion)
    START_PORTAL_RAZA = 3
@@ -571,11 +577,11 @@ messages:
 
    StartCity(who = $,words = $)
    "Ours: start <city>, our character creator's Skip tutorial, once, from a new character "
-   "(Player.CanChooseStart): that city's citizen, at its inn, with 30 base health, leather "
+   "(Player.CanChooseStart): that city's citizen, at its inn, with 40 base health, leather "
    "armor, a small round shield and 1000 shillings in all, attuned to Raza's and Marion's "
-   "portals."
+   "portals, with 1000 training points, and on the main quest chain with Word to Cor Noth."
    {
-      local sCity, iInn, rName, oItem, lGear, oMoney, iCash;
+      local sCity, iInn, rName, oItem, lGear, oMoney, iCash, oBook, lQuest;
 
       if who = $ OR NOT IsClass(who,&User) OR words = $ OR Length(words) < 2
       {
@@ -604,10 +610,11 @@ messages:
       Send(who,@SetStartChosen);
       Send(who,@SetHomeroom,#RID=iInn);
 
-      // 30 base health, with the experience that goes with it, and whole
-      Send(who,@GainBaseMaxHealth,#amount=30 - Send(who,@GetBaseMaxHealth));
+      // START_HEALTH base health, with the experience that goes with it, and whole
+      Send(who,@GainBaseMaxHealth,#amount=START_HEALTH - Send(who,@GetBaseMaxHealth));
       Send(who,@ResetXPToLevel);
       Send(who,@SetHealth,#amount=Send(who,@GetMaxHealth));
+      Send(who,@AddTrainingPoints,#points=START_TRAINING);
 
       lGear = [ Create(&LeatherArmor), Create(&MetalShield) ];
       foreach oItem in lGear
@@ -631,6 +638,14 @@ messages:
 
       Send(who,@TeleportTo,#RID=iInn,#bAdminPort=FALSE);
       Send(who,@MsgSendUser,#message_rsc=abil_start_done,#parm1=rName);
+
+      // On the main quest chain: Ran er'Hoth's report for Rook, parcel and all
+      oBook = Send(SYS,@GetQuestBook);
+      lQuest = Send(oBook,@GetQuest,#id=START_QUEST);
+      if lQuest <> $ AND Send(oBook,@LogEntry,#who=who,#id=START_QUEST) = $
+      {
+         Send(oBook,@StartQuest,#who=who,#qrow=lQuest);
+      }
 
       return;
    }
