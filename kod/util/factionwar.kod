@@ -70,6 +70,11 @@ constants:
    //  (Reinforce): only the first comer has the whole army formed round them
    REINFORCEMENTS = 3
 
+   // The attackers form up at the room's spawning place nearest this many squares from the
+   //  pole, on dry ground with no water between (SpawnArmies); at least FRONT_MIN off
+   FRONT_SQUARES = 12
+   FRONT_MIN = 6
+
    // A story siege (StartSiege) gathers this many minutes after it's called
    SIEGE_MUSTER_MINUTES = 2
 
@@ -717,10 +722,11 @@ messages:
 
    SpawnArmies()
    "Both armies take the field: the defenders round the pole, the attackers round the room's "
-   "spawning place farthest from it; but the army of the soldier who came gathers round them, "
-   "so nobody walks in alone against the other side."
+   "spawning place about FRONT_SQUARES from it, dry and with no river to wade between (else "
+   "the farthest); but the army of the soldier who came gathers round them, so nobody walks "
+   "in alone against the other side."
    {
-      local i, iBest, iDist, iFlagRow, iFlagCol, oFirst;
+      local i, iBest, iDist, iFlagRow, iFlagCol, oFirst, iScore, iBestScore;
 
       pbSpawned = TRUE;
 
@@ -732,11 +738,31 @@ messages:
          iFlagRow = Send(poFlag,@GetRow);
          iFlagCol = Send(poFlag,@GetCol);
          iBest = $;
+         iBestScore = $;
          foreach i in Send(poRoom,@GetGenerators)
          {
             iDist = (First(i) - iFlagRow) * (First(i) - iFlagRow)
                     + (Nth(i,2) - iFlagCol) * (Nth(i,2) - iFlagCol);
-            if iBest = $ OR iDist > iBest
+
+            // Ours: a dry place near the front, with no water between it and the pole
+            if iDist >= FRONT_MIN * FRONT_MIN
+               AND NOT Send(poRoom,@IsWaterAt,#row=First(i),#col=Nth(i,2))
+               AND Send(poRoom,@IsDryLine,#line_row1=First(i),#line_col1=Nth(i,2),
+                        #line_row2=iFlagRow,#line_col2=iFlagCol)
+            {
+               iScore = Abs(Sqrt(iDist) - FRONT_SQUARES);
+               if iBestScore = $ OR iScore < iBestScore
+               {
+                  iBestScore = iScore;
+                  plAttackAnchor = [ First(i), Nth(i,2) ];
+               }
+
+               continue;
+            }
+
+            // Else the farthest, as before
+            if iBestScore = $
+               AND (iBest = $ OR iDist > iBest)
             {
                iBest = iDist;
                plAttackAnchor = [ First(i), Nth(i,2) ];
@@ -953,7 +979,9 @@ messages:
             iTry = iTry + 1;
             iRow = iAnchorRow + Random(-3,3);
             iCol = iAnchorCol + Random(-3,3);
+            // Ours: not in water (the last tries take what they find)
             if iRow > 0 AND iCol > 0
+               AND (iTry > 7 OR NOT Send(poRoom,@IsWaterAt,#row=iRow,#col=iCol))
                AND Send(poRoom,@ReqNewHold,#what=troop,#new_row=iRow,#new_col=iCol)
                AND Send(poRoom,@ReqSomethingMoved,#what=troop,#new_row=iRow,#new_col=iCol)
             {
@@ -1064,7 +1092,7 @@ messages:
 
       if oBest <> $
       {
-         Send(troop,@TargetSwitch,#what=oBest,#iHatred=100);
+         Send(troop,@TargetSwitch,#what=oBest,#iHatred=100,#force=TRUE);
          Send(troop,@EnterStateChase,#target=oBest,#actnow=TRUE);
       }
 

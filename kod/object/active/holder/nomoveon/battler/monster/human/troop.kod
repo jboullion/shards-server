@@ -23,6 +23,8 @@ constants:
    // How far off archers and mages keep (fine units, as ArenaFighter's)
    BATTLE_ARCHER_RANGE = 320
    BATTLE_MAGE_RANGE = 192
+   // A battle troop changes foe only for one this much nearer, squared: 4 = half as far
+   BATTLE_SWITCH_NEARER_SQ_DIV = 4
 
    // Ours (the faction revamp's phase 3, util/factionworld.kod): a troop on duty in a town,
    // not fighting (SetDuty); factionworld.kod has the same
@@ -596,13 +598,35 @@ messages:
       propagate;
    }
 
-   TargetSwitch(what = $, iHatred = 0)
+   TargetSwitch(what = $, iHatred = 0, force = FALSE)
+   "In a battle: never a bystander, and (unless the battle picks for us, force) we keep our "
+   "foe unless what is much nearer; else every step a foe takes makes us chase whichever is "
+   "nearest, and we bounce between two archers backing off."
    {
-      // In a battle, never turn on a bystander.
+      local iNow, iNew;
+
       if poBattle <> $
-         AND NOT Send(self,@IsBattleFoe,#what=what)
       {
-         return;
+         if NOT Send(self,@IsBattleFoe,#what=what)
+         {
+            return;
+         }
+
+         if NOT force
+            AND poTarget <> $
+            AND poTarget <> what
+            AND IsObject(poTarget)
+            AND Send(poTarget,@GetOwner) = poOwner
+            AND Send(self,@IsBattleFoe,#what=poTarget)
+         {
+            iNow = Send(self,@SquaredFineDistanceTo,#what=poTarget);
+            iNew = Send(self,@SquaredFineDistanceTo,#what=what);
+            if iNow <> $
+               AND (iNew = $ OR iNew * BATTLE_SWITCH_NEARER_SQ_DIV > iNow)
+            {
+               return;
+            }
+         }
       }
 
       propagate;

@@ -2614,6 +2614,53 @@ messages:
       return iServerID;
    }
 
+   IsWaterAt(row = $, col = $, fine_row = FINENESS_HALF, fine_col = FINENESS_HALF)
+   "Ours: whether the floor there is under water (its sector has depth: the floor with depth "
+   "is lower than the floor). Off the map counts as not."
+   {
+      local iQflags, iRflags, iHeightF, iHeightFWD, iHeightC, iServerID;
+
+      if row = $ OR col = $
+      {
+         return FALSE;
+      }
+
+      iQflags = LIQ_GET_SECTORINFO;
+      if NOT GetLocationInfoBSP(prmRoom, iQflags, row, col, fine_row, fine_col,
+                  *iRflags, *iHeightF, *iHeightFWD, *iHeightC, *iServerID)
+      {
+         return FALSE;
+      }
+
+      return iHeightFWD < iHeightF;
+   }
+
+   IsDryLine(line_row1 = $, line_col1 = $, line_row2 = $, line_col2 = $)
+   "Ours: whether the straight line between two squares crosses no water (tested every half "
+   "square)."
+   {
+      local iSteps, i, iRow, iCol, iDRow, iDCol;
+
+      iDRow = (line_row2 - line_row1) * FINENESS;
+      iDCol = (line_col2 - line_col1) * FINENESS;
+      iSteps = Bound(Sqrt(iDRow * iDRow + iDCol * iDCol) / FINENESS_HALF,1,$);
+      i = 0;
+      while i <= iSteps
+      {
+         iRow = line_row1 * FINENESS + FINENESS_HALF + iDRow * i / iSteps;
+         iCol = line_col1 * FINENESS + FINENESS_HALF + iDCol * i / iSteps;
+         if Send(self,@IsWaterAt,#row=iRow / FINENESS,#col=iCol / FINENESS,
+                 #fine_row=iRow % FINENESS,#fine_col=iCol % FINENESS)
+         {
+            return FALSE;
+         }
+
+         i = i + 1;
+      }
+
+      return TRUE;
+   }
+
    LineOfSight(obj1 = $, obj2 = $)
    "Returns TRUE if there is a line of sight between obj1 and obj2"
    {
