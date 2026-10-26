@@ -33,7 +33,6 @@ resources:
 classvars:
 
    vrName = name_TosArena2
-   viPermanent_flags = ROOM_GUILD_PK_ONLY
    viTerrain_type = TERRAIN_CITY
 
 properties:

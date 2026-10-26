@@ -1392,8 +1392,8 @@
    ROOM_NO_COMBAT     = 0x0002
    // No players may attack each other here.
    ROOM_NO_PK         = 0x0004
-   // Only guild members may attack each other here.
-   ROOM_GUILD_PK_ONLY = 0x0008
+   // 0x0008 was ROOM_GUILD_PK_ONLY (guild and faction combat only), gone with random PvP:
+   //  Player.MayAttackPlayer decides who may fight whom everywhere.
    // No magic may be cast here at all.
    ROOM_NO_MAGIC      = 0x0010
    // An inn, which a player may declare to be his home.
@@ -1499,7 +1499,6 @@
    ICON_ROOM_SAFE_DEATH    = 1
    ICON_ROOM_NO_COMBAT     = 2
    ICON_ROOM_NO_PK         = 3
-   ICON_ROOM_GUILD_PK_ONLY = 4
    ICON_ROOM_NO_MAGIC      = 5
    ICON_ROOM_HOMETOWN      = 6
    ICON_ROOM_SANCTUARY     = 7
@@ -2176,8 +2175,6 @@
    ITEM_USE_SHIRT = 0x0800
    // In theory, used for masks.
    ITEM_USE_FACE = 0x1000
-   // Ours (guild revamp, ADR 0022 decision 22): the guild cloak, worn over everything else
-   ITEM_USE_CLOAK = 0x2000
 
    ITEMTYPE_MISC =     0
    ITEMTYPE_WEAPON =   0x000001

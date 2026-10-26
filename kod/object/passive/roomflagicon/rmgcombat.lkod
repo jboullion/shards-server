@@ -1,7 +1,0 @@
-rmgcombat_name_rsc = de "Nur Gilden- und Fraktionskampf"
-rmgcombat_desc_rsc = de \
-   "Hier kämpfen nur Gilden im Krieg und die Soldaten der Fürsten mit ihren "
-   "Schilden gegen die eines rivalisierenden Fürsten."
-
-rmgcombat_name_rsc = pt "Apenas Combate de Guildas e Facções"
-rmgcombat_desc_rsc = pt "Aqui só lutam guildas em guerra e os soldados dos senhores, com seus escudos, contra os de um senhor rival."

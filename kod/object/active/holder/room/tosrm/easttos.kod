@@ -26,7 +26,7 @@ resources:
 classvars:
 
    vrName = name_EastTos
-   viPermanent_flags = ROOM_GUILD_PK_ONLY | ROOM_LAMPS
+   viPermanent_flags = ROOM_LAMPS
    viTerrain_Type = TERRAIN_CITY | TERRAIN_ROAD
 
    viTeleport_row = 27

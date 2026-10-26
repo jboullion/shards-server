@@ -50,7 +50,8 @@ classvars:
    viTreasure_type = TID_WIMPY_MEDIUM
    viSpeed = SPEED_FAST
    viAttack_type = ATCK_WEAP_THRUST
-   viDefault_behavior = AI_FIGHT_KARMA_AGGRESSIVE | AI_FIGHT_HYPERAGGRESSIVE
+   // Ours: karma is gone (Player.GetKarma is 0), so karma aggression never fired; plain aggressive
+   viDefault_behavior = AI_FIGHT_AGGRESSIVE | AI_FIGHT_HYPERAGGRESSIVE
    viLevel = 90
    viDifficulty = 6
    viVisionDistance = 20

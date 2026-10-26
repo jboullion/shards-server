@@ -33,7 +33,6 @@ resources:
    radench_success_rsc = "You enchant %s%s."
    radench_need_instrument = "You need an instrument!"
 
-   radench_not_guilded = "You must be guilded to cast that spell here."
    radench_bad_target = "You cannot enchant %s%s."
    radench_bad_location = "You cannot cast enchantments upon others here."
    radench_other_already_enchanted = "%s%s is already affected by that magic."
@@ -188,19 +187,6 @@ messages:
             AND NOT Send(SETTINGS_OBJECT,@CanBuffOthersInSafeZones)
          {
             Send(who,@MsgSendUser,#message_rsc=radench_bad_location);
-
-            return FALSE;
-         }
-      }
-
-      if (viAffectsEnemies)
-      {
-         if (NOT Send(Send(who,@GetOwner),@AllowGuildAttack,#what=who)
-            AND Send(SYS,@IsPKAllowed)
-            AND NOT IsClass(who,&DM))
-         {
-            // Tried to cast unguilded in town with no monsters.  Denied!
-            Send(who,@MsgSendUser,#message_rsc=radench_not_guilded);
 
             return FALSE;
          }

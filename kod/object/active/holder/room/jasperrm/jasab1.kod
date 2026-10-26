@@ -28,7 +28,6 @@ classvars:
    viTeleport_row = 11
    viTeleport_col = 13
 
-   viPermanent_flags = ROOM_GUILD_PK_ONLY
    viTerrain_type = TERRAIN_CITY | TERRAIN_RESIDENCE
 
 properties:

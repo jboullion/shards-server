@@ -45,7 +45,10 @@ Traps that cost time:
 - **A failed build may not copy new `.bof` files into `run/server/loadkod`.** Touch the source
   and rebuild.
 - **Deleting a class's `.kod` does not remove its `.bof` from `run/server/memmap`** (nor
-  `rsc/<name>.rsc`). Delete them by hand.
+  `rsc/<name>.rsc`). Delete them by hand. A forgotten `.rsc` keeps its old resource numbers,
+  so once `kod/kodbase.txt` is renumbered it overwrites current strings in `rsc0000.rsb`
+  (guild rank names showed sound files and spell text). Any `run/server/rsc/*.rsc` with no
+  `.rsc` under `kod/` is stale.
 - **Deleting a Kod class that a saved world still holds an object of makes blakserv stop
   loading at that object**, losing every later object, characters included. It then falls back
   to a fresh world with the old accounts. Either keep a stub class while the objects are

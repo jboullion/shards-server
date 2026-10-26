@@ -1704,7 +1704,9 @@ messages:
 
    HallCommand(who = $,words = $)
    "\"guildhall\": the Hall tab asks for UC_GUILD_HALL. \"guildhall public\" and \"guildhall "
-   "private\" open or close the hall to visitors, for an Officer or the Leader."
+   "private\" open or close the hall to visitors, for an Officer or the Leader. \"guildhall "
+   "cloak on\" and \"guildhall cloak off\" put the guild's cloak on or take it off (ADR 0022 "
+   "decision 22: a box on the Hall tab, not an item)."
    {
       local sWord, oHall;
 
@@ -1714,7 +1716,12 @@ messages:
          return;
       }
 
-      if Length(words) >= 2
+      if Length(words) >= 3
+         AND StringEqual(Nth(words,2),"cloak")
+      {
+         Send(who,@SetGuildCloak,#value=StringEqual(Nth(words,3),"on"));
+      }
+      else if Length(words) >= 2
       {
          sWord = Nth(words,2);
          if StringEqual(sWord,"public")
@@ -1752,8 +1759,8 @@ messages:
    "it and how many items it holds). Then the prestige, its tier, the prestige the next tier "
    "starts at (0 at the top) and each chest's limit; the rent owed (below 0: paid ahead) and "
    "the hours left before unpaid rent costs the hall (0 for none); the trophies held, of how "
-   "many; and whether the guild has chosen its colours (for its cloaks). docs/research/"
-   "protocol.md has the layout."
+   "many; whether the guild has chosen its colours (for its cloaks); and whether who wears "
+   "the guild's cloak. docs/research/protocol.md has the layout."
    {
       local i, oSession, oHall, lChests, iHours;
 
@@ -1793,7 +1800,8 @@ messages:
                 2,Send(self,@GetChestLimit),4,piRentDue,2,iHours,
                 1,Bound(Length(plTrophies),0,255),
                 1,Length(Send(Send(SYS,@GetGuildTrophies),@GetTrophies)),
-                1,Send(self,@HasGuildColors));
+                1,Send(self,@HasGuildColors),
+                1,Send(who,@IsWearingGuildCloak));
       SendPacket(oSession);
 
       return;
@@ -2808,6 +2816,14 @@ messages:
    GetSecondaryGuildColor()
    {
       return piColor2;
+   }
+
+   GetCloakTranslation()
+   "The palette translation that puts the cloak's art in our colours: its cloth the first, "
+   "its collar, edges and hem the second."
+   {
+      return Send(SYS,@EncodeTwoColorXLAT,#color1=piColor1,#color2=piColor2)
+             & ITEM_PALETTE_MASK;
    }
 
    GetShieldShape()

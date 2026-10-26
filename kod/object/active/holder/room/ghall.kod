@@ -106,11 +106,6 @@ classvars:
    viTrophy_row = 0
    viTrophy_col = 0
 
-   // Ours (guild revamp, decision 22): the square on the globe's other side where the cloak
-   // rack stands (PlaceCloakRack); 0 for none
-   viRack_row = 0
-   viRack_col = 0
-
    viFoyer_north
    viFoyer_south
    viFoyer_east
@@ -169,9 +164,6 @@ properties:
 
    // Ours (guild revamp): the trophy case (PlaceTrophyCase)
    poTrophyCase = $
-
-   // Ours (guild revamp): the cloak rack (PlaceCloakRack)
-   poCloakRack = $
 
    piLastDoorOpen = 0
 
@@ -254,26 +246,8 @@ messages:
       Send(self,@AssignChestRanks);
 
       Send(self,@PlaceTrophyCase);
-      Send(self,@PlaceCloakRack);
 
       propagate;
-   }
-
-   PlaceCloakRack()
-   "Ours (guild revamp, decision 22): the cloak rack beside the news globe, once. An older "
-   "world's halls get theirs from the maintenance port: send object <hall> PlaceCloakRack."
-   {
-      if poCloakRack <> $
-         OR viRack_row = 0
-      {
-         return;
-      }
-
-      poCloakRack = Create(&CloakRack);
-      Send(self,@NewHold,#what=poCloakRack,#new_row=viRack_row,
-            #new_col=viRack_col,#fine_row=32,#fine_col=32);
-
-      return;
    }
 
    PlaceTrophyCase()
@@ -835,15 +809,13 @@ messages:
 
    SendRoomIcons(what=$)
    "Ours (guild revamp): halls are safe, since AllowBattlerAttack refuses "
-   "every player attack in one, so they show the safe room's icon.  They "
-   "aren't ROOM_NO_COMBAT, which would also stop members casting buffs on "
-   "one another (PersonalEnchantment)."
+   "every player attack in one, Frenzies included, so they show the safe "
+   "room's icon.  They aren't ROOM_NO_COMBAT, which would also stop members "
+   "casting buffs on one another (PersonalEnchantment)."
    {
       local i;
 
-      foreach i in Send(SYS,@GetRoomIcons,
-                        #flags=(piRoom_Flags & ~ROOM_GUILD_PK_ONLY)
-                               | ROOM_NO_COMBAT)
+      foreach i in Send(SYS,@GetRoomIcons,#flags=piRoom_Flags | ROOM_NO_COMBAT)
       {
          Send(what,@ShowAddEnchantment,#what=i,#type=ENCHANTMENT_ROOM);
       }
@@ -1159,12 +1131,6 @@ messages:
       //}
 
       propagate;
-   }
-
-   SetGuildPKOnly()
-   "Override so that the guild flag is not set for halls."
-   {
-      return;
    }
 
 end

@@ -11,8 +11,6 @@ radench_leave = de \
    "Du verlässteinem magischen Kreis, gezaubert von %s%s."
 radench_already_cast = de "Du zauberst bereits einen Kreiszauber."
 radench_need_instrument = de "Du benötigst ein Instrument!"
-radench_not_guilded = de \
-   "Du musst einer Gilde angehören, um diesen Zauber auszusprechen."
 radench_bad_target = de "Du kannst %s%s nicht verzaubern."
 radench_bad_location = de "Du kannst hier nicht auf andere Zaubern."
 radench_target_already_enchanted = de \
@@ -28,7 +26,6 @@ radench_off_other_rsc = pt "O círculo de magia mantido por %s%s desmorona."
 radench_off_caster_rsc = pt "Seu círculo de magia desmorona."
 radench_success_rsc = pt "Você encanta %s%s."
 radench_need_instrument = pt "Você precisa de um instrumento!"
-radench_not_guilded = pt "Você deve estar na guilda para lançar esse feitiço aqui."
 radench_bad_target = pt "Você não pode encantar %s%s."
 radench_bad_location = pt "Você não pode lançar encantamentos sobre outros aqui."
 radench_other_already_enchanted = pt "%s%s já está afetado por essa magia."

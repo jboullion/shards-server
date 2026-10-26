@@ -137,9 +137,6 @@ resources:
    qd_35_t2 = "Ceres of Qor"
    qd_35_s3 = "lost spirit slain"
    qd_35_t3 = "Ceres of Qor"
-   qd_36_name = "The Bone Priestess's Prize"
-   qd_36_s1 = "An orc pit boss head"
-   qd_36_t1 = "The Bone Priestess"
    qd_40_name = "Ore for Quintor"
    qd_40_s1 = "Take a chunk of ore to Quintor"
    qd_40_p1 = "a chunk of ore"
@@ -435,14 +432,6 @@ resources:
    qd_108_s1 = "Take a love letter to Pritchett"
    qd_108_p1 = "a love letter"
    qd_108_t1 = "Pritchett"
-   qd_109_name = "Stock for the Trading Post"
-   qd_109_s1 = "meat pie gathered"
-   qd_109_t1 = "Wulfgang zax'Ak"
-   qd_111_name = "A Feather by Trade"
-   qd_111_s1 = "chunk of nerudite gathered"
-   qd_111_t1 = "The Bone Priestess"
-   qd_111_s2 = "feather of an avar shaman gathered"
-   qd_111_t2 = "Hanla zax'Ta"
    qd_120_name = "Rats in the Stores"
    qd_120_s1 = "Giant rats slain"
    qd_120_t1 = "Marcus"
@@ -1038,6 +1027,21 @@ resources:
    qd_351_t2 = "Priestess Zuxana"
    qd_351_s3 = "Tell what you found"
    qd_351_t3 = "Priestess Zuxana"
+   qd_352_name = "The Sword of Riija"
+   qd_352_s1 = "Ask Quetzal in Ko'catan about the sword of Riija"
+   qd_352_t1 = "Quetzal"
+   qd_352_s2 = "Bring Wulfgang zax'Ak twenty-five meat pies"
+   qd_352_t2 = "Wulfgang zax'Ak"
+   qd_352_s3 = "Bring Hanla zax'Ta a chunk of nerudite ore"
+   qd_352_t3 = "Hanla zax'Ta"
+   qd_352_s4 = "Break up the orcs' war band: ten cave orcs, then tell the bone priestess"
+   qd_352_t4 = "The Bone Priestess"
+   qd_352_s5 = "Bring Bahal zax'Ot ten dragonfly eyes"
+   qd_352_t5 = "Bahal zax'Ot"
+   qd_352_s6 = "Wield the sword of Riija"
+   qd_352_t6 = "Duke Akardius"
+   qd_352_s7 = "Carry the sword to the Monk of Riija"
+   qd_352_t7 = "Monk of Riija"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -1053,7 +1057,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 21236137;
+      return 615502;
    }
 
    GetQuests()
@@ -1240,12 +1244,6 @@ messages:
              [ 1, &Spirit, 15, 0, &CeresofQor, 0, qd_35_s3, $, $, qd_35_t3,
                0, $, $, $, 0 ] ],
            0, 0, [ [ &CastleKey, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
-         // kocatan-bone-priestess
-         [ 36, qd_36_name, &KocatanBonePriestess, 0, 90, 150, $,
-           $, $, 10800, $,
-           [ [ 2, &OrcPitBossHead, 1, 0, &KocatanBonePriestess, 0, qd_36_s1, $, $, qd_36_t1,
-               0, $, $, $, 0 ] ],
-           0, 0, [ [ &SwordShardA, 1 ] ], 0, 3, $, $, 0, $, $, $, $ ],
          // errand-ore
          [ 40, qd_40_name, &BarloqueBlacksmith, 0, 25, 150, $,
            $, $, 7200, $,
@@ -1325,9 +1323,7 @@ messages:
            $, $, 86400, $,
            [ [ 2, &UncutSeraphym, 3, 0, &JasperElder, 0, qd_52_s1, $, $, qd_52_t1,
                0, $, $, $, 0 ] ],
-           0, 0, [ [ &PolishedSeraphym, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ]
-         ],
-         [
+           0, 0, [ [ &PolishedSeraphym, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
          // story-stunted-dwarf
          [ 53, qd_53_name, &MarionBartender, 0, 40, 150, $,
            $, $, $, $,
@@ -1341,7 +1337,9 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &MarionBartender, 0, qd_53_s5, $, qd_53_p5, qd_53_t5,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &OfferingShalille, 1 ], [ &OfferingRiija, 1 ], [ &OfferingQor, 1 ], [ &OfferingFaren, 1 ], [ &OfferingKraanan, 1 ] ], 0, $, $, $, $ ],
+           0, 0, $, 0, 2, $, [ [ &OfferingShalille, 1 ], [ &OfferingRiija, 1 ], [ &OfferingQor, 1 ], [ &OfferingFaren, 1 ], [ &OfferingKraanan, 1 ] ], 0, $, $, $, $ ]
+         ],
+         [
          // story-mystery-monster
          [ 54, qd_54_name, &Barloquetailor, 0, 0, 40, $,
            $, $, 86400, $,
@@ -1565,15 +1563,15 @@ messages:
            $, $, 43200, $,
            [ [ 2, &KriipaClaw, 20, 0, &KraananPriestess, 0, qd_90_s1, $, $, qd_90_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, $, 4, [ [ 2, 3 ] ], $, $, $ ]
-         ],
-         [
+           0, 0, $, 0, 2, $, $, 4, [ [ 2, 3 ] ], $, $, $ ],
          // insignia-faren
          [ 91, qd_91_name, &FarenPriestess, 0, 50, 150, $,
            $, $, 43200, $,
            [ [ 2, &DragonflyEye, 20, 0, &FarenPriestess, 0, qd_91_s1, $, $, qd_91_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, $, 4, [ [ 2, 4 ] ], $, $, $ ],
+           0, 0, $, 0, 2, $, $, 4, [ [ 2, 4 ] ], $, $, $ ]
+         ],
+         [
          // insignia-jala
          [ 92, qd_92_name, &JalaPriestess, 0, 50, 150, $,
            $, $, 43200, $,
@@ -1688,20 +1686,6 @@ messages:
            [ [ 4, $, 1, 0, &BarloqueInnkeeper, 0, qd_108_s1, $, qd_108_p1, qd_108_t1,
                0, $, $, $, 0 ] ],
            0, 0, $, 0, 3, $, [ [ &Shillings, 500 ], [ &Shillings, 600 ], [ &Shillings, 400 ], [ &Shillings, 700 ], [ &Shillings, 550 ], [ &Shillings, 650 ], [ &Shillings, 450 ] ], 0, $, $, $, $ ],
-         // errand-trading-post-good
-         [ 109, qd_109_name, &kocatanTradeMaster, 0, 80, 150, $,
-           $, $, 10800, $,
-           [ [ 2, &Meatpie, 50, 0, &kocatanTradeMaster, 0, qd_109_s1, $, $, qd_109_t1,
-               0, $, $, $, 0 ] ],
-           0, 0, [ [ &SwordShardc, 1 ] ], 0, 3, $, $, 0, $, $, $, $ ],
-         // errand-bowmaker-good
-         [ 111, qd_111_name, &KocatanBowMaker, 0, 80, 150, $,
-           $, $, 10800, $,
-           [ [ 2, &NeruditeOreChunk, 1, 0, &KocatanBonePriestess, 0, qd_111_s1, $, $, qd_111_t1,
-               0, [ 0, 0, 0, [ [ &AvarShamanFeather, 1 ] ], $, $ ], $, $, 0 ],
-             [ 2, &AvarShamanFeather, 1, 0, &KocatanBowMaker, 0, qd_111_s2, $, $, qd_111_t2,
-               0, $, $, $, 0 ] ],
-           0, 0, [ [ &SwordShardd, 1 ] ], 0, 3, $, $, 0, $, $, $, $ ],
          // raza-rats-in-the-stores
          [ 120, qd_120_name, &RazaInnKeeper, 0, 20, 30, [ 138 ],
            $, $, 0, $,
@@ -1767,9 +1751,7 @@ messages:
            $, $, $, $,
            [ [ 1, &Orc, 12, 1, &CorNothSergeant, 0, qd_131_s1, $, $, qd_131_t1,
                0, $, $, $, 0 ] ],
-           1215, 150, $, 0, 1, $, $, 0, $, $, $, $ ]
-         ],
-         [
+           1215, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-red-ants
          [ 132, qd_132_name, &CorNothInnkeeper, 0, 46, 56, [ 130 ],
            $, $, $, $,
@@ -1789,7 +1771,9 @@ messages:
            $, $, $, $,
            [ [ 17, $, 1, 0, &RazaInnKeeper, 0, qd_135_s1, $, $, qd_135_t1,
                1, $, $, $, 3 ] ],
-           110, 0, $, 0, 1, $, $, 0, $, $, $, $ ],
+           110, 0, $, 0, 1, $, $, 0, $, $, $, $ ]
+         ],
+         [
          // raza-road-to-marion
          [ 136, qd_136_name, &RazaInnKeeper, 0, 30, 40, [ 138 ],
            $, $, $, $,
@@ -1965,9 +1949,7 @@ messages:
            $, $, $, $,
            [ [ 1, &DaemonSkeleton, 10, 0, &HunterGhost, 0, qd_166_s1, $, $, qd_166_t1,
                0, $, $, $, 0 ] ],
-           12321, 3000, $, 0, 1, $, $, 0, $, $, $, $ ]
-         ],
-         [
+           12321, 3000, $, 0, 1, $, $, 0, $, $, $, $ ],
          // brax-queens-order
          [ 167, qd_167_name, &HunterGhost, 0, 120, 140, [ 166 ],
            $, $, $, $,
@@ -1985,7 +1967,9 @@ messages:
            $, $, $, $,
            [ [ 1, &Lich, 1, 0, &HunterGhost, 0, qd_169_s1, $, $, qd_169_t1,
                0, $, $, $, 0 ] ],
-           21451, 15000, $, 0, 1, $, $, 0, $, $, $, $ ],
+           21451, 15000, $, 0, 1, $, $, 0, $, $, $, $ ]
+         ],
+         [
          // kocatan-war-on-the-chieftains
          [ 170, qd_170_name, &KocatanCaptainGood, 0, 130, 150, [ 154 ],
            $, $, 86400, $,
@@ -2155,9 +2139,7 @@ messages:
                0, $, $, $, 0 ],
              [ 1, &Elemental, 4, 0, &DukeLiege, 0, qd_213_s2, $, $, qd_213_t2,
                0, $, $, $, 0 ] ],
-           23120, 15000, $, 0, 1, 1, $, 0, [ [ 4, 3 ] ], $, $, $ ]
-         ],
-         [
+           23120, 15000, $, 0, 1, 1, $, 0, [ [ 4, 3 ] ], $, $, $ ],
          // princess-waylay-oasis
          [ 214, qd_214_name, &PrincessLiege, 0, 135, 150, $,
            $, $, $, $,
@@ -2179,7 +2161,9 @@ messages:
            $, $, $, $,
            [ [ 1, &Skeleton, 15, 3, &fourCouncilor, 0, qd_220_s1, [ 38, 39 ], $, qd_220_t1,
                0, $, $, $, 0 ] ],
-           1951, 1000, $, 0, 1, $, $, 0, $, $, $, $ ],
+           1951, 1000, $, 0, 1, $, $, 0, $, $, $, $ ]
+         ],
+         [
          // castle-victoria-knights
          [ 221, qd_221_name, &fourCouncilor, 0, 95, 125, [ 220 ],
            $, $, $, $,
@@ -2359,9 +2343,7 @@ messages:
            $, $, $, $,
            [ [ 20, $, 1, 0, &BarloqueInnkeeper, 0, qd_269_s1, $, $, qd_269_t1,
                1, $, $, $, 8 ] ],
-           1040, 0, $, 250, 2, $, $, 0, $, $, $, $ ]
-         ],
-         [
+           1040, 0, $, 250, 2, $, $, 0, $, $, $, $ ],
          // node-maze-of-the-mimic
          [ 270, qd_270_name, &HunterGhost, 0, 110, 150, $,
            $, $, $, $,
@@ -2379,7 +2361,9 @@ messages:
            $, $, $, $,
            [ [ 20, $, 1, 0, &JasperBartender, 0, qd_272_s1, $, $, qd_272_t1,
                1, $, $, $, 2 ] ],
-           3281, 0, $, 300, 2, $, $, 0, $, $, $, $ ],
+           3281, 0, $, 300, 2, $, $, 0, $, $, $, $ ]
+         ],
+         [
          // node-castle-victoria
          [ 273, qd_273_name, &TosApothecary, 0, 95, 150, $,
            $, $, $, $,
@@ -2577,9 +2561,7 @@ messages:
                0, $, $, $, 0 ],
              [ 3, $, 1, 0, &KraananPriestess, 0, qd_313_s2, $, $, qd_313_t2,
                0, $, $, $, 0 ] ],
-           18432, 4000, $, 0, 1, 3, $, 0, [ [ 4, 10 ] ], $, $, 45 ]
-         ],
-         [
+           18432, 4000, $, 0, 1, 3, $, 0, [ [ 4, 10 ] ], $, $, 45 ],
          // rebel-act5-storm-the-keep
          [ 314, qd_314_name, &RebelLiege, 0, 105, 150, [ 313 ],
            $, $, $, $,
@@ -2597,7 +2579,9 @@ messages:
            $, $, 86400, $,
            [ [ 24, $, 1, 0, $, 0, qd_321_s1, $, $, qd_321_t1,
                1, $, $, $, 712 ] ],
-           4555, 750, $, 0, 1, $, $, 192, $, $, $, $ ],
+           4555, 750, $, 0, 1, $, $, 192, $, $, $, $ ]
+         ],
+         [
          // fallen-daily-muskgate-post
          [ 322, qd_322_name, $, 0, 100, 150, [ 333 ],
            $, $, 86400, $,
@@ -2771,9 +2755,7 @@ messages:
                1, $, $, $, 0 ],
              [ 3, $, 1, 0, &MarionElder, 0, qd_350_s3, $, $, qd_350_t3,
                0, $, $, $, 0 ] ],
-           15302, 2000, $, 0, 2, $, $, 0, $, [ 351 ], $, $ ]
-         ],
-         [
+           15302, 2000, $, 0, 2, $, $, 0, $, [ 351 ], $, $ ],
          // death-realm-qor
          [ 351, qd_351_name, &QorPriestess, 0, 100, 150, $,
            $, $, $, $,
@@ -2783,7 +2765,25 @@ messages:
                1, $, $, $, 0 ],
              [ 3, $, 1, 0, &QorPriestess, 0, qd_351_s3, $, $, qd_351_t3,
                0, $, $, $, 0 ] ],
-           15302, 2000, $, 0, 2, $, $, 0, $, [ 350 ], $, $ ]
+           15302, 2000, $, 0, 2, $, $, 0, $, [ 350 ], $, $ ],
+         // duke-sword-of-riija
+         [ 352, qd_352_name, &DukeLiege, 0, 70, 150, $,
+           $, $, $, $,
+           [ [ 3, $, 1, 0, &KocatanLanguageMaster, 0, qd_352_s1, $, $, qd_352_t1,
+               0, $, $, $, 0 ],
+             [ 2, &Meatpie, 25, 0, &kocatanTradeMaster, 0, qd_352_s2, $, $, qd_352_t2,
+               0, [ 0, 0, 0, [ [ &SwordShardc, 1 ] ], $, $ ], $, $, 0 ],
+             [ 2, &NeruditeOreChunk, 1, 0, &KocatanBowMaker, 0, qd_352_s3, $, $, qd_352_t3,
+               0, [ 0, 0, 0, [ [ &SwordShardd, 1 ] ], $, $ ], $, $, 0 ],
+             [ 1, &CaveOrc, 10, 0, &KocatanBonePriestess, 0, qd_352_s4, $, $, qd_352_t4,
+               0, [ 0, 0, 0, [ [ &SwordShardA, 1 ] ], $, $ ], $, $, 0 ],
+             [ 2, &DragonflyEye, 10, 0, &KocatanMadScientist, 0, qd_352_s5, $, $, qd_352_t5,
+               0, [ 0, 0, 0, [ [ &SwordShardb, 1 ] ], $, $ ], $, $, 0 ],
+             [ 10, $, 1, 0, &DukeLiege, 0, qd_352_s6, $, $, qd_352_t6,
+               1, $, $, [ &RiijaSword ], 0 ],
+             [ 3, $, 1, 0, &RiijaMonk, 0, qd_352_s7, $, $, qd_352_t7,
+               0, $, $, $, 0 ] ],
+           7562, 2000, $, 0, 2, $, $, 0, $, $, $, $ ]
          ]
       ];
    }
@@ -2811,7 +2811,6 @@ messages:
             [ 1, 80, 33 ],
             [ 1, 81, 34 ],
             [ 1, 82, 35 ],
-            [ 1, 17, 36 ],
             [ 1, 49, 40 ],
             [ 1, 50, 41 ],
             [ 1, 47, 42 ],
@@ -2822,10 +2821,10 @@ messages:
             [ 1, 54, 47 ],
             [ 1, 23, 50 ],
             [ 1, 25, 51 ],
-            [ 1, 32, 52 ]
+            [ 1, 32, 52 ],
+            [ 1, 24, 53 ]
          ],
          [
-            [ 1, 24, 53 ],
             [ 1, 36, 54 ],
             [ 1, 37, 55 ],
             [ 1, 38, 56 ],
@@ -2854,10 +2853,10 @@ messages:
             [ 1, 30, 87 ],
             [ 1, 33, 88 ],
             [ 1, 33, 89 ],
-            [ 1, 33, 90 ]
+            [ 1, 33, 90 ],
+            [ 1, 33, 91 ]
          ],
          [
-            [ 1, 33, 91 ],
             [ 1, 33, 92 ],
             [ 1, 34, 93 ],
             [ 1, 35, 94 ],
@@ -2876,8 +2875,6 @@ messages:
             [ 1, 51, 106 ],
             [ 1, 42, 107 ],
             [ 1, 43, 108 ],
-            [ 1, 19, 109 ],
-            [ 1, 21, 111 ],
             [ 1, 27, 347 ],
             [ 1, 26, 348 ]
          ]

@@ -29,7 +29,7 @@ resources:
 
 classvars:
 
-   viPermanent_flags = ROOM_GUILD_PK_ONLY | ROOM_LAMPS
+   viPermanent_flags = ROOM_LAMPS
    vrName = room_name_CorNoth
 
    viTerrain_Type = TERRAIN_CITY | TERRAIN_ROAD | TERRAIN_LAKE

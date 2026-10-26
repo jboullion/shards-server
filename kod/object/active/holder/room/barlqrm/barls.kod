@@ -29,7 +29,7 @@ classvars:
    viTeleport_row = 34
    viTeleport_col = 43
 
-   viPermanent_flags = ROOM_GUILD_PK_ONLY | ROOM_LAMPS
+   viPermanent_flags = ROOM_LAMPS
 
    // Not technically a beach, but we want the ocean-type sounds.
    viTerrain_Type = TERRAIN_CITY | TERRAIN_FOUNTAIN | TERRAIN_ROAD | TERRAIN_BEACH

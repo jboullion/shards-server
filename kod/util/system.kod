@@ -3069,10 +3069,8 @@ messages:
       plRoomIcons = [$,$,$,$,$,$,$,$,$,$,$,$,$,$];
 
       SetNth(plRoomIcons, ICON_ROOM_NO_COMBAT, Create(&RmNoCombat));
-      SetNth(plRoomIcons, ICON_ROOM_GUILD_PK_ONLY, Create(&RmGCombat));
 
-      // use kill zone icon for both kill zone flagged rooms and rooms without
-      // guild combat or no combat flags
+      // Ours (no random PvP): the kill zone icon says a Frenzy is on
       SetNth(plRoomIcons, ICON_ROOM_KILL_ZONE, Create(&RmCombat));
 
       return;
@@ -3102,6 +3100,9 @@ messages:
    }
 
    GetRoomIcons(flags=0)
+   "Ours (no random PvP): a safe room says so, and a Frenzy says anyone may "
+   "attack anyone. Elsewhere Player.MayAttackPlayer decides, the same "
+   "everywhere, so there's nothing to show."
    {
       local lRoomIcons;
 
@@ -3109,22 +3110,7 @@ messages:
       {
          lRoomIcons = Cons(Nth(plRoomIcons,ICON_ROOM_NO_COMBAT),lRoomIcons);
       }
-
-      if (flags & ROOM_GUILD_PK_ONLY)
-      {
-         lRoomIcons = Cons(Nth(plRoomIcons,ICON_ROOM_GUILD_PK_ONLY),lRoomIcons);
-      }
-
-      if NOT (flags & ROOM_NO_COMBAT)
-         AND NOT (flags & ROOM_GUILD_PK_ONLY)
-         AND NOT (flags & ROOM_KILL_ZONE)
-      {
-         lRoomIcons = Cons(Nth(plRoomIcons,ICON_ROOM_KILL_ZONE),lRoomIcons);
-      }
-
-      if (flags & ROOM_KILL_ZONE)
-         AND NOT (flags & ROOM_NO_COMBAT)
-         AND NOT (flags & ROOM_GUILD_PK_ONLY)
+      else if (flags & ROOM_KILL_ZONE)
       {
          lRoomIcons = Cons(Nth(plRoomIcons,ICON_ROOM_KILL_ZONE),lRoomIcons);
       }
@@ -4714,6 +4700,100 @@ messages:
       }
 
       return;
+   }
+
+   NameProblem(oUser = $,sName = $)
+   "Ours (ADR 0026): why ValidateUserName refuses sName, so Caramo can say. 0 if it's fine, "
+   "1 too short or too long, 3 someone already bears it, 4 it's a monster's, an NPC's, a "
+   "guild's, a god's or a retired name (or one that would confuse), 5 it holds a rude word, "
+   "2 any other reason, which is a character the names can't hold."
+   {
+      local i, lBadNameContain, lBadNameIs, oLookup;
+
+      if oUser = $
+         OR sName = $
+         OR Send(self,@ValidateUserName,#oUser=oUser,#sName=sName)
+      {
+         return 0;
+      }
+
+      if StringLength(sName) < MIN_CHAR_NAME_LEN
+         OR StringLength(sName) > MAX_CHAR_NAME_LEN
+      {
+         return 1;
+      }
+
+      oLookup = Send(SYS,@FindUserByString,#string=sName);
+      if oLookup <> $
+         AND oLookup <> oUser
+      {
+         return 3;
+      }
+
+      if Send(SYS,@FindMonsterByString,#string=sName) <> $
+         OR Send(SYS,@FindNPCByString,#string=sName) <> $
+         OR Send(SYS,@FindGuildByString,#string=sName) <> $
+      {
+         return 4;
+      }
+
+      // "a rat", "an orc": a monster's name with an article in front
+      foreach i in plMonsterTemplates
+      {
+         if StringContain(sName,Send(i,@GetTrueName))
+         {
+            if psTemp = $
+            {
+               psTemp = CreateString();
+            }
+
+            SetString(psTemp,sName);
+            StringSubstitute(psTemp,Send(i,@GetTrueName),"");
+            if StringEqual(psTemp,"a")
+               OR StringEqual(psTemp,"an")
+            {
+               return 4;
+            }
+         }
+      }
+
+      foreach i in plNaughtyWords
+      {
+         if StringContain(sName,i)
+         {
+            return 5;
+         }
+      }
+
+      lBadNameContain = ["guardian angel", "guardianangel"];
+      foreach i in lBadNameContain
+      {
+         if StringContain(sName,i)
+         {
+            return 4;
+         }
+      }
+
+      lBadNameIs = [ "Faren", "Shal'ille", "Qor", "Kraanan", "Riija", "Jala", "You",
+                     system_hidden_admin, system_guild_rsc ];
+      foreach i in lBadNameIs
+      {
+         if StringEqual(sName,i)
+         {
+            return 4;
+         }
+      }
+
+      foreach i in plRetiredNames
+      {
+         if StringEqual(sName,i)
+         {
+            return 4;
+         }
+      }
+
+      // Nothing else is left to refuse it: a character the names can't hold.
+      return 2;
    }
 
    AdminChangeUserName(oUser=$,sName=$)

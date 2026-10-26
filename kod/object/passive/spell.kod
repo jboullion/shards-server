@@ -850,6 +850,13 @@ messages:
          return TRUE;
       }
 
+      // Ours: a free spell (Minor Heal, Shal'ille's gift to all) is for anyone, and doesn't
+      // count as knowing its school, so it never keeps anyone from Qor.
+      if Send(self,@IsFreeToLearn)
+      {
+         return TRUE;
+      }
+
       if viSchool = SS_SHALILLE
       {
          foreach i in Send(who,@GetSpellList)
@@ -857,6 +864,7 @@ messages:
             oSpell = Send(SYS,@FindSpellByNum,
                            #num=Send(who,@DecodeSpellNum,#compound=i));
             if Send(oSpell,@GetSchool) = SS_QOR
+               AND NOT Send(oSpell,@IsFreeToLearn)
             {
                oFound = TRUE;
 
@@ -876,6 +884,7 @@ messages:
             oSpell = Send(SYS,@FindSpellByNum,
                            #num=Send(who,@DecodeSpellNum,#compound=i));
             if Send(oSpell,@GetSchool) = SS_SHALILLE
+               AND NOT Send(oSpell,@IsFreeToLearn)
             {
                oFound = TRUE;
 
@@ -900,7 +909,7 @@ messages:
    CanCastHere(who=$,where=$,lTargets=$,iSpellPower=0,bItemCast=FALSE,
                report=TRUE)
    {
-      local oSpell, lState, oTarget;
+      local oSpell, lState;
 
       if IsClass(who,&DM)
       {
@@ -937,41 +946,6 @@ messages:
             {
                return FALSE;
             }
-         }
-      }
-
-      // Prevent casting on people fighting in guild combat zones
-      // by unguilded mules.
-      if Send(where,@CheckRoomFlag,#flag=ROOM_GUILD_PK_ONLY)
-      {
-         if lTargets = $
-         {
-            oTarget = $;
-         }
-         else
-         {
-            oTarget = First(lTargets);
-         }
-
-         // Stop players from interfering. If the room does not allow the
-         // attack, then the spell fails if the caster cannot "help" the
-         // target (IE, the target attacked "recently"). Only count non-harmful
-         // spells here.  Attacks are caught in other places.
-         if NOT Send(self,@IsHarmful)
-            AND oTarget <> $
-            AND IsClass(oTarget,&Player)
-            AND oTarget <> who
-            AND NOT (Send(where,@AllowGuildAttack,#what=who,#victim=oTarget)
-                     OR Send(oTarget,@CanHelpPlayer))
-         {
-            if report
-            {
-               Send(who,@MsgSendUser,#message_rsc=spell_cant_help,
-                     #parm1=Send(oTarget,@GetDef),
-                     #parm2=Send(oTarget,@GetName));
-            }
-
-            return FALSE;
          }
       }
 

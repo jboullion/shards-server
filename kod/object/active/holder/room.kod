@@ -44,7 +44,6 @@ resources:
    room_no_harmful = \
       "You cannot cast harmful spells here when someone else is present."
    room_no_pk_allowed = "You cannot attack another player here."
-   room_guild_combat = "Only those in guilds may attack each other here."
    room_no_mob_attack = "You cannot attack monsters here."
 
    room_no_magic_allowed = "You can't cast spells here."
@@ -1308,31 +1307,10 @@ messages:
    SafePlayerAttack()
    // Should be called GetCanAttackPlayers
    "Used to determine whether or not a player can attack another player"
-   "Without restrictions or repercussions.  Default is True.  May be"
-   "set to true in areas like arenas or hunting zones."
+   "without restrictions or repercussions: TRUE where death has no "
+   "consequences (ROOM_SAFE_DEATH, the arenas, which override this)."
    {
       return Send(self,@CheckRoomFlag,#flag=ROOM_SAFE_DEATH);
-   }
-
-   SetGuildPKOnly(value=TRUE)
-   {
-      if (piRoom_Flags & ROOM_SAFE_DEATH)
-         OR (piRoom_Flags & ROOM_NO_COMBAT)
-         OR (piRoom_flags & ROOM_NO_PK)
-      {
-         return;
-      }
-
-      if (value)
-      {
-         piRoom_Flags = piRoom_Flags | ROOM_GUILD_PK_ONLY;
-      }
-      else
-      {
-         Send(self,@SetRoomFlagToDefault,#flag=ROOM_GUILD_PK_ONLY);
-      }
-
-      return;
    }
 
    GetPermanentFlags()
@@ -1522,21 +1500,6 @@ messages:
          return FALSE;
       }
 
-      if (piRoom_flags & ROOM_GUILD_PK_ONLY) AND IsClass(what,&User)
-         AND (victim = $ OR IsClass(victim,&User))
-      {
-         if (NOT Send(self,@AllowGuildAttack,#what=what,#victim=victim,#report=report))
-            AND Send(SYS,@IsPKAllowed)
-         {
-            if report
-            {
-               Send(what,@MsgSendUser,#message_rsc=room_guild_combat);
-            }
-
-            return FALSE;
-         }
-      }
-
       if use_weapon = $
       {
          use_weapon = stroke_obj;
@@ -1544,44 +1507,6 @@ messages:
 
       if NOT SendListBreak(plActive,1,@ReqSomethingAttack,#what=what,
                   #victim=victim,#use_weapon=use_weapon)
-      {
-         return FALSE;
-      }
-
-      return TRUE;
-   }
-
-   AllowGuildAttack(what = $, victim = $,report = TRUE)
-   "Returns TRUE if you can attack in ROOM_GUILD_PK_ONLY locations."
-   {
-      local oSoldierShield, oOtherShield;
-
-      // Monsters can always attack.
-      if IsClass(what,&Monster)
-         OR (victim <> $ AND IsClass(victim,&Monster))
-      {
-         return TRUE;
-      }
-
-      oSoldierShield = Send(what,@FindUsing,#class=&SoldierShield);
-      if victim <> $
-      {
-         oOtherShield = Send(victim,@FindUsing,#class=&SoldierShield);
-      }
-
-      // What this if statement translates to:
-      // If we're in a room that restricts attacks to guilds only:
-      // And if there is a victim, if s/he does not have a token,
-      //  is unguilded and doesn't have a soldier shield, then the attack fails.
-      //  Or, if the person attacking is not in a guild and doesn't have a
-      //   soldier shield, then the attack fails as well.
-      if Send(self,@CheckRoomFlag,#flag=ROOM_GUILD_PK_ONLY)
-         AND ((Send(what,@GetGuild) = $
-               AND oSoldierShield = $)
-              OR (victim <> $
-                  AND NOT Send(victim,@PossessesA,#class=&Token)
-                  AND Send(victim,@GetGuild) = $
-                  AND oOtherShield = $))
       {
          return FALSE;
       }
@@ -4400,7 +4325,6 @@ messages:
 
       Send(self,@SetRoomFlag,#flag=ROOM_KILL_ZONE,#value=TRUE);
       Send(self,@TrySetRoomFlag,#flag=ROOM_NO_COMBAT,#value=FALSE);
-      Send(self,@TrySetRoomFlag,#flag=ROOM_GUILD_PK_ONLY,#value=FALSE);
       Send(self,@TrySetRoomFlag,#flag=ROOM_NO_PK,#value=FALSE);
       Send(self,@TrySetRoomFlag,#flag=ROOM_NO_MAGIC,#value=FALSE);
 
@@ -4424,7 +4348,6 @@ messages:
          Send(self,@SetRoomFlagToDefault,#flag=ROOM_NO_COMBAT,#value=FALSE);
       }
 
-      Send(self,@SetRoomFlagToDefault,#flag=ROOM_GUILD_PK_ONLY,#value=FALSE);
       Send(self,@SetRoomFlagToDefault,#flag=ROOM_NO_PK,#value=FALSE);
       Send(self,@SetRoomFlagToDefault,#flag=ROOM_NO_MAGIC,#value=FALSE);
 

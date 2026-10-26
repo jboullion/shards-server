@@ -34,7 +34,7 @@ classvars:
    viFlag_row = 14
    viFlag_col = 10
    
-   viPermanent_flags = ROOM_GUILD_PK_ONLY | ROOM_LAMPS
+   viPermanent_flags = ROOM_LAMPS
 
    viTerrain_Type = TERRAIN_CITY | TERRAIN_ROAD | TERRAIN_BERG
    

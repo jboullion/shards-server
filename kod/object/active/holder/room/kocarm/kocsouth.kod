@@ -43,7 +43,6 @@ resources:
 classvars:
 
    vrName = room_name_kocatansouth
-   viPermanent_flags = ROOM_GUILD_PK_ONLY
 
    viTeleport_row = 67
    viTeleport_col = 36

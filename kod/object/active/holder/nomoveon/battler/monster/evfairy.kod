@@ -14,6 +14,9 @@ constants:
 
    include blakston.khd
 
+   // Ours: how much the fey hate a player of the other side (SpecialHatredBehavior)
+   FEY_HATRED = 50
+
 resources:
 
    include evfairy.lkod
@@ -90,6 +93,20 @@ messages:
       plReputationEnemies = [REP_FEY_GOOD];
 
       propagate;
+   }
+
+   SpecialHatredBehavior(what = $)
+   "Ours: player karma is gone, so the dirhai hunt every player but Qor's casters (anyone "
+   "who knows a Qor spell), whom they leave be unless attacked. The elhai are the reverse "
+   "(Fairy)."
+   {
+      if IsClass(what,&User)
+         AND NOT Send(what,@KnowsSpellSchool,#school=SS_QOR)
+      {
+         return FEY_HATRED;
+      }
+
+      return 0;
    }
 
    MonsterAttack(what = $)

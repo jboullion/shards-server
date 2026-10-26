@@ -38,6 +38,18 @@ resources:
    bq_clerk_bad_name = \
       "I can't record that name.  It may be taken, or too long or short, or simply not fit for "
       "the Book of Jala."
+   // Why a name is refused (System.NameProblem); the one above is for any reason not listed
+   bq_clerk_name_length = \
+      "A name must be between %i and %i letters long.  That one isn't."
+   bq_clerk_name_chars = \
+      "The Book of Jala can't hold a name with those characters in it.  Letters, numbers, "
+      "spaces and some marks are all it takes."
+   bq_clerk_name_taken = "Someone already bears that name.  Choose another."
+   bq_clerk_name_others = \
+      "That name belongs to a creature, a person of the realm, a guild or a god, or it is "
+      "kept from use.  Choose another."
+   bq_clerk_name_rude = \
+      "I will not write that name in the Book of Jala: it isn't fit to be read aloud."
    bq_clerk_not_enough = \
       "The fee is %i shillings, from your purse or from your bank account, and you don't "
       "have it."
@@ -96,7 +108,7 @@ messages:
    "Then the Book of Jala, and "
    "System renames them; blakserv sends every client the new name (BP_CHANGE_RESOURCE)."
    {
-      local iFee, oMoney, oBank, sOld;
+      local iFee, oMoney, oBank, sOld, iWhy;
 
       if who = $ OR sName = $
       {
@@ -110,9 +122,34 @@ messages:
          return;
       }
 
-      if NOT Send(SYS,@ValidateUserName,#oUser=who,#sName=sName)
+      iWhy = Send(SYS,@NameProblem,#oUser=who,#sName=sName);
+      if iWhy <> 0
       {
-         Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_bad_name);
+         if iWhy = 1
+         {
+            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_length,
+                 #parm1=MIN_CHAR_NAME_LEN,#parm2=MAX_CHAR_NAME_LEN);
+         }
+         else if iWhy = 2
+         {
+            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_chars);
+         }
+         else if iWhy = 3
+         {
+            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_taken);
+         }
+         else if iWhy = 4
+         {
+            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_others);
+         }
+         else if iWhy = 5
+         {
+            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_name_rude);
+         }
+         else
+         {
+            Send(self,@SayToOne,#target=who,#message_rsc=bq_clerk_bad_name);
+         }
 
          return;
       }

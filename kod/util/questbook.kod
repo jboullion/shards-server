@@ -1657,7 +1657,7 @@ messages:
       // IsClass needs an object, not a class: the first is made, and says whether it stacks
       foreach i in lItems
       {
-         oItem = Send(self,@MakeItem,#entry=i);
+         oItem = Send(self,@MakeItem,#entry=i,#who=who);
          Send(who,@MsgSendUser,#message_rsc=quest_reward_item,#parm1=Send(oItem,@GetName));
          Send(self,@GiveOrDrop,#who=who,#what=oItem);
          if NOT IsClass(oItem,&NumberItem)
@@ -1665,7 +1665,7 @@ messages:
             j = 1;
             while j < Nth(i,2)
             {
-               oItem = Send(self,@MakeItem,#entry=i);
+               oItem = Send(self,@MakeItem,#entry=i,#who=who);
                Send(who,@MsgSendUser,#message_rsc=quest_reward_item,
                     #parm1=Send(oItem,@GetName));
                Send(self,@GiveOrDrop,#who=who,#what=oItem);
@@ -1685,15 +1685,17 @@ messages:
       return;
    }
 
-   MakeItem(entry = $)
-   "A reward item: [ class, count ], or [ class, count, SS_* ] for one made for a school."
+   MakeItem(entry = $,who = $)
+   "A reward item: [ class, count ], or [ class, count, SS_* ] for one made for a school. "
+   "It's made for who (#quester), which a sword of Riija's shards need to bind; classes "
+   "without a quester ignore it."
    {
       if Length(entry) >= 3
       {
-         return Create(First(entry),#number=Nth(entry,2),#school=Nth(entry,3));
+         return Create(First(entry),#number=Nth(entry,2),#school=Nth(entry,3),#quester=who);
       }
 
-      return Create(First(entry),#number=Nth(entry,2));
+      return Create(First(entry),#number=Nth(entry,2),#quester=who);
    }
 
    AwardSpecial(who = $,kind = $,num = 0)

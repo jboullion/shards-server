@@ -17,9 +17,9 @@ resources:
 
    include rmcombat.lkod
 
-   rmcombat_name_rsc = "PvP Combat Allowed"
+   rmcombat_name_rsc = "Frenzy"
    rmcombat_icon_rsc = rmcombat.bgf
-   rmcombat_desc_rsc = "All types of combat are allowed here."
+   rmcombat_desc_rsc = "A Frenzy is on: anyone may attack anyone here."
 
 classvars:
 

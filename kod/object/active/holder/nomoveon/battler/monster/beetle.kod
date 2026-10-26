@@ -60,7 +60,8 @@ classvars:
    viHit_duration = 500       // Maximum total duration of animation.
 
    viTreasure_type = TID_WIMPY_MEDIUM
-   viDefault_behavior = AI_FIGHT_KARMA_AGGRESSIVE
+   // Ours: karma is gone (Player.GetKarma is 0), so karma aggression never fired; plain aggressive
+   viDefault_behavior = AI_FIGHT_AGGRESSIVE
    viSpeed = SPEED_SLOW
    viAttack_type = ATCK_WEAP_BITE
 

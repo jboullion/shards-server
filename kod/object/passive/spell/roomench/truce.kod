@@ -39,7 +39,6 @@ resources:
       "for battle once more."
    truce_guardian = \
       "Your guardian angel tells you, \"You are not ready to cast this spell.\""
-   truce_no_towns = "Shal'ille does not permit you to interfere right now."
    truce_sound = shalille.ogg
 
 classvars:
@@ -103,19 +102,6 @@ messages:
       if NOT Send(who,@CanPlayerPvP)
       {
          Send(who,@MsgSendUser,#message_rsc=truce_guardian);
-
-         return FALSE;
-      }
-
-      // Check to see if the room restricts guild attacks.
-      // Check to see if the person is attackable in the area, is on a PvP
-      //  server, or is a DM.
-      if (NOT Send(oRoom,@AllowGuildAttack,#what=who))
-         AND Send(SYS,@IsPKAllowed)
-         AND NOT IsClass(who,&DM)
-      {
-         // Tried to cast unguilded in town with no monsters.  Denied!
-         Send(who,@MsgSendUser,#message_rsc=truce_no_towns);
 
          return FALSE;
       }

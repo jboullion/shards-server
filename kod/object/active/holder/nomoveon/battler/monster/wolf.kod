@@ -43,7 +43,8 @@ classvars:
 
    viSpeed = SPEED_AVERAGE
    viAttack_type = ATCK_WEAP_SLASH
-   viDefault_behavior = AI_FIGHT_KARMA_AGGRESSIVE | AI_MOVE_FLEE_FRIGHTENERS
+   // Ours: karma is gone (Player.GetKarma is 0), so karma aggression never fired; plain aggressive
+   viDefault_behavior = AI_FIGHT_AGGRESSIVE | AI_MOVE_FLEE_FRIGHTENERS
 
    viDifficulty = 8
    // Attack range of 192, or 3 row/col.

@@ -1,0 +1,119 @@
+{
+  "id": 352,
+  "key": "duke-sword-of-riija",
+  "name": "The Sword of Riija",
+  "tier": "story",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 70,
+    "max": 150
+  },
+  "text": {
+    "offer": "Duke Akardius says, \"You have the look of someone who wants an edge. Long ago the monks of Riija forged swords that keep their bearers on the dreaming path. A mage of Riija with one in hand is worth ten without, and my court casts Riija's magic better than any. The last of those swords lies broken in four shards, held by the folk of Ko'catan. Find the old scholar Quetzal there and ask him about the sword of Riija. Come back with one in your own hand and I will pay well for the story.\"",
+    "progress": "Ko'catan lies past the Orc Caves, west of Tos in the Twisted Woods. An illusionary wall seals the caves: dispel it with Kraanan's spell or a scroll. Quetzal the scholar lives in Ko'catan itself.",
+    "complete": "The Monk of Riija says, \"Let the one who bears it walk with faith: so the runes say, and so they say of you now. Go back to your Duke if you like. The sword will remember who made it whole.\""
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanLanguageMaster"
+      },
+      "objective": "Ask Quetzal in Ko'catan about the sword of Riija",
+      "brief": "To the west of Tos, in the Twisted Woods, lies the cave into the Orc Caves, sealed by an illusionary wall that a dispel illusion spell or scroll will open. Go through the caves to Ko'catan and find Quetzal the scholar."
+    },
+    {
+      "kind": "collect",
+      "item": "Meatpie",
+      "count": 25,
+      "turnin": {
+        "class": "KocatanTradeMaster"
+      },
+      "objective": "Bring Wulfgang zax'Ak twenty-five meat pies",
+      "brief": "Quetzal says, \"The sword of Riija? The monks broke the last one into four shards and gave them to four keepers, so no thief could carry it off whole. Wulfgang zax'Ak keeps one at his trading post, deep in the jungle. Hanla the bowmaker keeps another. The bone priestess of the avars has the third, and the fourth is with Bahal zax'Ot, who is mad. Each will want something. Wulfgang always wants stock: take him twenty-five meat pies.\"",
+      "rewards": {
+        "items": [
+          {
+            "class": "SwordShardC"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "collect",
+      "item": "NeruditeOreChunk",
+      "count": 1,
+      "turnin": {
+        "class": "KocatanBowMaker"
+      },
+      "objective": "Bring Hanla zax'Ta a chunk of nerudite ore",
+      "brief": "Wulfgang zax'Ak says, \"Splendid, these will sell. Here: I never knew what to do with this shard anyway. Hanla the bowmaker has another. She tips her best arrows with nerudite, and she is always short of it. Tepal the tailor sells a chunk now and then, if you ask him about precious stones.\"",
+      "rewards": {
+        "items": [
+          {
+            "class": "SwordShardD"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "kill",
+      "target": "CaveOrc",
+      "count": 10,
+      "turnin": {
+        "class": "KocatanBonePriestess"
+      },
+      "objective": "Break up the orcs' war band: ten cave orcs, then tell the bone priestess",
+      "brief": "Hanla zax'Ta says, \"Good ore. The shard is yours. Now listen: the bone priestess will not give up hers for trinkets. The orcs are gathering in the caves, in Konima's Ascension and below, for a raid on the avar villages. Break up their war band, ten cave orcs at least, and she will see you as a friend.\" She lives in the avar lands of the jungle, among warriors who do not love strangers: go carefully.",
+      "rewards": {
+        "items": [
+          {
+            "class": "SwordShardA"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "collect",
+      "item": "DragonflyEye",
+      "count": 10,
+      "turnin": {
+        "class": "KocatanMadScientist"
+      },
+      "objective": "Bring Bahal zax'Ot ten dragonfly eyes",
+      "brief": "Chp chp chp! (The bone priestess presses a shard of a sword into your hands, and points you toward the hut of Bahal zax'Ot, the mad scientist.) His hut lies past the nest of the dragonfly queens: run, don't fight. Bahal wants dragonfly eyes for his experiments, and Zala ix'Mecya, Ko'catan's apothecary, sells them.",
+      "rewards": {
+        "items": [
+          {
+            "class": "SwordShardB"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "equip",
+      "items": [
+        "RiijaSword"
+      ],
+      "objective": "Wield the sword of Riija",
+      "brief": "Bahal zax'Ot says, \"Excellent. Good work, fair apprentice. Take this; I have no use for it.\" As the last shard touches the others, they bind themselves into a sword, and your name glows on its blade. Wield it."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RiijaMonk"
+      },
+      "objective": "Carry the sword to the Monk of Riija",
+      "brief": "The sword is light and strange in your hand, its runes shifting as you watch. Its makers would want to see it. Past the East Tower of Ko'catan lies the path to the ruins of Riija's temple; beyond the ruins and the land of the noble avars stands the temple itself, across its bridge."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "shillings": 2000
+  }
+}

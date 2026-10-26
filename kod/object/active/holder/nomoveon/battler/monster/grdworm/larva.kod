@@ -58,7 +58,8 @@ classvars:
    viDifficulty = 3
    viVisionDistance = 8
    viKarma = -10
-   viDefault_behavior = AI_FIGHT_KARMA_AGGRESSIVE
+   // Ours: karma is gone (Player.GetKarma is 0), so karma aggression never fired; plain aggressive
+   viDefault_behavior = AI_FIGHT_AGGRESSIVE
    viCashmin = 75
    viCashmax = 220
    viTrailLength = 2

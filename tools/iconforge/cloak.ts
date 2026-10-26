@@ -12,8 +12,9 @@
 // - cloakm.bgf, cloakf.bgf: the capes, one bitmap per torso view, hanging from the head's
 //   hotspot (HS_HEAD) with the torso's groups, so they follow whatever pose the body shows. Each
 //   frame carries our depth marker (meridian-browser packages/render/src/sprites.ts): over the
-//   body from the back (HS_OVER_BODY), behind the figure otherwise (HS_BEHIND_FIGURE).
-// - cloakic.bgf: the cloak's inventory icon. cloakrk.bgf: the hall's cloak rack.
+//   body and the near arm from the back and the sides (HS_OVER_BODY), behind the figure from the
+//   front and the front quarters (HS_BEHIND_FIGURE). The side views sit a little further back
+//   and, for men, higher on the back (SIDE_BACK, sideLift), as the user placed them.
 // - preview.png: both genders in a shirt, a robe and plate, from every view, in a few guild
 //   colours, drawn by meridian-browser's own compositor.
 //
@@ -61,18 +62,22 @@ const SHRINK = 4; // as the torsos
 const GENDERS = {
   male: {
     torsos: ["bta.bgf", "btae.bgf", "btc.bgf", "bte.bgf", "btg.bgf", "bti.bgf", "btk.bgf", "btm.bgf"],
-    head: "phax.bgf", legs: "bfa.bgf", right: "bra.bgf", left: "bla.bgf", out: "cloakm.bgf",
+    head: "phax.bgf", legs: "bfa.bgf", right: "bra.bgf", left: "bla.bgf", out: "cloakm.bgf", sideLift: 5,
     preview: [["bta.bgf", "bfa.bgf", "bla.bgf"], ["btc.bgf", "bfc.bgf", "blc.bgf"], ["bte.bgf", "bfa.bgf", "bla.bgf"]],
   },
   female: {
     torsos: ["btb.bgf", "btbe.bgf", "btd.bgf", "btf.bgf", "bth.bgf", "btj.bgf", "btl.bgf", "btn.bgf"],
-    head: "phkx.bgf", legs: "bfb.bgf", right: "brb.bgf", left: "blb.bgf", out: "cloakf.bgf",
+    head: "phkx.bgf", legs: "bfb.bgf", right: "brb.bgf", left: "blb.bgf", out: "cloakf.bgf", sideLift: 0,
     preview: [["btb.bgf", "bfb.bgf", "blb.bgf"], ["btd.bgf", "bfd.bgf", "bld.bgf"], ["btf.bgf", "bfb.bgf", "blb.bgf"]],
   },
 } as const;
 
 /** A torso's six views, as its stand group lays them out over the eight angle slots: 0 front, 3 back */
 const BACK_VIEW = 3;
+/** The two side views (angle slots 2 and 6) */
+const SIDE_VIEWS = [2, 4];
+/** How many base pixels further back the side views sit */
+const SIDE_BACK = 1;
 
 const hotspot = (b: any, n: number) => b.hotspots.find((h: any) => Math.abs(h.number) === n) ?? null;
 
@@ -175,9 +180,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
  * hem). It widens and stands further off the back towards the hem, with folds that deepen as it
  * falls. Body space: x to the figure's right, z forward, y down.
  */
-function drawCape(shape: Shape, view: number, facing: number): Frame {
+function drawCape(shape: Shape, view: number, facing: number, sideLift: number): Frame {
   const phi = VIEW_ANGLE[view] * facing;
-  const over = view === BACK_VIEW;
+  const side = SIDE_VIEWS.includes(view);
+  const marker = view === BACK_VIEW || side ? HS_OVER_BODY : HS_BEHIND_FIGURE;
+  const lift = side ? sideLift : 0;
+  const back = side ? SIDE_BACK : 0;
   const zbuf = new Map<string, { z: number; idx: number }>();
   const FOLDS = 7;
   const smooth = (e0: number, e1: number, x: number) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
@@ -189,9 +197,9 @@ function drawCape(shape: Shape, view: number, facing: number): Frame {
     const d = lerp(shape.depth + 1, shape.depth + 4, v);
     const fold = (0.5 + 2.3 * v) * Math.sin(FOLDS * th + 0.4);
     const x = w * Math.sin(th) + 0.6 * v * Math.sin(FOLDS * th + 0.4);
-    const z = -(d + fold) * Math.cos(th);
+    const z = -(d + fold) * Math.cos(th) - back;
     // over the shoulders the top edge falls a little at the sides
-    const y = 2 + 6 * Math.sin(th) ** 2 * (1 - smooth(0, 0.2, v)) + v * shape.length;
+    const y = 2 - lift + 6 * Math.sin(th) ** 2 * (1 - smooth(0, 0.2, v)) + v * shape.length;
     return { x, y, z };
   };
   // light from the viewer's upper left
@@ -254,50 +262,8 @@ function drawCape(shape: Shape, view: number, facing: number): Frame {
       });
       if (open) rim[i] = (pixels[i] & 0xf0) | Math.min(14, (pixels[i] & 0x0f) + 2);
     }
-  const hotspots = [{ number: over ? HS_OVER_BODY : HS_BEHIND_FIGURE, x: 0, y: 0 }];
+  const hotspots = [{ number: marker, x: 0, y: 0 }];
   return { width, height, xOffset: x0, yOffset: y0, pixels: rim, hotspots };
-}
-
-// ---- the icon and the rack ----
-
-const nearest = (r: number, g: number, b: number) => {
-  let best = 0, bd = Infinity;
-  for (let i = 0; i < 254; i++) {
-    const hi = i & 0xf0;
-    if (hi === CLOTH || hi === TRIM || i < 0x10) continue; // keep the guild's ramps and the system colours out
-    const d = (rgba[i * 4] - r) ** 2 + (rgba[i * 4 + 1] - g) ** 2 + (rgba[i * 4 + 2] - b) ** 2;
-    if (d < bd) { bd = d; best = i; }
-  }
-  return best;
-};
-
-/** Pastes frame f onto a canvas at (x, y) */
-function paste(dst: Frame, f: Frame, x: number, y: number) {
-  for (let yy = 0; yy < f.height; yy++)
-    for (let xx = 0; xx < f.width; xx++) {
-      const p = f.pixels[yy * f.width + xx];
-      const X = x + xx, Y = y + yy;
-      if (p !== T && X >= 0 && Y >= 0 && X < dst.width && Y < dst.height) dst.pixels[Y * dst.width + X] = p;
-    }
-}
-
-/** A wooden stand with the cape hung from its bar, seen from behind */
-function drawRack(cape: Frame): Frame {
-  const hung = cape;
-  const width = hung.width + 12, height = hung.height + 26;
-  const f: Frame = { width, height, xOffset: 0, yOffset: 0, pixels: new Uint8Array(width * height).fill(T), hotspots: [] };
-  const wood = [nearest(150, 104, 62), nearest(118, 80, 46), nearest(86, 58, 34), nearest(58, 38, 22)];
-  const cx = Math.floor(width / 2);
-  const put = (x: number, y: number, i: number) => { if (x >= 0 && y >= 0 && x < width && y < height) f.pixels[y * width + x] = i; };
-  // the post, lit from the left
-  for (let y = 4; y < height - 3; y++) for (let dx = -1; dx <= 1; dx++) put(cx + dx, y, wood[dx + 1]);
-  // the feet
-  for (let x = cx - 9; x <= cx + 9; x++) { put(x, height - 3, wood[1]); put(x, height - 2, wood[2]); put(x, height - 1, wood[3]); }
-  // the bar, with knobs
-  for (let x = 2; x < width - 2; x++) { put(x, 5, wood[0]); put(x, 6, wood[1]); put(x, 7, wood[2]); }
-  for (const x of [1, width - 2]) for (let y = 4; y <= 8; y++) put(x, y, wood[1]);
-  paste(f, hung, Math.floor((width - hung.width) / 2), 7);
-  return f;
 }
 
 // ---- writing ----
@@ -330,19 +296,13 @@ for (const [gender, g] of Object.entries(GENDERS)) {
   const shape: Shape = { shoulder: halfW, depth: halfD, length: Math.round(0.7 * feet) };
   const facing = await sideFacing(g.head);
   console.log(`${gender}: shoulders ${halfW * 2}, depth ${halfD * 2}, neck to soles ${feet}, cape ${shape.length}, side view faces ${facing > 0 ? "right" : "left"}`);
-  const frames = [0, 1, 2, 3, 4, 5].map((v) => drawCape(shape, v, facing));
+  const frames = [0, 1, 2, 3, 4, 5].map((v) => drawCape(shape, v, facing, g.sideLift));
   capes[gender] = frames;
   // the torso's groups, each angle slot showing the cape of its view
   const torso = await bgf(g.torsos[0]);
   const groups = torso.groups.map((grp: number[]) => grp.map((i: number) => i % 6));
   written[g.out] = await write(g.out, toBgf(g.out, frames, groups));
 }
-
-// The icon: a man's cape from behind
-const icon: Frame = { ...capes.male[BACK_VIEW], xOffset: 0, yOffset: 0, hotspots: [] };
-written["cloakic.bgf"] = await write("cloakic.bgf", toBgf("cloakic", [icon], [[0]]));
-const rack = drawRack(capes.male[BACK_VIEW]);
-written["cloakrk.bgf"] = await write("cloakrk.bgf", toBgf("cloakrk", [rack], [[0]]));
 
 // ---- the preview ----
 
@@ -378,13 +338,10 @@ for (const [gender, g] of Object.entries(GENDERS)) {
     }
   }
 }
-// the icon and the rack, in the first colours
-const extras: Frame[] = [icon, rack];
-
 const SCALE = 3, PAD = 6, COLS = 8;
 const cellW = Math.max(...tiles.map((t) => t.c.width / t.c.resolution)) * SCALE + PAD;
 const cellH = Math.max(...tiles.map((t) => t.c.height / t.c.resolution)) * SCALE + PAD;
-const rows = Math.ceil(tiles.length / COLS) + 1;
+const rows = Math.ceil(tiles.length / COLS);
 const W = Math.ceil(cellW * COLS + PAD), H = Math.ceil(cellH * rows + PAD);
 const img = new Uint8Array(W * H * 4);
 for (let i = 0; i < W * H; i++) img.set([96, 96, 104, 255], i * 4);
@@ -404,20 +361,6 @@ tiles.forEach((t, n) => {
       for (let dy = 0; dy < SCALE; dy++) for (let dx = 0; dx < SCALE; dx++) plot(ox + Math.floor((x * SCALE) / res) + dx, oy + Math.floor((y * SCALE) / res) + dy, p, identity);
     }
 });
-{
-  const table = xl.get(guildXlat(COLOURS[0][0], COLOURS[0][1]));
-  let ox = PAD;
-  const oy = PAD + (rows - 1) * cellH;
-  for (const f of extras) {
-    for (let y = 0; y < f.height; y++)
-      for (let x = 0; x < f.width; x++) {
-        const p = f.pixels[y * f.width + x];
-        if (p === T) continue;
-        for (let dy = 0; dy < SCALE; dy++) for (let dx = 0; dx < SCALE; dx++) plot(ox + x * SCALE + dx, oy + y * SCALE + dy, p, table);
-      }
-    ox += f.width * SCALE + PAD * 3;
-  }
-}
 writeFileSync(join(OUT, "preview.png"), png(W, H, img));
 console.log(`wrote ${Object.keys(written).join(", ")} and preview.png to ${OUT}`);
 

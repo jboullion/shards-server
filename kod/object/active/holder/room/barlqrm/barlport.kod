@@ -27,7 +27,6 @@ classvars:
    viTeleport_row = 3
    viTeleport_col = 21
 
-   viPermanent_flags = ROOM_GUILD_PK_ONLY
    viTerrain_Type = TERRAIN_CITY | TERRAIN_ROAD | TERRAIN_BEACH
 
    vrName = room_name_barloqueport

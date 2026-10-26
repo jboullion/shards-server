@@ -30,7 +30,7 @@ resources:
 classvars:
 
    vrName = room_name_tos
-   viPermanent_flags = ROOM_GUILD_PK_ONLY | ROOM_LAMPS
+   viPermanent_flags = ROOM_LAMPS
 
    viTeleport_Row = 60
    viTeleport_Col = 18
