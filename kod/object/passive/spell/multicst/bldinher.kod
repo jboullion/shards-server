@@ -8,7 +8,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-BloodInheritance is MultiCastSpell
+// Ours (spell revamp, ADR 0023): Qor's Blade, Qor's answer to Shal'ille's spiritual sword
+// (creaspsw.kod). Was Blood Inheritance, a multicast at a prism that gave a weapon a random
+// power; now cast alone, at once, it summons Qor's blade (weapon/qorblade.kod). The class
+// keeps its name and spell number, for the spell objects in saved worlds and the spellbooks
+// that know it.
+BloodInheritance is Spell
 
 constants:
 
@@ -18,27 +23,20 @@ resources:
 
    include bldinher.lkod
 
-
-   BloodInheritance_name_rsc = "blood inheritance"
+   BloodInheritance_name_rsc = "Qor's blade"
    BloodInheritance_icon_rsc = ibloodin.bgf
    BloodInheritance_desc_rsc = \
-      "Infuses a weapon with the malevolent power of Qor.  It is impossible "
-      "to predict exactly what form this dark benediction will take, but it "
-      "will always be deadly.  Several casters must pour their power into a "
-      "prism set on the ground nearby; one alone is rarely enough.  "
-      "Requires 16 shaman blood, 16 entroot berries, and 16 orc teeth, and "
-      "a prism."
+      "Summons a blade of Qor, which deals unholy damage and now and then drinks its "
+      "victim's blood to heal you.  It is bound to you; casting again replaces it.  "
+      "Requires 20 shaman blood and 30 orc teeth to cast."
 
    BloodInheritance_sound = qunbond.ogg
 
-   BloodInheritance_bad_target = \
-      "You must target this spell at a melee weapon."
-   BloodInheritance_bad_target2 = \
-      "You cannot give Qor's gift to a weapon which already has such "
-      "a strong enchantment."
-   BloodInheritance_succeeded = \
-      "The evil force of your spell lashes out at %s%s, infusing "
-      "it with Qor's power."
+   BloodInheritance_cast = "Qor's blade appears in your hand, dark and blood red."
+   BloodInheritance_replaced = "Your old blade crumbles to dust as the new one appears."
+   BloodInheritance_inv_full = \
+      "Qor's blade appears in the air before you, but before you can drop something and "
+      "grab it, it vanishes."
 
 classvars:
 
@@ -48,24 +46,13 @@ classvars:
 
    vrSucceed_wav = BloodInheritance_sound
 
-   viMana = 50
-
    viSpell_num = SID_BLOOD_INHERITANCE
    viSchool = SS_QOR
-   viSpell_level = 6   // Ours (spell revamp grids): was 5
-
-   viSpellExertion = 50
-   viCast_time = 20000
-   viChance_To_Increase = 35
-
-   // Drain is amount used every viDrainTime milliseconds
-   viManaDrain = 1
-   // Drain some mana every viDrainTime milliseconds
-   viDrainTime = 1000
-
-   // 10 minutes for worst case, 2.3 mins for best case.
-   viMultiCast_Spellpower = 3000
-   viMeditate_ratio = 50
+   viSpell_level = 6
+   viMana = 15
+   viSpellExertion = 2
+   viCast_time = 0
+   viMeditate_ratio = 60
 
 properties:
 
@@ -74,93 +61,44 @@ messages:
    ResetReagents()
    {
       plReagents = $;
-      plReagents = Cons([&ShamanBlood,16] ,plReagents);
-      plReagents = Cons([&EntrootBerry,16] ,plReagents);
-      plReagents = Cons([&OrcTooth,16] ,plReagents);
-
-      return;
-   }
-
-   CastSpell(who = $, lTargets = $, iSpellPower = 0)
-   {
-      local oTarget;
-
-      oTarget = First(lTargets);
-
-      // Gotta be a melee weapon. This spell will only create magical weapons that
-      // can normally be obtained, so don't allow ranged weapon to be given procs.
-      if oTarget = $
-         OR NOT IsClass(oTarget,&Weapon)
-         OR IsClass(oTarget,&RangedWeapon)
-      {
-         Send(who,@MsgSendUser,#message_rsc=BloodInheritance_bad_target);
-
-         return;
-      }
-
-      // Can't have any powerful enchantments.
-      if (NOT Send(oTarget,@CanUserAddSpecialAttributes))
-      {
-         Send(who,@MsgSendUser,#message_rsc=BloodInheritance_bad_target2);
-
-         return;
-      }
-
-      propagate;
-   }
-
-   PrismCast(spellpower = 0, lCasters=$, lTargets=$)
-   {
-      local oCaster, oTarget, ItemAtt, iCount;
-
-      oTarget = First(lTargets);
-
-      // Can't have any powerful enchantments.
-      if (NOT Send(oTarget,@CanUserAddSpecialAttributes))
-      {
-         foreach oCaster in lCasters
-         {
-            Send(oCaster,@MsgSendUser,#message_rsc=BloodInheritance_bad_target2);
-         }
-
-         return;
-      }
-
-      foreach oCaster in lCasters
-      {
-         Send(oCaster,@MsgSendUser,#message_rsc=BloodInheritance_succeeded,
-               #parm1=Send(oTarget,@GetDef),#parm2=Send(oTarget,@GetName));
-      }
-
-      // Try 10x to add an itematt not already present.
-      iCount = 0;
-      do
-      {
-         // Ours (the magic item revamp): no more curses
-         switch(Random(1,5))
-         {
-            case 1: ItemAtt = WA_VAMPER; break;
-            case 2: ItemAtt = WA_BLINDER; break;
-            case 3: ItemAtt = WA_PARALYZER; break;
-            case 4: ItemAtt = WA_SIPHON; break;
-            default: ItemAtt = WA_POISON; break;
-         }
-
-      }
-
-      while (Send(oTarget,@HasAttribute,#ItemAtt=ItemAtt) AND ++iCount < 10);
-
-      // ...and, cast by several, a tier rolled as for a hard monster's treasure, already
-      // known to its casters
-      Send(Send(SYS,@FindItemAttByNum,#Num=ItemAtt),@AddAsLoot,#oItem=oTarget,
-           #diff_seed=8,#bRevealed=TRUE);
+      plReagents = Cons([&ShamanBlood,20],plReagents);
+      plReagents = Cons([&OrcTooth,30],plReagents);
 
       return;
    }
 
    GetNumSpellTargets()
    {
-      return 1;
+      return 0;
+   }
+
+   CastSpell(who = $, lTargets = $, iSpellPower = $)
+   {
+      local oBlade, oOld;
+
+      oBlade = Create(&QorsBlade,#iToHitBonus=(iSpellPower * 3) / 2);
+
+      // Bound, so it can't be dropped: a new one replaces the old
+      oOld = Send(who,@FindHolding,#class=&QorsBlade);
+
+      if Send(who,@ReqNewHold,#what=oBlade)
+      {
+         if oOld <> $
+         {
+            Send(oOld,@Delete);
+            Send(who,@MsgSendUser,#message_rsc=BloodInheritance_replaced);
+         }
+
+         Send(who,@NewHold,#what=oBlade);
+         Send(who,@MsgSendUser,#message_rsc=BloodInheritance_cast);
+      }
+      else
+      {
+         Send(oBlade,@Delete);
+         Send(who,@MsgSendUser,#message_rsc=BloodInheritance_inv_full);
+      }
+
+      propagate;
    }
 
 end

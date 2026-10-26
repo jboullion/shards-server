@@ -22,13 +22,15 @@ resources:
       "Inherently having holy blessings, this sword is even more powerful "
       "than the standard variation.  Its blows deal holy damage, and now and "
       "then it flares with a holy touch that sears its victim, the undead "
-      "twice as badly.  It also strengthens its wielder's Shal'ille spells."
+      "twice as badly.  It also strengthens its wielder's Shal'ille spells.  It is bound "
+      "to you and will not leave you."
    SpiritSword_flare = "~gYour spiritual sword flares with holy light, searing %s%s for %i!"
 SpiritSword_window_overlay_rsc = povspirsword.bgf
    SpiritSword_player_overlay = spirswordov.bgf
 
    SS_not_qor = "Qor will not allow you to wield a holy weapon."
    SS_no_ao3 = "You amulet will not allow you to wield a holy weapon."
+   SS_bound = "The spiritual sword is bound to you.  It will not leave you."
 
 classvars:
    vrName = SpiritSword_name_rsc
@@ -163,6 +165,37 @@ messages:
       }
 
       return;
+   }
+
+   //// Ours: bound to its summoner, as Qor's blade is (qorblade.kod): it won't be dropped,
+   //// given, sold or stored. Casting again replaces it (creaspsw.kod).
+
+   ReqNewOwner(what = $)
+   {
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=SS_bound);
+
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   CanBeStoredInVault()
+   {
+      return FALSE;
+   }
+
+   CanBeGivenToNPC()
+   {
+      return FALSE;
+   }
+
+   DropOnDeath()
+   {
+      return FALSE;
    }
 
    CanEnchant()
