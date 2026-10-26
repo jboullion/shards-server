@@ -561,9 +561,9 @@ resources:
    qd_162_s1 = "Find Tendrath in the Cragged Mountains"
    qd_162_t1 = "Tendrath"
    qd_163_name = "The Way Down"
-   qd_163_s1 = "Cast a wall of lightning"
+   qd_163_s1 = "Find the ancient place south of the Cragged Mountains"
    qd_163_t1 = "Tendrath"
-   qd_163_s2 = "Get past the levers into the Winding Caverns"
+   qd_163_s2 = "Raise and light the pillars, and find the Winding Caverns"
    qd_163_t2 = "Tendrath"
    qd_164_name = "The Tusked Dead"
    qd_164_s1 = "Tusked skeletons destroyed"
@@ -1057,7 +1057,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 14500377;
+      return 56794218;
    }
 
    GetQuests()
@@ -1927,7 +1927,7 @@ messages:
          // brax-the-way-down
          [ 163, qd_163_name, &HunterGhost, 0, 95, 130, $,
            $, $, $, $,
-           [ [ 6, &LightningWall, 1, 0, &HunterGhost, 0, qd_163_s1, $, $, qd_163_t1,
+           [ [ 5, $, 1, 0, &HunterGhost, 0, qd_163_s1, [ 579 ], $, qd_163_t1,
                1, $, $, $, 0 ],
              [ 5, $, 1, 0, &HunterGhost, 0, qd_163_s2, [ 826 ], $, qd_163_t2,
                0, $, $, $, 0 ] ],

@@ -74,20 +74,41 @@ resources:
       "~BYou feel a sense of foreboding as you hear stone gears grinding "
       "in the distance."
    G9_center_lever_desc = \
-      "Clearly of ancient design, you somehow doubt that this lever still "
-      "does what it was originally enchanted to do, if it does anything at "
-      "all.  A label along the handle, written in an archaic but still legible "
-      "variant of modern Meridian script, reads \"Activate Center\""
-   G9_outer1_lever_desc = \
-      "Clearly of ancient design, you somehow doubt that this lever still "
-      "does what it was originally enchanted to do, if it does anything at "
-      "all.  A label along the handle, written in an archaic but still legible "
-      "variant of modern Meridian script, reads \"Activate Corner\""
-   G9_outer2_lever_desc = \
-      "Clearly of ancient design, you somehow doubt that this lever still does "
-      "what it was originally enchanted to do, if it does anything at all.  A "
-      "label along the handle, written in an archaic but still legible variant "
-      "of modern Meridian script, reads \"Raise/Lower Corner\""
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Light Center Pillar\""
+   G9_raise_nw_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Raise/Lower North-West Pillar\""
+   G9_raise_sw_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Raise/Lower South-West Pillar\""
+   G9_raise_se_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Raise/Lower South-East Pillar\""
+   G9_raise_ne_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Raise/Lower North-East Pillar\""
+   G9_light_nw_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Light North-West Pillar\""
+   G9_light_sw_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Light South-West Pillar\""
+   G9_light_se_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Light South-East Pillar\""
+   G9_light_ne_desc = \
+      "An ancient lever, its enchantment kept fresh by the Queen's Order.  A label "
+      "along the handle, in an archaic but still legible variant of modern Meridian "
+      "script, reads \"Light North-East Pillar\""
 
    G9_lever_icon = neclever.bgf
 
@@ -98,20 +119,17 @@ resources:
       "wrath by making careless mistakes).\n\n"
       "Powered by direct taps to the nearby mana node, the stone pillars of the "
       "Arena regulate and channel the flow of mana to our purposes.  Each outer "
-      "pillar may be raised or lowered and all five pillars may be activated or "
-      "deactivated.  Only when all pillars are raised and activated will the mana "
+      "pillar may be raised or lowered, and all five pillars may be lit.  Only when "
+      "the four outer pillars are raised and all five are lit will the mana "
       "be directed in just the right way to trigger the summoning of an undead horde "
       "for the Queen's sacrificial ceremonies, as well as raising the central stands to "
-      "a safe height above the ensuing mayhem.\n"
-      "¶"
-      "Note that under normal circumstances, raising and activating all the pillars "
-      "is as simple as pulling all nine control levers (although it should be noted "
-      "that activation levers will only activate that pillar if it is already raised).  "
-      "However, the magicks which "
-      "power the levers seem to be somewhat volatile;  when left unmaintained for "
-      "long periods of time, the effects of the levers seem to cross with each other.  "
-      "It is important, therefore, that you insist that one of the Queen's Order "
-      "continually re-enchant them.  Otherwise, you may wake up one day as one of the "
+      "a safe height above the ensuing mayhem.\n\n"
+      "Each of the nine levers is labelled with what it does: one raises or lowers "
+      "each outer pillar, one lights each of them, and one lights the center.  A "
+      "pillar will only light once it is raised, so raise the four outer pillars "
+      "first, then pull the five lighting levers.  Left alone, the mechanism settles "
+      "back to rest after a few minutes, and the stands come down soon after they "
+      "rise, so do not dawdle.  Otherwise, you may wake up one day as one of the "
       "undead warriors of the arena!\n\n"
       "(Life as an undead warrior is not the most glamorous of professions, "
       "I promise you.)"
@@ -165,11 +183,10 @@ properties:
 
    ptResetLightningPuzzle = $
 
+   // Ours: the honest levers. Each list is by corner, as plOuterSpires: NW, SW, SE, NE.
    poCenterLever = $
-   plOuterLevers1 = $
-   plLeverEffects1 = $
-   plOuterLevers2 = $
-   plLeverEffects2 = $
+   plRaiseLevers = $
+   plLightLevers = $
    ptReactivateLevers = $
 
    plSkellyGenPoints = $
@@ -261,7 +278,6 @@ messages:
       plOuterSpires = Cons(oMovingSpire, plOuterSpires);
 
       Post(self,@ResetLightningPuzzle);
-      Post(self,@RandomizeLeverEffects);
 
       propagate;
    }
@@ -302,60 +318,44 @@ messages:
       Send(self,@NewHold,#what=oBook,#new_row=37,#new_col=58,
             #fine_row=39,#fine_col=2,#new_angle=ANGLE_NORTH_WEST);
 
-      poCenterLever = Create(&Lever,#description=G9_center_lever_desc,
-                           #icon=G9_lever_icon,#range=2);
-      Send(self,@NewHold,#what=poCenterLever,#new_row=35,#new_col=57,
-            #fine_row=2,#fine_col=38,#new_angle=ANGLE_SOUTH);
+      // Ours: the levers do what their labels say (the original's were wired at random,
+      // a corner's lever moving others too). Raise the four corners, then light all five.
+      poCenterLever = Send(self,@MakeLever,#desc=G9_center_lever_desc,#row=35,#col=57,
+                           #fine_row=2,#fine_col=38,#angle=ANGLE_SOUTH);
 
-      oLever = Create(&Lever,#description=G9_outer1_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers1 = Cons(oLever,plOuterLevers1);
-      Send(self,@NewHold,#what=oLever,#new_row=35,#new_col=58,
-            #fine_row=46,#fine_col=28,#new_angle=ANGLE_WEST);
+      plLightLevers = [
+         Send(self,@MakeLever,#desc=G9_light_nw_desc,#row=35,#col=58,
+              #fine_row=46,#fine_col=28,#angle=ANGLE_WEST),
+         Send(self,@MakeLever,#desc=G9_light_sw_desc,#row=36,#col=58,
+              #fine_row=14,#fine_col=28,#angle=ANGLE_WEST),
+         Send(self,@MakeLever,#desc=G9_light_se_desc,#row=36,#col=58,
+              #fine_row=46,#fine_col=28,#angle=ANGLE_WEST),
+         Send(self,@MakeLever,#desc=G9_light_ne_desc,#row=37,#col=58,
+              #fine_row=14,#fine_col=28,#angle=ANGLE_WEST) ];
 
-      oLever = Create(&Lever,#description=G9_outer1_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers1 = Cons(oLever,plOuterLevers1);
-      Send(self,@NewHold,#what=oLever,#new_row=36,#new_col=58,
-            #fine_row=14,#fine_col=28,#new_angle=ANGLE_WEST);
-
-      oLever = Create(&Lever,#description=G9_outer1_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers1 = Cons(oLever,plOuterLevers1);
-      Send(self,@NewHold,#what=oLever,#new_row=36,#new_col=58,
-            #fine_row=46,#fine_col=28,#new_angle=ANGLE_WEST);
-
-      oLever = Create(&Lever,#description=G9_outer1_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers1 = Cons(oLever,plOuterLevers1);
-      Send(self,@NewHold,#what=oLever,#new_row=37,#new_col=58,
-            #fine_row=14,#fine_col=28,#new_angle=ANGLE_WEST);
-
-      oLever = Create(&Lever,#description=G9_outer2_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers2 = Cons(oLever,plOuterLevers2);
-      Send(self,@NewHold,#what=oLever,#new_row=38,#new_col=57,
-            #fine_row=3,#fine_col=45,#new_angle=ANGLE_NORTH);
-
-      oLever = Create(&Lever,#description=G9_outer2_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers2 = Cons(oLever,plOuterLevers2);
-      Send(self,@NewHold,#what=oLever,#new_row=38,#new_col=57,
-            #fine_row=3,#fine_col=13,#new_angle=ANGLE_NORTH);
-
-      oLever = Create(&Lever,#description=G9_outer2_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers2 = Cons(oLever,plOuterLevers2);
-      Send(self,@NewHold,#what=oLever,#new_row=38,#new_col=56,
-            #fine_row=3,#fine_col=45,#new_angle=ANGLE_NORTH);
-
-      oLever = Create(&Lever,#description=G9_outer2_lever_desc,
-                     #icon=G9_lever_icon,#range=2);
-      plOuterLevers2 = Cons(oLever,plOuterLevers2);
-      Send(self,@NewHold,#what=oLever,#new_row=38,#new_col=56,
-            #fine_row=3,#fine_col=13,#new_angle=ANGLE_NORTH);
+      plRaiseLevers = [
+         Send(self,@MakeLever,#desc=G9_raise_nw_desc,#row=38,#col=56,
+              #fine_row=3,#fine_col=13,#angle=ANGLE_NORTH),
+         Send(self,@MakeLever,#desc=G9_raise_sw_desc,#row=38,#col=56,
+              #fine_row=3,#fine_col=45,#angle=ANGLE_NORTH),
+         Send(self,@MakeLever,#desc=G9_raise_se_desc,#row=38,#col=57,
+              #fine_row=3,#fine_col=13,#angle=ANGLE_NORTH),
+         Send(self,@MakeLever,#desc=G9_raise_ne_desc,#row=38,#col=57,
+              #fine_row=3,#fine_col=45,#angle=ANGLE_NORTH) ];
 
       propagate;
+   }
+
+   MakeLever(desc=$,row=0,col=0,fine_row=0,fine_col=0,angle=0)
+   "Ours: one of the puzzle's levers, put in place."
+   {
+      local oLever;
+
+      oLever = Create(&Lever,#description=desc,#icon=G9_lever_icon,#range=2);
+      Send(self,@NewHold,#what=oLever,#new_row=row,#new_col=col,
+           #fine_row=fine_row,#fine_col=fine_col,#new_angle=angle);
+
+      return oLever;
    }
 
    DisableIllusions()
@@ -440,8 +440,6 @@ messages:
          AND NOT pbCenterLit
       {
          Send(self,@ToggleCenterLight);
-         SendList(plOuterSpires,0,@Toggle,#toggleback=FALSE);
-
          Send(self,@Touched);
       }
 
@@ -651,12 +649,6 @@ messages:
 
       Send(self,@GenerateSkellies);
 
-      // 1 out of 100 chance to randomize the levers after the puzzle is solved.
-      if Random(1,100) = 1
-      {
-         Send(self,@RandomizeLeverEffects);
-      }
-
       return;
    }
 
@@ -827,71 +819,31 @@ messages:
    }
 
    SomethingChanged(what=$)
+   "Ours: each lever does what its label says. The center's lights the center; a corner's "
+   "light lever lights that corner (once raised), its raise lever raises or lowers it."
    {
-      local oLever, i;
+      local i;
 
       if IsClass(what,&Lever)
       {
          if what = poCenterLever
          {
             Send(self,@ToggleCenterLight);
-            SendList(plOuterSpires,0,@Toggle,#toggleback=FALSE);
             Send(self,@Touched);
          }
 
-         foreach oLever in plOuterLevers1
+         i = FindListElem(plLightLevers,what);
+         if i > 0
          {
-            if what = oLever
-            {
-               i = Nth(plLeverEffects1,FindListElem(plOuterLevers1,oLever));
-
-               if i = 1
-               {
-                  Send(self,@ToggleNWLight);
-               }
-               else if i = 2
-               {
-                  Send(self,@ToggleSWLight);
-               }
-               else if i = 3
-               {
-                  Send(self,@ToggleSELight);
-               }
-               else if i = 4
-               {
-                  Send(self,@ToggleNELight);
-               }
-
-               // toggle the position of the spire after it in the list.
-               i = Nth(plLeverEffects1,((FindListElem(plOuterLevers1,oLever) % 4) + 1));
-               Send(Nth(plOuterSpires,i),@Toggle,#toggleback=FALSE);
-
-               // toggle the position of the spire before it in the list.
-               i = Nth(plLeverEffects1,(((FindListElem(plOuterLevers1,oLever) - 2) % 4) + 1));
-               Send(Nth(plOuterSpires,i),@Toggle,#toggleback=FALSE);
-
-               // toggle the position of the spire before that in the list.
-               i = Nth(plLeverEffects1,(((FindListElem(plOuterLevers1,oLever) - 3) % 4) + 1));
-               Send(Nth(plOuterSpires,i),@Toggle,#toggleback=FALSE);
-
-               Send(self,@Touched);
-            }
+            Send(self,@ToggleCornerLight,#corner=i);
+            Send(self,@Touched);
          }
 
-         foreach oLever in plOuterLevers2
+         i = FindListElem(plRaiseLevers,what);
+         if i > 0
          {
-            if what = oLever
-            {
-               i = Nth(plLeverEffects1,
-                       Nth(plLeverEffects2,FindListElem(plOuterLevers2,oLever)));
-               Send(Nth(plOuterSpires,i),@Toggle,#toggleback=FALSE);
-
-               i = Nth(plLeverEffects1,
-                       ((Nth(plLeverEffects2,FindListElem(plOuterLevers2,oLever)) % 4) + 1));
-               Send(Nth(plOuterSpires,i),@Toggle,#toggleback=FALSE);
-
-               Send(self,@Touched);
-            }
+            Send(Nth(plOuterSpires,i),@Toggle,#toggleback=FALSE);
+            Send(self,@Touched);
          }
 
          Send(self,@DeactivateLevers);
@@ -909,30 +861,13 @@ messages:
       propagate;
    }
 
-   RandomizeLeverEffects()
-   "Generates a random permutation of 1-4 for each lever set."
+   ToggleCornerLight(corner=0)
+   "A corner by its place in plOuterSpires: 1 NW, 2 SW, 3 SE, 4 NE."
    {
-      local l, index;
-
-      l = [1, 2, 3, 4];
-      plLeverEffects1 = $;
-
-      while Length(l) > 0
-      {
-         index = Random(1,Length(l));
-         plLeverEffects1 = Cons(Nth(l,index),plLeverEffects1);
-         l = DelListElem(l,Nth(l,index));
-      }
-
-      l = [1, 2, 3, 4];
-      plLeverEffects2 = $;
-
-      while Length(l) > 0
-      {
-         index = Random(1,Length(l));
-         plLeverEffects2 = Cons(Nth(l,index),plLeverEffects2);
-         l = DelListElem(l,Nth(l,index));
-      }
+      if corner = 1 { Send(self,@ToggleNWLight); return; }
+      if corner = 2 { Send(self,@ToggleSWLight); return; }
+      if corner = 3 { Send(self,@ToggleSELight); return; }
+      if corner = 4 { Send(self,@ToggleNELight); }
 
       return;
    }
@@ -944,11 +879,11 @@ messages:
       ptReactivateLevers = $;
 
       Send(poCenterLever,@SetStuck,#newStuck=FALSE);
-      foreach i in plOuterLevers1
+      foreach i in plLightLevers
       {
          Send(i,@SetStuck,#newStuck=FALSE);
       }
-      foreach i in plOuterLevers2
+      foreach i in plRaiseLevers
       {
          Send(i,@SetStuck,#newStuck=FALSE);
       }
@@ -968,12 +903,12 @@ messages:
 
       Send(poCenterLever,@SetStuck,#newStuck=TRUE);
 
-      foreach i in plOuterLevers1
+      foreach i in plLightLevers
       {
          Send(i,@SetStuck,#newStuck=TRUE);
       }
 
-      foreach i in plOuterLevers2
+      foreach i in plRaiseLevers
       {
          Send(i,@SetStuck,#newStuck=TRUE);
       }
@@ -1061,10 +996,8 @@ messages:
       poCenterSpire = $;
       plOuterSpires = $;
       poCenterLever = $;
-      plOuterLevers1 = $;
-      plOuterLevers2 = $;
-      plLeverEffects1 = $;
-      plLeverEffects2 = $;
+      plLightLevers = $;
+      plRaiseLevers = $;
       poSkellyCubbyholes = $;
 
       propagate;
