@@ -1,135 +1,119 @@
-Meridian 59 v2.0, February 2016
-Andrew Kirmse and Chris Kirmse
+# Meridian Shards: server
 
-Copyright 1994-2012 Andrew Kirmse and Chris Kirmse
-All rights reserved.  Meridian is a registered trademark.
+The game server, game code and tools for **Meridian Shards**, a fork of the Meridian 59
+"Server 104" code base (Blakod, `blakserv`, the classic client) that is being reworked into
+"the version of the game I have always wanted". It is played in a browser at
+<https://m59-shards.com/play/>.
 
-Before You Build
---------------
-Install Visual Studio 2015 with Visual C++ Support (important).
+This repo is the **server half**. The browser client, the desktop and Android shells, the
+deploy kit (Docker, gateway, website) and all the design records (ADRs) live in the companion
+repo **meridian-browser** (`E:\2026_Experiments\meridian-browser` on the dev machine). That
+repo reaches this one through a directory junction, `server\src` (made by `server\link-src.cmd`),
+so its build, asset build and deploy read this working tree directly.
 
-READ FIRST: Security Modifications
---------------
-This repository implemented a security feature that will require you to complete the following steps in order to build Classic and Blakserv. Without completing these steps, your client will fail to build and will fail to connect to the server.
+Developer and agent notes are in [AGENTS.md](AGENTS.md).
 
-1. Rename clientd3d/login.c-example to login.c
-2. Edit login.c and look for "EXAMPLE_KEY_HERE", replace with a 16 character string such as `abcdefghijklmnop` - Save, compile.
-3. Edit run/server/blakserv.cfg
-4. Update your configuration file section as shown below (update the key to match the key you put in the client)
+## What is different from Server 104
+
+Decisions and designs are recorded as ADRs in meridian-browser's `docs/adr/` (0001 to 0026).
+In short, as of release 0.13.0 (2026-10-24) and after:
+
+- **No random PvP.** Players fight each other only in the faction war, guild wars, the arena
+  (and its bouts) and Frenzies. Name colours mark enemies per viewer. (ADR 0021)
+- **Factions and the faction war:** renown, campaigns and sieges between the lieges, NPC
+  battles, Champion's Gifts, Roq's contracts; companions come only from faction leaders. (ADR 0021)
+- **Guild revamp:** public halls, ranked chests, prestige, a recruitment board, eight Fallen
+  Halls, daily guild quests, trophies and the Inner Sanctum, cloaks. (ADR 0022)
+- **Spell revamp:** level grids per school, the Jala songs (taught by Priestess Themala),
+  monster-targetable spells, spell effects and cast sounds. (ADR 0023)
+- **Magic items:** four tiers, no curses, an elder reveal, smith repair, random jewellery magic.
+- **Quests:** data-driven (`quests/*.json`, see below), with Marion's quest flow and
+  companion quests. (ADR 0009)
+- **Achievements** with titles (ADR 0025), **chat emoji and item links** (ADR 0024),
+  **cosmetics** (barber, tailor, dyes; ADR 0012), pets, followers and companions, an arena.
+- **The Office of the Justicar:** the Barloque Assizes (an NPC court always in session),
+  Caramo's daily bounties, and name changes from Caramo. (ADR 0026)
+- Skills improve at half speed. Shopkeepers have a Sell window.
+- **Removed:** the crafting school (school slot 7 stays reserved so client wire formats do not
+  change), curses, and the old random-PvP and karma systems. Parts of `design/` and `doc/`
+  still describe them: they are the upstream documents and have not been rewritten.
+
+## Layout
+
+| Path | What it is |
+|---|---|
+| `blakserv/` | The server (C). Ports and settings come from `run/server/blakserv.cfg`. |
+| `kod/` | The game code in Blakod (`.kod`), compiled to `.bof` by `blakcomp`. `kod/include` has `blakston.khd` and `protocol.khd`; `kod/util/questdefs.kod` is generated. |
+| `blakcomp/`, `blakdiff/`, `blakdeco/`, `bbgun/`, `makebgf/`, `gelmaker/`, `keybind/`, `roomedit/` | The Blakod compiler and the other upstream tools. |
+| `clientd3d/` | The classic Windows client (kept building; the browser client is the one in play). |
+| `quests/` | Quest definitions, one JSON file per quest, plus `givers.json` and `retired.json`. |
+| `run/server/` | The live server's working folder (built binary, `blakserv.cfg`, `loadkod`, `rsc`, `savegame`, `channel/*.txt` logs). `run/testserver` is the throwaway sandbox for the testbench; `run/localclient` is the classic client. |
+| `claude-testbench/` | `kodbench`, a runtime harness for checking Kod changes, and the `blakserv-dm` MCP server. See its `README.md`, `CLAUDE.md` and `RECIPES.md`. |
+| `tools/server.mjs` | Start, stop and inspect the local server (below). `tools/iconforge/` is the item-icon restyle pipeline (its own README). |
+| `www/` | The PHP statistics and guild website from upstream. |
+| `data/` | Inventories used by the icon tool. |
+| `doc/`, `design/`, `manual/`, `README.old`, `CONTRIBUTING.md` | Upstream Meridian 59 documentation (Blakod syntax, protocol, design pages). Useful for the language and protocol; the game design pages are out of date. |
+| `lib*/`, `libarchive/` | zlib, libarchive, libpng and jansson, built from source. |
+
+## Build (Windows)
+
+Needs Visual Studio with the C++ workload. The current recipe uses VS 18 and builds 32-bit;
+run it from the repo root:
+
+```bat
+call "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat" -arch=x86 -host_arch=x64
+set _CL_=/WX-
+nmake -nologo debug=1 Bzlib Bjansson Bserver Bkod
 ```
-[Login]              
-SecretKey            EXAMPLE_KEY_HERE
+
+- `_CL_=/WX-` switches off warnings-as-errors, which newer MSVC trips.
+- A fresh clone has no `run/server`; the build creates it.
+- The build exits 0 even when a `.kod` file fails to compile. Search its log for `.kod(` errors.
+- meridian-browser's `server\build.cmd` does the same and also runs the quest generator first;
+  prefer it when you will test in the browser client. The older `vsvars32.bat` (VS 2015)
+  instructions in `claude-testbench/CLAUDE.md` do not work on a machine without VS 2015.
+- The Linux build (`makefile.linux`, `common.mak.linux`, `rules.mak.linux`) is what the Docker
+  image on the live server uses. The Dockerfile is in meridian-browser's `deploy/blakserv/`.
+
+## Run (local)
+
+No `npm install` is needed:
+
+```bat
+npm start          :: start blakserv (about 35 s for a fresh game), waits for the ports
+npm stop           :: "terminate save": saves, then shuts down
+npm restart
+npm run status     :: ports listening, who is logged on
+npm run logs       :: the end of channel/error.txt and debug.txt
+npm run maint -- "show status"   :: any maintenance command
 ```
 
-When a client connects to your server, this key is checked. If the keys do not match, the client is redirected to update and disconnected. This is to prevent hackers / recompilers from connecting to your server without knowledge of your server's key.
+- Game port **5959**, maintenance port **9998** (both from `blakserv.cfg`). The testbench
+  sandbox uses 9999.
+- After recompiling Kod, `reload system` (maintenance command, or the toolbar button) loads the
+  new bytecode. New Kod strings reach the browser client only after its asset build copies
+  `run/server/rsc/rsc0000.rsb` (`node tools/assets/build-assets.ts` in meridian-browser).
+- Quests: edit `quests/*.json`, then run `npm run quests` in meridian-browser; it checks them
+  against the Kod and writes `kod/util/questdefs.kod`.
+- Blakod logs runtime errors and keeps running, so a clean compile proves little. Read
+  `run/server/channel/error.txt`, or use the testbench ([claude-testbench/CLAUDE.md](claude-testbench/CLAUDE.md)).
 
-Play Meridian 59
---------------
-This repository is for the "Server 104" version of Meridian 59.
-You can create an account for this server and download the client on
-the [server 104 website] (https://meridian59.us/).
+## Release and deploy
 
-License
---------------
-This project is distributed under a license that is described in the
-LICENSE file.  The license does not cover the game content (artwork, audio),
-which are not included.
+Releases (`npm run release:patch` / `release:minor`, `npm run ship`) and the Docker deploy to
+the live VM are driven from meridian-browser; see its `deploy/README.md`. Removing Kod classes
+can stop an existing save from loading: that file also has the fresh-world procedure.
 
-Note that "Meridian" is a registered trademark and you may not use it
-without the written permission of the owners.
+## Licence
 
-The license requires that if you redistribute this code in any form,
-you must make the source code available, including any changes you
-make.  We would love it if you would contribute your changes back to
-the original source so that everyone can benefit.
+Distributed under the licence in the [LICENSE](LICENSE) file. It does not cover the game
+content (artwork, audio), which is not included. "Meridian" is a registered trademark and may
+not be used without the owners' written permission. If you redistribute this code you must make
+the source, including your changes, available.
 
+## Origins
 
-What's included and not included
---------------
-The source to the client, server, game code, Blakod compiler, room
-editor, and all associated tools are included.  The source code to
-the irrKlang audio library is not included, and the graphics and music
-for Meridian 59 must be downloaded with the game client.
-
-
-Build Instructions
---------------
-
-0. Install [Microsoft Visual Studio 2015 Community Edition](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx).
-During installation you will need to choose "Custom" installation and add the
-C++ components to the installation, as these are not installed by default (see https://msdn.microsoft.com/en-au/library/60k1461a.aspx).
-0. Download this source code, either with a git client or with the
-"Download ZIP" option from your chosen repository.
-
-### Visual Studio GUI build
-0. If you prefer the Visual Studio graphical interface, open
-Meridian59.sln from the root folder of the codebase. Click on the
-BUILD menu and select Build Solution (or press CTRL+SHIFT+B) to build.
-
-### Makefile build
-0. Locate your Visual Studio install folder, usually something like
-`"C:\Program Files (x86)\Microsoft Visual Studio 14.0"`.
-Navigate to the Common folder, and then the Tools folder. Example:
-`"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools"`.
-0. Create a shortcut (by right-clicking on vsvars32.bat and selecting
-Create shortcut) called "Meridian Development Shell" on your desktop
-or in your start menu with the following property:
-Target: `%windir%\system32\cmd.exe /k "C:\Program Files (x86)\Microsoft
-Visual Studio 14.0\Common7\Tools\vsvars32.bat"`
-0. OPTIONAL: set the "Start In" property of your shortcut to the folder
-that contains the meridian source code for ease of use.
-0. Open the Meridian Development Shell and navigate to the folder
-containing the source code, then enter `nmake debug=1` to compile.
-
-Getting Started: Server
---------------
-0. After compilation completes, browse to the `.\run\server` folder,
-and double click `blakserv.exe` to start the server.
-0. Go to the `Administration` tab on the server's interface and enter
-the command: `create account admin username password email` (with your
-desired username, password and email (email can be "none@none").
-You will see a message saying `Created ACCOUNT 4` or similar.
-0. Then create a character slot on that account with `create admin 4`,
-using whichever number the previous line returned instead of 4.
-0. You'll now be able to log in with this account name and password.
-Be sure to "save game" from the server interface to save this new
-account.
-
-Getting Started: Client
---------------
-You will need to obtain the client graphics before you can run the
-client locally, which can be done by installing the server 104 classic client
-from the [104 website] (https://meridian59.us/).
-When this is installed, building the client (via makefile or VS
-solution) will automatically copy the needed resources to the
-appropriate directory. If for some reason this isn't done, copy
-the files manually from the 105 client's resource directory to
-your repo's `.\run\localclient\resource` directory. Running `postbuild.bat`
-from the root directory of the repo will also perform the copy function.
-Resources may differ between versions of Meridian 59 - if using this
-repository for a different version of the game, make sure you have that
-client downloaded and edit `postbuild.bat` to copy the appropriate
-resources.
-
-0. After compilation completes, the client is located at
-`.\run\localclient`.
-0. You can point your local client at your local server by running the
-client `meridian.exe` with command line flags, like this:
-`meridian.exe /U:username /W:password /H:localhost /P:5959`.
-0. Building the client will generate a shortcut to `meridian.exe`,
-with these flags, however if this shortcut isn't present in your
-client directory, you can create it by making the shortcut,
-right-clicking it and selecting Properties, and adding
-`/H:localhost /P:5959` after the existing link in the `Target:` box.
-
-Note that any time you recompile KOD code, changes need to be loaded
-into your local blakserv server by clicking the 'reload system' arrow
-icon, next to the 'save game' disk icon.
-
-Third-Party Code
---------------
-Meridian uses the third party libraries zlib, libarchive, libpng and jansson.
-Each of these is built from source which is included in the appropriately-named
-directories (libzlib, libarchive, libpng and libjansson).
-
-README file included as README.old.
+Meridian 59 is by Andrew Kirmse and Chris Kirmse (copyright 1994-2012). This fork builds on the
+open-source "Server 104" code base (<https://meridian59.us/>); thanks to everyone who kept it
+alive. Upstream's original README is kept as `README.old`. Its login-key instructions
+(`clientd3d/login.c-example`, `SecretKey` in `blakserv.cfg`) still apply to the classic client.
