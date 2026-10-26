@@ -20,7 +20,11 @@ resources:
 
    OfferingQor_name_rsc = "blood of the innocent"
    OfferingQor_icon_rsc = bloodinn.bgf
-   OfferingQor_desc_rsc = "This bottle of liquid holds some ominous purpose you can only guess at."
+   OfferingQor_desc_rsc = \
+      "A dark vial that never quite stops trembling, sacred to Qor.  Left at one of the "
+      "realm's shrines, it would give the shrine to the Dark Mistress for a day.  It is "
+      "said that six such offerings, one for each god, can open stranger doors than a "
+      "shrine's."
 
 classvars:         
 

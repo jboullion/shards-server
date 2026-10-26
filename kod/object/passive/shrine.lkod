@@ -1,10 +1,4 @@
 Shrine_name_rsc = de "Der Schrein"
-Shrine_desc_rsc = de \
-   "Die Götter bevorzugen jene, die ihr Königreich auf Erden stärken, indem "
-   "sie ihnen Plätze geben, um ihnen zu huldigen. Wenn Du hier eine angemessene "
-   "Spende abgibst, könnte das Deinem Gott gefallen.%s\n\n"
-Shrine_noone = de ""
-Shrine_dedicated = de "%s ist zur Zeit %s geweiht."
 Shrine_not_in_range = de \
    "Du bist nicht nah genug an dem Schrein, um mit ihm kommunizieren zu können."
 Shrine_meld = de \
@@ -30,9 +24,6 @@ Shrine_mana_boost = de \
 shrine_trance_break = de "Dein Gebet endet unvermittelt."
 
 Shrine_name_rsc = pt "santuário"
-Shrine_desc_rsc = pt "Os deuses favorecem aqueles que fortalecem seu reino na terra, dando-lhes lugares de adoração. Talvez se você fizer uma oferta adequada aqui, seu deus ficará satisfeito.\n\n%s"
-Shrine_noone = pt ""
-Shrine_dedicated = pt "O %s está atualmente dedicado a %s."
 Shrine_not_in_range = pt "Você não está perto o suficiente do santuário para se comunicar com ele."
 Shrine_meld = pt "Você ajoelha diante do santuário, oferecendo seus presentes."
 Shrine_satisfied = pt "O santuário parece satisfeito com %s."

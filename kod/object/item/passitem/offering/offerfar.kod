@@ -20,7 +20,10 @@ resources:
 
    OfferingFaren_name_rsc = "burning water"
    OfferingFaren_icon_rsc = burnwate.bgf
-   OfferingFaren_desc_rsc = "This bottle of liquid holds some ominous purpose you can only guess at."
+   OfferingFaren_desc_rsc = \
+      "A vial of water that burns without heat, sacred to Faren.  Left at one of the "
+      "realm's shrines, it would turn the shrine, and the elements' favour, to Faren for a "
+      "day."
 
 classvars:         
 

@@ -26,11 +26,31 @@ classvars:
 
 properties:  
 
+   // Ours: the last player to hold it (NewOwner)
+   poLastHolder = $
+
 messages:   
 
    GetAllegiance()
    {
       return vrAllegiance;
+   }
+
+   NewOwner(what = $)
+   "Ours (docs/adr/0027-offerings-and-shrines.md): the last player to hold it is credited when "
+   "it's offered at a shrine (Shrine.MakeOffering, a quest's shrine step)."
+   {
+      if what <> $ AND IsClass(what,&User)
+      {
+         poLastHolder = what;
+      }
+
+      propagate;
+   }
+
+   GetLastHolder()
+   {
+      return poLastHolder;
    }
 
 end

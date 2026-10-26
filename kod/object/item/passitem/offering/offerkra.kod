@@ -20,7 +20,10 @@ resources:
 
    OfferingKraanan_name_rsc = "sweat of the warrior king"
    OfferingKraanan_icon_rsc = sweat.bgf
-   OfferingKraanan_desc_rsc = "This bottle of liquid holds some ominous purpose you can only guess at."
+   OfferingKraanan_desc_rsc = \
+      "A stoppered flask of a champion's sweat, sacred to Kraanan.  Left at one of the "
+      "realm's shrines, it would claim the shrine for the Warrior King for a day, and the "
+      "arts of war would come easier to all."
 
 classvars:         
 

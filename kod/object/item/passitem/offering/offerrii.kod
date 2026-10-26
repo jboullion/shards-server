@@ -20,7 +20,10 @@ resources:
 
    offeringRiija_name_rsc = "bottle of lies"
    offeringRiija_icon_rsc = lies.bgf
-   offeringRiija_desc_rsc = "This bottle of liquid holds some ominous purpose you can only guess at."
+   offeringRiija_desc_rsc = \
+      "A bottle that looks full or empty depending on who is asking, sacred to Riija.  "
+      "Left at one of the realm's shrines, it would hand the shrine to the Lord Fool for a "
+      "day, for the benefit of every trickster in the land."
 
 classvars:         
 

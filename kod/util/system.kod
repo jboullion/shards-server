@@ -1458,6 +1458,8 @@ messages:
 
    NewGameHour()
    {
+      local i;
+
       piHour = (piHour + 1) % 24;
 
       // Tell GameEventEngine object we have a new hour.
@@ -1482,6 +1484,12 @@ messages:
       // Ours: the lieges' battles keep their schedule (util/factionwar.kod; this also makes
       //  it on a world that has none yet)
       Send(Send(self,@GetFactionWar),@NewGameHour);
+
+      // Ours (docs/adr/0027): a shrine's dedication lasts a real day
+      foreach i in plShrines
+      {
+         Send(i,@CheckExpiry);
+      }
 
       return;
    }

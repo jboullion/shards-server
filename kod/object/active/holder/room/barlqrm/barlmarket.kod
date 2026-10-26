@@ -88,6 +88,29 @@ messages:
       propagate;
    }
 
+   NewHold(what=$)
+   "Ours (docs/adr/0027): an item dropped by the shrine may be an offering, as at the Forest "
+   "Shrine (e5.kod). The market's shrine never had this, so it could never be dedicated."
+   {
+      if poShrine <> $ AND IsClass(what,&Item)
+      {
+         // Posted: a number item isn't placed yet, and SYS can't take posts
+         Post(self,@PostShrineCheckItem,#what=what);
+      }
+
+      propagate;
+   }
+
+   PostShrineCheckItem(what=$)
+   {
+      if poShrine <> $ AND Send(what,@GetOwner) = self
+      {
+         Send(SYS,@ShrineCheckItem,#ShrineObj=poShrine,#what=what,#Radius=2);
+      }
+
+      return;
+   }
+
    CreateStandardExits()
    {
       plExits = $;

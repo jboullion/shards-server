@@ -167,6 +167,9 @@ constants:
    // Ours (guild revamp, ADR 0022 decision 31): being there when a Fallen Hall's boss falls,
    // having struck it (FallenHall.BossSlain); the amount is the hall's room number, 0 any
    QK_FALLEN = 24
+   // Ours (ADR 0027): an offering made at a shrine (Shrine.MakeOffering); the amount is the
+   // offering's school (SS_SHALILLE 1 to SS_JALA 6), 0 any
+   QK_SHRINE = 25
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -2086,8 +2089,10 @@ messages:
          return what AND (Nth(step,QBS_AMOUNT) = 0 OR Nth(step,QBS_AMOUNT) = num);
       }
 
-      // fallen: the hall the step names (num, its room number), or any
+      // fallen: the hall the step names (num, its room number), or any; shrine: the offering's
+      //  school (num), or any
       if Nth(step,QBS_KIND) = QK_FALLEN
+         OR Nth(step,QBS_KIND) = QK_SHRINE
       {
          return Nth(step,QBS_AMOUNT) = 0 OR Nth(step,QBS_AMOUNT) = num;
       }
@@ -2182,6 +2187,15 @@ messages:
    "struck it (QK_FALLEN)."
    {
       Send(self,@ActionDone,#who=who,#kind=QK_FALLEN,#num=rid);
+
+      return;
+   }
+
+   ShrineOffered(who = $,school = 0)
+   "Ours (ADR 0027): Shrine.MakeOffering: who made an offering of school at a shrine "
+   "(QK_SHRINE)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_SHRINE,#num=school);
 
       return;
    }

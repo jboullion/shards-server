@@ -17,6 +17,10 @@ constants:
    SHRINE_RANGE = 3
    PRAY_TIME = 30000
 
+   // Ours (docs/adr/0027-offerings-and-shrines.md): an offering dedicates a shrine to its god
+   //  for a real day; System.NewGameHour asks each shrine to CheckExpiry
+   SHRINE_DEDICATION_SECONDS = 86400
+
 resources:
 
    include shrine.lkod
@@ -25,11 +29,13 @@ resources:
    Shrine_icon_rsc = shrine.bgf
    Shrine_desc_rsc = \
       "Gods favor those who strengthen their realm on earth by giving them "
-      "places of worship.  Perhaps if you were to make a proper offering "
-      "here, your god would be pleased.\n\n%s"
+      "places of worship.  Leave a god's offering here and the shrine is theirs for a day, "
+      "and their magic stronger for everyone in the realm.\n\n%s"
 
-   Shrine_noone = ""
-   Shrine_dedicated = "The %s is currently dedicated to %s."
+   Shrine_noone = "No god holds it now."
+   Shrine_dedicated = "The %s is dedicated to %s for about %i more %s."
+   Shrine_hour = "hour"
+   Shrine_hours = "hours"
 
    Shrine_not_in_range = \
       "You are not close enough to the shrine to commune with it."
@@ -55,6 +61,9 @@ resources:
    Shrine_Riija_sound = riija.ogg
    Shrine_Jala_text =  "A sweet song drifts lazily through the air."
    Shrine_Jala_sound = nodeup.ogg
+
+   // Ours: a dedication's day is over (CheckExpiry): the room, then the god's school
+   Shrine_fades = "~I%s: the shrine falls quiet, and the favour of %s fades from it."
 
    Shrine_unsatisfied = "The shrine finds nothing to its liking."
    Shrine_mana_boost = \
@@ -82,6 +91,9 @@ properties:
    // This records the school the shrine boosts.
    piAllegiance = 0
 
+   // Ours: GetTime() when the dedication ends (0: never dedicated)
+   piExpires = 0
+
 messages:
 
    Constructor(shrine_num=0,name_rsc=$)
@@ -99,7 +111,7 @@ messages:
 
    ShowDesc()
    {
-      local oSpell;
+      local oSpell, iHours;
 
       AddPacket(4,vrDesc);
       if piAllegiance <> bound(piAllegiance,SS_SHALILLE,SS_JALA)
@@ -114,6 +126,17 @@ messages:
          // Find any spell, any will give us the school string.
          oSpell = Send(SYS,@FindSpellByNum,#num=SID_BLINK);
          AddPacket(4,Send(oSpell,@GetSchoolStr,#iSchool=piAllegiance));
+
+         iHours = Send(self,@HoursLeft);
+         AddPacket(4,iHours);
+         if iHours = 1
+         {
+            AddPacket(4,Shrine_hour);
+         }
+         else
+         {
+            AddPacket(4,Shrine_hours);
+         }
       }
 
       return;
@@ -146,8 +169,19 @@ messages:
 
    MakeOffering(oOffering=$)
    {
+      local oOfferer;
+
       piAllegiance = Send(oOffering,@GetAllegiance);
+      // Ours: for a day, and another offering (either god's) starts a fresh one
+      piExpires = GetTime() + SHRINE_DEDICATION_SECONDS;
       Send(SYS,@RecomputeShrineTotals);
+
+      // Ours: the quest book hears who made it (a shrine step)
+      oOfferer = Send(oOffering,@GetLastHolder);
+      if oOfferer <> $
+      {
+         Send(Send(SYS,@GetQuestBook),@ShrineOffered,#who=oOfferer,#school=piAllegiance);
+      }
 
       // If we find one, then switch over to that god.
       Send(poOwner,@SomeoneSaid,#type=SAY_MESSAGE,#what=self,
@@ -215,6 +249,45 @@ messages:
       return piShrine_num;
    }
 
+   HoursLeft()
+   "Whole hours, rounded up, until the dedication ends (at least 1 while it lasts)."
+   {
+      return Bound((piExpires - GetTime() + 3599) / 3600,1,$);
+   }
+
+   CheckExpiry()
+   "Ours (System.NewGameHour): a dedication's day is over: no god holds the shrine, and "
+   "everyone hears the god's favour fade from it."
+   {
+      local oSpell, rSchool, rPlace, i;
+
+      if piAllegiance <> bound(piAllegiance,SS_SHALILLE,SS_JALA)
+         OR GetTime() < piExpires
+      {
+         return;
+      }
+
+      oSpell = Send(SYS,@FindSpellByNum,#num=SID_BLINK);
+      rSchool = Send(oSpell,@GetSchoolStr,#iSchool=piAllegiance);
+      piAllegiance = 0;
+      piExpires = 0;
+      Send(SYS,@RecomputeShrineTotals);
+
+      // The island's shrine isn't in its room until its puzzle is solved
+      if poOwner = $
+      {
+         return;
+      }
+
+      rPlace = Send(poOwner,@GetName);
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         Post(i,@MsgSendUser,#message_rsc=Shrine_fades,#parm1=rPlace,#parm2=rSchool);
+      }
+
+      return;
+   }
+
    ReqNewOwner(what = $)
    {
       return FALSE;
@@ -228,6 +301,14 @@ messages:
    SetAllegiance(allegiance=$)
    {
       piAllegiance = allegiance;
+      return;
+   }
+
+   SetExpires(time = 0)
+   "For testing: when the dedication ends (GetTime())."
+   {
+      piExpires = time;
+
       return;
    }
 

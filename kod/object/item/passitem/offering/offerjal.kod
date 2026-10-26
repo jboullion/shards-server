@@ -21,7 +21,9 @@ resources:
    OfferingJala_name_rsc = "mystic perfume"
    OfferingJala_icon_rsc = solagh.bgf
    OfferingJala_desc_rsc = \
-	"This bottle of liquid holds some ominous purpose you can only guess at."
+      "A little bottle of perfume that hums faintly, sacred to Jala.  Left at one of the "
+      "realm's shrines, it would give the shrine to the Lady of Song for a day, and every "
+      "bard's music would carry further."
 
 classvars:
 
