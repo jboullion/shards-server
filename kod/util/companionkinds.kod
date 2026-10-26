@@ -95,47 +95,6 @@ messages:
       return 0;
    }
 
-   GetLeaderClass(kind = 0)
-   {
-      if kind = COMPANION_DUKE
-      {
-         return &DukeLiege;
-      }
-
-      if kind = COMPANION_PRINCESS
-      {
-         return &PrincessLiege;
-      }
-
-      if kind = COMPANION_REBEL
-      {
-         return &RebelLiege;
-      }
-
-      return $;
-   }
-
-   GetHallRoom(kind = 0)
-   "Where its leader is: the room it waits and recovers in."
-   {
-      if kind = COMPANION_DUKE
-      {
-         return RID_DUKE3;
-      }
-
-      if kind = COMPANION_PRINCESS
-      {
-         return RID_CASTLE2C;
-      }
-
-      if kind = COMPANION_REBEL
-      {
-         return RID_JAS_BAR;
-      }
-
-      return $;
-   }
-
    GetKindFaction(kind = 0)
    "The faction a leader gives its companions to the members of."
    {

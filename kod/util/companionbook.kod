@@ -6,11 +6,12 @@
 // A companion is:
 //   COMP_ACTIVE      with its owner: beside them, or in limbo while they're logged off or in a
 //                    room that won't take it (it rejoins them in the next room that will)
-//   COMP_WAITING     dismissed for a while, standing at its leader's hall, unattackable
+//   COMP_WAITING     dismissed for a while, in limbo until its owner calls it back
 //   COMP_FALLEN      dead: in limbo while its corpse lies where it fell (Restore Companion on
 //                    the corpse brings it back there)
-//   COMP_RECOVERING  its corpse gone, at its leader's hall: fetched after an hour, or at once
-//                    for a fee
+//   COMP_RECOVERING  its corpse gone, in limbo: called back after an hour, or at once for a fee
+// A companion not with its owner is never in the world. One whose owner leaves its faction
+// leaves them for good (CheckFaction).
 //
 // Our client's commands (UC_SHARDS, User.ShardsCommand -> CompanionCommand):
 //   companion status | ask | follow | defend | stay | passive | dismiss | dismiss forever
@@ -60,9 +61,9 @@ resources:
    cbook_stance_stay = "%s stays where it stands."
    cbook_stance_passive = "%s follows you, and won't fight."
    cbook_left_behind = "%s can't follow you here.  It will rejoin you when it can."
-   cbook_dismissed = "%s goes to wait for you at %s%s's side."
+   cbook_dismissed = "%s goes to wait until you call it back."
+   cbook_left_faction = "%s leaves your service: you no longer serve its faction.  Anything %s carried is yours again."
    cbook_comes = "%s comes back to your side."
-   cbook_not_here = "%s is waiting for you elsewhere."
    cbook_recovering = "%s is still recovering.  You can fetch it in %i minutes, or pay %i shillings now."
    cbook_paid = "You pay %i shillings, and %s is ready to go."
    cbook_cant_pay = "You need %i shillings to fetch %s now."
@@ -70,8 +71,8 @@ resources:
    cbook_forever_fallen = "%s must recover before you can dismiss it for good."
    cbook_forever_ask = "Dismiss %s for good, and lose your bond?  Say it again within 30 seconds to confirm."
    cbook_forever_done = "%s leaves your service for good."
-   cbook_fell = "%s has fallen!  Restore Companion on the body brings it back, or it will recover at its leader's hall."
-   cbook_corpse_gone = "%s's body is gone; it is recovering at its leader's hall."
+   cbook_fell = "%s has fallen!  Restore Companion on the body brings it back, or it will recover in an hour."
+   cbook_corpse_gone = "%s's body is gone; it is recovering, and you can call it back in an hour."
    cbook_revived = "%s rises again!"
    cbook_bad_look = "That look isn't one %s can have."
    cbook_tier = "Your bond with %s grows stronger."
@@ -360,49 +361,8 @@ messages:
       return;
    }
 
-   ToHall(comp = $)
-   "To its leader's hall, beside the leader, to wait or recover."
-   {
-      local iKind, oRoom, oLeader, iRow, iCol;
-
-      Send(comp,@SetMaster,#oMaster=$);
-      iKind = Send(comp,@GetKind);
-      oRoom = Send(SYS,@FindRoomByNum,#num=Send(self,@GetHallRoom,#kind=iKind));
-      if oRoom = $
-      {
-         Send(self,@ToLimbo,#comp=comp);
-
-         return;
-      }
-
-      iRow = 10;
-      iCol = 10;
-      oLeader = Send(oRoom,@FindHoldingActive,#class=Send(self,@GetLeaderClass,#kind=iKind));
-      if oLeader <> $
-      {
-         iRow = Send(oLeader,@GetRow) + 1;
-         iCol = Send(oLeader,@GetCol);
-      }
-
-      if Send(comp,@GetOwner) <> oRoom
-      {
-         Send(comp,@EnterStateLimbo);
-         if NOT Send(SYS,@UtilGoNearSquare,#what=comp,#where=oRoom,#new_row=iRow,
-                     #new_col=iCol,#mob_override=TRUE)
-         {
-            Send(self,@ToLimbo,#comp=comp);
-
-            return;
-         }
-      }
-
-      Send(comp,@EnterStateWait);
-
-      return;
-   }
-
    Replace(comp = $)
-   "Something deleted it (a room rebuilt) and it parked itself: back where it belongs."
+   "Something deleted it and it parked itself in limbo: back with its owner if it was with them."
    {
       local oOwner, iState;
 
@@ -413,13 +373,6 @@ messages:
       }
 
       iState = Send(comp,@GetCompanionState);
-      if iState = COMP_WAITING OR iState = COMP_RECOVERING
-      {
-         Send(self,@ToHall,#comp=comp);
-
-         return;
-      }
-
       if iState = COMP_ACTIVE AND Send(oOwner,@GetShardsSession) <> $
       {
          Send(self,@PlaceWithOwner,#comp=comp,#who=oOwner);
@@ -468,6 +421,10 @@ messages:
 
          return;
       }
+
+      // Its owner may have left its faction while it was away (or before this rule)
+      Send(self,@CheckFaction,#who=who);
+      oComp = Send(who,@GetCompanion);
 
       if oComp <> $
       {
@@ -523,6 +480,37 @@ messages:
       Send(who,@SetCompanion,#comp=$);
       Send(oComp,@AllowDelete);
       Send(oComp,@Delete);
+
+      return;
+   }
+
+   CheckFaction(who = $)
+   "Posted by Player.ResetFaction and PlayerIsIntriguing, and at logon: a companion whose "
+   "owner no longer serves its faction leaves them for good, its pack given back."
+   {
+      local oComp, iFaction;
+
+      if who = $ OR NOT IsClass(who,&User)
+      {
+         return;
+      }
+
+      oComp = Send(who,@GetCompanion);
+      if oComp = $
+      {
+         return;
+      }
+
+      iFaction = Send(self,@GetKindFaction,#kind=Send(oComp,@GetKind));
+      if iFaction = $ OR Send(who,@GetFaction) = iFaction
+      {
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=cbook_left_faction,#parm1=Send(oComp,@GetName),
+           #parm2=Send(oComp,@GetName));
+      Send(oComp,@GiveAllTo,#who=who);
+      Send(self,@Forget,#who=who);
 
       return;
    }
@@ -658,7 +646,7 @@ messages:
    }
 
    CorpseGone(comp = $)
-   "Its body decayed before anyone brought it back: it recovers at its leader's hall."
+   "Its body decayed before anyone brought it back: it recovers in limbo."
    {
       local oOwner;
 
@@ -670,7 +658,7 @@ messages:
       Send(comp,@SetReadyAt,#when=GetTime() + COMPANION_RECOVER_SECONDS);
       Send(comp,@SetCompanionState,#state=COMP_RECOVERING);
       Send(comp,@SetHealthPercent,#percent=100);
-      Send(self,@ToHall,#comp=comp);
+      Send(self,@ToLimbo,#comp=comp);
       oOwner = Send(comp,@GetSworn);
       if oOwner <> $
       {
@@ -721,9 +709,9 @@ messages:
    ////////////////////////////////////////////////////////////// dismissing it
 
    Dismiss(who = $)
-   "Dismissed for a while: it waits at its leader's hall, keeping its pack."
+   "Dismissed for a while: it waits in limbo, keeping its pack."
    {
-      local oComp, iKind, oRoom, oLeader;
+      local oComp;
 
       oComp = Send(who,@GetCompanion);
       if oComp = $
@@ -741,29 +729,15 @@ messages:
       Send(self,@AccrueBond,#who=who);
       Send(who,@SetCompanionBondSince,#when=0);
       Send(oComp,@SetCompanionState,#state=COMP_WAITING);
-      Send(self,@ToHall,#comp=oComp);
-
-      iKind = Send(oComp,@GetKind);
-      oRoom = Send(SYS,@FindRoomByNum,#num=Send(self,@GetHallRoom,#kind=iKind));
-      oLeader = $;
-      if oRoom <> $
-      {
-         oLeader = Send(oRoom,@FindHoldingActive,#class=Send(self,@GetLeaderClass,#kind=iKind));
-      }
-
-      if oLeader <> $
-      {
-         Send(who,@MsgSendUser,#message_rsc=cbook_dismissed,#parm1=Send(oComp,@GetName),
-              #parm2=Send(oLeader,@GetDef),#parm3=Send(oLeader,@GetName));
-      }
-
+      Send(self,@ToLimbo,#comp=oComp);
+      Send(who,@MsgSendUser,#message_rsc=cbook_dismissed,#parm1=Send(oComp,@GetName));
       Send(self,@SendStatus,#who=who);
 
       return;
    }
 
    Come(who = $)
-   "Fetch it from its leader's hall (near it or the leader), or call it back from limbo."
+   "Call it back from limbo: waiting, recovered (or paid for), or left behind."
    {
       local oComp, iState, iLeft;
 
@@ -787,13 +761,6 @@ messages:
       if iState = COMP_FALLEN
       {
          Send(who,@MsgSendUser,#message_rsc=cbook_fell,#parm1=Send(oComp,@GetName));
-
-         return;
-      }
-
-      if Send(oComp,@GetOwner) <> Send(who,@GetOwner)
-      {
-         Send(who,@MsgSendUser,#message_rsc=cbook_not_here,#parm1=Send(oComp,@GetName));
 
          return;
       }
@@ -840,13 +807,6 @@ messages:
       oComp = Send(who,@GetCompanion);
       if oComp = $ OR Send(oComp,@GetCompanionState) <> COMP_RECOVERING
       {
-         return;
-      }
-
-      if Send(oComp,@GetOwner) <> Send(who,@GetOwner)
-      {
-         Send(who,@MsgSendUser,#message_rsc=cbook_not_here,#parm1=Send(oComp,@GetName));
-
          return;
       }
 
@@ -1111,7 +1071,7 @@ messages:
 
       AddPacket(1,Send(oComp,@GetStance));
 
-      // Where it is: its room, or its leader's hall's while waiting or recovering
+      // Where it is: its room, if it's in the world (only while with its owner)
       rRoom = $;
       if oRoom <> $
       {

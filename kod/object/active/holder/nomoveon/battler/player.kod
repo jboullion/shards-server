@@ -12841,6 +12841,8 @@ messages:
       }
 
       piFaction = faction;
+      // Ours: a companion leaves one who leaves its faction (util/companionbook.kod)
+      Post(Send(SYS,@GetCompanionBook),@CheckFaction,#who=self);
 
       return TRUE;
    }
@@ -13072,6 +13074,7 @@ messages:
          Send(self,@ClearFactionRenown);
          Send(oParl,@UpdateEffects,#who=self);
          Send(oParl,@MovetoFaction,#who=self,#faction=FACTION_NEUTRAL);
+         Post(Send(SYS,@GetCompanionBook),@CheckFaction,#who=self);
          Send(self,@ReceiveNestedMail,#from=intrigue_ambassador,
               #dest_list=[self],#nest_list=[4,player_intrigue_mail]);
       }
