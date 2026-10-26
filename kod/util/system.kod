@@ -1485,6 +1485,12 @@ messages:
       //  it on a world that has none yet)
       Send(Send(self,@GetFactionWar),@NewGameHour);
 
+      // Ours: the lieges never leave their spots (util/parlia.kod)
+      if poParliament <> $
+      {
+         Send(poParliament,@KeepLiegesHome);
+      }
+
       // Ours (docs/adr/0027): a shrine's dedication lasts a real day
       foreach i in plShrines
       {

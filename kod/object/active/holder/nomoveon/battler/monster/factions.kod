@@ -120,6 +120,28 @@ messages:
       return;
    }
 
+   KeepHome()
+   "Ours: a liege never leaves its spot. Parliament.KeepLiegesHome sends this hourly, and "
+   "Room.Recreate after it remakes the liege's room."
+   {
+      local room;
+
+      room = Send(SYS,@FindRoomByNum,#num=viHomeroom);
+      if room = $
+      {
+         return;
+      }
+
+      if poOwner <> room
+         OR Send(self,@GetRow) <> viMyRow
+         OR Send(self,@GetCol) <> viMyCol
+      {
+         Send(self,@GotoHomeroom);
+      }
+
+      return;
+   }
+
    NewHoldObject(what = $)
    {
       // Don't want them holding anything, so just delete it.

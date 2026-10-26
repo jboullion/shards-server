@@ -453,7 +453,7 @@ messages:
 
    Recreate()
    {
-      local cClass, lUsers, lWanderers, oNewRoom, oGodRoom, oWanderer, i;
+      local cClass, lUsers, lWanderers, lLieges, oNewRoom, oGodRoom, oWanderer, i;
 
       cClass = GetClass(self);
       oGodRoom = Send(SYS,@FindRoomByNum,#num=RID_GODROOM);
@@ -462,6 +462,15 @@ messages:
          if IsClass(First(i),&User)
          {
             lUsers = Cons(First(i),lUsers);
+         }
+
+         // Ours: deleting a liege makes Parliament replace it; keep this one instead and
+         //  send it home to the new room (Factions.KeepHome)
+         if IsClass(First(i),&Factions)
+            AND oGodRoom <> $
+            AND oGodRoom <> self
+         {
+            lLieges = Cons(First(i),lLieges);
          }
 
          // Wanderers are made once by the god room, so deleting one here
@@ -485,12 +494,22 @@ messages:
          Send(oGodRoom,@NewHold,#what=First(i),#new_row=15,#new_col=9);
       }
 
+      foreach i in lLieges
+      {
+         Send(oGodRoom,@NewHold,#what=i,#new_row=15,#new_col=9);
+      }
+
       Send(self,@Delete);
       Send(SYS,@CreateOneRoomIfNew,#num=piRoom_num,#class=cClass);
       oNewRoom = Send(SYS,@FindRoomByNum,#num=piRoom_num);
       foreach i in lUsers
       {
          Send(oNewRoom,@Teleport,#what=i);
+      }
+
+      foreach i in lLieges
+      {
+         Send(i,@KeepHome);
       }
 
       foreach i in lWanderers

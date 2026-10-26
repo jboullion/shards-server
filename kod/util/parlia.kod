@@ -588,6 +588,19 @@ messages:
       return;
    }
 
+   KeepLiegesHome()
+   "Ours: from System.NewGameHour; any liege off its spot goes back (Factions.KeepHome)."
+   {
+      local i;
+
+      foreach i in plLieges
+      {
+         Send(i,@KeepHome);
+      }
+
+      return;
+   }
+
    GetLiege(faction=0)
    {
       if plLieges=$
@@ -691,7 +704,9 @@ messages:
             {
                debug("Liege was deleted unintentionally. Replacement Created");
                SetNth(plLieges,count,Create(Send(Self,@FactionLiegeClass,#num=count))); 
-               Send(Nth(plLieges,count),@GotoHomeroom);
+               // Ours: posted, so a liege deleted with its room (Room.Recreate) goes to the
+               //  new room, not the one being deleted
+               Post(Nth(plLieges,count),@GotoHomeroom);
             
                return;
             }
