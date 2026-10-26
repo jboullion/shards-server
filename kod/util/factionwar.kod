@@ -26,8 +26,10 @@
 //
 // Our client (phase 5): "war" (UC_SHARDS -> WarCommand) asks for UC_FACTION_WAR kind 1, all
 // of it for the war window (SendWar); kind 2, the battle alone, goes to everyone when a battle
-// is called, opens or ends, and every few seconds of a fight, for the battle banner
-// (BroadcastBattle). docs/research/protocol.md has the layout.
+// is called, opens or ends, and every few seconds of a fight, for the War button by the map,
+// which glows while one is on (BroadcastBattle). docs/research/protocol.md has the layout.
+// Battles aren't announced in chat to everyone (2026-10-25): the button and the window say it;
+// only those who take part are told things (the siege's caller, rallies, reinforcements, pay).
 ////////////////////////////////////////////////////////////////////////////////
 FactionWar is UtilityFunctions
 
@@ -73,28 +75,12 @@ constants:
 
 resources:
 
-   fw_muster = \
-      "~B~k[Battle]~n ~B%s marches on %s, held by %s!  The armies meet there in %i %s.  "
-      "Soldiers of either liege, take up your shields."
-   fw_muster_open = \
-      "~B~k[Battle]~n ~B%s and %s both march on %s, which no liege holds.  The armies meet "
-      "there in %i %s.  Soldiers of either liege, take up your shields."
-   fw_minute = "minute"
-   fw_minutes = "minutes"
-   fw_begin = "~B~k[Battle]~n ~BThe armies of %s and %s clash at %s!"
-   fw_won_field = "~B~k[Battle]~n ~B%s carries the field at %s.  The day is theirs."
-   fw_won_time = \
-      "~B~k[Battle]~n ~BThe armies draw back from %s as the light fails.  %s holds the field."
-   fw_won_unwatched = "~B~k[Battle]~n ~BWord comes from %s: the day belongs to %s."
    fw_paid_win = "~IYour liege pays %i shillings to those who won the day at %s."
    fw_paid_lose = \
       "~IThe day is lost, but your liege remembers who stood at %s.  %i shillings for your "
       "trouble."
    fw_effort = "~IYour work strengthens %s's next battle."
 
-   fw_siege_muster = \
-      "~B~k[Battle]~n ~B%s leads %s's army against %s, before the walls of %s!  The siege "
-      "begins in %i minutes."
    fw_siege_called = "~IYour liege's army will be waiting for you at %s.  Lead it there."
    fw_siege_busy = \
       "~IThe armies are already in the field.  Your liege will march when this battle is done."
@@ -104,8 +90,6 @@ resources:
       "the line."
    fw_reinforce = "~IA squad of your liege's soldiers comes up with you."
    fw_siege_no_target = "~IThere are no walls of that enemy left to besiege."
-   fw_siege_won = \
-      "~B~k[Celebration]~n ~BThe siege at %s is won!  %s celebrates in %s."
 
 classvars:
 
@@ -289,29 +273,6 @@ messages:
    LiegeName(faction = $)
    {
       return Send(Send(SYS,@GetParliament),@GetFactionLiegeName,#faction=faction);
-   }
-
-   MinutesWord(minutes = 0)
-   {
-      if minutes = 1
-      {
-         return fw_minute;
-      }
-
-      return fw_minutes;
-   }
-
-   Announce(rsc = $,parm1 = $,parm2 = $,parm3 = $,parm4 = $,parm5 = $)
-   {
-      local i;
-
-      foreach i in Send(SYS,@GetUsersLoggedOn)
-      {
-         Send(i,@MsgSendUser,#message_rsc=rsc,#parm1=parm1,#parm2=parm2,#parm3=parm3,
-              #parm4=parm4,#parm5=parm5);
-      }
-
-      return;
    }
 
    //// War effort
@@ -543,23 +504,6 @@ messages:
       piState = STATE_MUSTER;
       piCalledAt = GetTime();
 
-      if pbOpenGround
-      {
-         Send(self,@Announce,#rsc=fw_muster_open,
-              #parm1=Send(self,@LiegeName,#faction=piAttacker),
-              #parm2=Send(self,@LiegeName,#faction=piDefender),
-              #parm3=Send(poRoom,@GetName),#parm4=piMusterMinutes,
-              #parm5=Send(self,@MinutesWord,#minutes=piMusterMinutes));
-      }
-      else
-      {
-         Send(self,@Announce,#rsc=fw_muster,
-              #parm1=Send(self,@LiegeName,#faction=piAttacker),
-              #parm2=Send(poRoom,@GetName),
-              #parm3=Send(self,@LiegeName,#faction=piDefender),#parm4=piMusterMinutes,
-              #parm5=Send(self,@MinutesWord,#minutes=piMusterMinutes));
-      }
-
       ptStage = CreateTimer(self,@OpenBattle,Bound(piMusterMinutes,0,60) * 60000 + 1);
       Send(self,@BroadcastBattle);
 
@@ -637,13 +581,6 @@ messages:
       poSiegeLeader = who;
       piState = STATE_MUSTER;
 
-      Send(self,@Announce,#rsc=fw_siege_muster,#parm1=Send(who,@GetName),
-           #parm2=Send(self,@LiegeName,#faction=iFaction),
-           #parm3=Send(self,@LiegeName,#faction=against),
-           #parm4=Send(Send(SYS,@FindRoomByNum,
-                            #num=Send(Send(self,@GetWorld),@Capital,#faction=against)),
-                       @GetName),
-           #parm5=SIEGE_MUSTER_MINUTES);
       Send(who,@MsgSendUser,#message_rsc=fw_siege_called,#parm1=Send(poRoom,@GetName));
 
       ptStage = CreateTimer(self,@OpenBattle,SIEGE_MUSTER_MINUTES * 60000);
@@ -662,11 +599,6 @@ messages:
 
       piState = STATE_FIGHT;
       piDeadline = GetTime() + Bound(piFightMinutes,1,120) * 60;
-
-      Send(self,@Announce,#rsc=fw_begin,
-           #parm1=Send(self,@LiegeName,#faction=piAttacker),
-           #parm2=Send(self,@LiegeName,#faction=piDefender),
-           #parm3=Send(poRoom,@GetName));
 
       piBannerSent = GetTime();
       Send(self,@BroadcastBattle);
@@ -1383,7 +1315,7 @@ messages:
 
    Resolve(winner = $,how = HOW_FIELD)
    {
-      local i, oWho, iFaction, iLoser, oRoom, rWinner;
+      local i, oWho, iFaction, iLoser, oRoom;
 
       if piState = STATE_NONE
       {
@@ -1411,21 +1343,6 @@ messages:
          AND Send(poFlag,@GetFaction) <> winner
       {
          Send(poFlag,@SetFaction,#faction=winner);
-      }
-
-      rWinner = Send(self,@LiegeName,#faction=winner);
-      if how = HOW_FIELD
-      {
-         Send(self,@Announce,#rsc=fw_won_field,#parm1=rWinner,#parm2=Send(oRoom,@GetName));
-      }
-      else if how = HOW_TIME
-      {
-         Send(self,@Announce,#rsc=fw_won_time,#parm1=Send(oRoom,@GetName),#parm2=rWinner);
-      }
-      else
-      {
-         Send(self,@Announce,#rsc=fw_won_unwatched,#parm1=Send(oRoom,@GetName),
-              #parm2=rWinner);
       }
 
       foreach i in plParticipants
@@ -1469,11 +1386,6 @@ messages:
       if pbSiege
          AND winner = piAttacker
       {
-         Send(self,@Announce,#rsc=fw_siege_won,#parm1=Send(oRoom,@GetName),
-              #parm2=Send(self,@LiegeName,#faction=winner),
-              #parm3=Send(Send(SYS,@FindRoomByNum,
-                               #num=Send(Send(self,@GetWorld),@Capital,#faction=winner)),
-                          @GetName));
          Send(Send(self,@GetWorld),@Celebrate,#faction=winner,
               #places=[ Send(Send(self,@GetWorld),@Capital,#faction=winner) ]);
       }
