@@ -199,18 +199,6 @@ messages:
            #new_row=59,#new_col=29,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
       Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
            #new_row=32,#new_col=16,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
-           #new_row=59,#new_col=29,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
-           #new_row=49,#new_col=12,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
-           #new_row=46,#new_col=15,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
-           #new_row=32,#new_col=16,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
-           #new_row=28,#new_col=22,#fine_row=32,#fine_col=32,#new_angle=ANGLE_EAST);
-      Send(self,@NewHold,#what=Create(&OrnamentalObject,#type=OO_RAZA_SHRUB),
-           #new_row=21,#new_col=16,#fine_row=0,#fine_col=0,#new_angle=ANGLE_EAST);
 
       Send(self,@NewHold,#what=Create(&Lamp),#new_row=55,#new_col=10,
            #fine_row=24,#fine_col=40,#new_angle=ANGLE_EAST);
@@ -222,6 +210,26 @@ messages:
            #fine_row=32,#fine_col=16,#new_angle=ANGLE_EAST);
       Send(self,@NewHold,#what=Create(&Lamp),#new_row=49,#new_col=22,
            #fine_row=48,#fine_col=48,#new_angle=ANGLE_EAST);
+
+      // Palace avenue lamps, in facing pairs on the kerbs either side of the
+      // road (cols 17-21) from the fountain to the Duke's gate, clear of the
+      // doorways.  Each stands 8 fine units in from the road edge: the west
+      // kerb is fine cols 34-50 of col 16, the east kerb 0-16 of col 22.  The
+      // east lamp of the last pair is the one at row 49 above.
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=15,#new_col=16,
+           #fine_row=32,#fine_col=42,#new_angle=ANGLE_EAST);
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=15,#new_col=22,
+           #fine_row=32,#fine_col=8,#new_angle=ANGLE_EAST);
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=26,#new_col=16,
+           #fine_row=48,#fine_col=42,#new_angle=ANGLE_EAST);
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=26,#new_col=22,
+           #fine_row=48,#fine_col=8,#new_angle=ANGLE_EAST);
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=37,#new_col=16,
+           #fine_row=32,#fine_col=42,#new_angle=ANGLE_EAST);
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=37,#new_col=22,
+           #fine_row=32,#fine_col=8,#new_angle=ANGLE_EAST);
+      Send(self,@NewHold,#what=Create(&Lamp),#new_row=49,#new_col=16,
+           #fine_row=48,#fine_col=42,#new_angle=ANGLE_EAST);
 
       Send(self,@NewHold,#what=Create(&Fountain),#new_row=56,#new_col=18,
            #fine_row=36,#fine_col=36,#new_angle=ANGLE_EAST);
