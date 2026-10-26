@@ -437,8 +437,10 @@ messages:
             return FALSE;
          }
 
+         // Ours: not at a town's own pole, which follows its capture points (as PickFront)
          oFlag = Send(oRoom,@FindHoldingActive,#class=&Flagpole);
          if oFlag = $
+            OR NOT Send(oFlag,@IsClaimable)
          {
             return FALSE;
          }

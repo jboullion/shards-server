@@ -765,6 +765,8 @@ messages:
       if poOwner <> $
       {
          Send(poOwner,@SomethingChanged,#what=self);
+         // Ours: the old holder's troops leave with the pole
+         Send(self,@DismissOtherTroops);
          if piFaction <> FACTION_NEUTRAL
             AND ptGenerateTroops = $
             AND IsClass(poOwner,&MonsterRoom)
@@ -871,6 +873,13 @@ messages:
 
       ptGenerateTroops = CreateTimer(self,@GenerateTroops,piGen_time);
 
+      // Ours: while the lieges' battle is fought here, its armies are the only troops
+      //  (util/factionwar.kod)
+      if Send(Send(SYS,@GetFactionWar),@IsBattleAt,#flag=self)
+      {
+         return;
+      }
+
       oTroop = $;
 
       if piFaction = FACTION_DUKE
@@ -948,6 +957,38 @@ messages:
          }
       }
       else
+      {
+         Send(oTroop,@Delete);
+      }
+
+      return;
+   }
+
+   DismissOtherTroops()
+   "Ours: the pole's own troops (not a battle's armies, nor a town's sentries) of any faction "
+   "but its holder's march away."
+   {
+      local i, oTroop, lGone;
+
+      if poOwner = $
+      {
+         return;
+      }
+
+      lGone = $;
+      foreach i in Send(poOwner,@GetHolderActive)
+      {
+         oTroop = First(i);
+         if IsClass(oTroop,&FactionTroop)
+            AND Send(oTroop,@GetBattle) = $
+            AND Send(oTroop,@GetDuty) = 0
+            AND Send(oTroop,@GetFaction) <> piFaction
+         {
+            lGone = Cons(oTroop,lGone);
+         }
+      }
+
+      foreach oTroop in lGone
       {
          Send(oTroop,@Delete);
       }
