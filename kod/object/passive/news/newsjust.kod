@@ -24,10 +24,17 @@ classvars:
 
 properties:
 
-   // Ours (ADR 0026): the register of name changes keeps more than a globe's 75 posts
+   // Ours (ADR 0026): the register of name changes keeps more than a globe's 75 posts.
+   // (A saved world keeps the value an object was created with, so GetMaxMessages
+   // answers for it, below.)
    piMax_messages = 200
 
 messages:
+
+   GetMaxMessages()
+   {
+      return 200;
+   }
 
    GetNewsPermission(what = $)
    { 

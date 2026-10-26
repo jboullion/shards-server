@@ -237,6 +237,11 @@ resources:
    quest_nothing = "They have no work for you right now."
    quest_not_ready = "You haven't finished that yet."
    quest_cant = "You can't take on that quest."
+   // Ours: a repeatable quest that was done lately (the court's bounties, the dailies)
+   quest_wait_hours = "You've done that one recently.  It will be offered again in %i hours."
+   quest_wait_hour = "You've done that one recently.  It will be offered again in about an hour."
+   quest_wait_minutes = "You've done that one recently.  It will be offered again in %i minutes."
+   quest_wait_soon = "You've done that one recently.  It will be offered again in a minute or so."
    quest_parcel_given = "You are given %s to deliver."
    quest_parcel_missing = \
       "You no longer have what you were to deliver.  Abandon the quest and take it on again."
@@ -1217,6 +1222,54 @@ messages:
 
    ////////////////////////////////////////////////////////////////// taking on and handing in
 
+   TellCooldown(who = $,qrow = $)
+   "Ours: if who did this quest lately and it's waiting on its cooldown, says how long is left "
+   "and returns TRUE; otherwise FALSE (so the plain refusal is given)."
+   {
+      local lDone, iLeft;
+
+      if qrow = $
+         OR Nth(qrow,QB_COOLDOWN) = $
+         OR Send(self,@LogEntry,#who=who,#id=First(qrow)) <> $
+      {
+         return FALSE;
+      }
+
+      lDone = Send(self,@DoneEntry,#who=who,#id=First(qrow));
+      if lDone = $
+      {
+         return FALSE;
+      }
+
+      iLeft = Nth(qrow,QB_COOLDOWN) - (GetTime() - Nth(lDone,QBD_LAST));
+      if iLeft <= 0
+      {
+         return FALSE;
+      }
+
+      if iLeft >= 7200
+      {
+         // Whole hours, rounded up
+         iLeft = (iLeft + 3599) / 3600;
+         Send(who,@MsgSendUser,#message_rsc=quest_wait_hours,#parm1=iLeft);
+      }
+      else if iLeft >= 3600
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_wait_hour);
+      }
+      else if iLeft >= 120
+      {
+         iLeft = (iLeft + 59) / 60;
+         Send(who,@MsgSendUser,#message_rsc=quest_wait_minutes,#parm1=iLeft);
+      }
+      else
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_wait_soon);
+      }
+
+      return TRUE;
+   }
+
    Accept(who = $,id = $,npcobj = $)
    {
       local lQuest;
@@ -1225,9 +1278,18 @@ messages:
       if lQuest = $
          OR NOT Send(self,@NpcMatches,#obj=npcobj,#cls=Nth(lQuest,QB_GIVER_CLASS),
                      #placed=Nth(lQuest,QB_GIVER_PLACED))
-         OR Send(self,@CanOffer,#who=who,#qrow=lQuest) <> QO_OFFER
       {
          Send(who,@MsgSendUser,#message_rsc=quest_cant);
+
+         return;
+      }
+
+      if Send(self,@CanOffer,#who=who,#qrow=lQuest) <> QO_OFFER
+      {
+         if NOT Send(self,@TellCooldown,#who=who,#qrow=lQuest)
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_cant);
+         }
 
          return;
       }
@@ -1300,9 +1362,18 @@ messages:
       if lQuest = $
          OR Nth(lQuest,QB_NEEDS) = $
          OR (Nth(lQuest,QB_NEEDS) & QBQ_ON_BOARD) = 0
-         OR Send(self,@CanOffer,#who=who,#qrow=lQuest,#board=TRUE) <> QO_OFFER
       {
          Send(who,@MsgSendUser,#message_rsc=quest_cant);
+
+         return;
+      }
+
+      if Send(self,@CanOffer,#who=who,#qrow=lQuest,#board=TRUE) <> QO_OFFER
+      {
+         if NOT Send(self,@TellCooldown,#who=who,#qrow=lQuest)
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_cant);
+         }
 
          return;
       }

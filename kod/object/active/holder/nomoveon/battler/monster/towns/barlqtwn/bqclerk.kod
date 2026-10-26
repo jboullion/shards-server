@@ -39,8 +39,8 @@ resources:
       "I can't record that name.  It may be taken, or too long or short, or simply not fit for "
       "the Book of Jala."
    bq_clerk_not_enough = \
-      "The fee is %i shillings, from your purse or your account at the bank in Tos, and you "
-      "don't have it."
+      "The fee is %i shillings, from your purse or from your bank account, and you don't "
+      "have it."
    bq_clerk_name_changed = \
       "~kCaramo dips her quill and writes in the Book of Jala.~n  It is done.  From this day "
       "you are %s."
@@ -91,7 +91,9 @@ messages:
 
    ChangeName(who = $,sName = $)
    "The window's Confirm (`rename <name>`). The name is checked first, so a refused one costs "
-   "nothing. Then the fee, from the purse or else the Tos bank. Then the Book of Jala, and "
+   "nothing. Then the fee, from the purse or else the player's bank account (every banker "
+   "in the world uses the one bank, BID_TOS, so it's the same account wherever they bank). "
+   "Then the Book of Jala, and "
    "System renames them; blakserv sends every client the new name (BP_CHANGE_RESOURCE)."
    {
       local iFee, oMoney, oBank, sOld;

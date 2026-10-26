@@ -2,7 +2,7 @@
   "id": 346,
   "key": "court-bounty-highway-bandits",
   "name": "Highway Bandits",
-  "tier": "main",
+  "tier": "errand",
   "giver": {
     "class": "BarloqueClerk"
   },

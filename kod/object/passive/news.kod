@@ -271,32 +271,41 @@ messages:
       return $;
    }
 
+   GetMaxMessages()
+   "Ours (ADR 0026): how many posts a group keeps. A property is saved with the "
+   "world, so a subclass that wants a different limit overrides this instead of "
+   "relying on its own default: an existing world would keep the old number."
+   {
+      return piMax_messages;
+   }
+
    ClearSpaceToPost()
    {
-      local lOld;
+      local lOld, iMax;
 
       // if we have too many news messages, delete oldest ones
       // to allow one message to be posted
 
-      if Length(plMessages) < piMax_messages
+      iMax = Send(self,@GetMaxMessages);
+      if Length(plMessages) < iMax
       {
          return;
       }
 
-      // unless piMax_messages has been modified, there is only
+      // unless the maximum has been modified, there is only
       // one node to delete.  So, be safe.
 
-      lOld = Nth(plMessages,piMax_messages);
+      lOld = Nth(plMessages,iMax);
       while lOld <> $
       {
          plMessages = DelListElem(plMessages,lOld);
-         if Length(plMessages) < piMax_messages
+         if Length(plMessages) < iMax
          {
             break;
          }
 
-         lOld = Nth(plMessages,piMax_messages);
-      }      
+         lOld = Nth(plMessages,iMax);
+      }
 
       return;
    }

@@ -2,7 +2,7 @@
   "id": 339,
   "key": "court-bounty-sewer-rats",
   "name": "Rats Under the Court",
-  "tier": "main",
+  "tier": "errand",
   "giver": {
     "class": "BarloqueClerk"
   },

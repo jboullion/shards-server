@@ -2,7 +2,7 @@
   "id": 340,
   "key": "court-bounty-shore-blight",
   "name": "Blight on the Shore",
-  "tier": "main",
+  "tier": "errand",
   "giver": {
     "class": "BarloqueClerk"
   },

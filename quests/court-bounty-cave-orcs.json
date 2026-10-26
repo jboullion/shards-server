@@ -2,7 +2,7 @@
   "id": 341,
   "key": "court-bounty-cave-orcs",
   "name": "Orcs in the Deep Caves",
-  "tier": "main",
+  "tier": "errand",
   "giver": {
     "class": "BarloqueClerk"
   },

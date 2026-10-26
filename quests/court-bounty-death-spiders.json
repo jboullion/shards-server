@@ -2,7 +2,7 @@
   "id": 343,
   "key": "court-bounty-death-spiders",
   "name": "Spiders in the Passes",
-  "tier": "main",
+  "tier": "errand",
   "giver": {
     "class": "BarloqueClerk"
   },

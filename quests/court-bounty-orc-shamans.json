@@ -2,7 +2,7 @@
   "id": 344,
   "key": "court-bounty-orc-shamans",
   "name": "The Orc Shaman Warrant",
-  "tier": "main",
+  "tier": "errand",
   "giver": {
     "class": "BarloqueClerk"
   },
