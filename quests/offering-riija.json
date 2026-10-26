@@ -18,7 +18,8 @@
   },
   "text": {
     "offer": "Lord Fool wishes to fortify you. Will you chant with me? Incant these words with me: Your words speak wisdom through me, Lord Riija. Feel your power grow with every word spoken.",
-    "complete": "Behold, the double-edged blessing of Riija. Bear it forth into the world and reap the chaos it sows! Placed at one of the Shrines around the world, it will dedicate the Shrine to Riija."
+    "progress": "The realm's shrines stand in the Forest Shrine past Marion, the Badlands beyond Barloque, the orc caves beyond Tos, the necromancers' arena at Brax and the citizen's market of Barloque. Drop the offering on the ground beside one.",
+    "complete": "Word has spread of your offering: the shrine is Riija's for a day, and all who wield Riija's magic are stronger for it. Come back tomorrow, and we will chant again."
   },
   "steps": [
     {
@@ -26,14 +27,30 @@
       "objective": "Chant the words with them",
       "turnin": {
         "class": "RiijaMonk"
+      },
+      "rewards": {
+        "items": [
+          {
+            "class": "OfferingRiija"
+          }
+        ]
       }
+    },
+    {
+      "kind": "shrine",
+      "school": "riija",
+      "rooms": [
+        "RID_E5",
+        "RID_K5",
+        "RID_ORC_CAVE5",
+        "RID_BRAX_ARENA",
+        "RID_BAR_MARKET"
+      ],
+      "brief": "Behold, the double-edged blessing of Riija. Bear it forth into the world and reap the chaos it sows! Placed at one of the Shrines around the world, it will dedicate the Shrine to Riija."
     }
   ],
   "rewards": {
-    "items": [
-      {
-        "class": "OfferingRiija"
-      }
-    ]
+    "xpPoints": 0.5,
+    "shillings": 300
   }
 }

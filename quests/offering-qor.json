@@ -1,0 +1,56 @@
+{
+  "id": 348,
+  "key": "offering-qor",
+  "name": "An Offering to Qor",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_QOR_OFFERING"
+  ],
+  "giver": {
+    "class": "QorPriestess"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Priestess Zuxana's eyes glitter. \"Qor hungers, little one, and she rewards those who feed her. Give her a taste of what lives in you, and I will bottle it for her. Speak these words with me: By the dark that waits behind every light, I call to thee, Qor, Mistress of Shadow.\"",
+    "progress": "The realm's shrines stand in the Forest Shrine past Marion, the Badlands beyond Barloque, the orc caves beyond Tos, the necromancers' arena at Brax and the citizen's market of Barloque. Drop the offering on the ground beside one.",
+    "complete": "Can you feel it? The shadows are deeper today, and Qor's servants are the stronger for your gift. Return tomorrow. She is always hungry."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "objective": "Chant the words with them",
+      "turnin": {
+        "class": "QorPriestess"
+      },
+      "rewards": {
+        "items": [
+          {
+            "class": "OfferingQor"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "shrine",
+      "school": "qor",
+      "rooms": [
+        "RID_E5",
+        "RID_K5",
+        "RID_ORC_CAVE5",
+        "RID_BRAX_ARENA",
+        "RID_BAR_MARKET"
+      ],
+      "brief": "There. The blood of the innocent, as dark as a moonless sky. Take it to one of the shrines that the fools of the Light have scattered across the realm, and spill it there. For a day, the shrine will be Qor's."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 300
+  }
+}

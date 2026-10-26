@@ -1,0 +1,53 @@
+{
+  "id": 350,
+  "key": "death-realm-marion",
+  "name": "The Realm of Death",
+  "tier": "story",
+  "giver": {
+    "class": "MarionElder"
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "notQuests": [
+      351
+    ]
+  },
+  "text": {
+    "offer": "Ran er'Hoth lowers his voice. \"You broke the statues in the crypt behind my hut, and you are stronger now than you were. So hear this. Below the statues, in the crypt's deepest room, two brothers worked their madness, and they tore a hole into a place of death and red skies. They left a book, 'The Ritual', that says how to open it again. You need six offerings, one for each god: the temples give them to those who pray there each day. Set one on each short pedestal in the brothers' laboratory, with Qor's in the centre, and speak the words: 'Hear me Qor, accept my offer. Open your realm and lend me your strength.' I pray you never do it. But if you must, come back and tell me what is there.\"",
+    "progress": "The Mad Brothers' laboratory is the deepest room of the crypt behind Ran er'Hoth's hut in Marion. Six offerings, one per god, from the temples' daily rites: one on each short pedestal, Qor's in the centre. Then say: \"Hear me Qor, accept my offer. Open your realm and lend me your strength.\"",
+    "complete": "Ran er'Hoth goes pale. \"Red skies, and the dead walking free... Shal'ille keep us. You came back, at least. Few would. Take this, and don't go back unless you mean to fight.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_MAR_CRYPT4"
+      ],
+      "auto": true,
+      "objective": "Find the Mad Brothers' laboratory beneath Marion",
+      "brief": "The laboratory is the crypt's deepest room. Read the book the brothers left there, \"The Ritual\", and set out the six offerings: one on each short pedestal, Qor's in the centre. Then speak the words: \"Hear me Qor, accept my offer. Open your realm and lend me your strength.\""
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_DTEMPLE"
+      ],
+      "auto": true,
+      "objective": "Open the way and enter the Death Realm"
+    },
+    {
+      "kind": "talk",
+      "objective": "Tell what you found",
+      "turnin": {
+        "class": "MarionElder"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "shillings": 2000
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": 347,
+  "key": "offering-shalille",
+  "name": "An Offering to Shal'ille",
+  "tier": "story",
+  "replaces": [
+    "QST_ID_SHALILLE_OFFERING"
+  ],
+  "giver": {
+    "class": "ShalillePriestess"
+  },
+  "band": {
+    "min": 50,
+    "max": 150
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "text": {
+    "offer": "Priestess Xiana smiles. \"Dear one, will you give a little of your own light, so that the Lady's may shine the brighter? Kneel with me, then, and we will shape it into something you can carry. Incant these words with me: By the dawn that ends every night, I call to thee, Shal'ille, Lady of Light.\"",
+    "progress": "The realm's shrines stand in the Forest Shrine past Marion, the Badlands beyond Barloque, the orc caves beyond Tos, the necromancers' arena at Brax and the citizen's market of Barloque. Drop the offering on the ground beside one.",
+    "complete": "The shrine glows with Shal'ille's light, and her healers walk a little taller today. Come back tomorrow, dear one, and we will pray together again."
+  },
+  "steps": [
+    {
+      "kind": "talk",
+      "objective": "Chant the words with them",
+      "turnin": {
+        "class": "ShalillePriestess"
+      },
+      "rewards": {
+        "items": [
+          {
+            "class": "OfferingShalille"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "shrine",
+      "school": "shalille",
+      "rooms": [
+        "RID_E5",
+        "RID_K5",
+        "RID_ORC_CAVE5",
+        "RID_BRAX_ARENA",
+        "RID_BAR_MARKET"
+      ],
+      "brief": "Behold: the tears of a newborn, the Lady's own mercy made solid. Carry them to one of the shrines around the realm and leave them there, and the shrine will belong to Shal'ille for a day."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 300
+  }
+}

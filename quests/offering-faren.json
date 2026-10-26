@@ -18,7 +18,8 @@
   },
   "text": {
     "offer": "Child of our Mistress of the Wilds, will you give of yourself so that your Mother may be stronger? Worship with me, then. Together, we will draw upon our own life essence to form a symbol of the power of nature. Incant these words with me: By the earth, the winds, the seas, and the fire inside, I summon thee, Faren, Mistress of the Wilds.",
-    "complete": "Behold, the Turbulence of Nature manifest! Go now, carry forth the power of our Mistress into the world! Placed at one of the Shrines around the world, it will dedicate the Shrine to Faren."
+    "progress": "The realm's shrines stand in the Forest Shrine past Marion, the Badlands beyond Barloque, the orc caves beyond Tos, the necromancers' arena at Brax and the citizen's market of Barloque. Drop the offering on the ground beside one.",
+    "complete": "Word has spread of your offering: the shrine is Faren's for a day, and all who wield Faren's magic are stronger for it. Come back tomorrow, and we will chant again."
   },
   "steps": [
     {
@@ -26,14 +27,30 @@
       "objective": "Chant the words with them",
       "turnin": {
         "class": "FarenPriestess"
+      },
+      "rewards": {
+        "items": [
+          {
+            "class": "OfferingFaren"
+          }
+        ]
       }
+    },
+    {
+      "kind": "shrine",
+      "school": "faren",
+      "rooms": [
+        "RID_E5",
+        "RID_K5",
+        "RID_ORC_CAVE5",
+        "RID_BRAX_ARENA",
+        "RID_BAR_MARKET"
+      ],
+      "brief": "Behold, the Turbulence of Nature manifest! Go now, carry forth the power of our Mistress into the world! Placed at one of the Shrines around the world, it will dedicate the Shrine to Faren."
     }
   ],
   "rewards": {
-    "items": [
-      {
-        "class": "OfferingFaren"
-      }
-    ]
+    "xpPoints": 0.5,
+    "shillings": 300
   }
 }

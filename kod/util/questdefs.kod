@@ -338,12 +338,18 @@ resources:
    qd_85_name = "An Offering to Faren"
    qd_85_s1 = "Chant the words with them"
    qd_85_t1 = "Priestess Tenuv'vyal"
+   qd_85_s2 = "Make an offering to Faren at a shrine"
+   qd_85_t2 = "Priestess Tenuv'vyal"
    qd_86_name = "An Offering to Kraanan"
    qd_86_s1 = "Chant the words with them"
    qd_86_t1 = "Priestess Qerti'nya"
+   qd_86_s2 = "Make an offering to Kraanan at a shrine"
+   qd_86_t2 = "Priestess Qerti'nya"
    qd_87_name = "An Offering to Riija"
    qd_87_s1 = "Chant the words with them"
    qd_87_t1 = "Monk of Riija"
+   qd_87_s2 = "Make an offering to Riija at a shrine"
+   qd_87_t2 = "Monk of Riija"
    qd_88_name = "The Sign of Shal'ille"
    qd_88_s1 = "polished seraphym gathered"
    qd_88_t1 = "Priestess Xiana"
@@ -1003,6 +1009,35 @@ resources:
    qd_346_name = "Highway Bandits"
    qd_346_s1 = "Bandits brought to justice"
    qd_346_t1 = "Caramo"
+   qd_347_name = "An Offering to Shal'ille"
+   qd_347_s1 = "Chant the words with them"
+   qd_347_t1 = "Priestess Xiana"
+   qd_347_s2 = "Make an offering to Shal'ille at a shrine"
+   qd_347_t2 = "Priestess Xiana"
+   qd_348_name = "An Offering to Qor"
+   qd_348_s1 = "Chant the words with them"
+   qd_348_t1 = "Priestess Zuxana"
+   qd_348_s2 = "Make an offering to Qor at a shrine"
+   qd_348_t2 = "Priestess Zuxana"
+   qd_349_name = "An Offering to Jala"
+   qd_349_s1 = "Chant the words with them"
+   qd_349_t1 = "Priestess Themala"
+   qd_349_s2 = "Make an offering to Jala at a shrine"
+   qd_349_t2 = "Priestess Themala"
+   qd_350_name = "The Realm of Death"
+   qd_350_s1 = "Find the Mad Brothers' laboratory beneath Marion"
+   qd_350_t1 = "Ran er'Hoth"
+   qd_350_s2 = "Open the way and enter the Death Realm"
+   qd_350_t2 = "Ran er'Hoth"
+   qd_350_s3 = "Tell what you found"
+   qd_350_t3 = "Ran er'Hoth"
+   qd_351_name = "The Mistress's Realm"
+   qd_351_s1 = "Find the Mad Brothers' laboratory beneath Marion"
+   qd_351_t1 = "Priestess Zuxana"
+   qd_351_s2 = "Open the way and enter the Death Realm"
+   qd_351_t2 = "Priestess Zuxana"
+   qd_351_s3 = "Tell what you found"
+   qd_351_t3 = "Priestess Zuxana"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -1018,7 +1053,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 69531496;
+      return 21236137;
    }
 
    GetQuests()
@@ -1493,20 +1528,26 @@ messages:
          [ 85, qd_85_name, &FarenPriestess, 0, 50, 150, $,
            $, $, 86400, $,
            [ [ 3, $, 1, 0, &FarenPriestess, 0, qd_85_s1, $, $, qd_85_t1,
-               0, $, $, $, 0 ] ],
-           0, 0, [ [ &OfferingFaren, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
+               0, [ 0, 0, 0, [ [ &OfferingFaren, 1 ] ], $, $ ], $, $, 0 ],
+             [ 25, $, 1, 0, &FarenPriestess, 0, qd_85_s2, $, $, qd_85_t2,
+               1, $, $, $, 4 ] ],
+           1301, 300, $, 0, 2, $, $, 0, $, $, $, $ ],
          // offering-kraanan
          [ 86, qd_86_name, &KraananPriestess, 0, 50, 150, $,
            $, $, 86400, $,
            [ [ 3, $, 1, 0, &KraananPriestess, 0, qd_86_s1, $, $, qd_86_t1,
-               0, $, $, $, 0 ] ],
-           0, 0, [ [ &OfferingKraanan, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
+               0, [ 0, 0, 0, [ [ &OfferingKraanan, 1 ] ], $, $ ], $, $, 0 ],
+             [ 25, $, 1, 0, &KraananPriestess, 0, qd_86_s2, $, $, qd_86_t2,
+               1, $, $, $, 3 ] ],
+           1301, 300, $, 0, 2, $, $, 0, $, $, $, $ ],
          // offering-riija
          [ 87, qd_87_name, &RiijaMonk, 0, 50, 150, $,
            $, $, 86400, $,
            [ [ 3, $, 1, 0, &RiijaMonk, 0, qd_87_s1, $, $, qd_87_t1,
-               0, $, $, $, 0 ] ],
-           0, 0, [ [ &OfferingRiija, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
+               0, [ 0, 0, 0, [ [ &OfferingRiija, 1 ] ], $, $ ], $, $, 0 ],
+             [ 25, $, 1, 0, &RiijaMonk, 0, qd_87_s2, $, $, qd_87_t2,
+               1, $, $, $, 5 ] ],
+           1301, 300, $, 0, 2, $, $, 0, $, $, $, $ ],
          // insignia-shalille
          [ 88, qd_88_name, &ShalillePriestess, 0, 50, 150, $,
            $, $, 43200, $,
@@ -2696,7 +2737,53 @@ messages:
            $, $, 86400, $,
            [ [ 1, &Bandit, 6, 1, &BarloqueClerk, 0, qd_346_s1, $, $, qd_346_t1,
                0, $, $, $, 0 ] ],
-           3466, 1000, $, 0, 3, $, $, 0, $, $, 100, $ ]
+           3466, 1000, $, 0, 3, $, $, 0, $, $, 100, $ ],
+         // offering-shalille
+         [ 347, qd_347_name, &ShalillePriestess, 0, 50, 150, $,
+           $, $, 86400, $,
+           [ [ 3, $, 1, 0, &ShalillePriestess, 0, qd_347_s1, $, $, qd_347_t1,
+               0, [ 0, 0, 0, [ [ &OfferingShalille, 1 ] ], $, $ ], $, $, 0 ],
+             [ 25, $, 1, 0, &ShalillePriestess, 0, qd_347_s2, $, $, qd_347_t2,
+               1, $, $, $, 1 ] ],
+           1301, 300, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // offering-qor
+         [ 348, qd_348_name, &QorPriestess, 0, 50, 150, $,
+           $, $, 86400, $,
+           [ [ 3, $, 1, 0, &QorPriestess, 0, qd_348_s1, $, $, qd_348_t1,
+               0, [ 0, 0, 0, [ [ &OfferingQor, 1 ] ], $, $ ], $, $, 0 ],
+             [ 25, $, 1, 0, &QorPriestess, 0, qd_348_s2, $, $, qd_348_t2,
+               1, $, $, $, 2 ] ],
+           1301, 300, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // offering-jala
+         [ 349, qd_349_name, &JalaPriestess, 0, 50, 150, $,
+           $, $, 86400, $,
+           [ [ 3, $, 1, 0, &JalaPriestess, 0, qd_349_s1, $, $, qd_349_t1,
+               0, [ 0, 0, 0, [ [ &OfferingJala, 1 ] ], $, $ ], $, $, 0 ],
+             [ 25, $, 1, 0, &JalaPriestess, 0, qd_349_s2, $, $, qd_349_t2,
+               1, $, $, $, 6 ] ],
+           1301, 300, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // death-realm-marion
+         [ 350, qd_350_name, &MarionElder, 0, 100, 150, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &MarionElder, 0, qd_350_s1, [ 2603 ], $, qd_350_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &MarionElder, 0, qd_350_s2, [ 3028 ], $, qd_350_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &MarionElder, 0, qd_350_s3, $, $, qd_350_t3,
+               0, $, $, $, 0 ] ],
+           15302, 2000, $, 0, 2, $, $, 0, $, [ 351 ], $, $ ]
+         ],
+         [
+         // death-realm-qor
+         [ 351, qd_351_name, &QorPriestess, 0, 100, 150, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &QorPriestess, 0, qd_351_s1, [ 2603 ], $, qd_351_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &QorPriestess, 0, qd_351_s2, [ 3028 ], $, qd_351_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &QorPriestess, 0, qd_351_s3, $, $, qd_351_t3,
+               0, $, $, $, 0 ] ],
+           15302, 2000, $, 0, 2, $, $, 0, $, [ 350 ], $, $ ]
          ]
       ];
    }
@@ -2790,7 +2877,9 @@ messages:
             [ 1, 42, 107 ],
             [ 1, 43, 108 ],
             [ 1, 19, 109 ],
-            [ 1, 21, 111 ]
+            [ 1, 21, 111 ],
+            [ 1, 27, 347 ],
+            [ 1, 26, 348 ]
          ]
       ];
    }

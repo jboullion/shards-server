@@ -1,0 +1,53 @@
+{
+  "id": 351,
+  "key": "death-realm-qor",
+  "name": "The Mistress's Realm",
+  "tier": "story",
+  "giver": {
+    "class": "QorPriestess"
+  },
+  "band": {
+    "min": 100,
+    "max": 150
+  },
+  "requires": {
+    "notQuests": [
+      350
+    ]
+  },
+  "text": {
+    "offer": "Priestess Zuxana leans close. \"You have grown strong. Qor has noticed. There is a door to her realm, little one, a real one: two mad brothers opened it beneath the crypt of Marion, in their laboratory below the stone guardians, and wrote down how in a book they called 'The Ritual'. Bring six offerings, one for each of the gods, even the weaklings of the Light: every temple hands them to its faithful each day. Lay one on each short pedestal, and hers in the centre, where it belongs. Then ask her for her strength, with these words: 'Hear me Qor, accept my offer. Open your realm and lend me your strength.' Go through. Then come back and tell me how she welcomed you.\"",
+    "progress": "The laboratory lies beneath the crypt behind the elder's hut in Marion, past the stone guardians. Six offerings, one per god, from the temples' daily rites: one on each short pedestal, Qor's in the centre. Then say: \"Hear me Qor, accept my offer. Open your realm and lend me your strength.\"",
+    "complete": "Zuxana laughs softly. \"You walked in her realm and came back whole. She will remember you. Take this, with her blessing, and go back whenever you hunger for more.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_MAR_CRYPT4"
+      ],
+      "auto": true,
+      "objective": "Find the Mad Brothers' laboratory beneath Marion",
+      "brief": "The laboratory is the crypt's deepest room. Read the book the brothers left there, \"The Ritual\", and set out the six offerings: one on each short pedestal, Qor's in the centre. Then speak the words: \"Hear me Qor, accept my offer. Open your realm and lend me your strength.\""
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_DTEMPLE"
+      ],
+      "auto": true,
+      "objective": "Open the way and enter the Death Realm"
+    },
+    {
+      "kind": "talk",
+      "objective": "Tell what you found",
+      "turnin": {
+        "class": "QorPriestess"
+      }
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1.5,
+    "shillings": 2000
+  }
+}
