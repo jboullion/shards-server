@@ -1121,7 +1121,7 @@ messages:
 
       lOffers = Send(self,@OffersFrom,#who=who,#npcobj=npcobj);
       // Ours: a tailor or barber says nothing of quests (its menu opens: util/cosmeticsbook.kod),
-      // and some NPCs say why there's nothing (a Guild Master: GuildMaster.SayNoQuests)
+      // and some NPCs say why there's nothing (Frular: GuildCreator.SayNoQuests)
       if lOffers = $ AND Send(npcobj,@GetShardsService) = 0
          AND NOT Send(npcobj,@SayNoQuests,#who=who)
       {

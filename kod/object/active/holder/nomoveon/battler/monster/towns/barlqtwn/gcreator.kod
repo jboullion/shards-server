@@ -14,6 +14,9 @@ constants:
 
    include blakston.khd
 
+   // Ours (guild revamp): the base health the guild story asks (quests 330-338)
+   STORY_HEALTH = 80
+
 resources:
 
    include gcreator.lkod
@@ -69,6 +72,21 @@ resources:
 
    GuildCreator_rent_command = "rent"
 
+   // Ours (guild revamp): Frular gives the guild story (quests 330-338), and says why not
+   // to those it isn't open to yet (SayNoQuests)
+   gcreator_story_no_guild = \
+      "Thy name is on none of my rolls.  Eight of the realm's old guild halls "
+      "have fallen to the Order of Necromancers, and it will take guilds to "
+      "win them back.  Buy a guild's charter from me, or join a guild, and "
+      "come back."
+   gcreator_story_too_weak = \
+      "Thy guild hath need of thee, but not yet.  Come back when thou hast "
+      "80 health, and I shall tell thee what became of the old guild halls."
+   gcreator_shield_warning = \
+      "A word of advice: take off thy soldier's shield while thou art in "
+      "Barloque.  The troops at the north gate care nothing for guilds, only "
+      "for a rival's colours."
+
 classvars:
 
    vrName = GuildCreator_name_rsc
@@ -87,6 +105,47 @@ classvars:
 properties:
 
 messages:
+
+   TryActivate(who = $)
+   "Ours: talking to Frular is talking about the guild story (Monster.TryActivate). A soldier "
+   "wearing a shield hears first that the north gate's troops will go for it."
+   {
+      if who <> $
+         AND IsClass(who,&Player)
+         AND Send(who,@FindUsing,#class=&SoldierShield) <> $
+      {
+         Send(self,@SayToOne,#target=who,#message_rsc=gcreator_shield_warning);
+      }
+
+      propagate;
+   }
+
+   SayNoQuests(who = $)
+   "Monster.SayNoQuests: with no guild, or too little health for the guild story, a player "
+   "hears why, and where the story begins."
+   {
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         return FALSE;
+      }
+
+      if Send(who,@GetGuild) = $
+      {
+         Send(self,@SayToOne,#target=who,#message_rsc=gcreator_story_no_guild);
+
+         return TRUE;
+      }
+
+      if Send(who,@GetBaseMaxHealth) < STORY_HEALTH
+      {
+         Send(self,@SayToOne,#target=who,#message_rsc=gcreator_story_too_weak);
+
+         return TRUE;
+      }
+
+      return FALSE;
+   }
 
    UserEntered(who = $)
    {

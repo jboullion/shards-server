@@ -947,31 +947,31 @@ resources:
    qd_327_t1 = "the guild window"
    qd_330_name = "A Guild's Calling"
    qd_330_s1 = "Visit the Den of Shadows"
-   qd_330_t1 = "any Guild Master"
+   qd_330_t1 = "Frular"
    qd_331_name = "Fallen Halls I: Den of Shadows"
    qd_331_s1 = "Mistress Ysolde brought down in the Den of Shadows"
-   qd_331_t1 = "any Guild Master"
+   qd_331_t1 = "Frular"
    qd_332_name = "Fallen Halls II: Friends of the Forest"
    qd_332_s1 = "Old Blackroot brought down in the home of the Friends of the Forest"
-   qd_332_t1 = "any Guild Master"
+   qd_332_t1 = "Frular"
    qd_333_name = "Fallen Halls III: Muskgate Post"
    qd_333_s1 = "Hrimvald brought down in Muskgate Post"
-   qd_333_t1 = "any Guild Master"
+   qd_333_t1 = "Frular"
    qd_334_name = "Fallen Halls IV: Old Dwarven Hall"
    qd_334_s1 = "Thane Durrek brought down in the Old Dwarven Hall"
-   qd_334_t1 = "any Guild Master"
+   qd_334_t1 = "Frular"
    qd_335_name = "Fallen Halls V: Abandoned Warehouse"
    qd_335_s1 = "Captain Vesk brought down in the Abandoned Warehouse"
-   qd_335_t1 = "any Guild Master"
+   qd_335_t1 = "Frular"
    qd_336_name = "Fallen Halls VI: Sewer Hideout"
    qd_336_s1 = "Grisk, the Sewer King brought down in the Sewer Hideout"
-   qd_336_t1 = "any Guild Master"
+   qd_336_t1 = "Frular"
    qd_337_name = "Fallen Halls VII: Slaughtered Command"
    qd_337_s1 = "Marshal Corvane brought down in the Hall of the Slaughtered Command"
-   qd_337_t1 = "any Guild Master"
+   qd_337_t1 = "Frular"
    qd_338_name = "Fallen Halls VIII: Wetland Fortress"
    qd_338_s1 = "Lieutenant Morvaine brought down in the Wetland Fortress"
-   qd_338_t1 = "any Guild Master"
+   qd_338_t1 = "Frular"
    qd_339_name = "Rats Under the Court"
    qd_339_s1 = "Rat soldiers put down"
    qd_339_t1 = "Caramo"
@@ -1057,7 +1057,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 615502;
+      return 14500377;
    }
 
    GetQuests()
@@ -2619,57 +2619,57 @@ messages:
                1, $, $, $, 719 ] ],
            8671, 2250, $, 0, 1, $, $, 192, $, $, $, $ ],
          // guild-story-a-guilds-calling
-         [ 330, qd_330_name, &GuildMaster, 0, 80, 150, $,
+         [ 330, qd_330_name, &GuildCreator, 0, 80, 150, $,
            $, $, $, $,
-           [ [ 5, $, 1, 0, &GuildMaster, 0, qd_330_s1, [ 703 ], $, qd_330_t1,
+           [ [ 5, $, 1, 0, &GuildCreator, 0, qd_330_s1, [ 703 ], $, qd_330_t1,
                0, $, $, $, 0 ] ],
            1640, 250, $, 0, 2, $, $, 64, $, $, $, $ ],
          // guild-story-den-of-shadows
-         [ 331, qd_331_name, &GuildMaster, 0, 80, 150, [ 330 ],
+         [ 331, qd_331_name, &GuildCreator, 0, 80, 150, [ 330 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_331_s1, $, $, qd_331_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_331_s1, $, $, qd_331_t1,
                0, $, $, $, 703 ] ],
            6561, 1000, $, 0, 2, $, $, 64, [ [ 6, 2 ] ], $, $, $ ],
          // guild-story-friends-of-the-forest
-         [ 332, qd_332_name, &GuildMaster, 0, 90, 150, [ 331 ],
+         [ 332, qd_332_name, &GuildCreator, 0, 90, 150, [ 331 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_332_s1, $, $, qd_332_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_332_s1, $, $, qd_332_t1,
                0, $, $, $, 712 ] ],
            9109, 1500, $, 0, 2, $, $, 64, [ [ 6, 3 ] ], $, $, $ ],
          // guild-story-muskgate-post
-         [ 333, qd_333_name, &GuildMaster, 0, 100, 150, [ 332 ],
+         [ 333, qd_333_name, &GuildCreator, 0, 100, 150, [ 332 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_333_s1, $, $, qd_333_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_333_s1, $, $, qd_333_t1,
                0, $, $, $, 720 ] ],
            12241, 2000, $, 0, 2, $, $, 64, [ [ 6, 4 ] ], $, $, $ ],
          // guild-story-old-dwarven-hall
-         [ 334, qd_334_name, &GuildMaster, 0, 100, 150, [ 333 ],
+         [ 334, qd_334_name, &GuildCreator, 0, 100, 150, [ 333 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_334_s1, $, $, qd_334_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_334_s1, $, $, qd_334_t1,
                0, $, $, $, 706 ] ],
            13261, 2500, $, 0, 2, $, $, 64, [ [ 6, 5 ] ], $, $, $ ],
          // guild-story-abandoned-warehouse
-         [ 335, qd_335_name, &GuildMaster, 0, 100, 150, [ 334 ],
+         [ 335, qd_335_name, &GuildCreator, 0, 100, 150, [ 334 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_335_s1, $, $, qd_335_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_335_s1, $, $, qd_335_t1,
                0, $, $, $, 709 ] ],
            14281, 3000, $, 0, 2, $, $, 64, [ [ 6, 6 ] ], $, $, $ ],
          // guild-story-sewer-hideout
-         [ 336, qd_336_name, &GuildMaster, 0, 100, 150, [ 335 ],
+         [ 336, qd_336_name, &GuildCreator, 0, 100, 150, [ 335 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_336_s1, $, $, qd_336_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_336_s1, $, $, qd_336_t1,
                0, $, $, $, 708 ] ],
            15302, 3500, $, 0, 2, $, $, 64, [ [ 6, 7 ] ], $, $, $ ],
          // guild-story-slaughtered-command
-         [ 337, qd_337_name, &GuildMaster, 0, 100, 150, [ 336 ],
+         [ 337, qd_337_name, &GuildCreator, 0, 100, 150, [ 336 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_337_s1, $, $, qd_337_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_337_s1, $, $, qd_337_t1,
                0, $, $, $, 713 ] ],
            16322, 4000, $, 0, 2, $, $, 64, [ [ 6, 8 ] ], $, $, $ ],
          // guild-story-wetland-fortress
-         [ 338, qd_338_name, &GuildMaster, 0, 100, 150, [ 337 ],
+         [ 338, qd_338_name, &GuildCreator, 0, 100, 150, [ 337 ],
            $, $, $, $,
-           [ [ 24, $, 1, 0, &GuildMaster, 0, qd_338_s1, $, $, qd_338_t1,
+           [ [ 24, $, 1, 0, &GuildCreator, 0, qd_338_s1, $, $, qd_338_t1,
                0, $, $, $, 719 ] ],
            17342, 4500, $, 0, 2, $, $, 64, [ [ 6, 9 ] ], $, $, $ ],
          // court-bounty-sewer-rats

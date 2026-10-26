@@ -60,10 +60,6 @@ messages:
 
    CreateStandardObjects()
    {
-      // Ours (guild revamp, ADR 0022 decision 28): the Princess's Guild Master, beside her
-      Send(self,@NewHold,#what=Create(&PrincessGuildMaster),
-           #new_row=33,#new_col=25,#fine_row=16,#fine_col=16,#new_angle=ANGLE_NORTH);
-
       // throne
 
       Send(self,@NewHold,#what=Create(&PrincessGuard),

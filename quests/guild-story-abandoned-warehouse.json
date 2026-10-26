@@ -4,12 +4,7 @@
   "name": "Fallen Halls V: Abandoned Warehouse",
   "tier": "story",
   "giver": {
-    "class": "GuildMaster",
-    "rooms": [
-      "RID_DUKE3",
-      "RID_CASTLE2C",
-      "RID_JAS_BAR"
-    ]
+    "class": "GuildCreator"
   },
   "band": {
     "min": 100,
