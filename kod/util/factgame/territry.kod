@@ -19,6 +19,10 @@ constants:
    GAME_PART = 1
    GAME_FULL = 2
 
+   // Ours: most untaken flags a liege's hall holds; the hourly flag waits
+   // below it and any beyond it are cleared.
+   FLAG_HALL_MAX = 10
+
 resources:
 
    include territry.lkod
@@ -722,29 +726,77 @@ messages:
 
    GenerateFlagItems()
    {
-      local iMaxFlagItems;
+      local iMaxFlagItems, iDukeHall, iPrincessHall, iRebelHall;
 
       ptGenerateFlagItems = $;
       ptGenerateFlagItems = CreateTimer(self,@GenerateFlagItems,piFlagItemGenTime * 1000 * 60);
       iMaxFlagItems = Length(plFlagRIDs)*2/3;
 
+      // Ours: every hall is tidied each hour, even a liege's at the cap.
+      iDukeHall = Send(self,@TidyHallFlags,#class=&DukeFlag,#rid=RID_DUKE3);
+      iPrincessHall = Send(self,@TidyHallFlags,#class=&PrincessFlag,
+                           #rid=RID_CASTLE2C);
+      iRebelHall = Send(self,@TidyHallFlags,#class=&RebelFlag,#rid=RID_JAS_BAR);
+
       if (Nth(plFlagCounts, (FACTION_DUKE+1)) + piDukeFlagItemCount) < iMaxFlagItems
+         AND iDukeHall < FLAG_HALL_MAX
       {
          Send(Create(&DukeFlag),@TeleportHome);
       }
 
       if (Nth(plFlagCounts, (FACTION_PRINCESS+1)) + piPrincessFlagItemCount) < iMaxFlagItems
+         AND iPrincessHall < FLAG_HALL_MAX
       {
          Send(Create(&PrincessFlag),@TeleportHome);
       }
 
       if (FACTION_NORMAL_MAX > FACTION_PRINCESS) and
             ((Nth(plFlagCounts, (FACTION_REBEL+1)) + piRebelFlagItemCount) < iMaxFlagItems)
+         AND iRebelHall < FLAG_HALL_MAX
       {
          Send(Create(&RebelFlag),@TeleportHome);
       }
 
       return;
+   }
+
+   TidyHallFlags(class=$, rid=$)
+   "Ours: deletes the untaken flags of class beyond FLAG_HALL_MAX lying in "
+   "the liege's hall rid, and returns how many are left there."
+   {
+      local oRoom, i, oObject, lFlags, iCount;
+
+      oRoom = Send(SYS,@FindRoomByNum,#num=rid);
+      if oRoom = $
+      {
+         return 0;
+      }
+
+      lFlags = $;
+      foreach i in Send(oRoom,@GetHolderPassive)
+      {
+         oObject = Send(oRoom,@HolderExtractObject,#data=i);
+         if IsClass(oObject,class)
+         {
+            lFlags = Cons(oObject,lFlags);
+         }
+      }
+
+      // Collected first: deleting a flag changes the room's list.
+      iCount = 0;
+      foreach oObject in lFlags
+      {
+         if iCount < FLAG_HALL_MAX
+         {
+            ++iCount;
+         }
+         else
+         {
+            Send(oObject,@Delete);
+         }
+      }
+
+      return iCount;
    }
 
    IncrementFlagItemCount(flag=$)
