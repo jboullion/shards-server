@@ -34,6 +34,12 @@ resources:
    courtfolk_talk_crowd = \
       "~kThe spectator whispers.~n  Shh!  This is the best part."
 
+   // The judge's gavel (Gavel): BigSoundBank's CC0 recordings, which our client has
+   //  (meridian-browser tools/assets/fetch-sounds.ts); one, two or three blows
+   courtfolk_gavel1 = amb_gavel1.ogg
+   courtfolk_gavel2 = amb_gavel2.ogg
+   courtfolk_gavel3 = amb_gavel3.ogg
+
 classvars:
 
    vrName = courtfolk_name_rsc
@@ -201,9 +207,16 @@ messages:
    ////////////////////////////////////////////////////////////// acting
 
    Gavel()
-   "The judge's gavel: an arm raised and brought down."
+   "The judge's gavel: an arm raised and brought down, and its knocks for the room to hear."
    {
+      local rSound;
+
       Send(self,@DoCast);
+      if poOwner <> $
+      {
+         rSound = Nth([ courtfolk_gavel1, courtfolk_gavel2, courtfolk_gavel3 ],Random(1,3));
+         Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=rSound);
+      }
 
       return;
    }
