@@ -35,7 +35,6 @@ spell_too_soon_since_attacking = de \
 spell_resists = de "%s%s widersteht Deinem Zauber!"
 spell_silenced_rsc = de \
    "Die Worte bleiben Dir im Halse stecken und Du kannst nicht sprechen."
-spell_desc_rsc = de "SCHULE : %s         LEVEL : %i \n\n%s%s%s%r%r%r"
 spell_school_riija = de "Riija"
 spell_school_shalille = de "Shal'ill"
 spell_school_qor = de "Qor"
@@ -69,8 +68,6 @@ spell_disabled = de \
    "Du sie ganz aussprechen kannst."
 spell_display_spellpower = de "Deine Zauberkraft für %s beträgt ~b%i%.~n"
 no_line_of_sight = de "Deine schlechte Sicht macht es noch schwerer zu Zaubern"
-spell_meditate_ratio_rsc = de \
-   "\n\nEs kostet dich %i Trainingspunkte um diesen Zauber zu verbessern."
 spell_Enchantment_type_default_rsc = de "Erzmagier"
 Spell_too_few_hp_rsc = de \
    "Du bist nicht stark genug um diesen Zauber zu benutzen."
@@ -103,7 +100,6 @@ spell_advanced = pt "Você avançou em %s! Sua habilidade está agora em %s."
 spell_too_soon_since_attacking = pt "Você atacou um jogador recentemente demais."
 spell_resists = pt "%s%s resiste às suas tentativas de encantá-lo!"
 spell_silenced_rsc = pt "Suas palavras ficam presas em sua garganta e você não consegue falar."
-spell_desc_rsc = pt "ESCOLA : %s         NÍVEL : %i \n\n%s%s%s%r%r%r"
 spell_school_riija = pt "Riija"
 spell_school_shalille = pt "Shal'ille"
 spell_school_qor = pt "Qor"
@@ -134,8 +130,6 @@ spell_display_spellpower = pt \
    "O poder do feitiço para %s é ~b%i~n."
 no_line_of_sight = pt \
    "Sua visão obstruída torna o lançamento mais difícil."
-spell_meditate_ratio_rsc = pt \
-   "\n\nCustará %i pontos de treinamento para melhorar neste feitiço."
 spell_Enchantment_type_default_rsc = pt "encantador"
 Spell_too_few_hp_rsc = pt "Você não é poderoso o suficiente para lançar este feitiço."
 cannot_cast_on_phased_out = pt \

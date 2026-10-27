@@ -78,29 +78,35 @@ resources:
    spell_fail_wav = spelfail.ogg
    // Ours (spell revamp phase 1): three more %r after the flavour text, for
    //  what the spell does at your spellpower, its costs, and the breakdown.
-   spell_desc_rsc = "SCHOOL : %s         LEVEL : %i \n\n%s%s%s%r%r%r%r%r%r"
+   // Ours (2026-10-27): marked up for our client's Description and Stats tabs:
+   //  the description, then §, then the stats one to a line, "Label¦Value" (a
+   //  label starting · is a sub-row), and lines without ¦ are notes (an
+   //  enchantment's own lines). LookDialogs.tsx and lookText.ts read it.
+   spell_desc_rsc = "%s%s%s§\nSchool¦%s\nLevel¦%i%r%r%r%r%r%r"
    spell_nl = "\n"
    spell_nl2 = "\n\n"
 
-   spell_effect_rsc = "\n\n~BAt your spellpower:~B %r"
+   spell_effect_rsc = "\nAt your spellpower¦%r"
 
-   spell_costs_rsc = "%r~BCosts:~B %r%r%r%r%r%r%r%r.%r%r"
-   spell_costs_mana = "%i mana"
-   spell_costs_mana_upkeep = "%i mana, then %i more every %i.%i seconds while it lasts"
-spell_costs_no_mana = "no mana"
-   spell_costs_vigor = ", %i vigor"
+   spell_costs_rsc = "%r%r%r%r%r%r%r%r%r%r%r"
+   spell_costs_mana = "\nMana¦%i"
+   spell_costs_mana_upkeep = "\nMana¦%i, then %i more every %i.%i seconds while it lasts"
+   spell_costs_no_mana = "\nMana¦none"
+   spell_costs_vigor = "\nVigor¦%i"
+   spell_costs_reagent_first = "\nReagents¦%i %s"
    spell_costs_reagent = ", %i %s"
+   spell_costs_reagent_unknown_first = "\nReagents¦%i other reagents"
    spell_costs_reagent_unknown = ", %i other reagents"
    spell_costs_more = ", and more"
-   spell_costs_cast_time = " Takes %i.%i seconds to cast."
-   spell_costs_recovery = " Your next spell can follow %i seconds later."
-   spell_costs_recovery_one = " Your next spell can follow a second later."
+   spell_costs_cast_time = "\nCast time¦%i.%i seconds"
+   spell_costs_recovery = "\nRecovery¦%i seconds"
+   spell_costs_recovery_one = "\nRecovery¦a second"
 
    spell_power_rsc = \
-      "\n\n~BSpellpower %i~B (the most is %i)%r"
+      "\nSpellpower¦%i (the most is %i)%r"
       "%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r"
    spell_pp_unknown = "\nYou don't know this spell yet."
-   spell_pp_line = "\n   %r: %s%i"
+   spell_pp_line = "\n·%r¦%s%i"
    spell_pp_plus = "+"
    spell_pp_immortal = "Immortal"
    spell_pp_ability = "Half your %s ability (%i%%)"
@@ -180,8 +186,7 @@ spell_costs_no_mana = "no mana"
    no_line_of_sight = \
       "Your hindered line of sight makes casting more difficult."
 
-   spell_meditate_ratio_rsc = \
-      "\n\nIt will cost you %i training points to improve in this spell."
+   spell_meditate_ratio_rsc = "\nTraining¦%i points to improve"
 
    spell_Enchantment_type_default_rsc = "enchanter"
 
@@ -391,8 +396,8 @@ messages:
 
          rExtra = Send(self,@GetExtraDesc);
 
-         AddPacket(4,spell_desc_rsc, 4,rSchool, 4,viSpell_Level, 4,vrDesc,
-                   4,rOutlaw, 4,rExtra);
+         AddPacket(4,spell_desc_rsc, 4,vrDesc, 4,rOutlaw, 4,rExtra,
+                   4,rSchool, 4,viSpell_Level);
 
          Send(self,@SendTrueEffectsDesc,#who=who);
 
@@ -469,17 +474,10 @@ messages:
    "Ours (spell revamp D1): mana, vigor, reagents, cast time and recovery, "
    "as they are for who."
    {
-      local i, iCount, iExertion, iTime, oReagent, iNumber, lUpkeep;
+      local i, iCount, iExertion, iTime, oReagent, iNumber, lUpkeep, rKnown, rUnknown;
 
-      AddPacket(4,spell_costs_rsc);
-      if bAfterEffect
-      {
-         AddPacket(4,spell_nl);
-      }
-      else
-      {
-         AddPacket(4,spell_nl2);
-      }
+      // (The first slot was a line or two of space before "Costs:"; rows need none)
+      AddPacket(4,spell_costs_rsc, 4,spell_blank);
 
       iNumber = Send(self,@GetManaCost,#who=who,#iSpellPower=iSpellPower);
       // Ours (spell revamp playtest): a song or held trance's upkeep too.
@@ -517,24 +515,33 @@ messages:
          {
             iNumber = Nth(i,2);
             oReagent = Send(SYS,@FindTemplateItemByClass,#cClass=First(i));
+            // The first opens the Reagents row; the rest follow it, after a comma
+            rUnknown = spell_costs_reagent_unknown;
+            rKnown = spell_costs_reagent;
+            if iCount = 1
+            {
+               rUnknown = spell_costs_reagent_unknown_first;
+               rKnown = spell_costs_reagent_first;
+            }
+
             if oReagent = $
             {
-               AddPacket(4,spell_costs_reagent_unknown, 4,iNumber);
+               AddPacket(4,rUnknown, 4,iNumber);
             }
             else if iNumber > 1
                AND IsClass(oReagent,&NumberItem)
             {
-               AddPacket(4,spell_costs_reagent, 4,iNumber,
+               AddPacket(4,rKnown, 4,iNumber,
                          4,Send(oReagent,@GetPluralName));
             }
             else if IsClass(oReagent,&NumberItem)
             {
-               AddPacket(4,spell_costs_reagent, 4,iNumber,
+               AddPacket(4,rKnown, 4,iNumber,
                          4,Send(oReagent,@GetSingularName));
             }
             else
             {
-               AddPacket(4,spell_costs_reagent, 4,iNumber,
+               AddPacket(4,rKnown, 4,iNumber,
                          4,Send(oReagent,@GetName));
             }
          }
