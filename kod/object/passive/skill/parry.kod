@@ -18,6 +18,7 @@ resources:
 
    include parry.lkod
 
+   parry_effect_rsc = "+%i to your defense while you wield a weapon you can parry with (not a bow)."
    parry_name_rsc = "parry"
    parry_icon_rsc = parryico.bgf
    parry_desc_rsc = "Parrying allows people with a weapon to turn aside a blow, thus avoiding being hit."
@@ -59,6 +60,19 @@ messages:
       propagate;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: Player.GetParryAbility: the ability, to the defense, with a melee weapon."
+   {
+      AddPacket(4,parry_effect_rsc, 4,iAbility);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

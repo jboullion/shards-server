@@ -18,6 +18,8 @@ resources:
 
    include profic.lkod
 
+   proficiency_effect_rsc = \
+      "+%i to your offense, and +%i.%i damage, then %i%% more from your stats."
    proficiency_name_rsc = "Weapon proficiency"
    proficiency_icon_rsc = light.bgf
    proficiency_desc_rsc = "This is a weapon proficiency"
@@ -49,6 +51,29 @@ properties:
 
 messages:
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: Player's offense (twice the proficiency) and Stroke.DamageFactors: (ability+1) x 5 "
+   "hundredths of damage, then a percentage from the stat and Might."
+   {
+      local iHundredths, iStat, iMight, iPercent;
+
+      iHundredths = (iAbility + 1) * 5;
+      iStat = Send(self,@GetRequisiteStat,#who=who) - 25;
+      iMight = Send(who,@GetMight) - 25;
+      iStat = (iStat + iMight) / 2;
+      iPercent = Bound(iStat * (iAbility + 1) / 100, 0, 40);
+
+      AddPacket(4,proficiency_effect_rsc, 4,2 * iAbility, 4,iHundredths / 100,
+                4,(iHundredths % 100) / 10, 4,iPercent);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

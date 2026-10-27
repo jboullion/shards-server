@@ -17,6 +17,9 @@ constants:
 resources:
 
    include block.lkod
+   block_effect_rsc = \
+      "Your shield gives +%i to your defense, and a %i%% chance to soften each hit with its armour."
+   block_effect_none_rsc = "With a shield: +%i to your defense, and more from the shield itself."
    Block_name_rsc = "block"
    Block_icon_rsc = iblock.bgf
    Block_desc_rsc = "Block is a basic skill, allowing people in combat to block blows with a shield.  "
@@ -52,6 +55,33 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: Shield.GetBlockAbility (the shield's bonus and the ability, at most 120, to the "
+   "defense) and ModifyDefenseDamage's check (SuccessChance with the shield's bonus)."
+   {
+      local oShield, iStat, iChance;
+
+      oShield = Send(who,@LookupPlayerShield);
+      if oShield = $
+      {
+         AddPacket(4,block_effect_none_rsc, 4,iAbility);
+
+         return;
+      }
+
+      iStat = Send(self,@GetRequisiteStat,#who=who);
+      iChance = ((100 - iStat) * iAbility / 100) + iStat + Send(oShield,@GetBlockAbility);
+      AddPacket(4,block_effect_rsc, 4,Send(oShield,@GetBlockAbility,#who=who),
+                4,Bound(iChance,0,100));
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

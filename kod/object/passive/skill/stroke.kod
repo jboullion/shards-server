@@ -19,6 +19,7 @@ constants:
 resources:
 
    include stroke.lkod
+   stroke_effect_rsc = "+%i to your offense."
    stroke_name_rsc = "Weapon stroke"
    stroke_icon_rsc = light.bgf
    stroke_desc_rsc = "This is a weapon stroke."
@@ -360,6 +361,25 @@ messages:
    GetHitSound()
    {
       return stroke_hit_sound;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: Player's offense: twice the stroke's ability."
+   {
+      AddPacket(4,stroke_effect_rsc, 4,2 * iAbility);
+
+      return;
+   }
+
+   GetVigorPerUse()
+   "Ours: PayCosts adds 1000 x viSkillExertion exertion, a tenth of a vigor for each."
+   {
+      return viSkillExertion;
    }
 
 end

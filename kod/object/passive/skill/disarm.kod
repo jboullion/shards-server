@@ -20,6 +20,8 @@ constants:
 resources:
 
    include disarm.lkod
+   disarm_effect_rsc = \
+      "A %i%% chance on each hit; a monster is held 2 to 6 seconds.  Thrusting weapons do better, blunt ones worse."
    Disarm_name_rsc = "disarm"
    Disarm_icon_rsc = idisarm.bgf
    Disarm_desc_rsc = "A technique that allows a warrior to strike at his or her opponent's weapon.  Often "
@@ -198,6 +200,23 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: SuccessChance with no weapon's modifier: Random(1,100) < num, so num - 1 percent."
+   {
+      local iStat, iNum;
+
+      iStat = Send(self,@GetRequisiteStat,#who=who);
+      iNum = (((100 - iStat) * iAbility / 100) + iStat + 1) / DISARM_FACTOR;
+      AddPacket(4,disarm_effect_rsc, 4,Bound(iNum - 1,0,100));
+
+      return;
    }
 
 end

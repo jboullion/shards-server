@@ -19,6 +19,8 @@ resources:
 
    include secwind.lkod
 
+   secondwind_effect_rsc = \
+      "When your vigor drops below 60, a %i%% chance to regain %i vigor; you then rest up to %i."
    SecondWind_name_rsc = "second wind"
    SecondWind_icon_rsc = isecwind.bgf
    SecondWind_desc_rsc = \
@@ -175,6 +177,24 @@ messages:
       // This message picks the appropriate resources for the duration given,
       // and sends them to the user.
       Send(self,@SendTimeRemaining,#iTime=iDuration);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: Skill.SuccessChance with Stamina, DoSkill's 40 + Stamina/2 + ability, and the rest "
+   "limit after it (Player: 80 + (ability+1)/5)."
+   {
+      local iStat;
+
+      iStat = Send(self,@GetRequisiteStat,#who=who);
+      AddPacket(4,secondwind_effect_rsc, 4,Bound(((100 - iStat) * iAbility / 100) + iStat,0,100),
+                4,40 + (iStat / 2) + iAbility, 4,80 + ((iAbility + 1) / 5));
 
       return;
    }

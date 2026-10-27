@@ -17,6 +17,7 @@ constants:
 resources:
 
    include dodge.lkod
+   dodge_effect_rsc = "+%i to your defense (none while you are held)."
    dodge_name_rsc = "dodge"
    dodge_icon_rsc = dodgeico.bgf
    dodge_desc_rsc = "Dodge is a basic skill, allowing people to avoid blows in combat."
@@ -60,6 +61,19 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iAbility=0)
+   "Ours: Player.GetDodgeAbility: twice the ability, to the defense."
+   {
+      AddPacket(4,dodge_effect_rsc, 4,2 * iAbility);
+
+      return;
    }
 
 end
