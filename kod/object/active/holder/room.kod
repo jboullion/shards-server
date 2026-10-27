@@ -2661,6 +2661,19 @@ messages:
       return TRUE;
    }
 
+   CanWalkLine(what = $, line_row1 = $, line_col1 = $, line_row2 = $, line_col2 = $)
+   "Ours: whether what could walk straight from one square's middle to another's (no wall, "
+   "hedge or ledge between)."
+   {
+      if what = $ OR line_row1 = $ OR line_col1 = $ OR line_row2 = $ OR line_col2 = $
+      {
+         return FALSE;
+      }
+
+      return CanMoveInRoomBSP(prmRoom,line_row1,line_col1,FINENESS_HALF,FINENESS_HALF,
+                              line_row2,line_col2,FINENESS_HALF,FINENESS_HALF,what,FALSE);
+   }
+
    LineOfSight(obj1 = $, obj2 = $)
    "Returns TRUE if there is a line of sight between obj1 and obj2"
    {

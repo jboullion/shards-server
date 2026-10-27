@@ -4,10 +4,11 @@
 //
 //   Celebrations  A liege who takes a town (TerritoryGame.RecalcTownFlags -> TownChanged), or
 //                 wins WIN_STREAK battles running (BattleWon), celebrates for CELEBRATE_MINUTES
-//                 in their capital and the town won: their standards go up round the town pole,
-//                 their soldiers make merry there (FactionTroop.SetDuty, DUTY_REVELLER), a
-//                 fanfare sounds, members who come get a day's boon of the liege's stat, and
-//                 merchants there sell to members for CELEBRATE_DISCOUNT percent less.
+//                 in their capital and the town won: their standards (WarStandard, a pole
+//                 flying their flag) go up round the town pole, their soldiers make merry
+//                 there (FactionTroop.SetDuty, DUTY_REVELLER: they cheer and dance), a fanfare
+//                 sounds every FANFARE_TICKS, members who come get a day's boon of the liege's
+//                 stat, and merchants there sell to members for CELEBRATE_DISCOUNT percent less.
 //   Mourning      A liege who loses a town lowers the flags of their capital to half-staff for
 //                 MOURN_MINUTES, and laments it in their hall.
 //   Occupation    A town's liege posts SENTRIES guards at its pole (DUTY_SENTRY; SyncSentries),
@@ -35,6 +36,13 @@ constants:
    OCCUPY_DISCOUNT = 10
    BOON_AMOUNT = 5
    TICK_MS = 15000
+   // Each tick, a reveller cheers one time in CHEER_CHANCE and dances one in DANCE_CHANCE;
+   //  the fanfare sounds again every FANFARE_TICKS (4 minutes)
+   CHEER_CHANCE = 4
+   DANCE_CHANCE = 3
+   FANFARE_TICKS = 16
+   // Standards stand at least this many squares from the pole, and from each other
+   STANDARD_GAP = 2
    LEDGER_SIZE = 10
 
    // FactionTroop.SetDuty (troop.kod has the same)
@@ -67,13 +75,6 @@ resources:
    fw_lament_princess = "~IKateriina lowers her eyes.  \"We will win back %s.  We must.\""
    fw_lament_rebel = "~IJonas slams his tankard down.  \"They took %s.  Not for long.\""
 
-   fw_standard_duke_name = "standard of Duke Akardius"
-   fw_standard_princess_name = "standard of Princess Kateriina"
-   fw_standard_rebel_name = "standard of Jonas D'Accor"
-   fw_standard_duke_icon = flagdinv.bgf
-   fw_standard_princess_icon = flagpinv.bgf
-   fw_standard_rebel_icon = flagjinv.bgf
-   fw_standard_desc = "Raised for the celebrations, this standard snaps in the wind."
    fanfare_sound = fanfare1.ogg
 
    fw_ledger_trigger = "ledger"
@@ -90,6 +91,7 @@ properties:
    // Battles won running: [ Duke, Princess, Rebels ]
    plStreak = $
    ptTick = $
+   piTicks = 0
 
 messages:
 
@@ -495,8 +497,8 @@ messages:
          while i < STANDARDS
          {
             i = i + 1;
-            oThing = Send(self,@MakeStandard,#faction=faction);
-            if Send(self,@PlaceNearPole,#where=oRoom,#what=oThing,#spread=3,#bMob=FALSE)
+            oThing = Create(&WarStandard,#faction=faction);
+            if Send(self,@PlaceStandard,#where=oRoom,#what=oThing,#spread=5)
             {
                lStandards = Cons(oThing,lStandards);
             }
@@ -504,11 +506,7 @@ messages:
 
          SetNth(lCeleb,5,lStandards);
 
-         oThing = Send(self,@TownPole,#rid=iRID);
-         if oThing <> $
-         {
-            Send(oRoom,@SomethingWaveRoom,#what=oThing,#wave_rsc=fanfare_sound);
-         }
+         Send(self,@Fanfare,#where=oRoom);
       }
 
       if ptTick = $
@@ -519,24 +517,58 @@ messages:
       return;
    }
 
-   MakeStandard(faction = $)
+   PlaceStandard(where = $,what = $,spread = 5)
+   "A standard on open ground near the pole: STANDARD_GAP from it and from other standards, dry, "
+   "and walkable to from the pole (not in a hedge or over a wall). Returns whether it was "
+   "placed; if not, it's deleted."
    {
-      local rName, rIcon;
+      local oPole, iTry, iRow, iCol, iPoleRow, iPoleCol, i, oThing, bNear;
 
-      rName = fw_standard_rebel_name;
-      rIcon = fw_standard_rebel_icon;
-      if faction = FACTION_DUKE
+      oPole = Send(where,@FindHoldingActive,#class=&Flagpole);
+      if oPole <> $
       {
-         rName = fw_standard_duke_name;
-         rIcon = fw_standard_duke_icon;
-      }
-      else if faction = FACTION_PRINCESS
-      {
-         rName = fw_standard_princess_name;
-         rIcon = fw_standard_princess_icon;
+         iPoleRow = Send(oPole,@GetRow);
+         iPoleCol = Send(oPole,@GetCol);
+         iTry = 0;
+         while iTry < 30
+         {
+            iTry = iTry + 1;
+            iRow = iPoleRow + Random(-spread,spread);
+            iCol = iPoleCol + Random(-spread,spread);
+            if iRow < 1 OR iCol < 1
+               OR (Abs(iRow - iPoleRow) < STANDARD_GAP AND Abs(iCol - iPoleCol) < STANDARD_GAP)
+               OR Send(where,@IsWaterAt,#row=iRow,#col=iCol)
+               OR NOT Send(where,@CanWalkLine,#what=oPole,#line_row1=iPoleRow,
+                           #line_col1=iPoleCol,#line_row2=iRow,#line_col2=iCol)
+            {
+               continue;
+            }
+
+            bNear = FALSE;
+            foreach i in Send(where,@GetHolderPassive)
+            {
+               oThing = First(i);
+               if IsClass(oThing,&WarStandard)
+                  AND Abs(Send(oThing,@GetRow) - iRow) < STANDARD_GAP
+                  AND Abs(Send(oThing,@GetCol) - iCol) < STANDARD_GAP
+               {
+                  bNear = TRUE;
+               }
+            }
+
+            if NOT bNear
+               AND Send(where,@ReqNewHold,#what=what,#new_row=iRow,#new_col=iCol)
+            {
+               Send(where,@NewHold,#what=what,#new_row=iRow,#new_col=iCol);
+
+               return TRUE;
+            }
+         }
       }
 
-      return Create(&OrnamentalObject,#rName=rName,#rIcon=rIcon,#rDesc=fw_standard_desc);
+      Send(what,@Delete);
+
+      return FALSE;
    }
 
    PlaceNearPole(where = $,what = $,spread = 3,bMob = FALSE)
@@ -584,6 +616,7 @@ messages:
 
       ptTick = $;
       lEnded = $;
+      piTicks = piTicks + 1;
 
       foreach i in plCelebrations
       {
@@ -595,6 +628,14 @@ messages:
          }
 
          Send(self,@Cheer,#celebration=i);
+
+         if piTicks % FANFARE_TICKS = 0
+         {
+            foreach oRoom in Nth(i,3)
+            {
+               Send(self,@Fanfare,#where=oRoom);
+            }
+         }
 
          foreach oRoom in Nth(i,3)
          {
@@ -616,22 +657,10 @@ messages:
    }
 
    Cheer(celebration = $)
+   "Each reveller cheers one tick in CHEER_CHANCE, and dances (its attack swing, as a toast) "
+   "one in DANCE_CHANCE."
    {
-      local lRevellers, oReveller, iFaction, lLines;
-
-      lRevellers = Nth(celebration,4);
-      if lRevellers = $
-         OR Random(1,3) <> 1
-      {
-         return;
-      }
-
-      oReveller = Nth(lRevellers,Random(1,Length(lRevellers)));
-      if NOT IsObject(oReveller)
-         OR Send(oReveller,@GetOwner) = $
-      {
-         return;
-      }
+      local oReveller, iFaction, lLines, oRoom;
 
       iFaction = First(celebration);
       lLines = [ fw_cheer_rebel1, fw_cheer_rebel2, fw_cheer_rebel3 ];
@@ -644,8 +673,43 @@ messages:
          lLines = [ fw_cheer_princess1, fw_cheer_princess2, fw_cheer_princess3 ];
       }
 
-      Send(Send(oReveller,@GetOwner),@SomeoneSaid,#what=oReveller,#type=SAY_RESOURCE,
-           #string=Nth(lLines,Random(1,Length(lLines))));
+      foreach oReveller in Nth(celebration,4)
+      {
+         if NOT IsObject(oReveller)
+         {
+            continue;
+         }
+
+         oRoom = Send(oReveller,@GetOwner);
+         if oRoom = $
+         {
+            continue;
+         }
+
+         if Random(1,CHEER_CHANCE) = 1
+         {
+            Send(oRoom,@SomeoneSaid,#what=oReveller,#type=SAY_RESOURCE,
+                 #string=Nth(lLines,Random(1,Length(lLines))));
+            Send(oReveller,@Dance);
+         }
+         else if Random(1,DANCE_CHANCE) = 1
+         {
+            Send(oReveller,@Dance);
+         }
+      }
+
+      return;
+   }
+
+   Fanfare(where = $)
+   {
+      local oPole;
+
+      oPole = Send(where,@FindHoldingActive,#class=&Flagpole);
+      if oPole <> $
+      {
+         Send(where,@SomethingWaveRoom,#what=oPole,#wave_rsc=fanfare_sound);
+      }
 
       return;
    }
@@ -735,6 +799,19 @@ messages:
       }
 
       return;
+   }
+
+   CelebrateIn(faction = $,rid = $)
+   "For the admin: faction celebrates in the town rid now (Celebrate)."
+   {
+      if rid = $
+      {
+         return FALSE;
+      }
+
+      Send(self,@Celebrate,#faction=faction,#places=[ rid ]);
+
+      return TRUE;
    }
 
    EndAllCelebrations()

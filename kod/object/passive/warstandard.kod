@@ -1,0 +1,84 @@
+// Ours (Meridian Shards, the faction revamp; docs/adr/0021): a liege's standard, planted for a
+// celebration (util/factionworld.kod Celebrate). A wooden pole flying the liege's flag, the
+// same art as a town's pole; only something to look at, never claimed.
+////////////////////////////////////////////////////////////////////////////////
+WarStandard is PassiveObject
+
+constants:
+
+   include blakston.khd
+
+   // The flag's hotspot on the pole (as Flagpole's)
+   HS_FLAG = 1
+   FRAME_START = 1
+   FRAME_END = 6
+
+resources:
+
+   warstandard_name_duke = "standard of Duke Akardius"
+   warstandard_name_princess = "standard of Princess Kateriina"
+   warstandard_name_rebel = "standard of Jonas D'Accor"
+   warstandard_icon = flagpole.bgf
+   warstandard_flag_duke = flagduke.bgf
+   warstandard_flag_princess = flagprnc.bgf
+   warstandard_flag_rebel = flagjspr.bgf
+   warstandard_desc = "Raised for the celebrations, this standard snaps in the wind."
+
+classvars:
+
+   vrIcon = warstandard_icon
+   vrDesc = warstandard_desc
+
+properties:
+
+   vrName = warstandard_name_rebel
+   piFaction = FACTION_REBEL
+
+messages:
+
+   Constructor(faction = FACTION_REBEL)
+   {
+      piFaction = faction;
+      vrName = warstandard_name_rebel;
+      if faction = FACTION_DUKE
+      {
+         vrName = warstandard_name_duke;
+      }
+      else if faction = FACTION_PRINCESS
+      {
+         vrName = warstandard_name_princess;
+      }
+
+      propagate;
+   }
+
+   GetFaction()
+   {
+      return piFaction;
+   }
+
+   SendOverlays()
+   "The liege's flag, waving at the top of the pole (as Flagpole's)."
+   {
+      AddPacket(1,1);
+      if piFaction = FACTION_DUKE
+      {
+         AddPacket(4,warstandard_flag_duke);
+      }
+      else if piFaction = FACTION_PRINCESS
+      {
+         AddPacket(4,warstandard_flag_princess);
+      }
+      else
+      {
+         AddPacket(4,warstandard_flag_rebel);
+      }
+
+      AddPacket(1,HS_FLAG);
+      AddPacket(1,ANIMATE_CYCLE,4,100,2,FRAME_START,2,FRAME_END);
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

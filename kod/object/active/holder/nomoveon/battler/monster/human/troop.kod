@@ -535,11 +535,27 @@ messages:
       return piDuty;
    }
 
+   Dance()
+   "A reveller's toast (FactionWorld.Cheer): one swing of the arm, as a monster's cast."
+   {
+      if poOwner = $
+      {
+         return;
+      }
+
+      piAnimation = ANIM_ATTACK;
+      Send(poOwner,@SomethingChanged,#what=self);
+      piAnimation = ANIM_NONE;
+
+      return;
+   }
+
    TweakBehavior()
    {
       if piDuty = DUTY_REVELLER
       {
-         piBehavior = AI_NPC | AI_NOFIGHT;
+         // Ours: they mill about the square (FactionWorld.Cheer makes them dance)
+         piBehavior = AI_NPC | AI_NOFIGHT | AI_MOVE_RANDOM;
 
          return;
       }
