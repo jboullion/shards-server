@@ -20,7 +20,8 @@ resources:
    include secwind.lkod
 
    secondwind_effect_rsc = \
-      "When your vigor drops below 60, a %i%% chance to regain %i vigor; you then rest up to %i."
+      "When your vigor drops below 60, a %i%% chance to regain %i vigor.  For %i seconds after, "
+      "resting and food give you no vigor; then you rest up to %i."
    SecondWind_name_rsc = "second wind"
    SecondWind_icon_rsc = isecwind.bgf
    SecondWind_desc_rsc = \
@@ -118,10 +119,19 @@ messages:
 
       iStamina = Send(self,@GetRequisiteStat,#who=who);
       iWaitTime = ((100-iStamina) * Send(who,@GetSkillAbility,#Skill_num=viSkill_num)/100) + iStamina;
-      // 5 to 10 minutes wait time before you can leap into the action again.
-      iWaitTime = (600 - (iWaitTime*3)) * 1; // * 1000
+      // Ours (2026-10-27): 3 minutes at the least down to 1 at the most before you can regain
+      //  vigor again; it was meant to be 5 to 10 minutes, but passed seconds where CreateTimer
+      //  takes milliseconds, so it was well under a second.
+      iWaitTime = Send(self,@GetWaitSeconds,#iChance=iWaitTime) * 1000;
 
       return iWaitTime;
+   }
+
+   GetWaitSeconds(iChance=0)
+   "Ours: the lockout in seconds for a chance of 0 to 100 (Stamina and the ability, as "
+   "SuccessChance): 180 down to 60."
+   {
+      return 180 - (Bound(iChance,0,100) * 120 / 100);
    }
 
    GetInitialChance(who = $)
@@ -190,11 +200,12 @@ messages:
    "Ours: Skill.SuccessChance with Stamina, DoSkill's 40 + Stamina/2 + ability, and the rest "
    "limit after it (Player: 80 + (ability+1)/5)."
    {
-      local iStat;
+      local iStat, iChance;
 
       iStat = Send(self,@GetRequisiteStat,#who=who);
-      AddPacket(4,secondwind_effect_rsc, 4,Bound(((100 - iStat) * iAbility / 100) + iStat,0,100),
-                4,40 + (iStat / 2) + iAbility, 4,80 + ((iAbility + 1) / 5));
+      iChance = Bound(((100 - iStat) * iAbility / 100) + iStat,0,100);
+      AddPacket(4,secondwind_effect_rsc, 4,iChance, 4,40 + (iStat / 2) + iAbility,
+                4,Send(self,@GetWaitSeconds,#iChance=iChance), 4,80 + ((iAbility + 1) / 5));
 
       return;
    }
