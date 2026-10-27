@@ -27,7 +27,7 @@ resources:
    room_name_castle2c = "The Assembly Chamber"
 
 
-   castle2c_music = castle.ogg
+   castle2c_music = princess.ogg
 
 classvars:
 

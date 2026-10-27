@@ -1,5 +1,8 @@
 {
- "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it); 'from' starts a new sprite (a variant the kod points at, not yet served) from another sprite's frames, our restyle of it if there is one. 'recolour': 'greys' puts the item's neutral part (its largest light grey patch, e.g. a plain stone) in the grey ramp, so the item's palette translation colours it, and keeps every other pixel out of it.",
+ "_doc": "Per-icon settings for iconforge. mode 'generate' draws a new icon from 'describe' and the style references only (the current art is not sent); 'output' writes under another file name (the kod must point at it); 'from' starts a new sprite (a variant the kod points at, not yet served) from another sprite's frames, our restyle of it if there is one. 'recolour': 'greys' puts the item's neutral part (its largest light grey patch, e.g. a plain stone) in the grey ramp, so the item's palette translation colours it, and keeps every other pixel out of it. 'orig_shrink' fits the new icon to the original as if drawn at that shrink, where its own is wrong (pumppie.bgf is shrink 1, so it filled a room).",
+ "pumppie.bgf": {
+  "orig_shrink": 26
+ },
  "icebolt.bgf": {
   "mode": "generate",
   "output": "iiceshrd.bgf",

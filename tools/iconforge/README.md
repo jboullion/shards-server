@@ -126,6 +126,18 @@ python tools/iconforge/weapon.py masterwand --install
 - Outputs go to `build/iconforge/weapon/<name>/`. `preview.png` shows the old frames, the new ones, and the new ones in each school's colour. `raw.png` is cached; `--force` asks the model again.
 - `--install` also replaces the copies `forge.py install` would otherwise copy back over these.
 
+## The red nose (`rednose.py`)
+
+```
+python tools/iconforge/rednose.py --install
+```
+
+The red nose mask's 104 fan art (`mmrednose.bgf`, `mfrednose.bgf`) was a ball 200 px across at shrink 1, as big worn as on the ground. The script draws the ball itself, so no model is needed: shaded in the grey ramp, which the mask's `PT_GRAY_TO_LRED` turns red, with a white glint.
+
+- The worn views hang from `HS_TOUPEE`, like the carrot nose's. Each view sits on the tip of the face's nose: the head's hotspot 14 plus that gender's nose bitmaps, averaged. The back views are blank, as the face's are.
+- It's at shrink 14, the face parts' own. The ground frame is 32 fine units across, about the carrot nose's size; the inventory shows it too.
+- Outputs go to `build/iconforge/rednose/`, with `preview.png` (both heads, every view). `--install` also replaces the kept icon, which `forge.py install` would otherwise copy back.
+
 ## Guild cloaks (`cloak.ts`)
 
 ```

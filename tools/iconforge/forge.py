@@ -624,7 +624,8 @@ def cmd_batch(a):
                         if gen is None:
                             raise KeyError("frame %d failed" % fi)
                         o_n = ovr.get(n, {})
-                        new[fi] = pixelize(gen, b.bitmaps[fi], b.shrink, a.shrink, pal, outline=a.outline,
+                        # `orig_shrink`: the size to fit it to, where the original's own shrink is wrong
+                        new[fi] = pixelize(gen, b.bitmaps[fi], o_n.get("orig_shrink", b.shrink), a.shrink, pal, outline=a.outline,
                                            fit_object=o_n.get("mode") == "generate",
                                            greys=o_n.get("recolour") == "greys")
                 except (KeyError, ValueError) as e:

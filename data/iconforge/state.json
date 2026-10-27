@@ -1,5 +1,5 @@
 {
- "next_batch": 35,
+ "next_batch": 38,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -3123,6 +3123,309 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\033\\plainamulet\\v0.bgf"
+   }
+  },
+  "pumppie.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "035",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "pumppie.bgf",
+   "chosen": {
+    "batch": "035",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\035\\pumppie\\v0.bgf"
+   }
+  },
+  "carrotplant.bgf": {
+   "status": "installed",
+   "attempts": 2,
+   "notes": [
+    "Draw three carrot plants side by side, like the original, not one."
+   ],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "reject"
+    },
+    {
+     "batch": "037",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "carrotplant.bgf",
+   "chosen": {
+    "batch": "037",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\037\\carrotplant\\v0.bgf"
+   }
+  },
+  "commonoats.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "commonoats.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\commonoats\\v0.bgf"
+   }
+  },
+  "cornbasket.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "cornbasket.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\cornbasket\\v0.bgf"
+   }
+  },
+  "cornstalk.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "cornstalk.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\cornstalk\\v0.bgf"
+   }
+  },
+  "ham.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "ham.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\ham\\v0.bgf"
+   }
+  },
+  "henhouse.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "henhouse.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\henhouse\\v0.bgf"
+   }
+  },
+  "pecanpie.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "pecanpie.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\pecanpie\\v0.bgf"
+   }
+  },
+  "potatoplant.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "potatoplant.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\potatoplant\\v0.bgf"
+   }
+  },
+  "rouladen.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "rouladen.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\rouladen\\v0.bgf"
+   }
+  },
+  "tomatoplant.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "tomatoplant.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\tomatoplant\\v0.bgf"
+   }
+  },
+  "turkey.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "turkey.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\turkey\\v0.bgf"
+   }
+  },
+  "watermelonpatch.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "watermelonpatch.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\watermelonpatch\\v0.bgf"
+   }
+  },
+  "wheatplant.bgf": {
+   "status": "installed",
+   "attempts": 1,
+   "notes": [],
+   "history": [
+    {
+     "batch": "036",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    }
+   ],
+   "output": "wheatplant.bgf",
+   "chosen": {
+    "batch": "036",
+    "spec": "openai",
+    "variant": 0,
+    "bgf": "build\\iconforge\\batches\\036\\wheatplant\\v0.bgf"
    }
   }
  }

@@ -1,11 +1,11 @@
 {
  "counts": {
-  "original": 544,
-  "check": 81,
-  "fanart": 191,
+  "original": 549,
+  "check": 85,
+  "fanart": 204,
   "missing": 1
  },
- "selected": 132,
+ "selected": 146,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -63,6 +63,25 @@
     64
    ],
    "selected": true
+  },
+  {
+   "name": "appletree.bgf",
+   "kind": "item",
+   "status": "check",
+   "classes": [
+    "Apple"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\appletree.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 2,
+   "groups": 2,
+   "size": [
+    200,
+    256
+   ],
+   "selected": false
   },
   {
    "name": "arrow.bgf",
@@ -822,6 +841,44 @@
    "selected": true
   },
   {
+   "name": "carrotplant.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Carrot"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\carrotplant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 15,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    509,
+    509
+   ],
+   "selected": true
+  },
+  {
+   "name": "cauldron.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "Soup"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cauldron.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    128,
+    128
+   ],
+   "selected": false
+  },
+  {
    "name": "chainamr.bgf",
    "kind": "item",
    "status": "original",
@@ -963,6 +1020,25 @@
    "selected": true
   },
   {
+   "name": "commonoats.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Oats"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\commonoats.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 9,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    512,
+    626
+   ],
+   "selected": true
+  },
+  {
    "name": "cookie.bgf",
    "kind": "item",
    "status": "check",
@@ -982,6 +1058,25 @@
    "selected": true
   },
   {
+   "name": "cornbasket.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Corn"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cornbasket.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 15,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    400,
+    300
+   ],
+   "selected": true
+  },
+  {
    "name": "corncob.bgf",
    "kind": "item",
    "status": "fanart",
@@ -997,6 +1092,25 @@
    "size": [
     256,
     220
+   ],
+   "selected": true
+  },
+  {
+   "name": "cornstalk.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "EarCorn"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\cornstalk.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 8,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    102,
+    448
    ],
    "selected": true
   },
@@ -1191,6 +1305,25 @@
     443
    ],
    "selected": true
+  },
+  {
+   "name": "drumspla.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "Drumstick"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\drumspla.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    150,
+    51
+   ],
+   "selected": false
   },
   {
    "name": "drumstik.bgf",
@@ -1668,6 +1801,25 @@
    "selected": true
   },
   {
+   "name": "ftnbaskt.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "FortuneCookie"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ftnbaskt.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    128,
+    76
+   ],
+   "selected": false
+  },
+  {
    "name": "ftncooky.bgf",
    "kind": "item",
    "status": "original",
@@ -1692,6 +1844,7 @@
    "status": "original",
    "classes": [
     "BrawlGloves",
+    "FistOfKraanan",
     "FistWeapons",
     "Gauntlet"
    ],
@@ -1840,6 +1993,25 @@
     512
    ],
    "selected": true
+  },
+  {
+   "name": "grapepla.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "Grapes"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\grapepla.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 5,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    150,
+    59
+   ],
+   "selected": false
   },
   {
    "name": "grapes.bgf",
@@ -1994,6 +2166,25 @@
    "selected": false
   },
   {
+   "name": "ham.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Ham"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ham.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 15,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    281,
+    179
+   ],
+   "selected": true
+  },
+  {
    "name": "hammer.bgf",
    "kind": "item",
    "status": "original",
@@ -2071,6 +2262,25 @@
     251
    ],
    "selected": false
+  },
+  {
+   "name": "henhouse.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Eggs"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\henhouse.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 6,
+   "bitmaps": 8,
+   "groups": 1,
+   "size": [
+    336,
+    306
+   ],
+   "selected": true
   },
   {
    "name": "herb.bgf",
@@ -2438,6 +2648,25 @@
    "selected": true
   },
   {
+   "name": "lever.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "NumberItem"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lever.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 3,
+   "bitmaps": 2,
+   "groups": 2,
+   "size": [
+    204,
+    145
+   ],
+   "selected": false
+  },
+  {
    "name": "lgskirt.bgf",
    "kind": "item",
    "status": "original",
@@ -2625,6 +2854,7 @@
    "kind": "item",
    "status": "original",
    "classes": [
+    "GuildRecallStone",
     "ManaCrystal"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\manacrys.bgf",
@@ -3283,6 +3513,25 @@
    "selected": true
   },
   {
+   "name": "orangetree.bgf",
+   "kind": "item",
+   "status": "check",
+   "classes": [
+    "Orange"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\orangetree.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    200,
+    256
+   ],
+   "selected": false
+  },
+  {
    "name": "orcpitbx.bgf",
    "kind": "item/monster",
    "status": "original",
@@ -3498,6 +3747,44 @@
    "selected": true
   },
   {
+   "name": "peartree.bgf",
+   "kind": "item",
+   "status": "check",
+   "classes": [
+    "Pear"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\peartree.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 2,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    164,
+    256
+   ],
+   "selected": false
+  },
+  {
+   "name": "pecanpie.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "PecanPie"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\pecanpie.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 40,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    920,
+    554
+   ],
+   "selected": true
+  },
+  {
    "name": "pecanslice.bgf",
    "kind": "item",
    "status": "fanart",
@@ -3517,6 +3804,25 @@
    "selected": true
   },
   {
+   "name": "pig.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "Pork"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\pig.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 8,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    200,
+    115
+   ],
+   "selected": false
+  },
+  {
    "name": "pilgrimhat.bgf",
    "kind": "item",
    "status": "fanart",
@@ -3534,6 +3840,27 @@
     400
    ],
    "selected": true
+  },
+  {
+   "name": "pitcher.bgf",
+   "kind": "item",
+   "status": "original",
+   "classes": [
+    "Goblet",
+    "KocatanMug",
+    "Mug"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\pitcher.bgf",
+   "in_classic": true,
+   "restyled": false,
+   "shrink": 8,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    150,
+    150
+   ],
+   "selected": false
   },
   {
    "name": "plaguemaskm.bgf",
@@ -3561,36 +3888,36 @@
    "classes": [
     "PlainAmulet"
    ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\amulet.bgf",
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\plainamulet.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "from": "amulet.bgf",
-   "shrink": 3,
+   "shrink": 5,
    "bitmaps": 2,
    "groups": 2,
    "size": [
-    64,
-    64
+    82,
+    107
    ],
    "selected": true
   },
   {
    "name": "plainring.bgf",
    "kind": "item",
-   "status": "fanart",
+   "status": "check",
    "classes": [
     "PlainRing"
    ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ring1.bgf",
+   "source": "J:\\m59-shards-server\\shards-server\\resource\\graphics\\shards\\plainring.bgf",
    "in_classic": false,
-   "restyled": false,
+   "restyled": true,
    "from": "ring1.bgf",
-   "shrink": 15,
+   "shrink": 5,
    "bitmaps": 2,
    "groups": 2,
    "size": [
-    128,
-    128
+    43,
+    43
    ],
    "selected": true
   },
@@ -3687,6 +4014,25 @@
    "size": [
     332,
     198
+   ],
+   "selected": true
+  },
+  {
+   "name": "potatoplant.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Potatoes"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\potatoplant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 30,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    576,
+    736
    ],
    "selected": true
   },
@@ -3826,6 +4172,25 @@
    "size": [
     759,
     883
+   ],
+   "selected": true
+  },
+  {
+   "name": "pumppie.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "PumpkinPie"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\pumppie.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 1,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    600,
+    361
    ],
    "selected": true
   },
@@ -4538,6 +4903,25 @@
    "selected": true
   },
   {
+   "name": "rouladen.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Rouladen"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\rouladen.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 40,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    900,
+    540
+   ],
+   "selected": true
+  },
+  {
    "name": "rshield.bgf",
    "kind": "item",
    "status": "original",
@@ -4728,8 +5112,7 @@
    "kind": "item",
    "status": "original",
    "classes": [
-    "BallotItem",
-    "NameChangeScroll"
+    "BallotItem"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\scr02.bgf",
    "in_classic": true,
@@ -5231,6 +5614,7 @@
    "kind": "item",
    "status": "fanart",
    "classes": [
+    "QorsBlade",
     "SpiritualSword"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\spirsword.bgf",
@@ -5550,6 +5934,25 @@
    "selected": true
   },
   {
+   "name": "tomatoplant.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Tomato"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\tomatoplant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    600,
+    600
+   ],
+   "selected": true
+  },
+  {
    "name": "torch.bgf",
    "kind": "item",
    "status": "original",
@@ -5606,6 +6009,25 @@
     255
    ],
    "selected": false
+  },
+  {
+   "name": "turkey.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "TurkeyLeg"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\turkey.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 40,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    840,
+    859
+   ],
+   "selected": true
   },
   {
    "name": "twnblad.bgf",
@@ -5855,6 +6277,25 @@
    "selected": true
   },
   {
+   "name": "watermelonpatch.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Watermelon"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\watermelonpatch.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 10,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    302,
+    206
+   ],
+   "selected": true
+  },
+  {
    "name": "watermelonslice.bgf",
    "kind": "item",
    "status": "fanart",
@@ -5910,6 +6351,25 @@
     133
    ],
    "selected": false
+  },
+  {
+   "name": "wheatplant.bgf",
+   "kind": "item",
+   "status": "fanart",
+   "classes": [
+    "Flour"
+   ],
+   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\wheatplant.bgf",
+   "in_classic": false,
+   "restyled": false,
+   "shrink": 7,
+   "bitmaps": 1,
+   "groups": 1,
+   "size": [
+    142,
+    457
+   ],
+   "selected": true
   },
   {
    "name": "whelm.bgf",
@@ -7386,6 +7846,7 @@
    "kind": "spell",
    "status": "original",
    "classes": [
+    "Burn",
     "Debuff",
     "Heat",
     "PersonalEnchantment",
@@ -7562,6 +8023,7 @@
    "kind": "spell",
    "status": "check",
    "classes": [
+    "Chill",
     "Freezing",
     "IceNova"
    ],
@@ -8631,25 +9093,6 @@
    "selected": false
   },
   {
-   "name": "ishatlok.bgf",
-   "kind": "spell",
-   "status": "original",
-   "classes": [
-    "ShatterLock"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ishatlok.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 1,
-   "bitmaps": 2,
-   "groups": 2,
-   "size": [
-    64,
-    64
-   ],
-   "selected": false
-  },
-  {
    "name": "ishatter.bgf",
    "kind": "spell",
    "status": "original",
@@ -9035,6 +9478,7 @@
    "kind": "spell",
    "status": "original",
    "classes": [
+    "Bewildered",
     "Vertigo"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\ivertigo.bgf",
@@ -12887,25 +13331,6 @@
    "selected": false
   },
   {
-   "name": "lichax.bgf",
-   "kind": "monster",
-   "status": "original",
-   "classes": [
-    "DeadLich"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lichax.bgf",
-   "in_classic": true,
-   "restyled": false,
-   "shrink": 3,
-   "bitmaps": 1,
-   "groups": 1,
-   "size": [
-    127,
-    26
-   ],
-   "selected": false
-  },
-  {
    "name": "lichb.bgf",
    "kind": "monster",
    "status": "original",
@@ -12929,7 +13354,6 @@
    "kind": "monster",
    "status": "original",
    "classes": [
-    "DeadLich",
     "Lich"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\lichbx.bgf",

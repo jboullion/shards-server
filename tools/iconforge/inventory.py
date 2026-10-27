@@ -4,7 +4,8 @@ Step 1: find every item icon and flag the ones that look like fan art.
     python tools/iconforge/forge.py inventory
 
 Reads the item, spell and skill classes (kod/object/item, kod/object/passive/spell and /skill) for
-the .bgf each one shows as its icon (vrIcon, vrIcon_male, vrIcon_female), finds the file the game serves for each, and compares it
+the .bgf each one shows as its icon (vrIcon, vrIcon_male, vrIcon_female; a food's vrDisp_icon, the
+whole dish its dispenser shows on a table), finds the file the game serves for each, and compares it
 with the classic Steam client's copy:
 
     fanart    not in the classic client (or changed since) AND high-res: shrink >= 15 or a side >= 300 px.
@@ -56,7 +57,7 @@ HIGHRES_SHRINK = 15
 HIGHRES_SIDE = 300
 
 RSC_RE = re.compile(r"^\s*(\w+)\s*=\s*([\w\-]+\.bgf)\b", re.M | re.I)
-ICON_RE = re.compile(r"^\s*(vrIcon\w*|vrDead_icon\w*)\s*=\s*(\w+)", re.M)
+ICON_RE = re.compile(r"^\s*(vrIcon\w*|vrDead_icon\w*|vrDisp_icon\w*)\s*=\s*(\w+)", re.M)
 CLASS_RE = re.compile(r"^(\w+)\s+is\s+\w+", re.M)
 
 
