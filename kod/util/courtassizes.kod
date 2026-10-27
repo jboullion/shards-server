@@ -562,20 +562,31 @@ messages:
       if seat
       {
          lHome = Send(self,@Home,#role=role);
-         Send(self,@PlaceAt,#what=oFolk,#row=First(lHome),#col=Nth(lHome,2),
-              #angle=Nth(lHome,3));
+         if Length(lHome) >= 5
+         {
+            Send(self,@PlaceAt,#what=oFolk,#row=First(lHome),#col=Nth(lHome,2),
+                 #angle=Nth(lHome,3),#fine_row=Nth(lHome,4),#fine_col=Nth(lHome,5));
+         }
+         else
+         {
+            Send(self,@PlaceAt,#what=oFolk,#row=First(lHome),#col=Nth(lHome,2),
+                 #angle=Nth(lHome,3));
+         }
       }
 
       return oFolk;
    }
 
    Home(role = 0)
-   "[ row, col, angle ]: where each of the court stands. The bench is along the south wall, "
-   "the witness stand beside it; the advocates and the accused face it."
+   "[ row, col, angle ] or [ row, col, angle, fine row, fine col ]: where each of the court "
+   "stands. The bench is along the south wall, the witness stand beside it; the advocates and "
+   "the accused face it."
    {
+      // The bench's platform runs from row 13 to the south wall at 14.5 (barcourt.room.json):
+      //  the middle of it, not row 14's centre, which is in the wall
       if role = COURT_ROLE_JUDGE
       {
-         return [ 14, 7, ANGLE_NORTH ];
+         return [ 13, 7, ANGLE_NORTH, 44, 8 ];
       }
 
       if role = COURT_ROLE_BAILIFF
@@ -607,7 +618,8 @@ messages:
       return [ 10, 3, ANGLE_EAST ];
    }
 
-   PlaceAt(what = $,row = 1,col = 1,angle = ANGLE_SOUTH)
+   PlaceAt(what = $,row = 1,col = 1,angle = ANGLE_SOUTH,fine_row = FINENESS_HALF,
+           fine_col = FINENESS_HALF)
    {
       if poRoom = $ OR what = $
       {
@@ -615,7 +627,7 @@ messages:
       }
 
       Send(SYS,@UtilGoNearSquare,#what=what,#where=poRoom,#new_row=row,#new_col=col,
-           #new_angle=angle,#mob_override=TRUE);
+           #new_angle=angle,#mob_override=TRUE,#fine_row=fine_row,#fine_col=fine_col);
 
       return;
    }
