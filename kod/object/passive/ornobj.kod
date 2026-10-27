@@ -631,7 +631,7 @@ resources:
    oo_modlute_desc = "A plaque below the model reads:\nThe instrument of the common bard."
    oo_modprism_name = "model prism"
    oo_modprism_icon = prism3.bgf
-   oo_modprism_desc = "A plaque below the model reads:\nA powerful device allowing multiple casters to combine their energies into more powerful spells."
+   oo_modprism_desc = "A plaque below the model reads:\nA guild's prism.  Set upon the pedestal in a guild's hall, it lends its colour's gift to as many of the guild as it has sides."
    oo_modinkycap_name = "wax inkycap mushrooms"
    oo_modinkycap_icon = mushroom.bgf
    oo_modinkycap_desc = "A plaque below the model reads:\nRich and meaty in texture, inkycap mushrooms are considered ambrosia by the populace of Meridian, and their restorative properties are widely documented."

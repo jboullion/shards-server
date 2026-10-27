@@ -1,0 +1,194 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+PrismPedestal is PassiveObject
+
+// Ours (ADR 0022 decision 34, 2026-10-26): the pedestal in every guild hall, near its trophy case
+// (GuildHall.PlacePrismPedestal). It shows the prism of the guild that holds the hall
+// (Guild.GetPrism; the prism itself is kept by the guild, out of the world, so a rebuilt room
+// can't lose it), and looking at it tells its gift and who is attuned.
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   prismped_icon_rsc = guildaltar.bgf
+   prismped_name_rsc = "prism pedestal"
+   prismped_desc_rsc = "%q"
+
+   prismped_empty = \
+      "A pedestal of polished stone, carved to hold a prism.  It stands empty.  A Lord of the "
+      "guild may set a prism upon it by saying \"prism place\"."
+   prismped_intro = "A pedestal of polished stone, bearing "
+   prismped_sides_1 = ", a prism of "
+   prismped_sides_2 = " sides."
+   prismped_side_2 = " side."
+   prismped_attuned_1 = "  "
+   prismped_attuned_2 = " of "
+   prismped_attuned_3 = " attuned"
+   prismped_attuned_none = "  Nobody is attuned to it yet"
+   prismped_colon = ": "
+   prismped_comma = ", "
+   prismped_end = "."
+   prismped_how = \
+      "\n\nA member may say \"attune\" near it to take a place, and \"unattune\" to give it up."
+
+classvars:
+
+   viMoveOn_type = MOVEON_NO
+
+   vrName = prismped_name_rsc
+   vrIcon = prismped_icon_rsc
+   vrDesc = prismped_desc_rsc
+
+properties:
+
+messages:
+
+   GetGuild()
+   {
+      if poOwner = $
+      {
+         return $;
+      }
+
+      return Send(poOwner,@GetGuildOwner);
+   }
+
+   GetPrism()
+   {
+      local oGuild;
+
+      oGuild = Send(self,@GetGuild);
+      if oGuild = $
+      {
+         return $;
+      }
+
+      return Send(oGuild,@GetPrism);
+   }
+
+   GetIcon()
+   {
+      local oPrism;
+
+      oPrism = Send(self,@GetPrism);
+      if oPrism <> $
+      {
+         return Send(oPrism,@GetIcon);
+      }
+
+      return vrIcon;
+   }
+
+   GetName()
+   {
+      local oPrism;
+
+      oPrism = Send(self,@GetPrism);
+      if oPrism <> $
+      {
+         return Send(oPrism,@GetName);
+      }
+
+      return vrName;
+   }
+
+   SendAnimation()
+   {
+      local oPrism;
+
+      oPrism = Send(self,@GetPrism);
+      if oPrism <> $
+         AND Send(oPrism,@GetPaletteTranslation) <> 0
+      {
+         AddPacket(1,ANIMATE_TRANSLATION, 1,Send(oPrism,@GetPaletteTranslation));
+      }
+
+      propagate;
+   }
+
+   Refresh()
+   "The guild's prism came or went: draw it again."
+   {
+      if poOwner <> $
+      {
+         Send(poOwner,@SomethingChanged,#what=self);
+      }
+
+      return;
+   }
+
+   ShowDesc()
+   {
+      local oGuild, oPrism, lAttuned, i, bFirst;
+
+      oGuild = Send(self,@GetGuild);
+      oPrism = Send(self,@GetPrism);
+      ClearTempString();
+      if oPrism = $
+      {
+         AppendTempString(prismped_empty);
+         AddPacket(4,vrDesc, 4,GetTempString());
+
+         return;
+      }
+
+      AppendTempString(prismped_intro);
+      AppendTempString(Send(oPrism,@GetIndef));
+      AppendTempString(Send(oPrism,@GetName));
+      AppendTempString(prismped_sides_1);
+      AppendTempString(Send(oPrism,@GetNumSides));
+      if Send(oPrism,@GetNumSides) = 1
+      {
+         AppendTempString(prismped_side_2);
+      }
+      else
+      {
+         AppendTempString(prismped_sides_2);
+      }
+
+      lAttuned = Send(oGuild,@GetPrismAttuned);
+      if lAttuned = $
+      {
+         AppendTempString(prismped_attuned_none);
+      }
+      else
+      {
+         AppendTempString(prismped_attuned_1);
+         AppendTempString(Length(lAttuned));
+         AppendTempString(prismped_attuned_2);
+         AppendTempString(Send(oPrism,@GetNumSides));
+         AppendTempString(prismped_attuned_3);
+         AppendTempString(prismped_colon);
+         bFirst = TRUE;
+         foreach i in lAttuned
+         {
+            if NOT bFirst
+            {
+               AppendTempString(prismped_comma);
+            }
+
+            bFirst = FALSE;
+            AppendTempString(Send(i,@GetTrueName));
+         }
+      }
+
+      AppendTempString(prismped_end);
+      AppendTempString(prismped_how);
+      AddPacket(4,vrDesc, 4,GetTempString());
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

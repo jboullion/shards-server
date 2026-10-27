@@ -11,6 +11,7 @@ BOFS = animate.bof \
 	   boon.bof \
        bait.bof \
        bewilder.bof \
+       bldinher.bof \
        brittle.bof \
        brthlife.bof \
        burn.bof \
@@ -34,15 +35,16 @@ BOFS = animate.bof \
        forsight.bof \
        heal.bof \
        holysymb.bof \
+       hunt.bof \
        illform.bof \
        itemench.bof \
        manabomb.bof \
        morph.bof \
-       multicst.bof \
        mysttch.bof \
        nodebrst.bof \
        persench.bof \
        portlife.bof \
+       prismatt.bof \
        purge.bof \
        purify.bof \
        radiusench.bof \

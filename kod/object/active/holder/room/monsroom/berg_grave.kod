@@ -15,7 +15,6 @@ constants:
    include blakston.khd
 
    SECTOR_DOOR = 1
-   SEC_PRISM_ZONE = 99
 
 resources:
 

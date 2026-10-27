@@ -1,0 +1,168 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours (ADR 0022 decision 34, 2026-10-26): attunement to a guild's prism (item/passitem/prism.kod),
+// an enchantment with no end while it lasts, its state the prism's colour. Never cast: the
+// guild starts and ends it (Guild.PrismCommand, EndPrismAttunement). The enchantment carries
+// what needs undoing (Ruby's health, Sapphire's mana, Amber's blows); the rest is read from
+// Player.GetPrismColour where it's worked out (experience, spellpower, regeneration).
+PrismAttunement is Spell
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   prismatt_name_rsc = "prism attunement"
+   prismatt_icon_rsc = prism3.bgf
+   prismatt_desc_rsc = \
+      "You are attuned to your guild's prism, and share in its gift while it stands in your "
+      "guild's hall."
+   prismatt_on = "~BYou attune yourself to %s%s, and feel its gift settle upon you."
+   prismatt_off = "Your attunement to your guild's prism fades."
+
+classvars:
+
+   vrName = prismatt_name_rsc
+   vrIcon = prismatt_icon_rsc
+   vrDesc = prismatt_desc_rsc
+
+   viSpell_num = SID_PRISM_ATTUNEMENT
+   viSchool = SS_DM_COMMAND
+   viSpell_level = 50
+   viMana = 0
+   viSpellExertion = 0
+
+properties:
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+
+      return;
+   }
+
+   CanPayCosts(who = $, lTargets = $)
+   "Never cast: only a guild attunes (Attune)."
+   {
+      return FALSE;
+   }
+
+   Attune(who = $, oPrism = $)
+   "who takes up the gift of oPrism (Guild.PrismCommand)."
+   {
+      local iColour;
+
+      if who = $ OR oPrism = $
+      {
+         return;
+      }
+
+      if Send(who,@IsEnchanted,#what=self)
+      {
+         Send(who,@RemoveEnchantment,#what=self,#report=FALSE);
+      }
+
+      iColour = Send(oPrism,@GetColour);
+      Send(who,@SetPrismColour,#colour=iColour);
+      Send(who,@StartEnchantment,#what=self,#state=iColour,
+           #time=SPELL_INDEFINITE_DURATION,#lastcall=TRUE,#addicon=TRUE);
+
+      if iColour = PRISM_COLOUR_RUBY
+      {
+         Send(who,@GainMaxHealth,#amount=PRISM_HEALTH);
+      }
+      else if iColour = PRISM_COLOUR_SAPPHIRE
+      {
+         Send(who,@ComputeMaxMana);
+      }
+      else if iColour = PRISM_COLOUR_AMBER
+      {
+         Send(who,@AddAttackModifier,#what=self);
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=prismatt_on,
+           #parm1=Send(oPrism,@GetDef),#parm2=Send(oPrism,@GetName));
+
+      return;
+   }
+
+   EndEnchantment(who = $, report = TRUE, state = 0)
+   {
+      Send(who,@SetPrismColour,#colour=PRISM_COLOUR_NONE);
+
+      if state = PRISM_COLOUR_RUBY
+      {
+         Send(who,@GainMaxHealth,#amount=-PRISM_HEALTH);
+      }
+      else if state = PRISM_COLOUR_SAPPHIRE
+      {
+         // Once the enchantment has gone from the list
+         Post(who,@ComputeMaxMana);
+      }
+      else if state = PRISM_COLOUR_AMBER
+      {
+         Send(who,@RemoveAttackModifier,#what=self);
+      }
+
+      if report
+      {
+         Send(who,@MsgSendUser,#message_rsc=prismatt_off);
+      }
+
+      return;
+   }
+
+   AffectsMaxMana()
+   {
+      return TRUE;
+   }
+
+   GetManaBonus(state = 0)
+   {
+      if state = PRISM_COLOUR_SAPPHIRE
+      {
+         return PRISM_MANA;
+      }
+
+      return 0;
+   }
+
+   // Amber's blows: an attack modifier (Player.AddAttackModifier)
+
+   ModifyHitRoll(who = $, what = $, hit_roll = $)
+   {
+      return hit_roll;
+   }
+
+   ModifyDamage(who = $, what = $, damage = $)
+   "PRISM_DAMAGE_PERCENT more, the fraction of a point given by chance."
+   {
+      local iTimes;
+
+      iTimes = damage * PRISM_DAMAGE_PERCENT;
+      if Random(1,100) <= iTimes % 100
+      {
+         return damage + iTimes / 100 + 1;
+      }
+
+      return damage + iTimes / 100;
+   }
+
+   CanBeRemovedByPlayer()
+   {
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

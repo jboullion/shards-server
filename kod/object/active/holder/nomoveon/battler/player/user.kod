@@ -982,6 +982,17 @@ messages:
       Send(Send(SYS,@GetQuestBook),@PlayerLoggedOn,#who=self);
       // Ours: our companion comes back with us (util/companionbook.kod)
       Send(Send(SYS,@GetCompanionBook),@OwnerLoggedOn,#who=self);
+      // Ours (ADR 0022 decision 34): our attunement to our guild's prism, put right
+      if Send(self,@GetGuild) <> $
+      {
+         Send(Send(self,@GetGuild),@CheckPrismAttunement,#who=self);
+      }
+      else if Send(self,@IsEnchanted,
+                   #what=Send(SYS,@FindSpellByNum,#num=SID_PRISM_ATTUNEMENT))
+      {
+         Send(self,@RemoveEnchantment,
+              #what=Send(SYS,@FindSpellByNum,#num=SID_PRISM_ATTUNEMENT),#report=FALSE);
+      }
       // Ours: the season, for our client's seasonal looks (System.SendSeason)
       Send(SYS,@SendSeason,#who=self);
       // Ours: our achievements, caught up on and sent (util/achievements.kod)

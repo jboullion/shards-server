@@ -37,6 +37,11 @@ resources:
    guildhall_public_word = "hall public"
    guildhall_private_word = "hall private"
    guildhall_stone_word = "recall stone"
+   // Ours (ADR 0022 decision 34): the guild's prism (Guild.PrismCommand)
+   guildhall_prism_place_word = "prism place"
+   guildhall_prism_remove_word = "prism remove"
+   guildhall_attune_word = "attune"
+   guildhall_unattune_word = "unattune"
 
    guildhall_now_public = \
       "~B%s%s opens %s to visitors.  Anyone may now come through its door."
@@ -164,6 +169,8 @@ properties:
 
    // Ours (guild revamp): the trophy case (PlaceTrophyCase)
    poTrophyCase = $
+   // Ours (ADR 0022 decision 34): the prism pedestal (PlacePrismPedestal)
+   poPrismPedestal = $
 
    piLastDoorOpen = 0
 
@@ -246,8 +253,56 @@ messages:
       Send(self,@AssignChestRanks);
 
       Send(self,@PlaceTrophyCase);
+      Send(self,@PlacePrismPedestal);
 
       propagate;
+   }
+
+   PlacePrismPedestal()
+   "Ours (ADR 0022 decision 34): the prism pedestal two squares from the trophy case, on the "
+   "first square of those that can be walked to from it (Room.CanWalkLine)."
+   {
+      local i, iRow, iCol;
+
+      if poPrismPedestal <> $
+         OR poTrophyCase = $
+      {
+         return;
+      }
+
+      foreach i in [ [0,2], [0,-2], [2,0], [-2,0], [2,2], [2,-2], [-2,2], [-2,-2], [0,1],
+                     [0,-1], [1,0], [-1,0] ]
+      {
+         iRow = viTrophy_row + First(i);
+         iCol = viTrophy_col + Nth(i,2);
+         if iRow >= 1 AND iCol >= 1
+            AND Send(self,@CanWalkLine,#what=poTrophyCase,#line_row1=viTrophy_row,
+                     #line_col1=viTrophy_col,#line_row2=iRow,#line_col2=iCol)
+         {
+            poPrismPedestal = Create(&PrismPedestal);
+            Send(self,@NewHold,#what=poPrismPedestal,#new_row=iRow,#new_col=iCol,
+                 #fine_row=32,#fine_col=32);
+
+            return;
+         }
+      }
+
+      return;
+   }
+
+   GetPrismPedestal()
+   {
+      return poPrismPedestal;
+   }
+
+   RefreshPrismPedestal()
+   {
+      if poPrismPedestal <> $
+      {
+         Send(poPrismPedestal,@Refresh);
+      }
+
+      return;
    }
 
    PlaceTrophyCase()
@@ -457,6 +512,7 @@ messages:
       poGuild_owner = $;
       piStatus = STATUS_UNOWNED;
       pbPublic = FALSE;
+      Send(self,@RefreshPrismPedestal);
 
       foreach i in plPassive
       {
@@ -729,6 +785,25 @@ messages:
                #parm2=Send(poGuild_owner,@GetName),
                #parm3=Send(poGuild_owner,@GetPrestige),
                #parm4=Send(poGuild_owner,@GetChestLimit));
+
+         return TRUE;
+      }
+
+      // Ours (ADR 0022 decision 34): the guild's prism
+      if StringEqual(string,guildhall_prism_place_word)
+         OR StringEqual(string,guildhall_prism_remove_word)
+      {
+         Send(poGuild_owner,@PrismCommand,#who=what,
+              #verb=Nth([ "place", "remove" ],
+                        1 + StringEqual(string,guildhall_prism_remove_word)));
+
+         return TRUE;
+      }
+
+      if StringEqual(string,guildhall_attune_word)
+         OR StringEqual(string,guildhall_unattune_word)
+      {
+         Send(poGuild_owner,@PrismCommand,#who=what,#verb=string);
 
          return TRUE;
       }

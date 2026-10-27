@@ -3571,6 +3571,8 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_STRENGTH_BOON,#class=&StrengthBoon);
       Send(self,@CreateOneSpellIfNew,#num=SID_AGILITY_BOON,#class=&AgilityBoon);
       Send(self,@CreateOneSpellIfNew,#num=SID_INTELLECT_BOON,#class=&IntellectBoon);
+      // Ours (ADR 0022 decision 34): a guild prism's attunement
+      Send(self,@CreateOneSpellIfNew,#num=SID_PRISM_ATTUNEMENT,#class=&PrismAttunement);
       Send(self,@CreateOneSpellIfNew,#num=SID_MYSTICISM_BOON,#class=&MysticismBoon);
       Send(self,@CreateOneSpellIfNew,#num=SID_AIM_BOON,#class=&AimBoon);
       Send(self,@CreateOneSpellIfNew,#num=SID_STAMINA_BOON,#class=&StaminaBoon);
@@ -3611,7 +3613,6 @@ messages:
       Send(self,@CreateOneSpellIfNew,#num=SID_HOLY_SYMBOL,#class=&HolySymbol);
       Send(self,@CreateOneSpellIfNew,#num=SID_FINAL_RITES,#class=&FinalRites);
       Send(self,@CreateOneSpellIfNew,#num=SID_HUNT,#class=&Hunt);
-      Send(self,@CreateOneSpellIfNew,#num=SID_SUMMON_COW,#class=&SummonCow);
       Send(self,@CreateOneSpellIfNew,#num=SID_SPIDER_WEB,#class=&SummonWeb);
       Send(self,@CreateOneSpellIfNew,#num=SID_JIG,#class=&Jig);
       Send(self,@CreateOneSpellIfNew,#num=SID_DEFLECT,#class=&Deflect);

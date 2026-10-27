@@ -1,0 +1,273 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours (ADR 0023 D43, 2026-10-26): one hunter, no prism. Cast it, and say the prey's name during
+// the trance; when the trance completes the prey is marked for HUNT_TIME, and every hunter on
+// them hears where they are as they move (Player.InformHunters). A second hunter joins the
+// first's mark.
+Hunt is Spell
+
+constants:
+
+   include blakston.khd
+
+   // Half an hour
+   HUNT_TIME = 1800000
+   // The trance, flat (ms)
+   HUNT_TRANCE = 15000
+
+resources:
+
+   Hunt_name_rsc = "hunt"
+   Hunt_icon_rsc = ihunt.bgf
+   Hunt_desc_rsc = \
+      "Lets the caster pick up a player's trail and track them for half an hour.  Speak the "
+      "name of your prey during the trance; when it is complete you will hear where they "
+      "are as they move.  Requires all of the claws from one kriipa paw."
+
+   Hunt_sound = khunt.ogg
+
+   hunt_cold_trail = "Your trail for %s%s seems to have gone cold."
+   hunt_no_target = \
+      "You try to find a trail, but since you named no one, you find nothing."
+   hunt_named = "You fix your mind on %s%s's trail."
+   hunt_target_is_dm = \
+      "~IImmortals leave no trail that can be followed by this spell.  "
+      "Try another target."
+   hunt_is_on = "~BThe hunt is on!"
+   hunt_no_such_prey = "You find no trail for anyone called %q."
+   hunt_prey_offline = "%s%s isn't in the lands just now; there is no trail to follow."
+   hunt_not_self = "You already know where you are."
+
+   hunt_lost_trackers = "You seem to have managed to lose your trackers!"
+   hunt_gain_trackers = "You sense that someone knows where you are..."
+
+classvars:
+
+   vrName = Hunt_name_rsc
+   vrIcon = Hunt_icon_rsc
+   vrDesc = Hunt_desc_rsc
+
+   vrSucceed_wav = Hunt_sound
+
+   viMana = 50
+
+   viSpell_num = SID_HUNT
+   viSchool = SS_KRAANAN
+   viSpell_level = 5
+
+   viSpellExertion = 50
+   viCast_time = HUNT_TRANCE
+   viChance_To_Increase = 50
+   viMeditate_ratio = 50
+
+properties:
+
+   // Spell is harmful to the player it's cast upon.
+   viHarmful = TRUE
+
+   // Who each caster named in their trance: [ [ caster, prey ], ... ]
+   plNamed = $
+
+messages:
+
+   Constructed()
+   {
+      // Allow the spell on Sacred Haven.
+      if NOT Send(SYS,@IsPKAllowed)
+      {
+         viHarmful = FALSE;
+      }
+
+      propagate;
+   }
+
+   ResetReagents()
+   {
+      plReagents = $;
+      plReagents = Cons([&KriipaClaw,4],plReagents);
+
+      return;
+   }
+
+   GetNumSpellTargets()
+   {
+      return 0;
+   }
+
+   GetTranceTime(iSpellpower=0,who=$)
+   {
+      return viCast_time;
+   }
+
+   SetNamed(who = $,prey = $)
+   {
+      local i;
+
+      foreach i in plNamed
+      {
+         if First(i) = who
+         {
+            plNamed = DelListElem(plNamed,i);
+
+            break;
+         }
+      }
+
+      if prey <> $
+      {
+         plNamed = Cons([ who, prey ],plNamed);
+      }
+
+      return;
+   }
+
+   GetNamed(who = $)
+   {
+      local i;
+
+      foreach i in plNamed
+      {
+         if First(i) = who
+         {
+            return Nth(i,2);
+         }
+      }
+
+      return $;
+   }
+
+   SomethingSaidDuringTrance(who=$,string=$,lTargets=$)
+   "The prey's name, spoken during the trance: remembered until it completes."
+   {
+      local oPrey;
+
+      oPrey = Send(SYS,@FindUserByString,#string=string);
+      if oPrey = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=hunt_no_such_prey,#parm1=string);
+
+         return;
+      }
+
+      if oPrey = who
+      {
+         Send(who,@MsgSendUser,#message_rsc=hunt_not_self);
+
+         return;
+      }
+
+      if NOT Send(oPrey,@IsLoggedOn)
+      {
+         Send(who,@MsgSendUser,#message_rsc=hunt_prey_offline,
+              #parm1=Send(oPrey,@GetCapDef),#parm2=Send(oPrey,@GetUserName));
+
+         return;
+      }
+
+      if IsClass(oPrey,&DM) AND NOT Send(oPrey,@IsHuntable)
+      {
+         Send(who,@MsgSendUser,#message_rsc=hunt_target_is_dm);
+
+         return;
+      }
+
+      Send(self,@SetNamed,#who=who,#prey=oPrey);
+      Send(who,@MsgSendUser,#message_rsc=hunt_named,
+           #parm1=Send(oPrey,@GetDef),#parm2=Send(oPrey,@GetUserName));
+
+      return;
+   }
+
+   TranceBroken(oCaster = $)
+   {
+      Send(self,@SetNamed,#who=oCaster,#prey=$);
+
+      propagate;
+   }
+
+   CastSpell(who = $, lTargets = $, iSpellPower = 0)
+   {
+      local oPrey, lHunters, i;
+
+      oPrey = Send(self,@GetNamed,#who=who);
+      Send(self,@SetNamed,#who=who,#prey=$);
+      if oPrey = $
+         OR NOT Send(oPrey,@IsLoggedOn)
+      {
+         Send(who,@MsgSendUser,#message_rsc=hunt_no_target);
+
+         return;
+      }
+
+      // Join any hunt already on them
+      lHunters = [ who ];
+      if Send(oPrey,@IsEnchanted,#what=self)
+      {
+         foreach i in Send(oPrey,@GetEnchantedState,#what=self)
+         {
+            if i <> who
+               AND IsObject(i)
+            {
+               lHunters = Cons(i,lHunters);
+            }
+         }
+
+         Send(oPrey,@RemoveEnchantment,#what=self,#report=FALSE);
+      }
+
+      Send(oPrey,@MsgSendUser,#message_rsc=hunt_gain_trackers);
+      Send(oPrey,@StartEnchantment,#what=self,#state=lHunters,#time=HUNT_TIME,
+           #iSpellPower=iSpellPower,#lastcall=TRUE,#addicon=FALSE);
+      Send(who,@MsgSendUser,#message_rsc=hunt_is_on);
+      Send(oPrey,@InformHunters);
+
+      propagate;
+   }
+
+   EndEnchantment(who = $, report = TRUE, state = $)
+   {
+      local i;
+
+      Send(who,@SetPlayerFlag,#flag=PFLAG2_HUNTED,#value=FALSE,#flagset=2);
+      if NOT report
+      {
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=hunt_lost_trackers);
+      foreach i in state
+      {
+         if IsObject(i)
+         {
+            Send(i,@MsgSendUser,#message_rsc=hunt_cold_trail,
+                 #parm1=Send(who,@GetDef),#parm2=Send(who,@GetUserName));
+         }
+      }
+
+      return;
+   }
+
+   SetSpellPlayerFlag(who=$)
+   {
+      Send(who,@SetPlayerFlag,#flag=PFLAG2_HUNTED,#value=TRUE,#flagset=2);
+
+      return;
+   }
+
+   CanBeRemovedByPlayer()
+   "Returns if a spell can be removed by normal Purge/Purify"
+   {
+      // You cannot remove this spell by spells.
+      return FALSE;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

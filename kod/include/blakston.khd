@@ -2572,7 +2572,7 @@
    SID_HOLY_SYMBOL = 132
    SID_FINAL_RITES = 133
    SID_HUNT = 134
-   SID_SUMMON_COW = 135
+   // 135 was Summon Bovine (removed 2026-10-26 with the prisms' group spells)
    SID_SPIDER_WEB = 136
    SID_JIG = 137
    SID_DEFLECT = 138
@@ -2641,6 +2641,8 @@
    // Ours (spell revamp D36): Riija's mind games leave a target bewildered
    //  (spell/bewilder.kod), an effect nobody learns
    SID_BEWILDERED = 207
+   // Ours (ADR 0022 decision 34): a guild prism's attunement (spell/prismatt.kod)
+   SID_PRISM_ATTUNEMENT = 208
 
    // Ours (spell revamp phase 9): what UC_SPELL_FX asks our client to draw
    SPELLFX_IMPACT = 1      // a hit on the target
@@ -3090,6 +3092,25 @@ SID_ICEWALL             = 241
    RANK_LORD = 3
    RANK_SIR = 2
    RANK_APPRENTICE = 1
+
+   // Ours (ADR 0022 decision 34): a guild prism's colour, and the bonus it gives those attuned
+   //  to it (item/passitem/prism.kod, spell/prismatt.kod)
+   PRISM_COLOUR_NONE = 0
+   PRISM_COLOUR_EMERALD = 1
+   PRISM_COLOUR_RUBY = 2
+   PRISM_COLOUR_SAPPHIRE = 3
+   PRISM_COLOUR_AMBER = 4
+   PRISM_COLOUR_AMETHYST = 5
+   PRISM_COLOUR_PEARL = 6
+   PRISM_COLOURS = 6
+   // Emerald: percent more kill experience; Ruby: max health; Sapphire: max mana; Amber:
+   //  percent more melee damage; Amethyst: spellpower; Pearl: percent faster regeneration
+   PRISM_XP_PERCENT = 5
+   PRISM_HEALTH = 5
+   PRISM_MANA = 5
+   PRISM_DAMAGE_PERCENT = 3
+   PRISM_SPELLPOWER = 3
+   PRISM_REGEN_PERCENT = 15
 
    // Ours (guild revamp, ADR 0022 decisions 17-19 and 26): guild trophies (util/guildtrophies.kod),
    //  one per guild for each, from a boss's class (Monster.viTrophy). The Fallen Halls' bosses,

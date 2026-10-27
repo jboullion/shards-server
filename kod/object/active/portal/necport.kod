@@ -16,6 +16,9 @@ constants:
 
    // 30 seconds (in ms)
    NECROPORTAL_CLOSE_TIME = 30 * 1000
+   // Ours: a shadow rift (spell/teleportspell/shadrift.kod) closes this long after it opens,
+   //  people about or not
+   NECROPORTAL_LIFE_TIME = 60 * 1000
 
 resources:
 
@@ -29,21 +32,32 @@ resources:
 classvars:
 
    viMoveOn_type = MOVEON_TELEPORTER
-   viMaxDistance = 0
+   // Ours: a group arrives about the bound spot, not all on one square
+   viMaxDistance = 2
 
 properties:
 
    vrIcon = NecropolisPortal_icon_rsc
    pbAnimate = TRUE
    ptClosePortal = $
+   ptLife = $
 
 messages:
 
    Constructor(lLocation=$)
    {
       Send(self,@SetTarget,#lTarget=lLocation);
+      ptLife = CreateTimer(self,@LifeOver,NECROPORTAL_LIFE_TIME);
 
       propagate;
+   }
+
+   LifeOver()
+   {
+      ptLife = $;
+      Send(self,@ClosePortal);
+
+      return;
    }
 
    SetTarget(lTarget = $)
@@ -138,6 +152,12 @@ messages:
          DeleteTimer(ptClosePortal);
 
          ptClosePortal = $;
+      }
+
+      if ptLife <> $
+      {
+         DeleteTimer(ptLife);
+         ptLife = $;
       }
 
       propagate;

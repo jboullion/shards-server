@@ -9,7 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ours (spell revamp, ADR 0023): Qor's answer to the spiritual sword, summoned by Qor's Blade
-// (spell/multicst/bldinher.kod). The sword's art, its blade turned blood red. Its blows deal
+// (spell/bldinher.kod). The sword's art, its blade turned blood red. Its blows deal
 // unholy damage, and now and then it drinks the victim's blood and heals its wielder by as
 // much; the undead have none to give. Bound to its summoner, as the sword is.
 QorsBlade is Weapon

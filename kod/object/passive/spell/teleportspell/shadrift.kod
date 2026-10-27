@@ -1,0 +1,236 @@
+// Meridian 59, Copyright 1994-2012 Andrew Kirmse and Chris Kirmse.
+// All rights reserved.
+//
+// This software is distributed under a license that is described in
+// the LICENSE file that accompanies it.
+//
+// Meridian is a registered trademark.
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Ours (ADR 0023 D42, 2026-10-26): a solo, prepared group portal. It needed a prism and several
+// casters; now, as Death Rift: cast outside a safe haven to bind the spot (Player.SetShadowRift,
+// apart from Death Rift's bind); cast in a safe haven (no combat, safe log off) to open a portal
+// there, back to the bound spot, for whoever walks in (NecropolisPortal, a minute at most). The
+// bind stays until it's cast outside a safe haven again. A long trance, refused in PvP, and
+// opened only from a safe haven: a way to bring a group somewhere, never a way out.
+DeathsDoor is TeleportationSpell
+
+constants:
+
+   include blakston.khd
+
+   // The trance, flat (ms)
+   SHADOW_RIFT_TRANCE = 25000
+
+resources:
+
+   DeathsDoor_name_rsc = "shadow rift"
+   DeathsDoor_icon_rsc = irift.bgf
+   DeathsDoor_desc_rsc = \
+      "Summons the darkest of magics to warp the fabric of space.  Cast it out in the world "
+      "to bind the darkness to that spot; cast it again within a safe haven to tear open a "
+      "portal there that carries all who enter it back to the bound spot, for a minute at "
+      "most.  The binding lasts until you bind another place.  The casting takes long "
+      "concentration, and is broken by any blow.  "
+      "Requires four dark angel feathers."
+
+   DeathsDoor_sound = qdthdoor.ogg
+
+   DeathsDoor_bad_place = \
+      "The fabric of space here resists the darkness; no rift can form."
+   DeathsDoor_bad_target = \
+      "The darkness you bound has slipped from its place.  Bind it again."
+   DeathsDoor_room_loop = \
+      "The rift would only lead back here.  You must leave this place to use it."
+   DeathsDoor_target_has_portal = \
+      "A cloud of magical force begins to coalesce, but then dissipates, repelled by "
+      "another rift where yours is bound."
+   DeathsDoor_bound = \
+      "You trace the outline of a door in the air, and the darkness remembers this place."
+   DeathsDoor_succeeded = "A shimmering portal springs into being!"
+   DeathsDoor_bound_desc = "\n\nYour shadow rift is bound to %s."
+
+classvars:
+
+   vrName = DeathsDoor_name_rsc
+   vrIcon = DeathsDoor_icon_rsc
+   vrDesc = DeathsDoor_desc_rsc
+
+   vrSucceed_wav = DeathsDoor_sound
+
+   viMana = 30
+
+   viSpell_num = SID_SHADOW_RIFT
+   viSchool = SS_QOR
+   viSpell_level = 4
+   viMeditate_ratio = 40
+
+   viSpellExertion = 40
+   viCast_time = SHADOW_RIFT_TRANCE
+   viChance_To_Increase = 25
+
+properties:
+
+messages:
+
+   ResetReagents()
+   {
+      plReagents = $;
+      plReagents = Cons([&DarkAngelFeather,4],plReagents);
+
+      return;
+   }
+
+   GetTranceTime(iSpellpower=0,who=$)
+   {
+      return viCast_time;
+   }
+
+   IsSafeHaven(oRoom = $)
+   "Death Rift's safe haven: no combat, and safe to log off."
+   {
+      return oRoom <> $
+             AND Send(oRoom,@CheckRoomFlag,#flag=ROOM_NO_COMBAT)
+             AND Send(oRoom,@CheckRoomFlag,#flag=ROOM_SAFELOGOFF);
+   }
+
+   CheckRift(who = $)
+   "Whether who may cast it where they stand, telling them why not."
+   {
+      local oRoom, lTarget, oTarget;
+
+      if who = $
+      {
+         return FALSE;
+      }
+
+      // Never in a fight with another player (Player.IsInPvP, as Rescue)
+      if Send(who,@IsInPvP)
+      {
+         Send(who,@MsgSendUser,#message_rsc=spell_too_soon_since_attacking);
+
+         return FALSE;
+      }
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+         OR NOT Send(oRoom,@CanHavePlayerPortal)
+      {
+         Send(who,@MsgSendUser,#message_rsc=DeathsDoor_bad_place);
+
+         return FALSE;
+      }
+
+      // Out in the world, it binds; that's always allowed where a portal may be
+      if NOT Send(self,@IsSafeHaven,#oRoom=oRoom)
+      {
+         return TRUE;
+      }
+
+      // In a safe haven, it opens: there must be a bound place to open to
+      lTarget = Send(who,@GetShadowRift);
+      oTarget = $;
+      if lTarget <> $
+      {
+         oTarget = Send(SYS,@FindRoomByNum,#num=First(lTarget));
+      }
+
+      if oTarget = $
+         OR NOT Send(oTarget,@CanHavePlayerPortal)
+      {
+         Send(who,@MsgSendUser,#message_rsc=DeathsDoor_bad_target);
+
+         return FALSE;
+      }
+
+      if oTarget = oRoom
+      {
+         Send(who,@MsgSendUser,#message_rsc=DeathsDoor_room_loop);
+
+         return FALSE;
+      }
+
+      // Another rift there already (a town's own portals don't count)
+      if Send(oTarget,@FindHoldingActive,#class=&NecropolisPortal) <> $
+      {
+         Send(who,@MsgSendUser,#message_rsc=DeathsDoor_target_has_portal);
+
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
+   CanPayCosts(who = $, lTargets = $, bItemCast = FALSE)
+   {
+      if NOT Send(self,@CheckRift,#who=who)
+      {
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   DoubleCheckAfterTrance(who=$, lTargets = $, iSpellPower = 0)
+   {
+      if NOT Send(self,@CheckRift,#who=who)
+      {
+         return FALSE;
+      }
+
+      propagate;
+   }
+
+   CastSpell(who = $, lTargets = $, iSpellPower = 0)
+   {
+      local oRoom, lHere, oPortal;
+
+      oRoom = Send(who,@GetOwner);
+      if oRoom = $
+      {
+         return;
+      }
+
+      lHere = [ Send(oRoom,@GetRoomNum), Send(who,@GetRow), Send(who,@GetCol),
+                Send(who,@GetFineRow), Send(who,@GetFineCol) ];
+
+      if NOT Send(self,@IsSafeHaven,#oRoom=oRoom)
+      {
+         Send(who,@SetShadowRift,#lLocation=lHere);
+         Send(who,@MsgSendUser,#message_rsc=DeathsDoor_bound);
+
+         propagate;
+      }
+
+      oPortal = Create(&NecropolisPortal,#lLocation=Send(who,@GetShadowRift));
+      Send(oRoom,@NewHold,#what=oPortal,#new_row=Nth(lHere,2),#new_col=Nth(lHere,3),
+           #fine_row=Nth(lHere,4),#fine_col=Nth(lHere,5));
+      Send(who,@MsgSendUser,#message_rsc=DeathsDoor_succeeded);
+
+      propagate;
+   }
+
+   SendStatsDesc(who=$)
+   {
+      local lTarget, oRoom;
+
+      lTarget = Send(who,@GetShadowRift);
+      oRoom = $;
+      if lTarget <> $
+      {
+         oRoom = Send(SYS,@FindRoomByNum,#num=First(lTarget));
+      }
+
+      if oRoom = $
+      {
+         propagate;
+      }
+
+      AddPacket(4,DeathsDoor_bound_desc, 4,Send(oRoom,@GetName));
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////

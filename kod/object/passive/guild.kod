@@ -73,6 +73,22 @@ resources:
    guild_hall_public_rank = "Only the guild's %q rank and above may open or close the hall to visitors."
    guild_hall_none = "Your guild has no hall to open or close."
 
+   // Ours (ADR 0022 decision 34): the guild's prism (PrismCommand)
+   guild_prism_not_in_hall = "You must be in your guild's hall to do that."
+   guild_prism_rank = "Only the guild's %q rank and above may set or take up the guild's prism."
+   guild_prism_have_one = "Your guild's pedestal already bears %s%s.  Take it up first."
+   guild_prism_none_carried = "You carry no prism to set upon the pedestal."
+   guild_prism_placed = "~B%s%s sets %s%s upon the pedestal of %s."
+   guild_prism_none = "Your guild's pedestal stands empty."
+   guild_prism_no_room = "You have no room to carry %s%s."
+   guild_prism_removed = "~B%s%s takes %s%s from the pedestal.  Every attunement to it ends."
+   guild_prism_far = "Stand nearer the prism to attune yourself to it."
+   guild_prism_already = "You are already attuned to %s%s."
+   guild_prism_full = "All %i of %s%s's sides are taken."
+   guild_prism_not_attuned = "You are not attuned to your guild's prism."
+   guild_prism_returned = \
+      "Your guild has lost its hall, and %s%s comes back to you from its pedestal."
+
    guild_name_rsc = "guild"
    guild_icon_rsc = light.bgf
    guild_desc_rsc = "An organization of individuals with similar purposes."
@@ -449,6 +465,11 @@ properties:
    // [ TROPHY_* id, when (GetTime), [ the names of the members who took part ] ], oldest
    // first (util/guildtrophies.kod)
    plTrophies = $
+
+   // Ours (ADR 0022 decision 34): the prism on the hall's pedestal, kept here out of the world
+   // (so a rebuilt room can't lose it), and the members attuned to it
+   poPrism = $
+   plPrismAttuned = $
 
    // Information for suing for peace from a mutual guild war.
    ptSuingForPeace = $
@@ -861,6 +882,8 @@ messages:
          }
       }
 
+      // Ours (ADR 0022 decision 34): the prism comes off the pedestal to the leader
+      Send(self,@ReturnPrism);
       Send(Send(self,@GetGuildHall),@ResetGuildHall);
       piGuild_hall = $;
 
@@ -1722,6 +1745,14 @@ messages:
          Send(who,@SetGuildCloak,#value=StringEqual(Nth(words,3),"on"));
       }
       else if Length(words) >= 2
+         AND (StringEqual(Nth(words,2),"attune") OR StringEqual(Nth(words,2),"unattune"))
+      {
+         // Ours (ADR 0022 decision 34): the Hall tab's buttons, as said in the hall
+         Send(self,@PrismCommand,#who=who,#verb=Nth(words,2));
+
+         return;
+      }
+      else if Length(words) >= 2
       {
          sWord = Nth(words,2);
          if StringEqual(sWord,"public")
@@ -1802,7 +1833,313 @@ messages:
                 1,Length(Send(Send(SYS,@GetGuildTrophies),@GetTrophies)),
                 1,Send(self,@HasGuildColors),
                 1,Send(who,@IsWearingGuildCloak));
+
+      // Ours (ADR 0022 decision 34): the prism: whether there's one, its sides, its colour,
+      //  how many are attuned, and whether who is
+      if poPrism = $
+      {
+         AddPacket(1,0, 1,0, 1,0, 1,0, 1,0);
+      }
+      else
+      {
+         AddPacket(1,1, 1,Send(poPrism,@GetNumSides), 1,Send(poPrism,@GetColour),
+                   1,Length(plPrismAttuned),
+                   1,(FindListElem(plPrismAttuned,who) <> 0));
+      }
+
       SendPacket(oSession);
+
+      return;
+   }
+
+   //// Ours (ADR 0022 decision 34): the guild's prism
+
+   GetPrism()
+   {
+      return poPrism;
+   }
+
+   GetPrismAttuned()
+   {
+      return plPrismAttuned;
+   }
+
+   IsPrismAttuned(who = $)
+   {
+      return who <> $ AND FindListElem(plPrismAttuned,who) <> 0;
+   }
+
+   PrismCommand(who = $, verb = $)
+   "'prism place', 'prism remove' (Lords and up), 'attune' and 'unattune', said in the hall "
+   "(GuildHall.HallCommandSaid) or from the Hall tab (HallCommand)."
+   {
+      local oHall, iRank, oPrism, oPedestal;
+
+      if who = $ OR verb = $
+         OR Send(who,@GetGuild) <> self
+      {
+         return;
+      }
+
+      oHall = Send(self,@GetGuildHall);
+      if oHall = $
+         OR Send(who,@GetOwner) <> oHall
+      {
+         Send(who,@MsgSendUser,#message_rsc=guild_prism_not_in_hall);
+
+         return;
+      }
+
+      iRank = Send(self,@GetRank,#who=who);
+      if StringEqual(verb,"place") OR StringEqual(verb,"remove")
+      {
+         if iRank < RANK_LORD
+         {
+            Send(who,@MsgSendUser,#message_rsc=guild_prism_rank,
+                 #parm1=Send(self,@GetRankName,#rank=RANK_LORD,#sex=Send(who,@GetGender)));
+
+            return;
+         }
+
+         if StringEqual(verb,"place")
+         {
+            if poPrism <> $
+            {
+               Send(who,@MsgSendUser,#message_rsc=guild_prism_have_one,
+                    #parm1=Send(poPrism,@GetIndef),#parm2=Send(poPrism,@GetName));
+
+               return;
+            }
+
+            oPrism = Send(who,@FindHolding,#class=&Prism);
+            if oPrism = $
+            {
+               Send(who,@MsgSendUser,#message_rsc=guild_prism_none_carried);
+
+               return;
+            }
+
+            Send(oPrism,@NewOwner,#what=$);
+            poPrism = oPrism;
+            Send(self,@TellMembers,#rsc=guild_prism_placed,
+                 #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName),
+                 #parm3=Send(oPrism,@GetIndef),#parm4=Send(oPrism,@GetName),
+                 #parm5=Send(oHall,@GetName));
+         }
+         else
+         {
+            if poPrism = $
+            {
+               Send(who,@MsgSendUser,#message_rsc=guild_prism_none);
+
+               return;
+            }
+
+            if NOT Send(who,@ReqNewHold,#what=poPrism)
+            {
+               Send(who,@MsgSendUser,#message_rsc=guild_prism_no_room,
+                    #parm1=Send(poPrism,@GetDef),#parm2=Send(poPrism,@GetName));
+
+               return;
+            }
+
+            Send(self,@TellMembers,#rsc=guild_prism_removed,
+                 #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName),
+                 #parm3=Send(poPrism,@GetDef),#parm4=Send(poPrism,@GetName));
+            Send(self,@EndAllPrismAttunements);
+            oPrism = poPrism;
+            poPrism = $;
+            Send(who,@NewHold,#what=oPrism);
+         }
+
+         Send(oHall,@RefreshPrismPedestal);
+         Send(self,@BroadcastHallInfo);
+
+         return;
+      }
+
+      if StringEqual(verb,"unattune")
+      {
+         if NOT Send(self,@IsPrismAttuned,#who=who)
+         {
+            Send(who,@MsgSendUser,#message_rsc=guild_prism_not_attuned);
+
+            return;
+         }
+
+         Send(self,@EndPrismAttunement,#who=who);
+         Send(self,@BroadcastHallInfo);
+
+         return;
+      }
+
+      if NOT StringEqual(verb,"attune")
+      {
+         return;
+      }
+
+      if poPrism = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=guild_prism_none);
+
+         return;
+      }
+
+      if Send(self,@IsPrismAttuned,#who=who)
+      {
+         Send(who,@MsgSendUser,#message_rsc=guild_prism_already,
+              #parm1=Send(poPrism,@GetDef),#parm2=Send(poPrism,@GetName));
+
+         return;
+      }
+
+      oPedestal = Send(oHall,@GetPrismPedestal);
+      if oPedestal <> $
+         AND Send(who,@SquaredDistanceTo,#what=oPedestal) > 16
+      {
+         Send(who,@MsgSendUser,#message_rsc=guild_prism_far);
+
+         return;
+      }
+
+      if Length(plPrismAttuned) >= Send(poPrism,@GetNumSides)
+      {
+         Send(who,@MsgSendUser,#message_rsc=guild_prism_full,
+              #parm1=Send(poPrism,@GetNumSides),
+              #parm2=Send(poPrism,@GetDef),#parm3=Send(poPrism,@GetName));
+
+         return;
+      }
+
+      plPrismAttuned = Cons(who,plPrismAttuned);
+      Send(Send(SYS,@FindSpellByNum,#num=SID_PRISM_ATTUNEMENT),@Attune,#who=who,
+           #oPrism=poPrism);
+      Send(self,@BroadcastHallInfo);
+
+      return;
+   }
+
+   EndPrismAttunement(who = $, report = TRUE)
+   "who is no longer attuned: they left the guild, gave it up, or the prism went."
+   {
+      local oSpell;
+
+      if who = $
+      {
+         return;
+      }
+
+      if FindListElem(plPrismAttuned,who) <> 0
+      {
+         plPrismAttuned = DelListElem(plPrismAttuned,who);
+      }
+
+      oSpell = Send(SYS,@FindSpellByNum,#num=SID_PRISM_ATTUNEMENT);
+      if oSpell <> $
+         AND Send(who,@IsEnchanted,#what=oSpell)
+      {
+         Send(who,@RemoveEnchantment,#what=oSpell,#report=report);
+      }
+
+      return;
+   }
+
+   EndAllPrismAttunements()
+   {
+      local i, lAll;
+
+      lAll = plPrismAttuned;
+      foreach i in lAll
+      {
+         Send(self,@EndPrismAttunement,#who=i);
+      }
+
+      plPrismAttuned = $;
+
+      return;
+   }
+
+   ReturnPrism()
+   "The guild loses its hall or ends: the attunements end and the prism goes to the leader "
+   "(into their pack, logged on or not)."
+   {
+      local oLeader, oPrism, oHall;
+
+      if poPrism = $
+      {
+         return;
+      }
+
+      Send(self,@EndAllPrismAttunements);
+      oPrism = poPrism;
+      poPrism = $;
+      oLeader = Send(self,@GetGuildMaster);
+      if oLeader = $
+      {
+         Send(oPrism,@Delete);
+      }
+      else
+      {
+         Send(oLeader,@NewHold,#what=oPrism);
+         Send(oLeader,@MsgSendUser,#message_rsc=guild_prism_returned,
+              #parm1=Send(oPrism,@GetIndef),#parm2=Send(oPrism,@GetName));
+      }
+
+      oHall = Send(self,@GetGuildHall);
+      if oHall <> $
+      {
+         Send(oHall,@RefreshPrismPedestal);
+      }
+
+      return;
+   }
+
+   CheckPrismAttunement(who = $)
+   "At logon (User): attuned here and not enchanted, or the other way about, is put right."
+   {
+      local oSpell, bEnchanted;
+
+      oSpell = Send(SYS,@FindSpellByNum,#num=SID_PRISM_ATTUNEMENT);
+      if who = $ OR oSpell = $
+      {
+         return;
+      }
+
+      bEnchanted = Send(who,@IsEnchanted,#what=oSpell);
+      if Send(self,@IsPrismAttuned,#who=who)
+      {
+         if poPrism = $
+         {
+            Send(self,@EndPrismAttunement,#who=who,#report=FALSE);
+         }
+         else if NOT bEnchanted
+         {
+            Send(oSpell,@Attune,#who=who,#oPrism=poPrism);
+         }
+
+         return;
+      }
+
+      if bEnchanted
+      {
+         Send(who,@RemoveEnchantment,#what=oSpell,#report=FALSE);
+      }
+
+      return;
+   }
+
+   TellMembers(rsc = $, parm1 = $, parm2 = $, parm3 = $, parm4 = $, parm5 = $)
+   {
+      local i;
+
+      foreach i in plMembers
+      {
+         if Send(First(i),@IsLoggedOn)
+         {
+            Send(First(i),@MsgSendUser,#message_rsc=rsc,#parm1=parm1,#parm2=parm2,
+                 #parm3=parm3,#parm4=parm4,#parm5=parm5);
+         }
+      }
 
       return;
    }
@@ -2639,6 +2976,9 @@ messages:
    "the timer isn't already gone (getting rid of an error message)."
    {
       local i, oBoard;
+
+      // Ours (ADR 0022 decision 34): the prism goes back to the leader, while they're a member
+      Send(self,@ReturnPrism);
 
       if piGuild_hall <> $
       {

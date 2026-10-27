@@ -128,6 +128,7 @@ spell_costs_no_mana = "no mana"
    spell_pp_dement = "Dement (up to %i more on each cast)"
    spell_pp_kraanan = "Kraanan's favour"
    spell_pp_attuned = "Attuned to %s"
+   spell_pp_prism = "Your guild's amethyst prism"
    spell_element_flame = "flame"
    spell_element_frost = "frost"
    spell_element_storm = "storm"
@@ -2678,6 +2679,17 @@ messages:
       {
          lParts = AppendListElem([spell_pp_attuned, iAttune,
                                   [Send(self,@GetFarenElementName)]], lParts);
+      }
+
+      // Ours (ADR 0022 decision 34): an amethyst guild prism's gift
+      if IsClass(who,&Player)
+         AND Send(who,@GetPrismColour) = PRISM_COLOUR_AMETHYST
+      {
+         iAttune += PRISM_SPELLPOWER;
+         if bParts
+         {
+            lParts = AppendListElem([spell_pp_prism, PRISM_SPELLPOWER, $], lParts);
+         }
       }
 
       iSpellPower = iPrimaryBonus + iSecondaryBonus + iPowerBonus + iBase

@@ -1005,6 +1005,9 @@ properties:
    // Ours (guild revamp, ADR 0022 decision 22): whether we wear our guild's cloak, set from
    // the guild window's Hall tab (SetGuildCloak). Drawn only while the guild has colours.
    pbGuildCloak = FALSE
+   // Ours (ADR 0022 decision 34): the colour of the guild prism we're attuned to
+   //  (PRISM_COLOUR_*, spell/prismatt.kod keeps it), for the bonuses worked out here
+   piPrismColour = 0
 
    // Animation type.  If none, then use piAction
    // piAnimation should be PANM_NONE in between KOD calls.
@@ -1088,6 +1091,9 @@ properties:
    piBound_fine_row = 0
    piBound_fine_col = 0
    piBound_angle = ANGLE_SOUTH
+   // Ours (ADR 0023 D42): where our shadow rift opens to, [ room, row, col, fine row,
+   //  fine col ] or $ (spell/teleportspell/shadrift.kod); apart from Death Rift's bind
+   plShadowRift = $
 
    // Is the player currently using a Death Rift spell?
    ptDeathRiftTimer = $
@@ -1766,9 +1772,9 @@ messages:
          if Nth(i,2) = oSpell
          {
             state = Nth(i,3);
-            if NOT IsClass(First(state),&Prism)
+            foreach j in state
             {
-               foreach j in state
+               if IsObject(j)
                {
                   Send(j,@MsgSendUser,#message_rsc=player_to_hunters,
                         #parm1=Send(self,@GetDef),
@@ -6587,6 +6593,7 @@ messages:
       iTime = iTime - Send(Send(SYS,@GetParliament),@GetFactionRegenBonus,
                            #who=self,#hpregen=TRUE);
 
+
 	  iMinTime = 1000;
 	  iMaxTime = 4000;
 	  
@@ -6597,7 +6604,15 @@ messages:
 		 iMaxTime = 1000;
       }
 
-      return bound(iTime,iMinTime,iMaxTime);
+      iTime = bound(iTime,iMinTime,iMaxTime);
+
+      // Ours (ADR 0022 decision 34): a pearl prism's gift, past the clamp so it always tells
+      if piPrismColour = PRISM_COLOUR_PEARL
+      {
+         iTime = iTime * (100 - PRISM_REGEN_PERCENT) / 100;
+      }
+
+      return iTime;
    }
 
    CalculateManaTime()
@@ -6618,6 +6633,7 @@ messages:
          iTime = iTime - Send(Send(SYS,@GetParliament),@GetFactionRegenBonus,
                               #who=self,#hpregen=FALSE);
 
+
          iMinTime = 1000;
 		 iMaxTime = 40000;
 		  
@@ -6629,6 +6645,12 @@ messages:
 		 }
 			
 		 iTime = Bound(iTime,iMinTime,iMaxTime);
+
+         // Ours (ADR 0022 decision 34): a pearl prism's gift, past the clamp so it always tells
+         if piPrismColour = PRISM_COLOUR_PEARL
+         {
+            iTime = iTime * (100 - PRISM_REGEN_PERCENT) / 100;
+         }
 
          // Mana Focus will adjust mana regen time based on its spellpower.
          // Flag check for speed.
@@ -7642,6 +7664,12 @@ messages:
    {
       local oStone;
 
+      // Ours (ADR 0022 decision 34): our attunement to its prism ends
+      if poGuild <> $
+      {
+         Send(poGuild,@EndPrismAttunement,#who=self);
+      }
+
       poGuild = $;
       piGuild_commands = 0;
 
@@ -7986,19 +8014,6 @@ messages:
 
          return FALSE;
       }
-
-//  When I re-enabled the shadow rift spell, it was only sold by the lich,
-//  and the Ao3/SotH quest that was needed to get the spell was broken and unfixable,
-//  so I made the spell sold by a different NPC.  I had to remove this check
-//  (which clearly doesn't belong in player; should be in the spell itself) to
-//  make it buyable.  - ARK 10/26/2010
-//
-//      if num = SID_SHADOW_RIFT
-//          AND ((NOT Send(self, @IsUsingA,#class=&NecromancerAmulet))
-//               AND (NOT IsClass(self,&Admin)))
-//      {
-//         return FALSE;
-//      }
 
       oSpell = Send(SYS,@FindSpellByNum,#num=num);
       if oSpell = $
@@ -8991,6 +9006,14 @@ messages:
             AND Send(self,@HasGuildmateOn,#what=what)
          {
             iGuildBonus = iXP * GUILD_BONUS_XP_PERCENT / 100;
+         }
+
+         // Ours (ADR 0022 decision 34): an emerald prism's gift, on a monster's kill
+         if iXP > 0
+            AND IsClass(what,&Monster)
+            AND piPrismColour = PRISM_COLOUR_EMERALD
+         {
+            iGuildBonus += Bound(iXP * PRISM_XP_PERCENT / 100,1,$);
          }
 
          // Add in XP bonus from items after this.
@@ -14943,6 +14966,30 @@ messages:
    GetBoundLocationCol()
    {
       return piBound_col;
+   }
+
+   SetShadowRift(lLocation = $)
+   {
+      plShadowRift = lLocation;
+
+      return;
+   }
+
+   GetShadowRift()
+   {
+      return plShadowRift;
+   }
+
+   SetPrismColour(colour = 0)
+   {
+      piPrismColour = colour;
+
+      return;
+   }
+
+   GetPrismColour()
+   {
+      return piPrismColour;
    }
 
    SetDeathRiftProtection(value=FALSE)
