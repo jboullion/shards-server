@@ -19,7 +19,7 @@ resources:
    include sign-ar.lkod
 
    oldarenasign_name_rsc = "sign"
-   oldarenasign_icon_rsc = sign.bgf
+   oldarenasign_icon_rsc = razsign1.bgf
    oldarenasign_desc_rsc = "The sign reads:\n\n%s "
 
    oldarenasign_arena_msg = "\"Say CHALLENGE to initiate a fight with a champion.  Say CHAMPION if no champion exists.  Champions must ACCEPT any challenges, or lose their title.  Champions may RENEGE their titles, but not while in combat.\""

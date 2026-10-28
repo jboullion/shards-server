@@ -23,7 +23,7 @@ resources:
    asshq_music = cave.ogg
 
    asshq_rules_name = "Rules of the Assassin's Game"
-   asshq_sign = sign.bgf
+   asshq_sign = razsign1.bgf
 
    asshq_rules1 = "Are you a true assassin, able to use guile, stealth and deception "
       "over brute force? Do you have the stomach to stick a dagger between the shoulder "

@@ -19,7 +19,8 @@ resources:
    include sign.lkod
 
    sign_name_rsc = "sign"
-   sign_icon_rsc = sign.bgf
+   // Ours: Raza's plank sign everywhere (2026-10-27); sign.bgf's runes on a board looked poor
+   sign_icon_rsc = razsign1.bgf
    sign_icon_newbie_rsc = razsign1.bgf
    sign_desc_rsc = "This is an informational sign."
    sign_insc_rsc = " "
