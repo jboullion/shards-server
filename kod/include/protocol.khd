@@ -277,6 +277,10 @@
    // Ours (achievements, ADR 0025): the achievements a player has earned, for our client's
    //  window and toast (util/achievements.kod): kind 1 all of them, kind 2 one just earned
    UC_ACHIEVEMENTS = 125
+   // Ours (ADR 0028): our client's Abilities tab, from ShardsAbilities.SendSchools: learn
+   //  points, Intellect's help, each school known (its level, the next, have, need, a
+   //  state) and the school and level of every spell and skill known
+   UC_SCHOOLS = 126
 
    // enchantment byte
    ENCHANTMENT_PLAYER = 1

@@ -986,6 +986,9 @@ properties:
 
    piVigor_rest_threshold = 80
 
+   // Ours (ADR 0028): a UC_SCHOOLS send is posted (QueueSchools)
+   pbSchoolsQueued = FALSE
+
    // The user's string description, typed when created (and editable in game).
    psPlayerDescription = $
 
@@ -7763,6 +7766,8 @@ messages:
       local i, bFound, elemNum, iAbility, bUsed, spellName, iChange,
             newAbility, oSpell, shrunken;
 
+      Send(self,@QueueSchools);
+
       oSpell = Send(SYS,@FindSpellByNum,#num=spell_num);
       if oSpell = $
       {
@@ -8003,6 +8008,8 @@ messages:
       local i, j, oSpell, lSpell_info, lPrereqs, bFound,
             iBoundAbility, lEncode;
 
+      Send(self,@QueueSchools);
+
       if Send(self,@HasSpell,#num=num)
       {
          if Send(self,@GetSpellAbility,#spell_num=num) < iAbility
@@ -8092,6 +8099,8 @@ messages:
    RemoveAllSpells()
    {
       local i;
+      Send(self,@QueueSchools);
+
       
       plSpells=$;
       if Send(self,@CheckLog)
@@ -8119,6 +8128,8 @@ messages:
    "Removes a spell by spell ID from the user's castable list of spells"
    {
       local oSpell, i, j, bFound;
+
+      Send(self,@QueueSchools);
 
       oSpell = Send(SYS,@FindSpellbyNum,#num=num);
       if oSpell = $
@@ -8351,6 +8362,8 @@ messages:
       local i, bFound, elemnum, iability, bUsed, iChange, skillname, 
             newability, oSkill;
 
+      Send(self,@QueueSchools);
+
       oSkill = Send(SYS,@FindSkillByNum,#num=skill_num);
       if oSkill = $
       {
@@ -8496,6 +8509,8 @@ messages:
    {
       local i,j,oSkill, lSkill_info, lPrereqs, bFound, iBoundAbility;
 
+      Send(self,@QueueSchools);
+
       if Send(self,@HasSkill,#num=num)
       {
          // Already has it.
@@ -8551,6 +8566,8 @@ messages:
 
    RemoveAllSkills()
    {
+      Send(self,@QueueSchools);
+
       plSkills = $;
 
       if Send(self,@checklog)
@@ -8568,6 +8585,8 @@ messages:
    "Removes a Skill by Skill ID from the user's castable list of Skills"
    {
       local oSkill, i, iVigorChange;
+
+      Send(self,@QueueSchools);
 
       oSkill = Send(SYS,@FindSkillbyNum,#num=num);
       if oSkill = $
@@ -12192,11 +12211,8 @@ messages:
    "learning. For example, if a player can't learn because he has too "
    "many competing schools, he needs to know that."
    {
-      local bSkill, obj, level, school, division, iHave, prev_level,
-            iSamediv, iOtherdiv, aHigh, bHigh, cHigh, iBase, i, temp,
-            nObj, nSID, index, iNeed, nSchool, nLevel, msg, bKnowOne,
-            iWeapon, iKraanan, iShalille, iQor, iFaren, iRiija, iJala,
-            iPoints;
+      local bSkill, obj, level, school, division, iHave, prev_level, iNeed, bKnowOne,
+            lNeed;
 
       // Phase one. Assert our data. Be sure we have been fed a valid spell
       // and skill num for a spell item that actually exists.
@@ -12262,29 +12278,21 @@ messages:
       school = Send(obj,@GetSchool);
       division = Send(obj,@GetDivision);
 
-      // Phase three. We begin to find our need.  Start by finding out how many
-      // spells exist at ALL at that level. While we are going through the spell
-      // skill list, count the spells/skills that count towards our total. Note
-      // that we only want the top three spells/skills at that school and level.
-
+      // Phase three. We begin to find our need. Shortcuts first: knowing anything at the
+      // next level lets them buy any spell here; knowing one at this level is enough above
+      // level 2, and two at or below it (so nobody gets every level 2 spell fresh out of
+      // character creation).
       bKnowOne = FALSE;
 
-      // Check to see if they have any spells of the next level.
-      //  If so, let them buy any spells they want.
       iHave = Send(self,@CountKnownAtLevel,#school=school,#level=level+1);
       if iHave > 0
       {
          return PLAYER_LEARN_SUCCESS;
       }
 
-      // See how many spells they have at this level.
       iHave = Send(self,@CountKnownAtLevel,#school=school,#level=level);
       if iHave > 0
       {
-         // For level 3 or higher, they can learn if they have another spell
-         // in that school and level. If they have two spells at a lower level,
-         // they need 2 or more spells in that school or level. This prevents
-         // people getting all level 2 spells fresh out of character creation.
          if level > 2
             OR iHave >= 2
          {
@@ -12295,185 +12303,11 @@ messages:
          bKnowOne = TRUE;
       }
 
-      if level > 1
+      if (bSkill AND Send(self,@HasSkill,#num=skill_num))
+         OR (NOT bSkill AND Send(self,@HasSpell,#num=spell_num))
       {
-         prev_level = Send(SYS,@GetNumAtLevel,#school=school,#level=level-1);
+         return PLAYER_LEARN_ALREADY;
       }
-      else
-      {
-         prev_level = 0;
-      }
-
-      aHigh = 0; bHigh = 0; cHigh = 0;
-
-      iWeapon = 0;
-      iKraanan = 0;
-      iShalille = 0;
-      iQor = 0;
-      iFaren = 0;
-      iRiija = 0;
-      iJala = 0;
-
-      foreach i in plSkills
-      {
-         nSID=Send(self,@DecodeSkillNum,#compound=i);
-         nobj=Send(SYS,@FindSkillByNum,#num=nSID);
-
-         if nobj = $
-         {
-            Debug("bad data in spell list!");
-
-            return PLAYER_LEARN_ERROR;
-         }
-
-         if nobj = obj
-         {
-            return PLAYER_LEARN_ALREADY;
-         }
-
-         nLevel = Send(nobj,@GetLevel);
-
-         // Is this in the same school at level N-1?
-         if school=Send(nobj,@GetSchool) AND (level-1) = (nLevel)
-         {
-            index = Send(self,@DecodeSkillAbility,#compound=i);
-            if index > aHigh
-            {
-               temp = aHigh;
-               aHigh = index;
-               index = temp;
-            }
-
-            if index > bHigh
-            {
-               temp = bHigh;
-               bHigh = index;
-               index = temp;
-            }
-
-            if index > cHigh
-            {
-               cHigh = index;
-            }
-         }
-
-         if nLevel > iWeapon
-         {
-            iWeapon = nLevel;
-         }
-      }
-
-      foreach i in plSpells
-      {
-         nSID=Send(self,@DecodeSpellNum,#compound=i);
-         nobj=Send(SYS,@FindSpellByNum,#num=nSID);
-         
-         if nobj = $
-         {
-            Debug("bad data in spell list!");
-
-            return PLAYER_LEARN_ERROR;
-         }
-
-         nSchool = Send(nobj,@GetSchool);
-         nLevel = Send(nobj,@GetLevel);
-
-         if (NOT IsClass(nobj,&Spell)) OR (nLevel> 10)
-         {
-            continue;
-         }
-
-         if nobj = obj
-         {
-            return PLAYER_LEARN_ALREADY;
-         }
-
-         if nSchool = SS_DM_COMMAND
-         {
-            continue;
-         }
-
-         // Is this in the same school at level N-1?
-         if school = nSchool AND (level-1) = (nlevel)
-         {
-            index = Send(self,@DecodeSpellAbility,#compound=i);
-
-            if index > aHigh
-            {
-               temp = aHigh; aHigh = index; index = temp;
-            }
-
-            if index > bHigh
-            {
-               temp = bHigh; bHigh = index; index = temp;
-            }
-
-            if index > cHigh
-            {
-               cHigh = index;
-            }
-         }
-
-         if NOT IsClass(nobj,&Blink)  // DON'T COUNT BLINK!
-            AND NOT IsClass(nobj,&UtilitySpell) // Don't count utility spells
-            AND NOT Send(nobj,@IsFreeToLearn) // Ours: nor free ones (Minor Heal)
-         {
-            switch (nSchool)
-            {
-            case SS_KRAANAN:
-               if nLevel > iKraanan
-               {
-                  iKraanan = nLevel;
-               }
-               break;
-            case SS_SHALILLE:
-               if nLevel > iShalille
-               {
-                  iShalille = nLevel;
-               }
-               break;
-            case SS_QOR:
-               if nLevel > iQor
-               {
-                  iQor = nLevel;
-               }
-               break;
-            case SS_FAREN:
-               if nLevel > iFaren
-               {
-                  iFaren = nLevel;
-               }
-               break;
-            case SS_RIIJA:
-               if nLevel > iRiija
-               {
-                  iRiija = nLevel;
-               }
-               break;
-            case SS_JALA:
-               if nLevel > iJala
-               {
-                  iJala = nLevel;
-               }
-               break;
-            }
-         }
-      }
-
-      if level > 1
-      {
-         // Only top three matter in the math.
-         iHave = aHigh + bHigh + cHigh;
-      }
-      else
-      {
-         // You always have the "max" for level 1
-         iHave = (3 * 99);
-      }
-
-      // Do easy checks to prevent unnecessary math.
-      // Keep these checks here so they are of lower precedence than
-      // the 'you already have this spell' check.
 
       if NOT Send(obj,@KarmaCheck,#who=self)
       {
@@ -12482,9 +12316,21 @@ messages:
             Send(scryer,@MsgSendUser,#message_rsc=player_Debug_noKarma,
                  #parm1=Send(self,@GetTrueName),#parm2=Send(obj,@GetName));
          }
-         
+
          return PLAYER_LEARN_KARMA;
       }
+
+      // Ours (ADR 0028): the reckoning is LearnNeed's, which our client's Abilities tab
+      //  shares (ShardsAbilities.SendSchools), so the tab and the trainers always agree
+      lNeed = Send(self,@LearnNeed,#school=school,#level=level,#know_one=bKnowOne);
+      if lNeed = $
+      {
+         return PLAYER_LEARN_ERROR;
+      }
+
+      iHave = Nth(lNeed,1);
+      iNeed = Nth(lNeed,2);
+      prev_level = Nth(lNeed,3);
 
       // Player can't learn level this because he knows nothing of
       //  previous level.
@@ -12493,105 +12339,15 @@ messages:
          return PLAYER_LEARN_NOBASE;
       }
 
-      // We have done all the information gathering, so now, lets compute:
-
-      iPoints =  Send(SYS,@GetLevelLearnPoints,#level=iWeapon)
-               + Send(SYS,@GetLevelLearnPoints,#level=iKraanan)
-               + Send(SYS,@GetLevelLearnPoints,#level=iShalille)
-               + Send(SYS,@GetLevelLearnPoints,#level=iQor)
-               + Send(SYS,@GetLevelLearnPoints,#level=iFaren)
-               + Send(SYS,@GetLevelLearnPoints,#level=iRiija)
-               + Send(SYS,@GetLevelLearnPoints,#level=iJala);
-
-      // Okay, we're going into new territory if we don't already know one
-      //  spell in the school, so we're increasing the level of our
-      //  knowledge.  Add points.
-      if not bKnowOne
-      {
-         iPoints = iPoints + Send(SYS,@GetLevelLearnPoints,#level=level)
-                           - Send(SYS,@GetLevelLearnPoints,#level=(level-1));
-      }
-
-      // How this oddball equation works: You have a POINTS_SLOPE that determines
-      //  how steep the advancement slope is.  A higher slope results in lower
-      //  levels requiring less points, but each school level gained counts more
-      //  against future learning.  You hit your max when you get to 297 points
-      //  (3*99), so when your points equals max points, you've maxxed out.  
-      //  Intellect gives you a bonus to learning, currently about 20 points
-      //  for 50 Intellect (approximately mastering 2 extra schools)
-      iNeed =   (iPoints * POINTS_SLOPE)
-              + (297 - (Send(SETTINGS_OBJECT, @GetMaxLearnPoints) * POINTS_SLOPE))
-              - ((Send(self,@GetRawIntellect) * 2 * POINTS_SLOPE) / 5);
-
-      // NOTE: if you modify the above equation, also modify GivePlayerAllSkills
-      //  and GivePlayerAllSpells as needed
-
-      // Bound iNeed to a reasonable low level so people can't just rush in and
-      //  get high level with very little work.
-      iNeed = Bound(iNeed,MIN_NEEDED_TO_ADVANCE,$);
-
       if scryer <> $
       {
-         // nSchool will equal how much the intended school's points added.
-         if bSkill
-         {
-            nSchool = iWeapon;
-         }
-         else if school = SS_KRAANAN
-         {
-            nSchool = iKraanan;
-         }
-         else if school = SS_SHALILLE
-         {
-            nSchool = iShalille;
-         }
-         else if school = SS_QOR
-         {
-            nSchool = iQor;
-         }
-         else if school = SS_FAREN
-         {
-            nSchool = iFaren;
-         }
-         else if school = SS_RIIJA
-         {
-            nSchool = iRiija;
-         }
-         else if school = SS_JALA
-         {
-            nSchool = iJala;
-         }
-
-         // Bring the points back down to the original total, before learning.
-         if NOT bKnowOne
-         {
-            iPoints = iPoints - Send(SYS,@GetLevelLearnPoints,#level=level)
-                              + Send(SYS,@GetLevelLearnPoints,#level=(level-1));
-         }
-
          Send(scryer,@MsgSendUser,#message_rsc=player_Debug_playercanlearn,
               #parm1=Send(self,@GetName),#parm2=Send(obj,@GetLevel),
-              #parm3=Send(obj,@GetSchoolStr),#parm4=iPoints,#parm5=nSchool,
-              #parm6=((Send(self,@GetRawIntellect) * 2 * POINTS_SLOPE) / 5),
-              #parm7=iNeed,#parm8=iHave);
-      }
+              #parm3=Send(obj,@GetSchoolStr),#parm4=Nth(lNeed,4),#parm5=Nth(lNeed,5),
+              #parm6=Nth(lNeed,6),#parm7=Nth(lNeed,7),#parm8=iHave);
 
-      // If the previous level has fewer than three spells, help them out.
-      if prev_level = 1
-      {
-         iNeed= iNeed / 3;
-         if scryer <> $
-         {
-            Send(scryer,@MsgSendUser,
-                  #message_rsc=player_Debug_playercanlearn_scarcity,
-                  #parm1=iNeed);
-         }
-      }
-
-      if prev_level = 2
-      {
-         iNeed = (iNeed*2)/3;
-         if scryer <> $
+         if prev_level = 1
+            OR prev_level = 2
          {
             Send(scryer,@MsgSendUser,
                   #message_rsc=player_Debug_playercanlearn_scarcity,
@@ -12604,13 +12360,8 @@ messages:
          return PLAYER_LEARN_SUCCESS;
       }
 
-      // Okay, at this point, we know that they didn't pass the test.  Now give
-      // them a good reason why.  Essentially, if they know a lot of other
-      // divisions and it's slowing them down, tell them that.  Otherwise,
-      // be more generic.
-      
       // Is it now impossible to actually learn this spell level?  This would
-      // mean that the need is greater than 99// in three of the previous
+      // mean that the need is greater than 99% in three of the previous
       // level's spells, or 297 (most of the time).  Levels with fewer than
       // three spells are a special instance.
       if iNeed > (99*(bound(prev_level,1,3)))
@@ -12628,6 +12379,286 @@ messages:
       // of spell or skill points they need, and y is the reason why they
       // failed.  Only condition is "not enough points".
       return ((10*(iNeed-iHave))+PLAYER_LEARN_BASE);
+   }
+
+   LearnStanding()
+   "Ours (ADR 0028, from PlayerCanLearn): the highest level known in weaponcraft and each "
+   "school of magic, as they count toward learn points: [weaponcraft, Kraanan, Shal'ille, "
+   "Qor, Faren, Riija, Jala]. Weaponcraft is the highest level of any skill, as "
+   "PlayerCanLearn always counted it. Blink, utility, free and DM spells don't count. $ on "
+   "bad data."
+   {
+      local i, nObj, nLevel, iWeapon, iKraanan, iShalille, iQor, iFaren, iRiija, iJala;
+
+      iWeapon = 0;
+      iKraanan = 0;
+      iShalille = 0;
+      iQor = 0;
+      iFaren = 0;
+      iRiija = 0;
+      iJala = 0;
+
+      foreach i in plSkills
+      {
+         nObj = Send(SYS,@FindSkillByNum,#num=Send(self,@DecodeSkillNum,#compound=i));
+         if nObj = $
+         {
+            Debug("bad data in skill list!");
+
+            return $;
+         }
+
+         nLevel = Send(nObj,@GetLevel);
+         if nLevel > iWeapon
+         {
+            iWeapon = nLevel;
+         }
+      }
+
+      foreach i in plSpells
+      {
+         nObj = Send(SYS,@FindSpellByNum,#num=Send(self,@DecodeSpellNum,#compound=i));
+         if nObj = $
+         {
+            Debug("bad data in spell list!");
+
+            return $;
+         }
+
+         nLevel = Send(nObj,@GetLevel);
+         if (NOT IsClass(nObj,&Spell)) OR nLevel > 10
+            OR Send(nObj,@GetSchool) = SS_DM_COMMAND
+            OR IsClass(nObj,&Blink)
+            OR IsClass(nObj,&UtilitySpell)
+            OR Send(nObj,@IsFreeToLearn)
+         {
+            continue;
+         }
+
+         switch (Send(nObj,@GetSchool))
+         {
+         case SS_KRAANAN:
+            iKraanan = Bound(iKraanan,nLevel,$);
+            break;
+         case SS_SHALILLE:
+            iShalille = Bound(iShalille,nLevel,$);
+            break;
+         case SS_QOR:
+            iQor = Bound(iQor,nLevel,$);
+            break;
+         case SS_FAREN:
+            iFaren = Bound(iFaren,nLevel,$);
+            break;
+         case SS_RIIJA:
+            iRiija = Bound(iRiija,nLevel,$);
+            break;
+         case SS_JALA:
+            iJala = Bound(iJala,nLevel,$);
+            break;
+         }
+      }
+
+      return [ iWeapon, iKraanan, iShalille, iQor, iFaren, iRiija, iJala ];
+   }
+
+   LearnSchoolLevel(standing = $,school = 0)
+   "Ours (ADR 0028): a school's highest level in a LearnStanding list; any skill school "
+   "reads weaponcraft's."
+   {
+      if standing = $
+      {
+         return 0;
+      }
+
+      switch (school)
+      {
+      case SS_KRAANAN:
+         return Nth(standing,2);
+      case SS_SHALILLE:
+         return Nth(standing,3);
+      case SS_QOR:
+         return Nth(standing,4);
+      case SS_FAREN:
+         return Nth(standing,5);
+      case SS_RIIJA:
+         return Nth(standing,6);
+      case SS_JALA:
+         return Nth(standing,7);
+      }
+
+      return First(standing);
+   }
+
+   LearnTopThree(school = 0,level = 0)
+   "Ours (ADR 0028, from PlayerCanLearn): the three best abilities known in a school at a "
+   "level, the spells and skills that count toward its next level: [their percents added "
+   "up, [ the abilities ]]."
+   {
+      local i, nObj, iAbility, lTop, iSum, oBest, iBest, j, lBest;
+
+      lTop = $;
+      foreach i in plSkills
+      {
+         nObj = Send(SYS,@FindSkillByNum,#num=Send(self,@DecodeSkillNum,#compound=i));
+         if nObj <> $
+            AND Send(nObj,@GetSchool) = school
+            AND Send(nObj,@GetLevel) = level
+         {
+            lTop = Cons([nObj,Send(self,@DecodeSkillAbility,#compound=i)],lTop);
+         }
+      }
+
+      foreach i in plSpells
+      {
+         nObj = Send(SYS,@FindSpellByNum,#num=Send(self,@DecodeSpellNum,#compound=i));
+         if nObj <> $
+            AND IsClass(nObj,&Spell)
+            AND Send(nObj,@GetLevel) <= 10
+            AND Send(nObj,@GetSchool) <> SS_DM_COMMAND
+            AND Send(nObj,@GetSchool) = school
+            AND Send(nObj,@GetLevel) = level
+         {
+            lTop = Cons([nObj,Send(self,@DecodeSpellAbility,#compound=i)],lTop);
+         }
+      }
+
+      // The best three, one at a time
+      iSum = 0;
+      lBest = $;
+      j = 0;
+      while j < 3 AND lTop <> $
+      {
+         oBest = $;
+         iBest = -1;
+         foreach iAbility in lTop
+         {
+            if Nth(iAbility,2) > iBest
+            {
+               oBest = iAbility;
+               iBest = Nth(iAbility,2);
+            }
+         }
+
+         iSum = iSum + iBest;
+         lBest = Cons(First(oBest),lBest);
+         lTop = DelListElem(lTop,oBest);
+         j = j + 1;
+      }
+
+      return [ iSum, lBest ];
+   }
+
+   LearnNeed(school = 0,level = 0,know_one = FALSE)
+   "Ours (ADR 0028, from PlayerCanLearn): what learning the first ability of a school's "
+   "level asks: [have, need, abilities at the level below, learn points before it, the "
+   "school's highest level, Intellect's help, the need before a thin level's help]. Have is "
+   "the three best percents at the level below (297 for level 1). Need is the learn points "
+   "(LearnStanding, with this level's if know_one is FALSE) times POINTS_SLOPE, plus 297 "
+   "less the most learn points times POINTS_SLOPE, less Intellect x 2/5 x POINTS_SLOPE, "
+   "at least MIN_NEEDED_TO_ADVANCE, and a third or two thirds of that when the level below "
+   "has one or two abilities. $ on bad data."
+   {
+      local lStanding, i, iBefore, iPoints, iHave, iPrev, iInt, iNeed, iBase;
+
+      lStanding = Send(self,@LearnStanding);
+      if lStanding = $
+      {
+         return $;
+      }
+
+      iBefore = 0;
+      foreach i in lStanding
+      {
+         iBefore = iBefore + Send(SYS,@GetLevelLearnPoints,#level=i);
+      }
+
+      // Okay, we're going into new territory if we don't already know one
+      //  spell in the school, so we're increasing the level of our
+      //  knowledge.  Add points.
+      iPoints = iBefore;
+      if NOT know_one
+      {
+         iPoints = iPoints + Send(SYS,@GetLevelLearnPoints,#level=level)
+                           - Send(SYS,@GetLevelLearnPoints,#level=(level-1));
+      }
+
+      if level > 1
+      {
+         // Only top three matter in the math.
+         iHave = First(Send(self,@LearnTopThree,#school=school,#level=level-1));
+         iPrev = Send(SYS,@GetNumAtLevel,#school=school,#level=level-1);
+      }
+      else
+      {
+         // You always have the "max" for level 1
+         iHave = (3 * 99);
+         iPrev = 0;
+      }
+
+      // How this oddball equation works: You have a POINTS_SLOPE that determines
+      //  how steep the advancement slope is.  A higher slope results in lower
+      //  levels requiring less points, but each school level gained counts more
+      //  against future learning.  You hit your max when you get to 297 points
+      //  (3*99), so when your points equals max points, you've maxxed out.  
+      //  Intellect gives you a bonus to learning, currently about 20 points
+      //  for 50 Intellect (approximately mastering 2 extra schools)
+      iInt = Send(self,@LearnIntellectHelp);
+      iNeed =   (iPoints * POINTS_SLOPE)
+              + (297 - (Send(SETTINGS_OBJECT, @GetMaxLearnPoints) * POINTS_SLOPE))
+              - iInt;
+
+      // NOTE: if you modify the above equation, also modify GivePlayerAllSkills
+      //  and GivePlayerAllSpells as needed
+
+      // Bound iNeed to a reasonable low level so people can't just rush in and
+      //  get high level with very little work.
+      iNeed = Bound(iNeed,MIN_NEEDED_TO_ADVANCE,$);
+      iBase = iNeed;
+
+      // If the previous level has fewer than three spells, help them out.
+      if iPrev = 1
+      {
+         iNeed = iNeed / 3;
+      }
+
+      if iPrev = 2
+      {
+         iNeed = (iNeed*2)/3;
+      }
+
+      return [ iHave, iNeed, iPrev, iBefore,
+               Send(self,@LearnSchoolLevel,#standing=lStanding,#school=school), iInt,
+               iBase ];
+   }
+
+   LearnIntellectHelp()
+   "Ours (ADR 0028): what Intellect takes off every school's need (LearnNeed)."
+   {
+      return (Send(self,@GetRawIntellect) * 2 * POINTS_SLOPE) / 5;
+   }
+
+   QueueSchools()
+   "Ours (ADR 0028): our client's Abilities tab is sent again (UC_SCHOOLS), once, after "
+   "whatever changed our abilities or Intellect: a stat reset changes dozens at once."
+   {
+      if pbSchoolsQueued
+         OR NOT IsClass(self,&User)
+      {
+         return;
+      }
+
+      pbSchoolsQueued = TRUE;
+      Post(self,@SendSchoolsNow);
+
+      return;
+   }
+
+   SendSchoolsNow()
+   {
+      pbSchoolsQueued = FALSE;
+      Send(Send(SYS,@GetShardsAbilities),@SendSchools,#who=self);
+
+      return;
    }
 
    GetTotalLearnPoints(except = $)

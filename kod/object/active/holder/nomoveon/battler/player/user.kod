@@ -997,6 +997,9 @@ messages:
       Send(SYS,@SendSeason,#who=self);
       // Ours: our achievements, caught up on and sent (util/achievements.kod)
       Send(Send(SYS,@GetAchievements),@PlayerLoggedOn,#who=self);
+      // Ours (ADR 0028): our standing in each school, for our client's Abilities tab
+      pbSchoolsQueued = FALSE;
+      Send(self,@QueueSchools);
       // Ours: a PvP lockout still running (logging off in one adds the phase time to it)
       if Send(self,@IsInPvP)
       {
@@ -4101,6 +4104,7 @@ messages:
    //   companion ... our companion: ask, stances, dismiss, come, looks (util/companionbook.kod)
    //   tailor, barber ... their menus (util/cosmeticsbook.kod)
    //   train list    the abilities we can train, and their costs (util/shardsabilities.kod)
+   //   schools       our standing in each school, UC_SCHOOLS back (ADR 0028)
    //   start <city>  a new character skips the tutorial (ShardsAbilities.StartCity)
    // UC_SHARDS_OBJECT carries an object with its line (ShardsObjectCommand): train, appraise,
    // vault and guild.
@@ -4180,6 +4184,14 @@ messages:
          OR StringEqual(sVerb,"rename")
       {
          Send(Send(SYS,@GetItemServiceBook),@ServiceCommand,#who=self,#words=lWords);
+
+         return;
+      }
+
+      // Ours (ADR 0028): our client's Abilities tab asks for our standing in each school
+      if StringEqual(sVerb,"schools")
+      {
+         Send(self,@QueueSchools);
 
          return;
       }
@@ -11631,6 +11643,8 @@ messages:
 
       // Refresh the client screen so they see the new stats
       Send(self, @InvalidateData);
+      // Ours (ADR 0028): Intellect changes every school's need
+      Send(self,@QueueSchools);
       Debug("Player Updated!");
 
       return;

@@ -33,6 +33,11 @@ constants:
    APPRAISE_MIN_VALUE = 5000
    // Skipping the tutorial: the purse a new character sets out with (StartCity)
    START_SHILLINGS = 1000
+   // Our client's Abilities tab (SendSchools, UC_SCHOOLS): a school's next level is
+   SCHOOL_READY = 1        // there to learn now
+   SCHOOL_SHORT = 2        // short of its need
+   SCHOOL_IMPOSSIBLE = 3   // out of reach: the need is past 99% in each ability below
+   SCHOOL_MAX = 4          // none: the school's last level is known
    // ...the base health it starts at
    START_HEALTH = 40
    // ...the training points for the kills it skipped on the way there (Train window)
@@ -270,6 +275,127 @@ messages:
       foreach i in lRows
       {
          AddPacket(4,First(i), 4,Nth(i,2));
+      }
+
+      SendPacket(oSession);
+
+      return;
+   }
+
+   SendSchools(who = $)
+   "UC_SCHOOLS (ADR 0028), for our client's Abilities tab: who's learn points and Intellect's "
+   "help to every need, then weaponcraft and each school of magic they know (its level, the "
+   "next, have, need and a SCHOOL_* state, from Player.LearnNeed as the trainers reckon it), "
+   "then every spell and skill they know with its school, level and whether it's one of the "
+   "three counting toward its school's next level. Player.QueueSchools sends it."
+   {
+      local oSession, lStanding, lRows, lCounted, lAbilities, iSchool, iLevel, iNext,
+            iHave, iNeed, iState, lNeed, iPoints, iInt, i, oAbility;
+
+      oSession = Send(who,@GetShardsSession);
+      if oSession = $
+      {
+         return;
+      }
+
+      lStanding = Send(who,@LearnStanding);
+      if lStanding = $
+      {
+         return;
+      }
+
+      iPoints = 0;
+      foreach i in lStanding
+      {
+         iPoints = iPoints + Send(SYS,@GetLevelLearnPoints,#level=i);
+      }
+      iInt = Send(who,@LearnIntellectHelp);
+
+      // Backwards, so the rows come out weaponcraft first, then the schools in their order
+      lRows = $;
+      lCounted = $;
+      foreach iSchool in [ SS_JALA, SS_RIIJA, SS_FAREN, SS_KRAANAN, SS_QOR, SS_SHALILLE,
+                           SKS_FENCING ]
+      {
+         iLevel = Send(who,@LearnSchoolLevel,#standing=lStanding,#school=iSchool);
+         if iLevel < 1
+         {
+            continue;
+         }
+
+         iNext = iLevel + 1;
+         iHave = 0;
+         iNeed = 0;
+         iState = SCHOOL_MAX;
+         if iLevel < NUM_SPELL_LEVELS
+            AND Send(SYS,@GetNumAtLevel,#school=iSchool,#level=iNext) > 0
+         {
+            lNeed = Send(who,@LearnNeed,#school=iSchool,#level=iNext);
+            if lNeed = $
+            {
+               return;
+            }
+
+            iHave = Nth(lNeed,1);
+            iNeed = Nth(lNeed,2);
+            if iHave >= iNeed
+               // Knowing one there already opens the rest (PlayerCanLearn)
+               OR Send(who,@CountKnownAtLevel,#school=iSchool,#level=iNext) > 0
+            {
+               iState = SCHOOL_READY;
+            }
+            else if iNeed > 99 * Bound(Nth(lNeed,3),1,3)
+            {
+               iState = SCHOOL_IMPOSSIBLE;
+            }
+            else
+            {
+               iState = SCHOOL_SHORT;
+            }
+         }
+         else
+         {
+            iNext = 0;
+         }
+
+         foreach i in Nth(Send(who,@LearnTopThree,#school=iSchool,#level=iLevel),2)
+         {
+            lCounted = Cons(i,lCounted);
+         }
+
+         lRows = Cons([iSchool,iLevel,iNext,iHave,iNeed,iState],lRows);
+      }
+
+      lAbilities = $;
+      foreach i in Send(who,@GetSpellList)
+      {
+         oAbility = Send(SYS,@FindSpellByNum,#num=Send(who,@DecodeSpellNum,#compound=i));
+         if oAbility <> $
+         {
+            lAbilities = Cons(oAbility,lAbilities);
+         }
+      }
+
+      foreach i in Send(who,@GetSkillList)
+      {
+         oAbility = Send(SYS,@FindSkillByNum,#num=Send(who,@DecodeSkillNum,#compound=i));
+         if oAbility <> $
+         {
+            lAbilities = Cons(oAbility,lAbilities);
+         }
+      }
+
+      AddPacket(1,BP_USERCOMMAND, 1,UC_SCHOOLS, 2,iPoints, 2,iInt, 1,Length(lRows));
+      foreach i in lRows
+      {
+         AddPacket(1,First(i), 1,Nth(i,2), 1,Nth(i,3), 2,Nth(i,4), 2,Nth(i,5), 1,Nth(i,6));
+      }
+
+      AddPacket(2,Length(lAbilities));
+      foreach oAbility in lAbilities
+      {
+         AddPacket(4,oAbility, 1,Send(oAbility,@GetSchool), 1,Bound(Send(oAbility,@GetLevel),0,255),
+                   1,(FindListElem(lCounted,oAbility) <> 0));
       }
 
       SendPacket(oSession);
