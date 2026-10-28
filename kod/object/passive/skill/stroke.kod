@@ -45,6 +45,10 @@ classvars:
    vrIcon = stroke_icon_rsc
    vrDesc = stroke_desc_rsc
 
+   // Ours: weapon skills learn at half the others' pace since 2026-10-28 (skill.kod
+   //  viPractice_slowness, 2): every gain takes twice the uses; they rose too fast in play
+   viPractice_slowness = 4
+
    vrPlayer_Hit_something = stroke_hit_attacker
    vrPlayer_was_hit = stroke_hit_defender
    vrPlayer_killed_something = $

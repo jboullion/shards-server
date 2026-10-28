@@ -37,6 +37,9 @@ classvars:
    viSkill_num = 0
    
    viMeditate_ratio = 30
+   // Ours: weapon skills learn at half the others' pace since 2026-10-28 (skill.kod
+   //  viPractice_slowness, 2): every gain takes twice the uses; they rose too fast in play
+   viPractice_slowness = 4
 
    vbAutomatic = TRUE    // does not show up in pull-down menu
 
