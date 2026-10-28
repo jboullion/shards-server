@@ -155,7 +155,7 @@ resources:
       "token."
    player_improve_maxhealth = "~I~BYou suddenly feel a little tougher."
    player_improve_health_invigorate = \
-      "~I~BYou feel invigorated by your success."
+      "~I~BYour wounds close in the flush of your success."
    player_spits = "You spit on the corpse of your unworthy foe."
    player_newbie_over = \
       "~IYou're no longer new to these lands: from now on a death breaks the "
@@ -9159,11 +9159,11 @@ messages:
             Send(self,@MsgSendUser,#message_rsc=player_improve_maxhealth);
             Send(self,@WaveSendUser,#what=self,#wave_rsc=player_tougher_wav_rsc);
 
-            // Boost the player to max health, and give them 200 vigor.
+            // Boost the player to max health. Ours: no longer to 200 vigor too (2026-10-28):
+            //  from 20 to 50 health the gains came so often that nobody had to eat
             Send(self,@MsgSendUser,#message_rsc=player_improve_health_invigorate);
             piHealth = piMax_Health * 100;
             Send(self,@DrawHealth);
-            Send(self,@EatSomething,#nutrition=200);
             Post(self,@DrawOffense);
             Post(self,@DrawDefense);
 
