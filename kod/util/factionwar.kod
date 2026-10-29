@@ -349,19 +349,12 @@ messages:
          }
 
          oFlag = Send(oRoom,@FindHoldingActive,#class=&Flagpole);
-         if oFlag = $
-            OR NOT Send(oFlag,@IsClaimable)
-            OR Send(oFlag,@IsClaimAttemptInProgress)
+         if NOT Send(self,@CanBeAttacked,#rid=iRID,#flag=oFlag)
          {
             continue;
          }
 
          iOwner = Send(oFlag,@GetFaction);
-         if iOwner <> FACTION_NEUTRAL
-            AND Send(oTG,@IsHometownFlag,#RID=iRID,#faction=iOwner)
-         {
-            continue;
-         }
 
          foreach iNear in Send(oRoom,@GetYellZone)
          {
@@ -377,17 +370,12 @@ messages:
             }
 
             oNearFlag = Send(oNearRoom,@FindHoldingActive,#class=&Flagpole);
-            if oNearFlag = $
+            if NOT Send(self,@MarchesFrom,#flag=oFlag,#near=oNearFlag)
             {
                continue;
             }
 
             iNearFaction = Send(oNearFlag,@GetFaction);
-            if iNearFaction = FACTION_NEUTRAL
-               OR iNearFaction = iOwner
-            {
-               continue;
-            }
 
             if iOwner <> FACTION_NEUTRAL
             {
@@ -421,6 +409,48 @@ messages:
       }
 
       return Nth(lFronts,Random(1,Length(lFronts)));
+   }
+
+   CanBeAttacked(rid = $,flag = $)
+   "Whether a battle could be called for this pole (PickFront): not a town's own pole, no claim "
+   "on it, and not its liege's own city or capture points."
+   {
+      local iOwner, oTG;
+
+      if flag = $
+         OR NOT Send(flag,@IsClaimable)
+         OR Send(flag,@IsClaimAttemptInProgress)
+      {
+         return FALSE;
+      }
+
+      iOwner = Send(flag,@GetFaction);
+      oTG = Send(SYS,@GetTerritoryGame);
+      if iOwner <> FACTION_NEUTRAL
+         AND oTG <> $
+         AND Send(oTG,@IsHometownFlag,#RID=rid,#faction=iOwner)
+      {
+         return FALSE;
+      }
+
+      return TRUE;
+   }
+
+   MarchesFrom(flag = $,near = $)
+   "Whether the liege holding the pole near could march on flag (PickFront): a liege holds it, "
+   "and not flag's."
+   {
+      local iNear;
+
+      if flag = $
+         OR near = $
+      {
+         return FALSE;
+      }
+
+      iNear = Send(near,@GetFaction);
+
+      return iNear <> FACTION_NEUTRAL AND iNear <> Send(flag,@GetFaction);
    }
 
    StartBattle(rid = $,attacker = $)
@@ -1592,9 +1622,11 @@ messages:
    "effort; every flag room [ rid, name, liege, flags: 1 a town's own pole, 2 at half-staff, "
    "4 the battle's ]; the towns [ rid, name, liege, liege celebrating there ]; the last "
    "battles [ rid, name, attacker, defender, winner, how, seconds ago ]; our liege's ledger "
-   "[ name, rank, kills, battles won, fought ]."
+   "[ name, rank, kills, battles won, fought ]; and the flag rooms that are neighbours (each's "
+   "yell zone) [ rid, rid, flags: 1 a front, where PickFront could call a battle ]."
    {
-      local oSession, oWorld, oTG, i, j, iFlags, oPole, iFaction, lRecord, lList, iCeleb, oRoom;
+      local oSession, oWorld, oTG, i, j, iFlags, oPole, iFaction, lRecord, lList, iCeleb, oRoom,
+            lPoles, lRIDs, lKeys, lPairs, iNear, oNearPole, iKey;
 
       if who = $ OR NOT IsClass(who,&User)
       {
@@ -1651,6 +1683,7 @@ messages:
          }
       }
 
+      lPoles = lList;
       AddPacket(1,Length(lList));
       foreach i in lList
       {
@@ -1727,6 +1760,59 @@ messages:
          AddPacket(STRING_RESOURCE,Send(j,@GetTrueName),
                    STRING_RESOURCE,Send(j,@GetRenownRankName),
                    2,First(lRecord),2,Nth(lRecord,4),2,Nth(lRecord,3));
+      }
+
+      // Ours (2026-10-29): neighbouring flag rooms, for the map's lines, each pair once
+      lRIDs = $;
+      foreach i in lPoles
+      {
+         lRIDs = Cons(First(i),lRIDs);
+      }
+
+      lKeys = $;
+      lPairs = $;
+      foreach i in lPoles
+      {
+         foreach iNear in Send(Nth(i,2),@GetYellZone)
+         {
+            if iNear = First(i)
+               OR FindListElem(lRIDs,iNear) = 0
+            {
+               continue;
+            }
+
+            iKey = Bound(First(i),0,iNear) * 100000 + Bound(First(i),iNear,$);
+            if FindListElem(lKeys,iKey) <> 0
+            {
+               continue;
+            }
+
+            lKeys = Cons(iKey,lKeys);
+            foreach j in lPoles
+            {
+               if First(j) = iNear
+               {
+                  oNearPole = Nth(j,3);
+               }
+            }
+
+            iFlags = 0;
+            if (Send(self,@CanBeAttacked,#rid=First(i),#flag=Nth(i,3))
+                AND Send(self,@MarchesFrom,#flag=Nth(i,3),#near=oNearPole))
+               OR (Send(self,@CanBeAttacked,#rid=iNear,#flag=oNearPole)
+                   AND Send(self,@MarchesFrom,#flag=oNearPole,#near=Nth(i,3)))
+            {
+               iFlags = 1;
+            }
+
+            lPairs = Cons([ First(i), iNear, iFlags ],lPairs);
+         }
+      }
+
+      AddPacket(2,Length(lPairs));
+      foreach i in lPairs
+      {
+         AddPacket(4,First(i),4,Nth(i,2),1,Nth(i,3));
       }
 
       SendPacket(oSession);
