@@ -63,6 +63,7 @@ messages:
          Send(self,@SendTaste,#what=what,#apply_on=apply_on);
          Send(what,@WaveSendUser,#wave_rsc=vrEat_wav);
          Send(apply_on,@EatSomething,#nutrition=viNutrition,#filling=viFilling);
+         Send(Send(SYS,@GetQuestBook),@FoodEaten,#who=apply_on,#what=self);
          Send(self,@SubtractNumber,#number=1);
       }
       else

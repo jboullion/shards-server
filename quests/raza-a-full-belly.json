@@ -1,0 +1,39 @@
+{
+  "id": 353,
+  "key": "raza-a-full-belly",
+  "name": "A Full Belly",
+  "tier": "main",
+  "giver": {
+    "class": "RazaBartender"
+  },
+  "band": {
+    "min": 20,
+    "max": 30
+  },
+  "text": {
+    "offer": "You've the look of someone who hasn't eaten since the boat, friend. Let a cook tell you what nobody told me when I was new. Watch your vigor. Walking, running and fighting all burn it down, and only food brings it back up, so eat whenever your vigor runs low. It matters for more than your belly: the higher your vigor, the faster your wounds close. Well fed, you get a point of health back about every second. Half starved, it's one every four seconds. Resting speeds it up either way. Eat something now, those apples in your pack or a loaf from my counter, and then come and tell me how you feel.",
+    "progress": "Open your inventory and use any food to eat it: an apple, bread, a meat pie. If you have none, right-click Eric and choose Buy. Then come back to Eric at the bar.",
+    "complete": "There, colour in your cheeks already. Take these for the road, and remember: when your vigor runs low, eat before you fight, not after."
+  },
+  "steps": [
+    {
+      "kind": "eat",
+      "auto": false,
+      "objective": "Eat something"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 50,
+    "items": [
+      {
+        "class": "Bread",
+        "count": 3
+      },
+      {
+        "class": "MeatPie",
+        "count": 3
+      }
+    ]
+  }
+}

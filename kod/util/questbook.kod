@@ -173,6 +173,8 @@ constants:
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
+   // Ours: eating something (Food.NewApplied); the step's class, or any food
+   QK_EAT = 26
    QT_STORY = 2
    QT_ERRAND = 3
 
@@ -2132,7 +2134,7 @@ messages:
          return FALSE;
       }
 
-      // cast, buy: the spell or the item, when the step names one
+      // cast, buy, eat: the spell or the item, when the step names one
       return Nth(step,QBS_CLASS) = $ OR IsClass(what,Nth(step,QBS_CLASS));
    }
 
@@ -2225,6 +2227,14 @@ messages:
             {
                return Nth(lStep,QBS_AMOUNT);
             }
+   FoodEaten(who = $,what = $)
+   "Ours: Food.NewApplied: who ate what (QK_EAT)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_EAT,#what=what);
+
+      return;
+   }
+
          }
       }
 
