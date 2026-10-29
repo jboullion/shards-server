@@ -674,12 +674,14 @@ messages:
    }
 
    MageSchool(faction = $,which = 1)
-   "The liege's two schools: the Princess Shal'ille and Faren, the Duke Qor and Riija, Jonas "
-   "Kraanan and Jala."
+   "The liege's two schools: the Princess Faren and Shal'ille, the Duke Qor and Riija, Jonas "
+   "Kraanan and Jala. An army of 10 has one mage, of the first."
    {
+      // Ours (27 October): the Princess's mage is Faren's first, a battle mage of fire and
+      //  lightning; Shal'ille's second
       if faction = FACTION_PRINCESS
       {
-         return Nth([ SS_SHALILLE, SS_FAREN ],which);
+         return Nth([ SS_FAREN, SS_SHALILLE ],which);
       }
 
       if faction = FACTION_DUKE

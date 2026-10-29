@@ -14,6 +14,10 @@ constants:
 
    include blakston.khd
 
+   // A battle mage's chance to cast (Monster.piSpellChance; MonsterCastSpell tries one chase
+   //  step in this * 6)
+   BATTLE_SPELL_CHANCE = 4
+
 resources:
 
 classvars:
@@ -22,6 +26,9 @@ properties:
 
    piMana = 100
    piMax_Mana = 100
+
+   // Ours: the school SetBattleSchool gave us (0 for none)
+   piBattleSchool = 0
 
 messages:
 
@@ -93,6 +100,7 @@ messages:
       }
 
       Send(self,@AddEquipmentObject,#what=Create(&DiscipleRobe,#school=school));
+      piBattleSchool = school;
 
       if school = SS_KRAANAN
          OR school = SS_JALA
@@ -124,15 +132,68 @@ messages:
       }
       else if school = SS_FAREN
       {
-         plSpellBook = [ [SID_SPIDER_WEB,6,20], [SID_LIGHTNING_BOLT,6,55],
-                         [SID_FIREBALL,7,80], [SID_ICESHARD,7,100] ];
+         // Ours (27 October): bolts only, fire and lightning (Touch of Flame up close:
+         //  GetSpellType, MonsterAttack, DidDamage)
+         plSpellBook = [ [SID_LIGHTNING_BOLT,6,50], [SID_FIREBALL,7,100] ];
       }
       else
       {
          plSpellBook = [ [SID_DAZZLE,6,30], [SID_HOLY_BLAZE,7,100] ];
       }
 
+      // A battle mage casts often: one chase step in BATTLE_SPELL_CHANCE * 6 (Monster's 10)
+      piSpellChance = BATTLE_SPELL_CHANCE;
+
       return;
+   }
+
+   //// Ours (27 October): a Faren battle mage's blows up close are Touch of Flame's
+
+   IsFlameHanded()
+   {
+      return piBattleSchool = SS_FAREN;
+   }
+
+   GetSpellType(what = $, use_weapon = $)
+   {
+      if Send(self,@IsFlameHanded)
+      {
+         return ATCK_SPELL_FIRE + ATCK_SPELL_ALL;
+      }
+
+      propagate;
+   }
+
+   MonsterAttack(what = $)
+   {
+      if Send(self,@IsFlameHanded)
+      {
+         Send(self,@DoCast);
+
+         return;
+      }
+
+      propagate;
+   }
+
+   DidDamage(what = $, amount = 0)
+   "Embers where a flame-handed blow lands (as Touch of Flame's, TouchAttackSpell)."
+   {
+      local oFlame;
+
+      if Send(self,@IsFlameHanded)
+         AND what <> $
+      {
+         oFlame = Send(SYS,@FindSpellByNum,#num=SID_TOUCH_OF_FLAME);
+         if oFlame <> $
+         {
+            Send(oFlame,@SendSpellFx,#kind=SPELLFX_IMPACT,#source=self,#target=what,
+                 #size=1,#color=Send(oFlame,@ElementFxColor,#iType=ATCK_SPELL_FIRE),
+                 #fxlook=Send(oFlame,@ElementFxLook,#iType=ATCK_SPELL_FIRE));
+         }
+      }
+
+      propagate;
    }
 
 end
