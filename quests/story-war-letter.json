@@ -33,33 +33,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 1000
-      },
-      {
-        "class": "Shillings",
-        "count": 1000
-      },
-      {
-        "class": "Shillings",
-        "count": 1500
-      },
-      {
-        "class": "Shillings",
-        "count": 2000
-      },
-      {
-        "class": "LongSword"
-      },
-      {
-        "class": "Gauntlet"
-      },
-      {
-        "class": "InkyCap",
-        "count": 5
-      }
-    ]
+    "shillings": 1250
   }
 }

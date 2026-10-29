@@ -66,21 +66,24 @@
     }
   ],
   "rewards": {
-    "oneOf": [
+    "choice": [
       {
         "class": "OfferingShalille"
-      },
-      {
-        "class": "OfferingRiija"
       },
       {
         "class": "OfferingQor"
       },
       {
+        "class": "OfferingKraanan"
+      },
+      {
         "class": "OfferingFaren"
       },
       {
-        "class": "OfferingKraanan"
+        "class": "OfferingRiija"
+      },
+      {
+        "class": "OfferingJala"
       }
     ]
   }

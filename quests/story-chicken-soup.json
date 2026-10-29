@@ -38,33 +38,9 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Hammer"
-      },
+    "items": [
       {
         "class": "LongSword"
-      },
-      {
-        "class": "Axe"
-      },
-      {
-        "class": "ScaleArmor"
-      },
-      {
-        "class": "FireRing"
-      },
-      {
-        "class": "ColdRing"
-      },
-      {
-        "class": "ShockRing"
-      },
-      {
-        "class": "AcidRing"
-      },
-      {
-        "class": "RingInvisibility"
       }
     ]
   }

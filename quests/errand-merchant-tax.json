@@ -33,38 +33,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "InkyCap",
-        "count": 4
-      },
-      {
-        "class": "EntrootBerry",
-        "count": 20
-      },
-      {
-        "class": "OrcTooth",
-        "count": 20
-      },
-      {
-        "class": "DetectInvisibilityPotion"
-      },
-      {
-        "class": "DetectGoodPotion"
-      },
-      {
-        "class": "DetectEvilPotion"
-      },
-      {
-        "class": "IllusionaryFormPotion"
-      },
-      {
-        "class": "NeruditeArrow",
-        "count": 20
-      },
-      {
-        "class": "NodeBurstPotion"
-      }
-    ]
+    "shillings": 1200
   }
 }

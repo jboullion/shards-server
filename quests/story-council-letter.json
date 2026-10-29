@@ -33,23 +33,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 500
-      },
-      {
-        "class": "Shillings",
-        "count": 750
-      },
-      {
-        "class": "Shillings",
-        "count": 750
-      },
-      {
-        "class": "Shillings",
-        "count": 1000
-      }
-    ]
+    "shillings": 750
   }
 }

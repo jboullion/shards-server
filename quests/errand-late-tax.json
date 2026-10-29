@@ -33,40 +33,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 800
-      },
-      {
-        "class": "Shillings",
-        "count": 1000
-      },
-      {
-        "class": "Shillings",
-        "count": 1200
-      },
-      {
-        "class": "Shillings",
-        "count": 1400
-      },
-      {
-        "class": "Shillings",
-        "count": 1600
-      },
-      {
-        "class": "NeruditeArrow",
-        "count": 20
-      },
-      {
-        "class": "DetectGoodPotion"
-      },
-      {
-        "class": "DetectEvilPotion"
-      },
-      {
-        "class": "DetectInvisibilityPotion"
-      }
-    ]
+    "shillings": 1200
   }
 }

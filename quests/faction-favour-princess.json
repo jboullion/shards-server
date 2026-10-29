@@ -41,19 +41,6 @@
   "rewards": {
     "renown": 2,
     "trainingPoints": 100,
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 200
-      },
-      {
-        "class": "Shillings",
-        "count": 300
-      },
-      {
-        "class": "Shillings",
-        "count": 400
-      }
-    ]
+    "shillings": 300
   }
 }

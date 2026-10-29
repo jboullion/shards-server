@@ -1042,6 +1042,9 @@ resources:
    qd_352_t6 = "Duke Akardius"
    qd_352_s7 = "Carry the sword to the Monk of Riija"
    qd_352_t7 = "Monk of Riija"
+   qd_353_name = "A Full Belly"
+   qd_353_s1 = "Eat something"
+   qd_353_t1 = "Eric d'Jorn"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -1057,7 +1060,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 35564330;
+      return 131997379;
    }
 
    GetQuests()
@@ -1249,13 +1252,13 @@ messages:
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &JasperBlacksmith, 0, qd_40_s1, $, qd_40_p1, qd_40_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 500 ], [ &Shillings, 300 ], [ &Shillings, 400 ], [ &Shillings, 600 ], [ &Shillings, 450 ], [ &Shillings, 650 ], [ &Shillings, 750 ], [ &Shillings, 550 ], [ &NeruditeArrow, 25 ], [ &NeruditeArrow, 35 ], [ &SilverArrow, 25 ], [ &SilverArrow, 35 ], [ &Axe, 1 ], [ &MysticSword, 1 ], [ &StrengthPotion, 1 ], [ &HastePotion, 1 ], [ &MagicShieldPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 525, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-apothecary
          [ 41, qd_41_name, &TosApothecary, 0, 25, 150, $,
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &BarloqueApothecary, 0, qd_41_s1, $, qd_41_p1, qd_41_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 600 ], [ &Shillings, 650 ], [ &Shillings, 600 ], [ &Shillings, 650 ], [ &Shillings, 600 ], [ &Shillings, 750 ], [ &Shillings, 700 ], [ &Shillings, 750 ], [ &Shillings, 800 ], [ &Book, 1 ], [ &DetectInvisibilityPotion, 1 ], [ &NightVisionPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 650, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-bar-restock
          [ 42, qd_42_name, &JasperBartender, 0, 0, 150, $,
            $, $, 7200, $,
@@ -1263,7 +1266,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &JasperBartender, 0, qd_42_s2, $, qd_42_p2, qd_42_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 1400 ], [ &Shillings, 1500 ], [ &Shillings, 1600 ], [ &Shillings, 1700 ], [ &Shillings, 1800 ], [ &Shillings, 1900 ], [ &Shillings, 2000 ], [ &NeruditeArrow, 25 ], [ &NeruditeArrow, 35 ], [ &SilverArrow, 25 ], [ &SilverArrow, 35 ], [ &Book, 1 ], [ &ShadowFormPotion, 1 ], [ &KaraholsCursePotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1700, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-catering
          [ 43, qd_43_name, &OneCouncilor, 0, 0, 150, $,
            $, $, 7200, $,
@@ -1271,7 +1274,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &ThreeCouncilor, 0, qd_43_s2, $, qd_43_p2, qd_43_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 1300 ], [ &Shillings, 1400 ], [ &Shillings, 1500 ], [ &Shillings, 1600 ], [ &Shillings, 1700 ], [ &Shillings, 1800 ], [ &Shillings, 1900 ], [ &Shillings, 2000 ], [ &NeruditeArrow, 25 ], [ &SilverArrow, 30 ], [ &BaitPotion, 1 ], [ &DetectGoodPotion, 1 ], [ &DetectEvilPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1650, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-identify-potion
          [ 44, qd_44_name, &MarionInnkeeper, 0, 0, 40, $,
            $, $, 7200, $,
@@ -1279,7 +1282,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &MarionInnkeeper, 0, qd_44_s2, $, qd_44_p2, qd_44_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 1000 ], [ &Shillings, 1500 ], [ &Meatpie, 4 ], [ &Cheese, 3 ], [ &ShortSword, 1 ], [ &Hammer, 1 ] ], 0, $, $, $, $ ],
+           0, 1250, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-identify-wand
          [ 45, qd_45_name, &BarloqueInnkeeper, 0, 0, 40, $,
            $, $, 7200, $,
@@ -1287,19 +1290,19 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &BarloqueInnkeeper, 0, qd_45_s2, $, qd_45_p2, qd_45_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 1000 ], [ &Shillings, 1500 ], [ &Meatpie, 4 ], [ &Cheese, 3 ], [ &ShortSword, 1 ], [ &Hammer, 1 ] ], 0, $, $, $, $ ],
+           0, 1250, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-kocatan-ale
          [ 46, qd_46_name, &CorNothInnkeeper, 0, 50, 150, $,
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &KocatanBartender, 0, qd_46_s1, $, qd_46_p1, qd_46_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &InkyCap, 10 ], [ &Arrow, 60 ], [ &NeruditeArrow, 30 ], [ &SilverArrow, 30 ], [ &Longbow, 1 ], [ &KaraholsCursePotion, 1 ], [ &HoldWand, 1 ], [ &FireRing, 1 ], [ &ColdRing, 1 ], [ &ShockRing, 1 ], [ &AcidRing, 1 ], [ &ResistMagicPotion, 1 ], [ &ResistPoisonPotion, 1 ], [ &ResistShockPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1200, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-kocatan-arrows
          [ 47, qd_47_name, &KocatanBowMaker, 0, 50, 150, $,
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &DukeLiege, 0, qd_47_s1, $, qd_47_p1, qd_47_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &InkyCap, 10 ], [ &Emerald, 6 ], [ &PurifyWand, 1 ], [ &ResistColdPotion, 1 ], [ &ResistFirePotion, 1 ], [ &ResistMagicPotion, 1 ], [ &ResistPoisonPotion, 1 ], [ &ResistShockPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1000, $, 0, 3, $, $, 0, $, $, $, $ ],
          // story-chicken-soup
          [ 50, qd_50_name, &CornothGrocer, 0, 0, 40, $,
            $, $, 86400, $,
@@ -1307,7 +1310,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &CornothGrocer, 0, qd_50_s2, $, qd_50_p2, qd_50_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &Hammer, 1 ], [ &LongSword, 1 ], [ &Axe, 1 ], [ &ScaleArmor, 1 ], [ &FireRing, 1 ], [ &ColdRing, 1 ], [ &ShockRing, 1 ], [ &AcidRing, 1 ], [ &RingInvisibility, 1 ] ], 0, $, $, $, $ ],
+           0, 0, [ [ &LongSword, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
          // story-hypochondriac
          [ 51, qd_51_name, &TosApothecary, 0, 0, 150, $,
            $, $, 86400, $,
@@ -1317,7 +1320,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &TosApothecary, 0, qd_51_s3, $, qd_51_p3, qd_51_t3,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &ScaleArmor, 1 ], [ &PlateArmor, 1 ], [ &FineLute, 1 ], [ &Rose, 1 ], [ &BerserkerRing, 1 ], [ &Gauntlet, 1 ], [ &EnfeebleWand, 1 ] ], 0, $, $, $, $ ],
+           0, 0, [ [ &ScaleArmor, 1 ] ], 0, 2, $, $, 0, $, $, $, $ ],
          // story-polished-seraphym
          [ 52, qd_52_name, &JasperElder, 0, 25, 150, $,
            $, $, 86400, $,
@@ -1337,7 +1340,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &MarionBartender, 0, qd_53_s5, $, qd_53_p5, qd_53_t5,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &OfferingShalille, 1 ], [ &OfferingRiija, 1 ], [ &OfferingQor, 1 ], [ &OfferingFaren, 1 ], [ &OfferingKraanan, 1 ] ], 0, $, $, $, $ ]
+           0, 0, $, 0, 2, $, [ [ &OfferingShalille, 1 ], [ &OfferingQor, 1 ], [ &OfferingKraanan, 1 ], [ &OfferingFaren, 1 ], [ &OfferingRiija, 1 ], [ &OfferingJala, 1 ] ], 0, $, $, $, $ ]
          ],
          [
          // story-mystery-monster
@@ -1353,7 +1356,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &KocatanBowMaker, 0, qd_55_s2, $, qd_55_p2, qd_55_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 100, 2, $, [ [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &Mace, 1 ], [ &BlindWand, 1 ], [ &ShortSword, 1 ], [ &ShortSword, 1 ], [ &ShortSword, 1 ], [ &MysticSword, 1 ], [ &PlateArmor, 1 ] ], 0, $, $, $, $ ],
+           0, 0, [ [ &Mace, 1 ] ], 100, 2, $, $, 0, $, $, $, $ ],
          // story-moxal-investment
          [ 56, qd_56_name, &KocatanInnkeeper, 0, 80, 150, $,
            $, $, 86400, $,
@@ -1371,13 +1374,13 @@ messages:
            $, $, 86400, $,
            [ [ 4, $, 1, 0, &TwoCouncilor, 0, qd_57_s1, $, qd_57_p1, qd_57_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &Shillings, 500 ], [ &Shillings, 750 ], [ &Shillings, 750 ], [ &Shillings, 1000 ] ], 0, $, $, $, $ ],
+           0, 750, $, 0, 2, $, $, 0, $, $, $, $ ],
          // story-war-letter
          [ 58, qd_58_name, &RebelLiege, 0, 30, 150, $,
            $, $, 86400, $,
            [ [ 4, $, 1, 0, &TosBanker, 0, qd_58_s1, $, qd_58_p1, qd_58_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &Shillings, 1000 ], [ &Shillings, 1000 ], [ &Shillings, 1500 ], [ &Shillings, 2000 ], [ &LongSword, 1 ], [ &Gauntlet, 1 ], [ &InkyCap, 5 ] ], 0, $, $, $, $ ],
+           0, 1250, $, 0, 2, $, $, 0, $, $, $, $ ],
          // story-jala-necklace
          [ 59, qd_59_name, &Minstrel, 0, 80, 150, $,
            $, $, 86400, $,
@@ -1413,7 +1416,7 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &Barloquetailor, 0, qd_61_s3, $, qd_61_p3, qd_61_t3,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &Shillings, 1400 ], [ &Shillings, 1600 ], [ &Shillings, 1800 ], [ &Shillings, 2000 ] ], 0, $, $, $, $ ],
+           0, 1700, $, 0, 2, $, $, 0, $, $, $, $ ],
          // story-necromancer-warning-evil
          [ 62, qd_62_name, &DarkWizard, 0, 40, 150, $,
            $, $, 86400, $,
@@ -1421,7 +1424,7 @@ messages:
                0, $, $, $, 0 ],
              [ 3, $, 1, 0, &DarkWizard, 0, qd_62_s2, $, $, qd_62_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &Shillings, 800 ], [ &Shillings, 1000 ], [ &Shillings, 1200 ], [ &Shillings, 1400 ], [ &Shillings, 1600 ], [ &SilverArrow, 10 ], [ &SilverArrow, 15 ], [ &SilverArrow, 20 ], [ &Prism, 1 ] ], 0, $, $, $, $ ],
+           0, 1200, $, 0, 2, $, $, 0, $, $, $, $ ],
          // story-necromancer-warning-good
          [ 63, qd_63_name, &Minstrel, 0, 40, 150, $,
            $, $, 86400, $,
@@ -1429,7 +1432,7 @@ messages:
                0, $, $, $, 0 ],
              [ 3, $, 1, 0, &Minstrel, 0, qd_63_s2, $, $, qd_63_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 2, $, [ [ &Shillings, 1000 ], [ &Shillings, 1000 ], [ &Shillings, 1200 ], [ &Shillings, 1400 ], [ &Shillings, 1600 ], [ &Prism, 1 ] ], 0, $, $, $, $ ],
+           0, 1200, $, 0, 2, $, $, 0, $, $, $, $ ],
          // faction-join-duke
          [ 70, qd_70_name, &DukeLiege, 0, 50, 150, $,
            $, $, 86400, $,
@@ -1455,19 +1458,19 @@ messages:
                0, $, $, $, 0 ],
              [ 4, $, 1, 0, &DukeLiege, 0, qd_73_s2, $, qd_73_p2, qd_73_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 100, 2, 1, [ [ &Shillings, 200 ], [ &Shillings, 300 ], [ &Shillings, 400 ] ], 0, [ [ 4, 2 ] ], $, $, $ ],
+           0, 300, $, 100, 2, 1, $, 0, [ [ 4, 2 ] ], $, $, $ ],
          // faction-favour-princess
          [ 74, qd_74_name, &PrincessLiege, 0, 50, 150, $,
            $, $, 43200, $,
            [ [ 4, $, 1, 0, &FiveCouncilor, 0, qd_74_s1, $, qd_74_p1, qd_74_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 100, 2, 2, [ [ &Shillings, 200 ], [ &Shillings, 300 ], [ &Shillings, 400 ] ], 0, [ [ 4, 2 ] ], $, $, $ ],
+           0, 300, $, 100, 2, 2, $, 0, [ [ 4, 2 ] ], $, $, $ ],
          // faction-favour-rebel
          [ 75, qd_75_name, &RebelLiege, 0, 50, 150, $,
            $, $, 43200, $,
            [ [ 2, &LongSword, 1, 0, &RebelLiege, 0, qd_75_s1, $, $, qd_75_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 100, 2, 3, [ [ &Shillings, 200 ], [ &Shillings, 300 ], [ &Shillings, 400 ] ], 0, [ [ 4, 2 ] ], $, $, $ ],
+           0, 300, $, 100, 2, 3, $, 0, [ [ 4, 2 ] ], $, $, $ ],
          // soldier-princess
          [ 76, qd_76_name, &PrincessLiege, 0, 50, 150, $,
            $, $, $, $,
@@ -1661,31 +1664,31 @@ messages:
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &BarloqueMerchant, 0, qd_104_s1, $, qd_104_p1, qd_104_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 800 ], [ &Shillings, 1000 ], [ &Shillings, 1200 ], [ &Shillings, 1400 ], [ &Shillings, 1600 ], [ &NeruditeArrow, 20 ], [ &DetectGoodPotion, 1 ], [ &DetectEvilPotion, 1 ], [ &DetectInvisibilityPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1200, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-merchant-tax
          [ 105, qd_105_name, &JasperMerchant, 0, 30, 150, $,
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &DukeLiege, 0, qd_105_s1, $, qd_105_p1, qd_105_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &InkyCap, 4 ], [ &EntrootBerry, 20 ], [ &OrcTooth, 20 ], [ &DetectInvisibilityPotion, 1 ], [ &DetectGoodPotion, 1 ], [ &DetectEvilPotion, 1 ], [ &IllusionaryFormPotion, 1 ], [ &NeruditeArrow, 20 ], [ &NodeBurstPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1200, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-vault-tax
          [ 106, qd_106_name, &TosBanker, 0, 30, 150, $,
            $, $, 7200, $,
            [ [ 4, $, 1, 0, &DukeLiege, 0, qd_106_s1, $, qd_106_p1, qd_106_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &InkyCap, 7 ], [ &EntrootBerry, 20 ], [ &OrcTooth, 20 ], [ &DetectInvisibilityPotion, 1 ], [ &DetectGoodPotion, 1 ], [ &DetectEvilPotion, 1 ], [ &IllusionaryFormPotion, 1 ], [ &NeruditeArrow, 30 ], [ &SilverArrow, 30 ], [ &NodeBurstPotion, 1 ] ], 0, $, $, $, $ ],
+           0, 1200, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-love-letter
          [ 107, qd_107_name, &BarloqueInnkeeper, 0, 0, 150, $,
            $, $, 10800, $,
            [ [ 4, $, 1, 0, &Barloquetailor, 0, qd_107_s1, $, qd_107_p1, qd_107_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 500 ], [ &Shillings, 600 ], [ &Shillings, 400 ], [ &Shillings, 700 ], [ &Shillings, 550 ], [ &Shillings, 650 ], [ &Shillings, 450 ], [ &SeduceWand, 1 ] ], 0, $, $, $, $ ],
+           0, 550, $, 0, 3, $, $, 0, $, $, $, $ ],
          // errand-madelias-letter
          [ 108, qd_108_name, &Barloquetailor, 0, 0, 150, $,
            $, $, 10800, $,
            [ [ 4, $, 1, 0, &BarloqueInnkeeper, 0, qd_108_s1, $, qd_108_p1, qd_108_t1,
                0, $, $, $, 0 ] ],
-           0, 0, $, 0, 3, $, [ [ &Shillings, 500 ], [ &Shillings, 600 ], [ &Shillings, 400 ], [ &Shillings, 700 ], [ &Shillings, 550 ], [ &Shillings, 650 ], [ &Shillings, 450 ] ], 0, $, $, $, $ ],
+           0, 550, $, 0, 3, $, $, 0, $, $, $, $ ],
          // raza-rats-in-the-stores
          [ 120, qd_120_name, &RazaInnKeeper, 0, 20, 30, [ 138 ],
            $, $, 0, $,
@@ -2783,7 +2786,13 @@ messages:
                1, $, $, [ &RiijaSword ], 0 ],
              [ 3, $, 1, 0, &RiijaMonk, 0, qd_352_s7, $, $, qd_352_t7,
                0, $, $, $, 0 ] ],
-           7562, 2000, $, 0, 2, $, $, 0, $, $, $, $ ]
+           7562, 2000, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // raza-a-full-belly
+         [ 353, qd_353_name, &RazaBartender, 0, 20, 30, $,
+           $, $, $, $,
+           [ [ 26, $, 1, 0, &RazaBartender, 0, qd_353_s1, $, $, qd_353_t1,
+               0, $, $, $, 0 ] ],
+           221, 50, [ [ &Bread, 3 ], [ &Meatpie, 3 ] ], 0, 1, $, $, 0, $, $, $, $ ]
          ]
       ];
    }

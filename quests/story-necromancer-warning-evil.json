@@ -38,42 +38,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 800
-      },
-      {
-        "class": "Shillings",
-        "count": 1000
-      },
-      {
-        "class": "Shillings",
-        "count": 1200
-      },
-      {
-        "class": "Shillings",
-        "count": 1400
-      },
-      {
-        "class": "Shillings",
-        "count": 1600
-      },
-      {
-        "class": "SilverArrow",
-        "count": 10
-      },
-      {
-        "class": "SilverArrow",
-        "count": 15
-      },
-      {
-        "class": "SilverArrow",
-        "count": 20
-      },
-      {
-        "class": "Prism"
-      }
-    ]
+    "shillings": 1200
   }
 }

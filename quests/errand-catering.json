@@ -44,56 +44,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 1300
-      },
-      {
-        "class": "Shillings",
-        "count": 1400
-      },
-      {
-        "class": "Shillings",
-        "count": 1500
-      },
-      {
-        "class": "Shillings",
-        "count": 1600
-      },
-      {
-        "class": "Shillings",
-        "count": 1700
-      },
-      {
-        "class": "Shillings",
-        "count": 1800
-      },
-      {
-        "class": "Shillings",
-        "count": 1900
-      },
-      {
-        "class": "Shillings",
-        "count": 2000
-      },
-      {
-        "class": "NeruditeArrow",
-        "count": 25
-      },
-      {
-        "class": "SilverArrow",
-        "count": 30
-      },
-      {
-        "class": "BaitPotion"
-      },
-      {
-        "class": "DetectGoodPotion"
-      },
-      {
-        "class": "DetectEvilPotion"
-      }
-    ]
+    "shillings": 1650
   }
 }

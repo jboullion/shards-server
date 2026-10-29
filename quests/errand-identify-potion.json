@@ -38,29 +38,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 1000
-      },
-      {
-        "class": "Shillings",
-        "count": 1500
-      },
-      {
-        "class": "MeatPie",
-        "count": 4
-      },
-      {
-        "class": "Cheese",
-        "count": 3
-      },
-      {
-        "class": "ShortSword"
-      },
-      {
-        "class": "Hammer"
-      }
-    ]
+    "shillings": 1250
   }
 }

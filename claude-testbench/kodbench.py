@@ -84,6 +84,12 @@ def setup_sandbox(force=False):
 def _patch_cfg(cfg: pathlib.Path):
     """Ensure the sandbox uses non-conflicting ports and localhost maintenance."""
     lines = cfg.read_text(errors="ignore").splitlines() if cfg.exists() else []
+    # A clone of run/server carries the live ports: replace them, or the sandbox clashes with live
+    want = {"Port": SANDBOX_GAME_PORT, "MaintenancePort": SANDBOX_MAINT_PORT}
+    patched = [f"{ln.split()[0]:<21}{want[ln.split()[0]]}" if ln.strip() and ln.split()[0] in want else ln for ln in lines]
+    if patched != lines:
+        lines = patched
+        cfg.write_text("\n".join(lines) + "\n")
     have = {ln.split()[0] for ln in lines if ln.strip() and not ln.startswith("#")}
     inject = []
     if "Port" not in have:

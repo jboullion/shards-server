@@ -46,27 +46,9 @@
     }
   ],
   "rewards": {
-    "oneOf": [
+    "items": [
       {
         "class": "ScaleArmor"
-      },
-      {
-        "class": "PlateArmor"
-      },
-      {
-        "class": "FineLute"
-      },
-      {
-        "class": "Rose"
-      },
-      {
-        "class": "BerserkerRing"
-      },
-      {
-        "class": "Gauntlet"
-      },
-      {
-        "class": "EnfeebleWand"
       }
     ]
   }

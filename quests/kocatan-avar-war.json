@@ -41,7 +41,7 @@
     }
   ],
   "rewards": {
-    "oneOf": [
+    "choice": [
       {
         "class": "Yrxlsap",
         "count": 500

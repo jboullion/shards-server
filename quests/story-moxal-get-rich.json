@@ -39,54 +39,9 @@
   ],
   "rewards": {
     "trainingPoints": 100,
-    "oneOf": [
+    "items": [
       {
         "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "Mace"
-      },
-      {
-        "class": "BlindWand"
-      },
-      {
-        "class": "ShortSword"
-      },
-      {
-        "class": "ShortSword"
-      },
-      {
-        "class": "ShortSword"
-      },
-      {
-        "class": "MysticSword"
-      },
-      {
-        "class": "PlateArmor"
       }
     ]
   }

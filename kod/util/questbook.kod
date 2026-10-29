@@ -15,7 +15,8 @@
 // (User.poQuestNpc; our client's commands can't name objects). Then our client sends "quest ..."
 // commands (UC_SHARDS, User.ShardsCommand -> QuestCommand):
 //   quest accept <id>     take on a quest that NPC offers
-//   quest turnin <id>     hand in the current step there
+//   quest turnin <id> [n] hand in the current step there; n picks the reward on the last step
+//                         of a quest whose reward is a choice (QB_CHOICE)
 //   quest offers          what that NPC has for us again
 //   quest abandon <id>
 //   quest log             -> UC_QUEST_LOG
@@ -55,7 +56,8 @@ constants:
    QB_TP = 16
    QB_TIER = 17
    QB_FACTION = 18
-   QB_ONE_OF = 19
+   // Ours: the items the player chooses one of as they hand the quest in ($: none)
+   QB_CHOICE = 19
    QB_NEEDS = 20
    QB_SPECIAL = 21
    QB_EXCLUDES = 22
@@ -100,13 +102,14 @@ constants:
    QBS_CLASSES = 14
    QBS_AMOUNT = 15
 
-   // A step's rewards, and a quest's: [ xp, shillings, training points, items, one of, special ].
+   // A step's rewards, and a quest's: [ xp, shillings, training points, items, the items to
+   // choose one of (a quest's only: a step's is $), special ].
    // An item is [ class, count ] or [ class, count, SS_* ] (made for a school: a disciple robe).
    QBR_XP = 1
    QBR_SHILLINGS = 2
    QBR_TP = 3
    QBR_ITEMS = 4
-   QBR_ONE_OF = 5
+   QBR_CHOICE = 5
    QBR_SPECIAL = 6
 
    // Special rewards: [ kind, its number ] (tools/quests/validate.ts SPECIAL)
@@ -170,11 +173,11 @@ constants:
    // Ours (ADR 0027): an offering made at a shrine (Shrine.MakeOffering); the amount is the
    // offering's school (SS_SHALILLE 1 to SS_JALA 6), 0 any
    QK_SHRINE = 25
+   // Ours: eating something (Food.NewApplied); the step's class, or any food
+   QK_EAT = 26
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
-   // Ours: eating something (Food.NewApplied); the step's class, or any food
-   QK_EAT = 26
    QT_STORY = 2
    QT_ERRAND = 3
 
@@ -241,6 +244,8 @@ resources:
    quest_too_far = "You must stand closer to speak with them."
    quest_nothing = "They have no work for you right now."
    quest_not_ready = "You haven't finished that yet."
+   // Ours: a quest whose reward is a choice, handed in without one (TurnIn)
+   quest_choose = "Choose your reward first."
    quest_cant = "You can't take on that quest."
    // Ours: a repeatable quest that was done lately (the court's bounties, the dailies)
    quest_wait_hours = "You've done that one recently.  It will be offered again in %i hours."
@@ -951,7 +956,7 @@ messages:
    "The client's quest commands (UC_SHARDS): accept, turnin, offers, abandon, log, and the "
    "guild window's board and board-accept."
    {
-      local sVerb, iId, oNpc;
+      local sVerb, iId, oNpc, iChoice;
 
       if who = $ OR NOT IsClass(who,&User) OR Length(words) < 2
       {
@@ -1021,7 +1026,12 @@ messages:
 
       if StringEqual(sVerb,"turnin")
       {
-         Send(self,@TurnIn,#who=who,#id=iId,#npcobj=oNpc);
+         iChoice = 0;
+         if Length(words) >= 4
+         {
+            iChoice = StringToNumber(Nth(words,4));
+         }
+         Send(self,@TurnIn,#who=who,#id=iId,#npcobj=oNpc,#choice=iChoice);
 
          return;
       }
@@ -1504,7 +1514,9 @@ messages:
       return;
    }
 
-   TurnIn(who = $,id = $,npcobj = $)
+   TurnIn(who = $,id = $,npcobj = $,choice = 0)
+   "Hands in who's current step of quest id to npcobj. On a quest's last step, a reward to choose "
+   "needs choice, 1 to its length."
    {
       local lEntry, lQuest, lStep, iStep;
 
@@ -1538,6 +1550,15 @@ messages:
          return;
       }
 
+      // Ours: the reward chosen, before anything is taken
+      if iStep = Length(Nth(lQuest,QB_STEPS)) AND Nth(lQuest,QB_CHOICE) <> $
+         AND (choice < 1 OR choice > Length(Nth(lQuest,QB_CHOICE)))
+      {
+         Send(who,@MsgSendUser,#message_rsc=quest_choose);
+
+         return;
+      }
+
       // What the step took
       if Nth(lStep,QBS_KIND) = QK_COLLECT
       {
@@ -1548,13 +1569,14 @@ messages:
          Send(self,@DeleteParcels,#who=who,#id=id);
       }
 
-      Send(self,@AdvanceStep,#who=who,#entry=lEntry,#qrow=lQuest);
+      Send(self,@AdvanceStep,#who=who,#entry=lEntry,#qrow=lQuest,#choice=choice);
 
       return;
    }
 
-   AdvanceStep(who = $,entry = $,qrow = $)
-   "The current step is done: the next one, or the quest is complete."
+   AdvanceStep(who = $,entry = $,qrow = $,choice = 1)
+   "The current step is done: the next one, or the quest is complete (choice: the reward chosen, "
+   "if it's a choice)."
    {
       local iStep, lStep;
 
@@ -1568,7 +1590,7 @@ messages:
       iStep = Nth(entry,QBL_STEP) + 1;
       if iStep > Length(Nth(qrow,QB_STEPS))
       {
-         Send(self,@Complete,#who=who,#entry=entry,#qrow=qrow);
+         Send(self,@Complete,#who=who,#entry=entry,#qrow=qrow,#choice=choice);
 
          return;
       }
@@ -1585,7 +1607,7 @@ messages:
       return;
    }
 
-   Complete(who = $,entry = $,qrow = $)
+   Complete(who = $,entry = $,qrow = $,choice = 1)
    {
       local lDone;
 
@@ -1605,26 +1627,26 @@ messages:
       // Ours: quests done, and the factions' chains, are achievements (util/achievements.kod)
       Send(Send(SYS,@GetAchievements),@QuestDone,#who=who);
       Send(who,@MsgSendUser,#message_rsc=quest_complete,#parm1=Nth(qrow,QB_NAME));
-      Send(self,@Award,#who=who,#qrow=qrow);
+      Send(self,@Award,#who=who,#qrow=qrow,#choice=choice);
       Send(self,@SendLog,#who=who);
       Send(self,@RefreshMarkers,#who=who);
 
       return;
    }
 
-   Award(who = $,qrow = $)
-   "A quest's rewards, at its end."
+   Award(who = $,qrow = $,choice = 1)
+   "A quest's rewards, at its end, with the one chosen of its choice (the first, for an admin's)."
    {
-      Send(self,@AwardList,#who=who,
+      Send(self,@AwardList,#who=who,#choice=choice,
            #rewards=[ Nth(qrow,QB_XP), Nth(qrow,QB_SHILLINGS), Nth(qrow,QB_TP), Nth(qrow,QB_ITEMS),
-                      Nth(qrow,QB_ONE_OF), Nth(qrow,QB_SPECIAL) ]);
+                      Nth(qrow,QB_CHOICE), Nth(qrow,QB_SPECIAL) ]);
 
       return;
    }
 
-   AwardList(who = $,rewards = $)
-   "[ xp, shillings, training points, items, one of these items, special ]: a step's rewards, or "
-   "a quest's."
+   AwardList(who = $,rewards = $,choice = 1)
+   "[ xp, shillings, training points, items, the items to choose from, special ]: a step's "
+   "rewards, or a quest's, with the choice'th of the items to choose from."
    {
       local i, j, oItem, lItems;
 
@@ -1649,11 +1671,12 @@ messages:
          Send(who,@MsgSendUser,#message_rsc=quest_reward_money,#parm1=Nth(rewards,QBR_SHILLINGS));
       }
 
-      // The items, and one more drawn from the list of choices
+      // The items, and the one chosen
       lItems = Nth(rewards,QBR_ITEMS);
-      if Nth(rewards,QBR_ONE_OF) <> $
+      if Nth(rewards,QBR_CHOICE) <> $
       {
-         lItems = Cons(Nth(Nth(rewards,QBR_ONE_OF),Random(1,Length(Nth(rewards,QBR_ONE_OF)))),lItems);
+         lItems = Cons(Nth(Nth(rewards,QBR_CHOICE),Bound(choice,1,Length(Nth(rewards,QBR_CHOICE)))),
+                       lItems);
       }
 
       // IsClass needs an object, not a class: the first is made, and says whether it stacks
@@ -2204,6 +2227,14 @@ messages:
       return;
    }
 
+   FoodEaten(who = $,what = $)
+   "Ours: Food.NewApplied: who ate what (QK_EAT)."
+   {
+      Send(self,@ActionDone,#who=who,#kind=QK_EAT,#what=what);
+
+      return;
+   }
+
    SiegeAgainst(who = $)
    "The faction a siege step who is on would besiege (its amount), or $ if they're on none "
    "(Factions.SomeoneSaid, 'march')."
@@ -2227,14 +2258,6 @@ messages:
             {
                return Nth(lStep,QBS_AMOUNT);
             }
-   FoodEaten(who = $,what = $)
-   "Ours: Food.NewApplied: who ate what (QK_EAT)."
-   {
-      Send(self,@ActionDone,#who=who,#kind=QK_EAT,#what=what);
-
-      return;
-   }
-
          }
       }
 

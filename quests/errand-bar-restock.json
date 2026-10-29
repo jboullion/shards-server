@@ -38,60 +38,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "Shillings",
-        "count": 1400
-      },
-      {
-        "class": "Shillings",
-        "count": 1500
-      },
-      {
-        "class": "Shillings",
-        "count": 1600
-      },
-      {
-        "class": "Shillings",
-        "count": 1700
-      },
-      {
-        "class": "Shillings",
-        "count": 1800
-      },
-      {
-        "class": "Shillings",
-        "count": 1900
-      },
-      {
-        "class": "Shillings",
-        "count": 2000
-      },
-      {
-        "class": "NeruditeArrow",
-        "count": 25
-      },
-      {
-        "class": "NeruditeArrow",
-        "count": 35
-      },
-      {
-        "class": "SilverArrow",
-        "count": 25
-      },
-      {
-        "class": "SilverArrow",
-        "count": 35
-      },
-      {
-        "class": "Book"
-      },
-      {
-        "class": "ShadowformPotion"
-      },
-      {
-        "class": "KaraholsCursePotion"
-      }
-    ]
+    "shillings": 1700
   }
 }

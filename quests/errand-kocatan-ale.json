@@ -30,53 +30,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "InkyCap",
-        "count": 10
-      },
-      {
-        "class": "Arrow",
-        "count": 60
-      },
-      {
-        "class": "NeruditeArrow",
-        "count": 30
-      },
-      {
-        "class": "SilverArrow",
-        "count": 30
-      },
-      {
-        "class": "LongBow"
-      },
-      {
-        "class": "KaraholsCursePotion"
-      },
-      {
-        "class": "HoldWand"
-      },
-      {
-        "class": "FireRing"
-      },
-      {
-        "class": "ColdRing"
-      },
-      {
-        "class": "ShockRing"
-      },
-      {
-        "class": "AcidRing"
-      },
-      {
-        "class": "ResistMagicPotion"
-      },
-      {
-        "class": "ResistPoisonPotion"
-      },
-      {
-        "class": "ResistShockPotion"
-      }
-    ]
+    "shillings": 1200
   }
 }

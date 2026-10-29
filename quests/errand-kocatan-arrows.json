@@ -33,33 +33,6 @@
     }
   ],
   "rewards": {
-    "oneOf": [
-      {
-        "class": "InkyCap",
-        "count": 10
-      },
-      {
-        "class": "Emerald",
-        "count": 6
-      },
-      {
-        "class": "PurifyWand"
-      },
-      {
-        "class": "ResistColdPotion"
-      },
-      {
-        "class": "ResistFirePotion"
-      },
-      {
-        "class": "ResistMagicPotion"
-      },
-      {
-        "class": "ResistPoisonPotion"
-      },
-      {
-        "class": "ResistShockPotion"
-      }
-    ]
+    "shillings": 1000
   }
 }
