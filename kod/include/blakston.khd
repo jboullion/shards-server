@@ -3239,6 +3239,8 @@ SID_ICEWALL             = 241
    // Ours (the faction revamp): a player's renown with their faction, 0 to RENOWN_MAX
    // (Player.AddFactionRenown), and what earns or costs it.
    RENOWN_MAX = 100
+   // Renown a player keeps on leaving their faction, to take to the next (Player.ResetFaction)
+   RENOWN_KEPT = 40
    RENOWN_SOLDIER_KILL = 1
    RENOWN_FLAG_CLAIM = 3
    RENOWN_TOKEN = 3

@@ -12876,10 +12876,10 @@ messages:
          Send(oSoldierShield,@LostFaction);
       }
 
-      // Ours: renown is with one faction; leaving it, or changing it, starts again
+      // Ours: leaving a faction, or changing it, keeps renown up to RENOWN_KEPT
       if faction <> piFaction
       {
-         Send(self,@ClearFactionRenown);
+         Send(self,@KeepFactionRenown);
          Post(self,@NameColorsChanged);
 
          // ...and the old liege's shield is gone, so its soldier quest can be done again
@@ -13169,8 +13169,7 @@ messages:
       }
 
       piFaction = new_faction;
-      // Ours: a new member, or a defector, starts with no renown
-      Send(self,@ClearFactionRenown);
+      // Ours: a new member, or a defector, brings what renown they kept (KeepFactionRenown)
       Post(self,@NameColorsChanged);
       // The loyalty quests are QuestBook favours now (ADR 0009): nothing to schedule
       if piFaction = FACTION_PRINCESS
@@ -13406,6 +13405,20 @@ messages:
       piFactionRenown = 0;
       piTroopKills = 0;
       piTroopRenownToday = 0;
+
+      return;
+   }
+
+   KeepFactionRenown()
+   "Leaving a faction: renown above RENOWN_KEPT is lost, the rest goes with us to the next. "
+   "The troop count starts again, but not the day's troop renown, so leaving doesn't reset it."
+   {
+      if piFactionRenown > RENOWN_KEPT
+      {
+         piFactionRenown = RENOWN_KEPT;
+      }
+
+      piTroopKills = 0;
 
       return;
    }
