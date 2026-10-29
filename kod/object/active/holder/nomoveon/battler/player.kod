@@ -2401,7 +2401,7 @@ messages:
 
       if iTimespan > 16*60*60
       {
-         if piTraining_points >= 10000
+         if piTraining_points >= MAX_TRAINING_POINTS
          {
             return;
          }
@@ -8867,7 +8867,7 @@ messages:
    "stamina, all the way down to half for those with high staminas."
    {
       local i, iMaxHealth, dodgeskill, oSkill, monster_level, iXP, oWeapon,
-            iItemBonus, iBonusXP, iBonusTP, iGuildBonus;
+            iItemBonus, iBonusXP, iBonusTP, iGuildBonus, iGainTP;
 
       iXP = 0;
       iItemBonus = 0;
@@ -9054,55 +9054,49 @@ messages:
          // Here, we work out if the player deserves a training point.
          // They qualify if they got at least one gain point from the monster,
          // and also got the killing blow (no double points from single mobs).
+         // Ours: added up, then given through AddTrainingPoints, which keeps the cap
+         //  (MAX_TRAINING_POINTS) and says when it's reached
+         iGainTP = 0;
          if iXP > 0
             AND killing_blow
-            AND piTraining_points < 10000
          {
-            piTraining_points = piTraining_points + 1
+            iGainTP = 1
                + (Send(what,@GetBoostedLevel)
                / Send(Send(SYS,@GetSurvivalRoomMaintenance),@GetSurvivalTP));
 
             if monster_level > 249
             {
-               piTraining_points = piTraining_points + 9;
+               iGainTP = iGainTP + 9;
             }
             else if monster_level > 199
             {
-               piTraining_points = piTraining_points + 7;
+               iGainTP = iGainTP + 7;
             }
             else if monster_level > 130
             {
-               piTraining_points = piTraining_points + 5;
+               iGainTP = iGainTP + 5;
             }
             else if monster_level > 100
             {
-               piTraining_points = piTraining_points + 4;
+               iGainTP = iGainTP + 4;
             }
             else if monster_level > 70
             {
-               piTraining_points = piTraining_points + 3;
-			   }
+               iGainTP = iGainTP + 3;
+            }
             else if monster_level > 40
             {
-               piTraining_points = piTraining_points + 2;
+               iGainTP = iGainTP + 2;
             }
          }
-         
-		 // Add bonus training points
-         piTraining_points += iBonusTP;
 
-         // Let the player know how many training points they have, if they
-         // either reached the max, or a multiple of 100.
-         if piTraining_points > 9999
-         {
-            if piInform
-            {
-               Send(self,@MsgSendUser,#message_rsc=player_reached_maxtraining,
-                  #parm1=piTraining_points);
-               piInform = FALSE;
-            }
-         }
-         else if piTraining_points % 100 = 0
+         // Add bonus training points
+         iGainTP = iGainTP + iBonusTP;
+         Send(self,@AddTrainingPoints,#points=iGainTP,#report=FALSE);
+
+         // Let the player know how many training points they have at a multiple of 100
+         if piTraining_points < MAX_TRAINING_POINTS
+            AND piTraining_points % 100 = 0
                AND piTraining_points <> 0
                AND piInform
          {
@@ -9203,7 +9197,7 @@ messages:
          if (iMaxHealth >= 100 + iStamina
             OR iMaxHealth >= MAX_HP)
          {
-            Send(self,@AddTrainingPoints,#points=iMaxHealth * 3,#bCap=FALSE);
+            Send(self,@AddTrainingPoints,#points=iMaxHealth * 3);
          }
 
          return TRUE;
@@ -9299,26 +9293,27 @@ messages:
       return piTraining_points;
    }
 
-   AddTrainingPoints(points=0,report=TRUE,bCap=TRUE)
+   AddTrainingPoints(points=0,report=TRUE)
+   "Every gain and cost of training points. Ours: a gain stops at MAX_TRAINING_POINTS (one who "
+   "holds more from before keeps them to spend, and gains nothing), and a cost at none."
    {
+      if points > 0
+      {
+         if piTraining_points >= MAX_TRAINING_POINTS
+         {
+            return;
+         }
+
+         points = Bound(points,0,MAX_TRAINING_POINTS - piTraining_points);
+      }
+      else
+      {
+         points = Bound(points,-piTraining_points,0);
+      }
+
       if points = 0
       {
          return;
-      }
-
-      if bCap
-      {
-         if piTraining_points <= 10000
-         {
-            points = bound(points,-piTraining_points,10000 - piTraining_points);
-         }
-         else if points > 0
-         {
-               // We're respecting the 1000 point cap, have more than 1000
-               // points and are trying to add more. Don't add the points,
-               // return out.
-               return;
-         }
       }
 
       if report AND points > 0
@@ -9335,13 +9330,13 @@ messages:
 
       piTraining_points = piTraining_points + points;
 
-      if piTraining_points < 10000
-         OR NOT bCap
+      if piTraining_points < MAX_TRAINING_POINTS
       {
          piInform = TRUE;
       }
-      else
+      else if piInform
       {
+         // Once, as the cap is reached
          Send(self,@MsgSendUser,#message_rsc=player_reached_maxtraining,
                #parm1=piTraining_points);
          piInform = FALSE;
@@ -9358,7 +9353,7 @@ messages:
 
       ptReward_timer = CreateTimer(self,@GetDailyTrainingReward,24*60*60*1000);
 
-      if piTraining_points >= 10000
+      if piTraining_points >= MAX_TRAINING_POINTS
       {
          return;
       }

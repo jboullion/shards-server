@@ -91,7 +91,7 @@ messages:
       }
       else
       {
-         Send(what,@AddTrainingPoints,#points=(piPoints),#bCap=FALSE);
+         Send(what,@AddTrainingPoints,#points=(piPoints));
 
          return TRUE;
       }

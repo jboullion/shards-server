@@ -2824,6 +2824,9 @@ SID_ICEWALL             = 241
    MAX_CALCULATED_HP = 392
    MAX_XP = 20000000
    MAX_XP_DEATH_LOSS = 10000
+   // Ours (29 October): the most training points a player holds; past it nothing more comes,
+   //  so they are spent, not hoarded (was 10000). Player.AddTrainingPoints keeps it
+   MAX_TRAINING_POINTS = 2000
 
    // First set of flags (in piFlags)
    // A mask of flags that are unaffected by ResetPlayerFlagList. The bits of

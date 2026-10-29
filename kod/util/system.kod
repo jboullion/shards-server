@@ -7981,7 +7981,7 @@ messages:
             else
             {
                iTP = Send(oSpell,@GetMeditateRatio);
-               Send(i,@AddTrainingPoints,#points=iTP * iPercent,#bCap=FALSE);
+               Send(i,@AddTrainingPoints,#points=iTP * iPercent);
                Debug("Added ",iTP * iPercent," TP to ",Send(i,@GetTrueName));
             }
          }
@@ -8027,7 +8027,7 @@ messages:
             else
             {
                iTP = Send(oSkill,@GetMeditateRatio);
-               Send(i,@AddTrainingPoints,#points=iTP * iPercent,#bCap=FALSE);
+               Send(i,@AddTrainingPoints,#points=iTP * iPercent);
                Debug("Added ",iTP * iPercent," TP to ",Send(i,@GetTrueName));
             }
          }

@@ -398,7 +398,7 @@ messages:
 
          if viTrainingPointsReward > 0
          {
-            Send(poQuester,@AddTrainingPoints,#points=viTrainingPointsReward,#bCap=FALSE);
+            Send(poQuester,@AddTrainingPoints,#points=viTrainingPointsReward);
          }
 
          if viMoneyReward > 0
