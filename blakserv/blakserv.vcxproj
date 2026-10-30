@@ -240,6 +240,7 @@ copy "$(SolutionDir)bin\libcurl.dll" "$(SolutionDir)run\server"</Command>
     <ClInclude Include="resync.h" />
     <ClInclude Include="roofile.h" />
     <ClInclude Include="roomdata.h" />
+    <ClInclude Include="navgrid.h" />
     <ClInclude Include="saveacco.h" />
     <ClInclude Include="saveall.h" />
     <ClInclude Include="savegame.h" />
@@ -312,6 +313,7 @@ copy "$(SolutionDir)bin\libcurl.dll" "$(SolutionDir)run\server"</Command>
     <ClCompile Include="resync.c" />
     <ClCompile Include="roofile.c" />
     <ClCompile Include="roomdata.c" />
+    <ClCompile Include="navgrid.c" />
     <ClCompile Include="saveacco.c" />
     <ClCompile Include="saveall.c" />
     <ClCompile Include="savegame.c" />

@@ -40,6 +40,7 @@ OBJS =  \
     $(OUTDIR)\loadrsc.obj \
     $(OUTDIR)\blakres.obj \
     $(OUTDIR)\roomdata.obj \
+    $(OUTDIR)\navgrid.obj \
     $(OUTDIR)\commcli.obj \
     $(OUTDIR)\string.obj \
     $(OUTDIR)\async.obj \

@@ -809,6 +809,9 @@ void BSPChangeTexture(room_type* Room, unsigned int ServerID, unsigned short New
          if (side->ServerID != ServerID)
             continue;
 
+         // whether a side has an upper or lower texture is part of the move rule
+         unsigned short upper = side->TextureUpper, lower = side->TextureLower;
+
          if (isAboveWall)
             side->TextureUpper = (isReset ? side->TextureUpperOrig : NewTexture);
 
@@ -817,6 +820,9 @@ void BSPChangeTexture(room_type* Room, unsigned int ServerID, unsigned short New
 
          if (isBelowWall)
             side->TextureLower = (isReset ? side->TextureLowerOrig : NewTexture);
+
+         if ((upper > 0) != (side->TextureUpper > 0) || (lower > 0) != (side->TextureLower > 0))
+            NavFreeGrid(Room);
       }
    }
 
@@ -853,6 +859,9 @@ void BSPMoveSector(room_type* Room, unsigned int ServerID, bool Floor, float Hei
       // server ID does not match
       if (sector->ServerID != ServerID)
          continue;
+
+      // the room's shape changed: its nav grid is built again on the next path
+      NavFreeGrid(Room);
 
       // move floor
       if (Floor)
@@ -1305,6 +1314,8 @@ bool BSPLoadRoom(char *fname, room_type *room)
    unsigned short unsigshort;
    int offset_client, offset_tree, offset_walls, offset_sides, offset_sectors, offset_things;
    char tmpbuf[128];
+
+   room->Nav = NULL;
 
    FILE *infile = fopen(fname, "rb");
    if (infile == NULL)
@@ -1902,6 +1913,7 @@ void BSPFreeRoom(room_type *room)
    room->SectorsCount = 0;
 
    BSPBlockerClear(room);
+   NavFreeGrid(room);
 
    /****************************************************************************/
    /*                               SERVER PARTS                               */

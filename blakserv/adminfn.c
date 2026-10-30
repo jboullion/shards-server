@@ -100,6 +100,12 @@ void AdminShowCalled(int session_id,admin_parm_type parms[],
 void AdminShowCalledClass(class_node *c);
 void AdminShowRoomTable(int session_id, admin_parm_type parms[],
                         int num_blak_parm, parm_node blak_parm[]);
+void AdminShowNavGrid(int session_id,admin_parm_type parms[],
+                      int num_blak_parm,parm_node blak_parm[]);
+void AdminShowPath(int session_id,admin_parm_type parms[],
+                   int num_blak_parm,parm_node blak_parm[]);
+void AdminSaveNavGrids(int session_id,admin_parm_type parms[],
+                       int num_blak_parm,parm_node blak_parm[]);
 void AdminShowBlockers(int session_id,admin_parm_type parms[],
                        int num_blak_parm,parm_node blak_parm[]);
 void AdminShowObject(int session_id,admin_parm_type parms[],
@@ -366,8 +372,10 @@ admin_table_type admin_show_table[] =
 	{ AdminShowMessage,       {S,S,N},F,A|M, NULL, 0, "message",       "Show info about class & message" },
 	{ AdminShowName,          {R,N}, F, A|M, NULL, 0, "name",          "Show object of user name" },
 	{ AdminShowNameIDs,       {N},   F, A|M, NULL, 0, "nameids",       "Show all name ids (message/parms)" },
+	{ AdminShowNavGrid,       {I,N}, F, A|M, NULL, 0, "navgrid",       "Show a room's nav grid (roomdata id)" },
 	{ AdminShowObject,        {I,N}, F, A|M, NULL, 0, "object",        "Show one object by id" },
 	//{ AdminShowOpcodes,       {N},   F, A|M, NULL, 0, "opcodes",       "Show opcode count" },
+	{ AdminShowPath,          {I,I,I,I,I,N}, F, A|M, NULL, 0, "path", "Show a monster's path in a room (roomdata, row, col, to row, to col)" },
 	{ AdminShowPackages,      {N},   F,A, NULL, 0, "packages",         "Show all packages loaded" },
 	{ AdminShowProtocol,      {N},   F, A|M, NULL, 0, "protocol",      "Show protocol message counts" },
 	{ AdminShowReferences,    {S,S,N}, F, A|M, NULL, 0, "references",  "Show what objects or lists reference a particular data value" },
@@ -570,6 +578,7 @@ admin_table_type admin_save_table[] =
 {
 	{ AdminSaveConfiguration,{N},F, A|M, NULL, 0, "configuration","Save blakserv.cfg" },
 	{ AdminSaveGame,      {N},   F, A|M, NULL, 0, "game",    "Save game (will garbage collect first)" },
+	{ AdminSaveNavGrids,  {N},   F, A|M, NULL, 0, "navgrids","Write every loaded room's nav grid to nav/<room>.nav" },
 };
 #define LEN_ADMIN_SAVE_TABLE (sizeof(admin_save_table)/sizeof(admin_table_type))
 
@@ -1580,6 +1589,104 @@ void AdminShowBlockers(int session_id,admin_parm_type parms[],
          b->ObjectID, row, finerow, col, finecol);
       b = b->Next;
    }
+}
+
+void AdminShowNavGrid(int session_id,admin_parm_type parms[],
+                      int num_blak_parm,parm_node blak_parm[])
+{
+   room_node *room = GetRoomDataByID((int)parms[0]);
+   if (!room)
+   {
+      aprintf("Invalid roomdata.\n");
+      return;
+   }
+
+   NavGrid *g = NavGetGrid(&room->data);
+   if (!g)
+   {
+      aprintf("No grid.\n");
+      return;
+   }
+
+   int walk = 0, linked = 0, water = 0, areas = 0;
+   for (int i = 0; i < g->Cols * g->Rows; i++)
+   {
+      walk += g->Walk[i];
+      linked += g->Links[i] ? 1 : 0;
+      water += (g->Flags[i] & NAVF_WATER) ? 1 : 0;
+      areas = std::max(areas, (int)g->Area[i]);
+   }
+   aprintf("%i x %i cells (half squares), %i walkable, %i linked, %i water, %i areas, built in %i ms\n",
+      g->Cols, g->Rows, walk, linked, water, areas, g->BuildMs);
+   aprintf("Row 1 is the top; cell (r, c) is square row r/2+1, col c/2+1. '#' wall, '.' area 1, 'o' other areas, '~' water, ',' no links\n");
+
+   char line[1024];
+   for (int r = 0; r < g->Rows; r++)
+   {
+      int c;
+      for (c = 0; c < g->Cols && c < (int)sizeof(line) - 2; c++)
+      {
+         int i = r * g->Cols + c;
+         char ch = '#';
+         if (g->Walk[i])
+         {
+            if (!g->Links[i])
+               ch = ',';
+            else if (g->Flags[i] & NAVF_WATER)
+               ch = '~';
+            else
+               ch = (g->Area[i] == 1) ? '.' : 'o';
+         }
+         line[c] = ch;
+      }
+      line[c] = 0;
+      aprintf("%s\n", line);
+   }
+}
+
+void AdminShowPath(int session_id,admin_parm_type parms[],
+                   int num_blak_parm,parm_node blak_parm[])
+{
+   room_node *room = GetRoomDataByID((int)parms[0]);
+   if (!room)
+   {
+      aprintf("Invalid roomdata.\n");
+      return;
+   }
+
+   // the middle of each square
+   V2 s, e;
+   s.X = GRIDCOORDTOROO((int)parms[2], KODFINENESS / 2);
+   s.Y = GRIDCOORDTOROO((int)parms[1], KODFINENESS / 2);
+   e.X = GRIDCOORDTOROO((int)parms[4], KODFINENESS / 2);
+   e.Y = GRIDCOORDTOROO((int)parms[3], KODFINENESS / 2);
+
+   double start = GetMicroCountDouble();
+   for (int k = 0; k < 64; k++)
+   {
+      V2 p;
+      int res = NavGetPathStep(&room->data, &s, &e, &p, true);
+      if (res == NAV_PATH_NONE)
+      {
+         aprintf("No path from row %i, col %i.\n",
+            ROOCOORDTOGRIDBIG(s.Y), ROOCOORDTOGRIDBIG(s.X));
+         break;
+      }
+      aprintf("-> row %i fine %i, col %i fine %i\n",
+         ROOCOORDTOGRIDBIG(p.Y), ROOCOORDTOGRIDFINE(p.Y), ROOCOORDTOGRIDBIG(p.X), ROOCOORDTOGRIDFINE(p.X));
+      if ((p.X == e.X && p.Y == e.Y) || (p.X == s.X && p.Y == s.Y))
+         break;
+      s = p;
+   }
+   aprintf("%i us\n", (int)(GetMicroCountDouble() - start));
+}
+
+void AdminSaveNavGrids(int session_id,admin_parm_type parms[],
+                       int num_blak_parm,parm_node blak_parm[])
+{
+   UINT64 start = GetMilliCount();
+   int n = NavExportAll("nav");
+   aprintf("Wrote %i nav grids to nav/ in %i ms.\n", n, (int)(GetMilliCount() - start));
 }
 
 void AdminShowObjects(int session_id,admin_parm_type parms[],

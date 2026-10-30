@@ -233,6 +233,7 @@ char * GetLastErrorStr();
 #include "loadgame.h"
 #include "roofile.h"
 #include "roomdata.h"
+#include "navgrid.h"
 #include "files.h"
 
 #include "bufpool.h"

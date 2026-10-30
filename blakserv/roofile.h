@@ -215,6 +215,8 @@ typedef struct BlockerNode
    BlockerNode* Next;
 } BlockerNode;
 
+struct NavGrid;
+
 typedef struct room_type
 {
    int roomdata_id; 
@@ -238,6 +240,8 @@ typedef struct room_type
    unsigned short SidesCount;
    SectorNode*    Sectors;
    unsigned short SectorsCount; 
+
+   struct NavGrid* Nav;  /* ours (ADR 0029): built on the first path asked for, see navgrid.c */
 } room_type;
 #pragma endregion
 
@@ -246,6 +250,7 @@ typedef struct room_type
 /*                                          METHODS                                                           */
 /**************************************************************************************************************/
 bool  BSPGetHeight(room_type* Room, V2* P, float* HeightF, float* HeightFWD, float* HeightC, BspLeaf** Leaf);
+bool  BSPCanMoveInRoomTree(const BspNode* Node, const V2* S, const V2* E, Wall** BlockWall);
 bool  BSPCanMoveInRoom(room_type* Room, V2* S, V2* E, int ObjectID, bool moveOutsideBSP, Wall** BlockWall);
 bool  BSPLineOfSightView(V2 *S, V2 *E, int kod_angle);
 bool  BSPLineOfSight(room_type* Room, V3* S, V3* E);

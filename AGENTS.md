@@ -44,6 +44,12 @@ Traps that cost time:
   every file.
 - **A failed build may not copy new `.bof` files into `run/server/loadkod`.** Touch the source
   and rebuild.
+- **blakserv's makefile has no header dependencies.** Changing a struct in a header such as
+  `roofile.h` doesn't recompile the `.c` files that use it: they keep the old size and corrupt
+  memory at run time. Delete `blakserv/debug/*.obj` and rebuild.
+- **`Bserver` can't copy `blakserv.exe` into `run/server` while the server runs**; the build
+  still succeeds up to that copy. Stop the server first, or test the new `blakserv/debug/blakserv.exe`
+  in the testbench sandbox (`run/testserver`).
 - **Deleting a class's `.kod` does not remove its `.bof` from `run/server/memmap`** (nor
   `rsc/<name>.rsc`). Delete them by hand. A forgotten `.rsc` keeps its old resource numbers,
   so once `kod/kodbase.txt` is renumbered it overwrites current strings in `rsc0000.rsb`
