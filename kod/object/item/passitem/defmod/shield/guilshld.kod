@@ -447,6 +447,15 @@ messages:
          Post(poOwner,@SomethingChanged,#what=self);
       }
 
+      // Ours (2026-10-30): worn, everyone in the room sees the new sign at once (as
+      //  Player.SetOverlay tells them), not only once the shield is worn again
+      if poOwner <> $
+         AND IsClass(poOwner,&Battler)
+         AND Send(poOwner,@GetOwner) <> $
+      {
+         Send(Send(poOwner,@GetOwner),@SomethingChanged,#what=poOwner);
+      }
+
       return;
    }
 

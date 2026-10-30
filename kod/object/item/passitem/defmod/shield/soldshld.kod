@@ -33,6 +33,38 @@ resources:
    SoldierShield_icon_rsc = gshE.bgf
    SoldierShield_icon_back_rsc = gsheback.bgf
    SoldierShield_window_overlay_rsc = povgshE.bgf
+
+   // Ours (2026-10-30): the guild shield's insignias, for looks only (ChangeGuildInsignia): its
+   //  emblem, held and on the ground; slung on the back, the liege's own unless the sign has
+   //  one (the lieges' and Shal'ille's)
+   soldshield_insig_riija = gshri.bgf
+   soldshield_insig_riija_over = gshriov.bgf
+   soldshield_insig_qor = gshqo.bgf
+   soldshield_insig_qor_over = gshqoov.bgf
+   soldshield_insig_kraanan = gshkr.bgf
+   soldshield_insig_kraanan_over = gshkrov.bgf
+   soldshield_insig_faren = gshfa.bgf
+   soldshield_insig_faren_over = gshfaov.bgf
+   soldshield_insig_jala = gshja.bgf
+   soldshield_insig_jala_over = gshjaov.bgf
+   soldshield_insig_shalille = gshsh.bgf
+   soldshield_insig_shalille_over = gshshov.bgf
+   soldshield_insig_shalille_back = gshshbk.bgf
+   soldshield_insig_duke = gshda.bgf
+   soldshield_insig_duke_over = gshdaov.bgf
+   soldshield_insig_duke_back = gshdabk.bgf
+   soldshield_insig_princess = gshpr.bgf
+   soldshield_insig_princess_over = gshprov.bgf
+   soldshield_insig_princess_back = gshprbk.bgf
+   soldshield_insig_rebel = gshre.bgf
+   soldshield_insig_rebel_over = gshreov.bgf
+   soldshield_insig_rebel_back = gshrebk.bgf
+   soldshield_insig_desc_riija = "\n\nThe unblinking eye of Riija stares from its center."
+   soldshield_insig_desc_qor = "\n\nThe skull insignia of Qor is upon it."
+   soldshield_insig_desc_kraanan = "\n\nThe weapons of Kraanan are crossed acenter."
+   soldshield_insig_desc_faren = "\n\nThe power of Faren arcs across it."
+   soldshield_insig_desc_jala = "\n\nThe lute of Jala is depicted upon it."
+   soldshield_insig_desc_shalille = "\n\nThe ankh of Shal'ille's blessing is upon it."
    SoldierShield_rank_desc = "\n\nYour rank within %s is: %s."
    SoldierShield_renown_desc = \
       "\n\nYou are %s of %s, with %i renown of 100.\n"
@@ -95,6 +127,13 @@ classvars:
    viLayer = 0
 
 properties:
+
+   // Ours (2026-10-30): an insignia it bears, for looks only (INSIG_NONE: its liege's own
+   //  emblem, the classvars prShield_emblem_*), and its art ($: the liege's own)
+   piInsigniaType = INSIG_NONE
+   prInsig_held = $
+   prInsig_drop = $
+   prInsig_back = $
 
    // 1 to 10: the owner's renown / 10 (RenownChanged); the subclasses' powers read it
    piFactionRank = 1
@@ -573,10 +612,135 @@ messages:
 
    //// Misc. Infrastructure
 
+   EmblemHeld()
+   "The emblem drawn on the shield held: an insignia's (ChangeGuildInsignia), else the liege's."
+   {
+      if prInsig_held <> $
+      {
+         return prInsig_held;
+      }
+
+      return prShield_emblem_held;
+   }
+
+   EmblemDrop()
+   {
+      if prInsig_drop <> $
+      {
+         return prInsig_drop;
+      }
+
+      return prShield_emblem_drop;
+   }
+
+   EmblemBack()
+   "Slung on the back: an insignia's back art if it has one (the lieges' and Shal'ille's), else "
+   "the liege's."
+   {
+      if prInsig_back <> $
+      {
+         return prInsig_back;
+      }
+
+      return prShield_emblem_back;
+   }
+
+   HasInsignia()
+   {
+      return piInsigniaType <> INSIG_NONE;
+   }
+
+   ChangeGuildInsignia(insignia = INSIG_NONE)
+   "Ours (2026-10-30): a temple's sign or a liege's seal on the shield, as on a guild shield "
+   "(QuestBook QRW_INSIGNIA), but for looks only: it gives no spellpower. Its liege's own seal, "
+   "or INSIG_NONE, shows its own emblem again."
+   {
+      local lArt;
+
+      // [ held, on the ground, slung on the back ($: the liege's own) ]
+      lArt = $;
+      if insignia = INSIG_RIIJA
+      {
+         lArt = [ soldshield_insig_riija_over, soldshield_insig_riija, $ ];
+      }
+      else if insignia = INSIG_QOR
+      {
+         lArt = [ soldshield_insig_qor_over, soldshield_insig_qor, $ ];
+      }
+      else if insignia = INSIG_KRAANAN
+      {
+         lArt = [ soldshield_insig_kraanan_over, soldshield_insig_kraanan, $ ];
+      }
+      else if insignia = INSIG_FAREN
+      {
+         lArt = [ soldshield_insig_faren_over, soldshield_insig_faren, $ ];
+      }
+      else if insignia = INSIG_JALA
+      {
+         lArt = [ soldshield_insig_jala_over, soldshield_insig_jala, $ ];
+      }
+      else if insignia = INSIG_SHALILLE
+      {
+         lArt = [ soldshield_insig_shalille_over, soldshield_insig_shalille,
+                  soldshield_insig_shalille_back ];
+      }
+      else if insignia = INSIG_DUKE AND viFaction <> FACTION_DUKE
+      {
+         lArt = [ soldshield_insig_duke_over, soldshield_insig_duke,
+                  soldshield_insig_duke_back ];
+      }
+      else if insignia = INSIG_PRINCESS AND viFaction <> FACTION_PRINCESS
+      {
+         lArt = [ soldshield_insig_princess_over, soldshield_insig_princess,
+                  soldshield_insig_princess_back ];
+      }
+      else if insignia = INSIG_REBEL AND viFaction <> FACTION_REBEL
+      {
+         lArt = [ soldshield_insig_rebel_over, soldshield_insig_rebel,
+                  soldshield_insig_rebel_back ];
+      }
+
+      piInsigniaType = INSIG_NONE;
+      prInsig_held = $;
+      prInsig_drop = $;
+      prInsig_back = $;
+      if lArt <> $
+      {
+         piInsigniaType = insignia;
+         prInsig_held = First(lArt);
+         prInsig_drop = Nth(lArt,2);
+         prInsig_back = Nth(lArt,3);
+      }
+
+      if poOwner <> $
+      {
+         Post(poOwner,@SomethingChanged,#what=self);
+      }
+
+      // Ours (2026-10-30): worn, everyone in the room sees the new sign at once (as
+      //  Player.SetOverlay tells them), not only once the shield is worn again
+      if poOwner <> $
+         AND IsClass(poOwner,&Battler)
+         AND Send(poOwner,@GetOwner) <> $
+      {
+         Send(Send(poOwner,@GetOwner),@SomethingChanged,#what=poOwner);
+      }
+
+      return;
+   }
+
    AppendDesc()
-   "Ours (the faction revamp): the owner's renown rank, renown and war record."
+   "Ours (the faction revamp): the owner's renown rank, renown and war record; and a god's sign "
+   "it bears."
    {
       local lRecord;
+
+      if piInsigniaType = INSIG_RIIJA { AddPacket(4,soldshield_insig_desc_riija); }
+      else if piInsigniaType = INSIG_QOR { AddPacket(4,soldshield_insig_desc_qor); }
+      else if piInsigniaType = INSIG_KRAANAN { AddPacket(4,soldshield_insig_desc_kraanan); }
+      else if piInsigniaType = INSIG_FAREN { AddPacket(4,soldshield_insig_desc_faren); }
+      else if piInsigniaType = INSIG_JALA { AddPacket(4,soldshield_insig_desc_jala); }
+      else if piInsigniaType = INSIG_SHALILLE { AddPacket(4,soldshield_insig_desc_shalille); }
 
       if poOwner = $
          OR NOT IsClass(poOwner,&Player)
@@ -705,9 +869,9 @@ messages:
    GetNumberOverlays()
    {
       if (piOverlayHotspot = HS_LEFT_WEAPON
-          AND prShield_emblem_held <> $)
+          AND Send(self,@EmblemHeld) <> $)
          OR (piOverlayHotspot = HS_SHIELD_BACK
-             AND prShield_emblem_back <> $)
+             AND Send(self,@EmblemBack) <> $)
       {
          return 2;
       }
@@ -723,9 +887,9 @@ messages:
 
       if piOverlayHotspot = HS_LEFT_WEAPON
       {
-         if prShield_emblem_held <> $
+         if Send(self,@EmblemHeld) <> $
          {
-            AddPacket(4,prShield_emblem_held);
+            AddPacket(4,Send(self,@EmblemHeld));
             AddPacket(1,piOverlayHotspot);
             AddPacket(1,ANIMATE_NONE, 2,1);
          }
@@ -733,11 +897,11 @@ messages:
       else
       {
          // Therefore, piOverlayHotspot = HS_SHIELD_BACK
-         if prShield_emblem_back <> $
+         if Send(self,@EmblemBack) <> $
          {
             // Shields slung on the back use a different hotspot for the emblem
             //  due to overlay priorities.
-            AddPacket(4,prShield_emblem_back);
+            AddPacket(4,Send(self,@EmblemBack));
             AddPacket(1,piOverlayHotspot);
             if iAnimation = PANM_BOW_FIRE
             {
@@ -816,10 +980,10 @@ messages:
 
    SendOverlays()
    {
-      if prShield_emblem_drop <> $
+      if Send(self,@EmblemDrop) <> $
       {
          AddPacket(1,1);
-         AddPacket(4,prShield_emblem_drop, 1,1, 1,ANIMATE_NONE, 2,2);
+         AddPacket(4,Send(self,@EmblemDrop), 1,1, 1,ANIMATE_NONE, 2,2);
       }
       else
       {
@@ -843,10 +1007,10 @@ messages:
 
    SendLookOverlays()
    {
-      if prShield_emblem_drop <> $
+      if Send(self,@EmblemDrop) <> $
       {
          AddPacket(1,1);
-         AddPacket(4,prShield_emblem_drop, 1,1, 1,ANIMATE_NONE, 2,1);
+         AddPacket(4,Send(self,@EmblemDrop), 1,1, 1,ANIMATE_NONE, 2,1);
       }
       else
       {

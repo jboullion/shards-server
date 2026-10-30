@@ -263,10 +263,10 @@ resources:
    quest_reward_money = "You receive %i shillings."
    quest_reward_item = "You receive %s."
    quest_reward_floor = "You can't carry %s; it's on the ground at your feet."
-   quest_reward_insignia = "Your guild shield now bears a new sign."
+   quest_reward_insignia = "Your shield now bears a new sign."
    // Ours (guild revamp): QRW_PRESTIGE
    quest_reward_prestige = "Your guild gains %i prestige."
-   quest_no_shield = "You have no guild shield to bear the sign."
+   quest_no_shield = "You have no guild or soldier's shield to bear the sign."
 
    quest_sound_accept = nodeup.ogg
 
@@ -705,7 +705,10 @@ messages:
          }
       }
 
-      if (needs & QBQ_GUILD_SHIELD) AND NOT Send(who,@PossessesA,#class=&GuildShield)
+      // Ours (2026-10-30): a soldier's shield takes a sign too, for looks
+      if (needs & QBQ_GUILD_SHIELD)
+         AND NOT Send(who,@PossessesA,#class=&GuildShield)
+         AND NOT Send(who,@PossessesA,#class=&SoldierShield)
       {
          return FALSE;
       }
@@ -1801,19 +1804,23 @@ messages:
    }
 
    FindGuildShield(who = $)
-   "The guild shield to emboss: the one in use, else one in the pack without a sign, else any."
+   "The shield to emboss: the guild or soldier's shield in use, else a guild shield in the pack "
+   "without a sign, else any, else a soldier's shield in the pack (ours, 2026-10-30: a soldier's "
+   "shield takes a sign for looks)."
    {
-      local i, oShield;
+      local i, oShield, oSoldier;
 
       foreach i in Send(who,@GetPlayerUsing)
       {
          if IsClass(i,&GuildShield)
+            OR IsClass(i,&SoldierShield)
          {
             return i;
          }
       }
 
       oShield = $;
+      oSoldier = $;
       foreach i in Send(who,@GetHolderPassive)
       {
          if IsClass(i,&GuildShield)
@@ -1825,6 +1832,16 @@ messages:
 
             oShield = i;
          }
+
+         if IsClass(i,&SoldierShield)
+         {
+            oSoldier = i;
+         }
+      }
+
+      if oShield = $
+      {
+         return oSoldier;
       }
 
       return oShield;
