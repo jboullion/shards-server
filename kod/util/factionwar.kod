@@ -30,6 +30,17 @@
 // which glows while one is on (BroadcastBattle). docs/research/protocol.md has the layout.
 // Battles aren't announced in chat to everyone (2026-10-25): the button and the window say it;
 // only those who take part are told things (the siege's caller, rallies, reinforcements, pay).
+//
+// Ours (2026-10-30, ADR 0021 decision 18): the assault on a liege's seat. The moment a rival
+// liege takes a liege's own capital (TownChanged), everyone is told, and after
+// ASSAULT_MUSTER_MINUTES the armies meet at the liege's seat (SeatOf: the Courtyard of
+// Blackstone Keep, the Bourgeois Castle, the Temple of Kraanan), the seat held by its liege's
+// guard, a quarter as many again. There's no pole: won, the attackers are paid ASSAULT_WIN_RENOWN
+// and ASSAULT_WIN_SHILLINGS, their capital celebrates and the beaten liege mourns for
+// ASSAULT_MOURN_MINUTES; held, the defenders are paid so and celebrate. The guard who stood are
+// paid as winners even when the seat falls, and an assault nobody fought is held. Either way
+// the capital goes back to its liege (ReturnCapital), and an assault called while a battle is
+// on waits for it (plAssaultsWaiting).
 ////////////////////////////////////////////////////////////////////////////////
 FactionWar is UtilityFunctions
 
@@ -75,8 +86,25 @@ constants:
    FRONT_SQUARES = 12
    FRONT_MIN = 6
 
+   // Ours (2026-10-30): a battle's horn (the troops' cry as they take a target, FactionTroop.
+   //  PlayAwareSound) sounds as the armies take the field, then at most this often (seconds)
+   BATTLE_HORN_SECONDS = 45
+
+   // Ours (2026-10-30): a troop is placed only on a floor within a step of its anchor's, so
+   //  none lands up on a ledge it can't come down from (blakserv MAXSTEPHEIGHT, in Kod units)
+   PLACE_STEP_HEIGHT = 24
+
    // A story siege (StartSiege) gathers this many minutes after it's called
    SIEGE_MUSTER_MINUTES = 2
+
+   // Ours (2026-10-30): the assault on a liege's seat (StartAssault): its muster in minutes,
+   //  the seat's guard as a percent of an army, the pay for the side that wins it, and how
+   //  long the liege whose seat falls mourns
+   ASSAULT_MUSTER_MINUTES = 10
+   ASSAULT_GUARD_PERCENT = 125
+   ASSAULT_WIN_RENOWN = 15
+   ASSAULT_WIN_SHILLINGS = 3000
+   ASSAULT_MOURN_MINUTES = 240
 
 resources:
 
@@ -95,6 +123,17 @@ resources:
       "the line."
    fw_reinforce = "~IA squad of your liege's soldiers comes up with you."
    fw_siege_no_target = "~IThere are no walls of that enemy left to besiege."
+
+   fw_assault_called = \
+      "~B~k[War]~n ~B%s has taken %s and storms %s's seat!  The armies meet at %s in ten "
+      "minutes."
+   fw_assault_won = \
+      "~B~k[War]~n ~B%s's army has stormed %s and carried off %s's banner!  %s returns to its "
+      "liege."
+   fw_assault_held = \
+      "~B~k[War]~n ~B%s's guard has held %s against %s's army!  %s returns to its liege."
+   fw_paid_held = \
+      "~IThe seat has fallen, but your liege pays %i shillings to every guard who stood at %s."
 
 classvars:
 
@@ -125,6 +164,12 @@ properties:
    // A story siege (StartSiege): the player who called it
    pbSiege = FALSE
    poSiegeLeader = $
+   // Ours (2026-10-30): the battle is an assault on piDefender's seat (StartAssault), and the
+   //  assaults waiting for the battle under way: [ attacker, defender ]
+   pbAssault = FALSE
+   plAssaultsWaiting = $
+   // Ours: GetTime() the battle's horn last sounded (MayHorn); 0 before the armies are out
+   piHornAt = 0
    piDeadline = 0
    pbSpawned = FALSE
    // Where each army gathers: [ row, col ] (SpawnArmies), or $ (the defenders: the pole)
@@ -205,11 +250,66 @@ messages:
    }
 
    TownChanged(town = $,from = FACTION_NEUTRAL,to = FACTION_NEUTRAL)
-   "From TerritoryGame.RecalcTownFlags: passed on to the world."
+   "From TerritoryGame.RecalcTownFlags: passed on to the world. Ours: a liege's own capital "
+   "taken by a rival liege calls the assault on its seat (CapitalTaken)."
    {
       Send(Send(self,@GetWorld),@TownChanged,#town=town,#from=from,#to=to);
+      Post(self,@CapitalTaken,#town=town,#to=to);
 
       return;
+   }
+
+   CapitalTaken(town = $,to = FACTION_NEUTRAL)
+   "Ours (2026-10-30): town is now to's: if it's another liege's capital, to storms that liege's "
+   "seat (StartAssault)."
+   {
+      local i, oWorld;
+
+      if town = $
+         OR to <= FACTION_NEUTRAL
+         OR to > FACTION_NORMAL_MAX
+      {
+         return;
+      }
+
+      oWorld = Send(self,@GetWorld);
+      i = FACTION_DUKE;
+      while i <= FACTION_NORMAL_MAX
+      {
+         if i <> to
+            AND Send(oWorld,@Capital,#faction=i) = town
+         {
+            Send(self,@StartAssault,#attacker=to,#defender=i);
+
+            return;
+         }
+
+         i = i + 1;
+      }
+
+      return;
+   }
+
+   SeatOf(faction = $)
+   "Ours (2026-10-30): where faction's seat is stormed: [ room, the defenders' row and col, the "
+   "attackers' row and col ] (squares checked against the rooms' maps, on one floor)."
+   {
+      if faction = FACTION_DUKE
+      {
+         return [ RID_DUKE1, 55, 33, 75, 33 ];
+      }
+
+      if faction = FACTION_PRINCESS
+      {
+         return [ RID_CASTLE2B, 29, 51, 28, 9 ];
+      }
+
+      if faction = FACTION_REBEL
+      {
+         return [ RID_TEMPLE_KRAANAN, 34, 20, 42, 32 ];
+      }
+
+      return $;
    }
 
    ScheduleNext(minutes = $)
@@ -547,6 +647,154 @@ messages:
       return TRUE;
    }
 
+   StartAssault(attacker = $,defender = $)
+   "Ours (2026-10-30): attacker holds defender's capital: everyone hears it, and after "
+   "ASSAULT_MUSTER_MINUTES the armies meet at defender's seat (SeatOf). Called while a battle "
+   "is on, it waits for it (Resolve). The regular schedule stays as it was. Returns whether "
+   "it was called (or will be)."
+   {
+      local lSeat, oRoom, oWorld, iCapital;
+
+      if attacker = $
+         OR defender = $
+         OR attacker = defender
+         OR attacker <= FACTION_NEUTRAL OR attacker > FACTION_NORMAL_MAX
+         OR defender <= FACTION_NEUTRAL OR defender > FACTION_NORMAL_MAX
+      {
+         return FALSE;
+      }
+
+      oWorld = Send(self,@GetWorld);
+      iCapital = Send(oWorld,@Capital,#faction=defender);
+      lSeat = Send(self,@SeatOf,#faction=defender);
+      if lSeat = $
+         OR iCapital = $
+      {
+         return FALSE;
+      }
+
+      // Still theirs to storm from (one waiting may have been won back meanwhile)
+      if Send(oWorld,@TownOwner,#rid=iCapital) <> attacker
+      {
+         return FALSE;
+      }
+
+      oRoom = Send(SYS,@FindRoomByNum,#num=First(lSeat));
+      if oRoom = $
+      {
+         return FALSE;
+      }
+
+      if piState <> STATE_NONE
+      {
+         plAssaultsWaiting = AppendListElem([ attacker, defender ],plAssaultsWaiting);
+
+         return TRUE;
+      }
+
+      poRoom = oRoom;
+      poFlag = $;
+      piAttacker = attacker;
+      piDefender = defender;
+      pbOpenGround = FALSE;
+      pbSpawned = FALSE;
+      plParticipants = $;
+      plAttackArmy = $;
+      plDefendArmy = $;
+      poAttackCaptain = $;
+      poDefendCaptain = $;
+      pbSiege = FALSE;
+      poSiegeLeader = $;
+      pbAssault = TRUE;
+      piState = STATE_MUSTER;
+
+      Send(oWorld,@Announce,#rsc=fw_assault_called,
+           #parm1=Send(self,@LiegeName,#faction=attacker),
+           #parm2=Send(oWorld,@RoomName,#rid=iCapital),
+           #parm3=Send(self,@LiegeName,#faction=defender),
+           #parm4=Send(oRoom,@GetName));
+      ptStage = CreateTimer(self,@OpenBattle,ASSAULT_MUSTER_MINUTES * 60000);
+      Send(self,@BroadcastBattle);
+
+      return TRUE;
+   }
+
+   AssaultDone(winner = $)
+   "Ours (2026-10-30): the assault on piDefender's seat is over: everyone hears it, the winner's "
+   "capital celebrates, a seat that fell mourns, and the capital goes back to its liege."
+   {
+      local oWorld, iCapital;
+
+      oWorld = Send(self,@GetWorld);
+      iCapital = Send(oWorld,@Capital,#faction=piDefender);
+      if winner = piAttacker
+      {
+         Send(oWorld,@Announce,#rsc=fw_assault_won,
+              #parm1=Send(self,@LiegeName,#faction=piAttacker),#parm2=Send(poRoom,@GetName),
+              #parm3=Send(self,@LiegeName,#faction=piDefender),
+              #parm4=Send(oWorld,@RoomName,#rid=iCapital));
+         Send(oWorld,@Celebrate,#faction=piAttacker,
+              #places=[ Send(oWorld,@Capital,#faction=piAttacker) ]);
+         Send(oWorld,@Mourn,#faction=piDefender,#town=iCapital,#victor=piAttacker,
+              #minutes=ASSAULT_MOURN_MINUTES,#bAnnounce=FALSE);
+      }
+      else
+      {
+         Send(oWorld,@Announce,#rsc=fw_assault_held,
+              #parm1=Send(self,@LiegeName,#faction=piDefender),#parm2=Send(poRoom,@GetName),
+              #parm3=Send(self,@LiegeName,#faction=piAttacker),
+              #parm4=Send(oWorld,@RoomName,#rid=iCapital));
+         Send(oWorld,@Celebrate,#faction=piDefender,#places=[ iCapital ]);
+      }
+
+      Send(self,@ReturnCapital,#faction=piDefender);
+
+      return;
+   }
+
+   ReturnCapital(faction = $)
+   "Ours (2026-10-30): after an assault, faction's capital and its capture points are its own "
+   "again. The city's pole goes first, quietly, so the recount as the capture points come back "
+   "finds it already faction's and nobody celebrates or mourns the city twice."
+   {
+      local oWorld, oTG, iCapital, oPole, i;
+
+      oWorld = Send(self,@GetWorld);
+      oTG = Send(SYS,@GetTerritoryGame);
+      iCapital = Send(oWorld,@Capital,#faction=faction);
+      if oTG = $
+         OR iCapital = $
+      {
+         return;
+      }
+
+      oPole = Send(oWorld,@TownPole,#rid=iCapital);
+      if oPole <> $
+      {
+         Send(oPole,@SystemSetFaction,#faction=faction);
+      }
+
+      foreach i in Send(oTG,@GetFlagRIDs)
+      {
+         if i <> iCapital
+            AND Send(oTG,@IsHometownFlag,#RID=i,#faction=faction)
+         {
+            oPole = Send(oWorld,@TownPole,#rid=i);
+            if oPole <> $
+               AND Send(oPole,@GetFaction) <> faction
+            {
+               Send(oPole,@SetFaction,#faction=faction);
+            }
+         }
+      }
+
+      // The counts and the saved states, whatever came back (TerritoryGame.FlagClaimed)
+      Send(oTG,@FlagClaimed);
+      Send(oWorld,@SyncSentries);
+
+      return;
+   }
+
    StartSiege(who = $,against = $)
    "Ours (the faction revamp's campaigns): who, on their campaign's siege step, said 'march' "
    "to their liege (Factions.SomeoneSaid): their liege's army besieges a capture point of "
@@ -758,12 +1006,23 @@ messages:
    "the farthest); but the army of the soldier who came gathers round them, so nobody walks "
    "in alone against the other side."
    {
-      local i, iBest, iDist, iFlagRow, iFlagCol, oFirst, iScore, iBestScore;
+      local i, iBest, iDist, iFlagRow, iFlagCol, oFirst, iScore, iBestScore, lSeat;
 
       pbSpawned = TRUE;
+      piHornAt = 0;
 
       plAttackAnchor = $;
       plDefendAnchor = $;
+      // Ours: an assault forms up on its seat's squares (SeatOf)
+      if pbAssault
+      {
+         lSeat = Send(self,@SeatOf,#faction=piDefender);
+         if lSeat <> $
+         {
+            plDefendAnchor = [ Nth(lSeat,2), Nth(lSeat,3) ];
+            plAttackAnchor = [ Nth(lSeat,4), Nth(lSeat,5) ];
+         }
+      }
       if poFlag <> $
          AND IsClass(poRoom,&MonsterRoom)
       {
@@ -909,6 +1168,11 @@ messages:
 
       iSize = Bound(piArmySize,2,30)
               + Bound(Send(self,@GetWarEffort,#faction=faction),0,EFFORT_MAX);
+      // Ours: a seat is held by its liege's guard, a quarter as many again
+      if pbAssault AND bHome
+      {
+         iSize = iSize * ASSAULT_GUARD_PERCENT / 100;
+      }
       iArchers = Bound(iSize / 10,1,$);
       iMages = Bound(iSize / 10,1,$);
       iMage = 0;
@@ -976,7 +1240,7 @@ messages:
    "([ row, col ]) if it's given; anywhere in the room if there's no room there. Returns "
    "whether it was placed (if not, the troop is gone)."
    {
-      local iTry, iRow, iCol, iAnchorRow, iAnchorCol;
+      local iTry, iRow, iCol, iAnchorRow, iAnchorCol, iAnchorHeight, iHeight;
 
       iAnchorRow = $;
       if anchor <> $
@@ -1005,15 +1269,25 @@ messages:
 
       if iAnchorRow <> $
       {
+         // Ours: on the anchor's floor, within a step (PLACE_STEP_HEIGHT): not up on a ledge
+         iAnchorHeight = Send(poRoom,@FloorHeightAt,#row=iAnchorRow,#col=iAnchorCol);
          iTry = 0;
-         while iTry < 10
+         while iTry < 20
          {
             iTry = iTry + 1;
             iRow = iAnchorRow + Random(-3,3);
             iCol = iAnchorCol + Random(-3,3);
-            // Ours: not in water (the last tries take what they find)
+            iHeight = $;
             if iRow > 0 AND iCol > 0
-               AND (iTry > 7 OR NOT Send(poRoom,@IsWaterAt,#row=iRow,#col=iCol))
+            {
+               iHeight = Send(poRoom,@FloorHeightAt,#row=iRow,#col=iCol);
+            }
+
+            // Ours: not in water (the last tries take what they find), and not up or down a ledge
+            if iRow > 0 AND iCol > 0
+               AND (iTry > 15 OR NOT Send(poRoom,@IsWaterAt,#row=iRow,#col=iCol))
+               AND (iAnchorHeight = $ OR iHeight = $
+                    OR Abs(iHeight - iAnchorHeight) <= PLACE_STEP_HEIGHT)
                AND Send(poRoom,@ReqNewHold,#what=troop,#new_row=iRow,#new_col=iCol)
                AND Send(poRoom,@ReqSomethingMoved,#what=troop,#new_row=iRow,#new_col=iCol)
             {
@@ -1021,6 +1295,14 @@ messages:
 
                return TRUE;
             }
+         }
+
+         // Ours: the anchor's own square, before anywhere in the room
+         if Send(poRoom,@ReqNewHold,#what=troop,#new_row=iAnchorRow,#new_col=iAnchorCol)
+         {
+            Send(poRoom,@NewHold,#what=troop,#new_row=iAnchorRow,#new_col=iAnchorCol);
+
+            return TRUE;
          }
       }
 
@@ -1032,6 +1314,21 @@ messages:
       return Send(troop,@IsBattleFoe,#what=what);
    }
 
+   MayHorn()
+   "Ours (2026-10-30): whether a troop's cry may sound now: the first as the armies take the "
+   "field, then once every BATTLE_HORN_SECONDS."
+   {
+      if piHornAt > 0
+         AND GetTime() - piHornAt < BATTLE_HORN_SECONDS
+      {
+         return FALSE;
+      }
+
+      piHornAt = GetTime();
+
+      return TRUE;
+   }
+
    KeepTargets(all = FALSE)
    "Each troop without a foe in its sights goes for the nearest; one others are already on "
    "counts as further off, so the armies spread out (as ArenaBouts.PickTarget)."
@@ -1041,11 +1338,12 @@ messages:
       foreach i in Send(self,@AllTroops)
       {
          oTarget = Send(i,@GetTarget);
-         if all
-            OR oTarget = $
+         // Ours: all, but a mage keeps a foe it has (FactionTroop.TargetSwitch)
+         if oTarget = $
             OR NOT IsObject(oTarget)
             OR NOT Send(i,@IsBattleFoe,#what=oTarget)
             OR Send(oTarget,@GetOwner) <> poRoom
+            OR (all AND Send(i,@GetBattleRole) <> BATTLE_ROLE_MAGE)
          {
             Send(self,@PickTarget,#troop=i);
          }
@@ -1308,8 +1606,8 @@ messages:
    {
       local iChance, iA, iD;
 
-      // A siege nobody led fails
-      if pbSiege
+      // A siege nobody led fails; ours: an assault nobody fought is held
+      if (pbSiege OR pbAssault)
          AND NOT pbSpawned
       {
          Send(self,@Resolve,#winner=piDefender,#how=HOW_UNWATCHED);
@@ -1377,7 +1675,7 @@ messages:
 
    Resolve(winner = $,how = HOW_FIELD)
    {
-      local i, oWho, iFaction, iLoser, oRoom;
+      local i, oWho, iFaction, iLoser, oRoom, iRenown, iPay, lNext;
 
       if piState = STATE_NONE
       {
@@ -1428,9 +1726,28 @@ messages:
          if iFaction = winner
          {
             Send(oWho,@NoteBattle,#won=TRUE);
+            // Ours: an assault won pays more
+            iRenown = WIN_RENOWN;
+            iPay = WIN_SHILLINGS;
+            if pbAssault
+            {
+               iRenown = ASSAULT_WIN_RENOWN;
+               iPay = ASSAULT_WIN_SHILLINGS;
+            }
+
+            Send(oWho,@AddFactionRenown,#amount=iRenown);
+            Send(oWho,@NewHold,#what=Create(&Shillings,#number=iPay));
+            Send(oWho,@MsgSendUser,#message_rsc=fw_paid_win,#parm1=iPay,
+                 #parm2=Send(oRoom,@GetName));
+         }
+         else if pbAssault
+            AND iFaction = piDefender
+         {
+            // Ours: the seat's guard who stood are paid as a battle's winners
+            Send(oWho,@NoteBattle,#won=FALSE);
             Send(oWho,@AddFactionRenown,#amount=WIN_RENOWN);
             Send(oWho,@NewHold,#what=Create(&Shillings,#number=WIN_SHILLINGS));
-            Send(oWho,@MsgSendUser,#message_rsc=fw_paid_win,#parm1=WIN_SHILLINGS,
+            Send(oWho,@MsgSendUser,#message_rsc=fw_paid_held,#parm1=WIN_SHILLINGS,
                  #parm2=Send(oRoom,@GetName));
          }
          else
@@ -1450,6 +1767,12 @@ messages:
       {
          Send(Send(self,@GetWorld),@Celebrate,#faction=winner,
               #places=[ Send(Send(self,@GetWorld),@Capital,#faction=winner) ]);
+      }
+
+      // Ours: an assault's stakes, and the capital back to its liege
+      if pbAssault
+      {
+         Send(self,@AssaultDone,#winner=winner);
       }
 
       // Both sides' war effort is spent.
@@ -1485,6 +1808,7 @@ messages:
       // A siege leaves the regular schedule as it was. Ours: a regular battle's next one is
       // called piBattleMinutes after it was, so the muster and the fight don't push it back.
       if NOT pbSiege
+         AND NOT pbAssault
       {
          if piCalledAt > 0
          {
@@ -1503,7 +1827,16 @@ messages:
 
       pbSiege = FALSE;
       poSiegeLeader = $;
+      pbAssault = FALSE;
       Send(self,@BroadcastBattle);
+
+      // Ours: an assault that waited for this battle is called now
+      if plAssaultsWaiting <> $
+      {
+         lNext = First(plAssaultsWaiting);
+         plAssaultsWaiting = Rest(plAssaultsWaiting);
+         Post(self,@StartAssault,#attacker=First(lNext),#defender=Nth(lNext,2));
+      }
 
       return;
    }
@@ -1561,7 +1894,7 @@ messages:
 
    AddBattlePacket()
    "The battle: state, attacker, defender, flags (1 a siege, 2 the armies are out, 4 open "
-   "ground), its room, the seconds to the clash or left of the fight, each army's troops left "
+   "ground, 8 an assault on the defender's seat), its room, the seconds to the clash or left of the fight, each army's troops left "
    "and raised, and the seconds to the next battle called (0: not known)."
    {
       local iFlags, iRID, rName, iSeconds, iNext;
@@ -1585,6 +1918,12 @@ messages:
          if pbOpenGround
          {
             iFlags = iFlags | 4;
+         }
+
+         // Ours (2026-10-30): an assault on a liege's seat
+         if pbAssault
+         {
+            iFlags = iFlags | 8;
          }
 
          iRID = Send(poRoom,@GetRoomNum);

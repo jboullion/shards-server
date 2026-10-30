@@ -364,8 +364,9 @@ messages:
       return;
    }
 
-   Mourn(faction = $,town = $,victor = $)
-   "faction lost town: its capital's flags go to half-staff, and its liege laments it."
+   Mourn(faction = $,town = $,victor = $,minutes = MOURN_MINUTES,bAnnounce = TRUE)
+   "faction lost town: its capital's flags go to half-staff for minutes, and its liege laments "
+   "it. Ours (2026-10-30): an assault on its seat says what happened itself (bAnnounce FALSE)."
    {
       local iCapital, oTG, lRIDs, i, oPole, oLiege, rLament;
 
@@ -375,9 +376,12 @@ messages:
          return;
       }
 
-      Send(self,@Announce,#rsc=fw_mourn,#parm1=Send(self,@RoomName,#rid=town),
-           #parm2=Send(self,@LiegeName,#faction=victor),
-           #parm3=Send(self,@RoomName,#rid=iCapital));
+      if bAnnounce
+      {
+         Send(self,@Announce,#rsc=fw_mourn,#parm1=Send(self,@RoomName,#rid=town),
+              #parm2=Send(self,@LiegeName,#faction=victor),
+              #parm3=Send(self,@RoomName,#rid=iCapital));
+      }
 
       // The capital's own pole, and its capture points' poles
       oTG = Send(SYS,@GetTerritoryGame);
@@ -398,7 +402,7 @@ messages:
          oPole = Send(self,@TownPole,#rid=i);
          if oPole <> $
          {
-            Send(oPole,@HalfStaff,#duration=MOURN_MINUTES * 60000);
+            Send(oPole,@HalfStaff,#duration=minutes * 60000);
          }
       }
 

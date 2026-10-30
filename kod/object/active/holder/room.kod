@@ -2635,6 +2635,27 @@ messages:
       return iHeightFWD < iHeightF;
    }
 
+   FloorHeightAt(row = $, col = $, fine_row = FINENESS_HALF, fine_col = FINENESS_HALF)
+   "Ours (2026-10-30): the floor's height there, in Kod units (a step a player can climb is "
+   "24: blakserv MAXSTEPHEIGHT), or $ off the map."
+   {
+      local iQflags, iRflags, iHeightF, iHeightFWD, iHeightC, iServerID;
+
+      if row = $ OR col = $
+      {
+         return $;
+      }
+
+      iQflags = LIQ_GET_SECTORINFO;
+      if NOT GetLocationInfoBSP(prmRoom, iQflags, row, col, fine_row, fine_col,
+                  *iRflags, *iHeightF, *iHeightFWD, *iHeightC, *iServerID)
+      {
+         return $;
+      }
+
+      return iHeightF;
+   }
+
    IsDryLine(line_row1 = $, line_col1 = $, line_row2 = $, line_col2 = $)
    "Ours: whether the straight line between two squares crosses no water (tested every half "
    "square)."

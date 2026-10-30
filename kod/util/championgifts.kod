@@ -1,6 +1,7 @@
 // Ours (Meridian Shards, the faction revamp): the Champion's Gifts. One object,
-// SYS@GetChampionGifts, made on demand. A player of renown CHAMPION_RENOWN (a Captain) or
-// more, with at least CHAMPION_HEALTH base health, may say "champion" to their liege
+// SYS@GetChampionGifts, made on demand. A Champion (renown CHAMPION_RENOWN; 2026-10-30, it was
+// 70, a Captain) who has won their liege's siege (the campaign's fifth act), with at least
+// CHAMPION_HEALTH base health, may say "champion" to their liege
 // (Factions.SomeoneSaid) and be given the liege's god's gift, one at a time:
 //
 //   Princess Kateriina (Shal'ille)  the Sword of the Hunt   (item/passitem/weapon/huntsw.kod)
@@ -22,14 +23,15 @@ constants:
    include blakston.khd
    include protocol.khd
 
-   CHAMPION_RENOWN = 70
+   CHAMPION_RENOWN = 100
    CHAMPION_HEALTH = 100
 
-   // Ours (the faction revamp's campaigns, ADR 0021): the gift waits on each liege's fourth
-   // act (quests/duke-the-price-of-loyalty.json and the others)
-   CAMPAIGN_ACT4_DUKE = 303
-   CAMPAIGN_ACT4_PRINCESS = 308
-   CAMPAIGN_ACT4_REBEL = 313
+   // Ours (the faction revamp's campaigns, ADR 0021): the gift waits on each liege's fifth act,
+   // the siege of a rival's capital (quests/duke-act5-the-siege-of-barloque.json and the
+   // others; 2026-10-30, it was the fourth)
+   CAMPAIGN_ACT5_DUKE = 304
+   CAMPAIGN_ACT5_PRINCESS = 309
+   CAMPAIGN_ACT5_REBEL = 314
 
    // How often a gift's hunger ticks: a minute, sixty to a point of piHunger
    GIFT_HUNGER_TICK = 60000
@@ -55,15 +57,15 @@ resources:
 
    champion_not_yours = "You do not serve me, %s."
    champion_need_renown = \
-      "Not yet, %s.  My gift is for those who have risen to Captain in my service.  Come back "
+      "Not yet, %s.  My gift is for those who have risen to Champion in my service.  Come back "
       "when you have."
    champion_need_health = \
       "Your deeds are worthy, %s, but you are not yet hardy enough to bear my gift.  Return "
       "when you are stronger."
    champion_have_one = "You already bear my gift, %s.  Keep it fed."
    champion_need_campaign = \
-      "Rank alone does not earn my gift, %s.  See my war through with me first: there is "
-      "work I have kept for my Captains.  Ask me for it."
+      "Rank alone does not earn my gift, %s.  See my war through with me first: lead my "
+      "army against a rival's capital.  Ask me for that work."
    champion_cant_hold = "You have no room to carry my gift, %s.  Make some, and return."
 
    champion_gift_princess = \
@@ -152,19 +154,19 @@ messages:
       return champion_liege_rebel;
    }
 
-   CampaignAct4(faction = $)
+   CampaignAct5(faction = $)
    {
       if faction = FACTION_PRINCESS
       {
-         return CAMPAIGN_ACT4_PRINCESS;
+         return CAMPAIGN_ACT5_PRINCESS;
       }
 
       if faction = FACTION_DUKE
       {
-         return CAMPAIGN_ACT4_DUKE;
+         return CAMPAIGN_ACT5_DUKE;
       }
 
-      return CAMPAIGN_ACT4_REBEL;
+      return CAMPAIGN_ACT5_REBEL;
    }
 
    IsTrigger(string = $)
@@ -216,9 +218,9 @@ messages:
          return;
       }
 
-      // Ours: the campaign's fourth act first (ADR 0021)
+      // Ours: the campaign's fifth act, the siege, first (ADR 0021)
       if Send(Send(SYS,@GetQuestBook),@DoneEntry,#who=who,
-              #id=Send(self,@CampaignAct4,#faction=iFaction)) = $
+              #id=Send(self,@CampaignAct5,#faction=iFaction)) = $
       {
          Send(liege,@SayToOne,#target=who,#message_rsc=champion_need_campaign,
               #parm1=Send(who,@GetName));

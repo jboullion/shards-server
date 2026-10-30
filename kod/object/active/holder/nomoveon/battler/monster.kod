@@ -1178,12 +1178,34 @@ messages:
       return;
    }
 
+   PlayAwareSound(random_pitch = FALSE)
+   "Ours (2026-10-30): the cry as we take a target (EnterStateChase, TargetSwitch's lock), for "
+   "FactionTroop to keep a battle's from sounding all the time."
+   {
+      if vrSound_aware = $
+         OR poOwner = $
+      {
+         return;
+      }
+
+      if random_pitch
+      {
+         Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=vrSound_aware,
+              #flags=SOUND_RANDOM_PITCH);
+
+         return;
+      }
+
+      Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=vrSound_aware);
+
+      return;
+   }
+
    EnterStateChase( target = $, actnow = TRUE )
    {
       if poTarget <> target AND vrSound_aware <> $
       {
-         Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=vrSound_aware,
-              #flags=SOUND_RANDOM_PITCH);
+         Send(self,@PlayAwareSound,#random_pitch=TRUE);
       }
 
       Send(self,@SetState,#bit=STATE_CHASE);
@@ -7845,7 +7867,7 @@ if isClass(self,&Reflection)
       // 'lock' sound
       if vrSound_aware <> $
       {
-         Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=vrSound_aware);
+         Send(self,@PlayAwareSound);
       }
 
       return;

@@ -614,10 +614,24 @@ messages:
       propagate;
    }
 
+   PlayAwareSound(random_pitch = FALSE)
+   "Ours (2026-10-30): in a battle, the army's horn sounds as the armies take the field and "
+   "then at most now and then (FactionWar.MayHorn), not at every troop's every new target."
+   {
+      if poBattle <> $
+         AND NOT Send(poBattle,@MayHorn)
+      {
+         return;
+      }
+
+      propagate;
+   }
+
    TargetSwitch(what = $, iHatred = 0, force = FALSE)
    "In a battle: never a bystander, and (unless the battle picks for us, force) we keep our "
    "foe unless what is much nearer; else every step a foe takes makes us chase whichever is "
-   "nearest, and we bounce between two archers backing off."
+   "nearest, and we bounce between two archers backing off. Ours (2026-10-30): a mage keeps "
+   "its foe until it falls or leaves, nearer or not, and whoever strikes it."
    {
       local iNow, iNew;
 
@@ -635,6 +649,11 @@ messages:
             AND Send(poTarget,@GetOwner) = poOwner
             AND Send(self,@IsBattleFoe,#what=poTarget)
          {
+            if piBattleRole = BATTLE_ROLE_MAGE
+            {
+               return;
+            }
+
             iNow = Send(self,@SquaredFineDistanceTo,#what=poTarget);
             iNew = Send(self,@SquaredFineDistanceTo,#what=what);
             if iNow <> $
