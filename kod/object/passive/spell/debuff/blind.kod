@@ -58,6 +58,9 @@ classvars:
    vrSucceed_wav = blind_sound
    vrProjectile_icon = blind_proj_rsc
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    piBaseDuration = 4000 // 103 value 5000

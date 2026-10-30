@@ -33,6 +33,9 @@ classvars:
    //  new one past it ends the one they started first
    viMaxSongs = 2
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    // Ours: when each singer last started this song, [who, GetTickCount()]

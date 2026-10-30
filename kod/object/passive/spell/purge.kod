@@ -355,11 +355,11 @@ messages:
          if pbPurgeNoRemove
             OR pbRemoveWithPercentChance
          {
-            iNewPower = Bound(iNewPower,1,99);
+            iNewPower = Bound(iNewPower,1,Send(oSpell,@GetMaxSpellPower));
          }
          else
          {
-            iNewPower = Bound(iNewPower,$,99);
+            iNewPower = Bound(iNewPower,$,Send(oSpell,@GetMaxSpellPower));
          }
 
          // Start the new enchantment with the time left and the new state,

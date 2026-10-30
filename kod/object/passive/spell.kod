@@ -233,6 +233,11 @@ classvars:
    viIcon_animation_start = 2
    viIcon_animation_end = 2
 
+   // Ours: the most spellpower this spell can reach. Spells whose formulas
+   //  keep working past SPELLPOWER_MAXIMUM (full power, 99) set it to
+   //  SPELLPOWER_EMPOWERED_MAXIMUM; the rest stop at 99 as before.
+   viMax_spellpower = SPELLPOWER_MAXIMUM
+
    // viCast_time is in milliseconds.
    viCast_time = 0
    // viPostCast_time in seconds, since it works off GetTime().
@@ -597,7 +602,7 @@ messages:
    {
       local i, j, lShown, iOther, iSlots, lAlways;
 
-      AddPacket(4,spell_power_rsc, 4,First(lPower), 4,SPELLPOWER_MAXIMUM);
+      AddPacket(4,spell_power_rsc, 4,First(lPower), 4,viMax_spellpower);
 
       if Send(who,@GetSpellAbility,#spell_num=viSpell_num) = 0
       {
@@ -2226,6 +2231,12 @@ messages:
       return;
    }
 
+   GetMaxSpellPower()
+   "Ours: the most spellpower this spell can reach (viMax_spellpower)."
+   {
+      return viMax_spellpower;
+   }
+
    GetTranceTime(iSpellpower=0,who=$)
    {
       local iPercent;
@@ -2241,8 +2252,9 @@ messages:
          return 0;
       }
 
-      // 51// for high, 149// for low
-      iPercent = 150 - iSpellPower;   
+      // 51// for high, 149// for low. Ours: no faster past full power, which
+      //  spells with a higher viMax_spellpower can now pass.
+      iPercent = 150 - Bound(iSpellPower,0,SPELLPOWER_MAXIMUM);
       
       return (viCast_time*iPercent)/100;
    }
@@ -2456,11 +2468,11 @@ messages:
       {
          if bParts
          {
-            return [SPELLPOWER_MAXIMUM,
-                    [ [spell_pp_immortal, SPELLPOWER_MAXIMUM, $] ]];
+            return [viMax_spellpower,
+                    [ [spell_pp_immortal, viMax_spellpower, $] ]];
          }
 
-         return SPELLPOWER_MAXIMUM;
+         return viMax_spellpower;
       }
 
       // KLUDGE: This allows monsters to query spellpower.  Should be a function
@@ -2786,14 +2798,14 @@ messages:
          }
       }
 
-      // Bound the result.
-      iBound = Bound(iSpellPower,SPELLPOWER_MINIMUM,SPELLPOWER_MAXIMUM);
+      // Bound the result (ours: at this spell's own most, viMax_spellpower).
+      iBound = Bound(iSpellPower,SPELLPOWER_MINIMUM,viMax_spellpower);
       if bParts
       {
          if iBound < iSpellPower
          {
             lParts = AppendListElem([spell_pp_total_cap, iBound - iSpellPower,
-                                     [SPELLPOWER_MAXIMUM]], lParts);
+                                     [viMax_spellpower]], lParts);
          }
          else if iBound > iSpellPower
          {

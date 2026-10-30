@@ -61,7 +61,9 @@ classvars:
    // In seconds, since it works off GetTime()
    viPostCast_time = 1 // 103 value 2.
 
-   
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    piBaseDuration = 2000 // 103 value 2000.
@@ -180,7 +182,7 @@ messages:
       // By default, base duration 2000ms, total time 2000-6000ms using 40x
       // spellpower multiplier, with the final duration 50-100// max
       // Ours (spell revamp balance): 4 to 8 seconds (it was 2 to 5).
-      iDuration = 4000 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) * 40;
+      iDuration = 4000 + Bound(iSpellPower,0,viMax_spellpower) * 40;
       iDuration = Random(iDuration * (100 - piDeviation) / 100,iDuration);
 
       return iDuration;

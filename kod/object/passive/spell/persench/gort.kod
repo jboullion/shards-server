@@ -83,6 +83,9 @@ classvars:
 
    viDefensive = TRUE
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    // The effectiveness of purge on the target spell as a percentage.
@@ -130,7 +133,8 @@ messages:
 
       iSpellPower = Send(who,@GetEnchantedState,#what=self);
       iMax = 1500;
-      iAbsorbed = bound(random(0,iSpellPower*4),0,400);
+      // Ours: up to 600 at the most spellpower (EffectDesc shows state/25).
+      iAbsorbed = bound(random(0,iSpellPower*4),0,viMax_spellpower*4);
 
       if aspell <> 0 OR (atype & ATCK_WEAP_MAGIC)
       {

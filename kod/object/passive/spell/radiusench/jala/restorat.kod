@@ -80,7 +80,8 @@ messages:
 
    GetDuration(iSpellPower=0)
    {
-      return 100000 / (iSpellPower+1);
+      // Ours: no quicker past full power.
+      return 100000 / (Bound(iSpellPower,0,SPELLPOWER_MAXIMUM)+1);
    }
 
    PeriodicEffect(who = $)

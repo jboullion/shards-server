@@ -68,6 +68,9 @@ classvars:
    viIcon_animation_start = 4
    viIcon_animation_end = 6
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    pbAccessible = TRUE

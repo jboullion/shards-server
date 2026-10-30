@@ -58,6 +58,9 @@ classvars:
 
    vrSucceed_wav = Animate_sound
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
 messages:

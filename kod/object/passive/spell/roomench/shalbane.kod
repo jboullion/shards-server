@@ -74,6 +74,9 @@ classvars:
    vrSucceed_wav =  ShalilleBane_sound
    viHarmful = TRUE
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
 messages:

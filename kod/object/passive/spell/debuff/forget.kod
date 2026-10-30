@@ -67,6 +67,9 @@ classvars:
    viChance_to_increase = 20
    viMeditate_ratio = 20
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    piBaseDuration = 30000

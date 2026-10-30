@@ -49,6 +49,9 @@ classvars:
    viChance_To_Increase = 20
    viMeditate_ratio = 30
 
+   // Ours: damage keeps growing past full power (ScaleDamage).
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
    vbIsRangedAttack = FALSE
    vbSelfHarming = FALSE
 
@@ -318,7 +321,8 @@ messages:
       iDamage = Send(self,@DamageFactors,#damage=iDamage,#who=who,
                      #lTargets=lTargets);
 
-      // Reduce damage based on spell power.
+      // Reduce damage based on spell power. Ours: past full power (99) it adds
+      //  half a percent a point, up to 126% at 150.
       iDamage = (iDamage * (50 + (iSpellPower / 2))) / SPELLPOWER_MAXIMUM;
 
       // Ours (spell revamp balance): Mana Convergence, up to a fifth more.

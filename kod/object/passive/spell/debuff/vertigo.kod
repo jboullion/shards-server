@@ -60,6 +60,9 @@ classvars:
 
    vrSucceed_wav = Vertigo_sound
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    piBaseDuration = 4000
@@ -192,7 +195,7 @@ messages:
 
    GetFullDuration(iSpellPower=0)
    {
-      return 10000 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM) * 200;
+      return 10000 + Bound(iSpellPower,0,viMax_spellpower) * 200;
    }
 
    EndEnchantment(who=$,state=$,report=TRUE)

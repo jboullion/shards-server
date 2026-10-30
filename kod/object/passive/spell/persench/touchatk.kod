@@ -110,6 +110,9 @@ classvars:
    // The amount of light added to player's screen.
    viEnchantmentLight = 0
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    plPrerequisites = $

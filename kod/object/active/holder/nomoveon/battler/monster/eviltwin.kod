@@ -765,9 +765,11 @@ messages:
 
       // Ours (spell revamp D38): a quarter to a half of the original's
       //  health by spellpower (it was about 20 whatever it copied).
-      // Ours (spell revamp balance): 40 to 70 percent (it was 25 to 50).
+      // Ours (spell revamp balance): 40 to 70 percent (it was 25 to 50), and
+      //  85 at the most spellpower past full power.
       piMax_hit_points = Bound(Send(who,@GetMaxHealth)
-                               * (40 + Bound(piSpellpower,1,99) * 30 / 99)
+                               * (40 + Bound(piSpellpower,1,
+                                             SPELLPOWER_EMPOWERED_MAXIMUM) * 30 / 99)
                                / 100, 15,$);
       piHit_points = piMax_hit_points * 100;
 

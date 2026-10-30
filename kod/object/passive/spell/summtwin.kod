@@ -50,6 +50,9 @@ classvars:
 
    vrSucceed_wav = summonEvilTwin_sound
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
 

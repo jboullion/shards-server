@@ -54,6 +54,9 @@ classvars:
    vrSucceed_wav = Dazzle_sound
    vrProjectile_icon = dazzle_proj_rsc
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    piSpellPowerMultiplier = 40 //103 value 70

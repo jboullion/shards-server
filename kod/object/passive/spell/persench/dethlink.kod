@@ -63,6 +63,9 @@ classvars:
 
    vbCanCastOnOthers = FALSE
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    // The effectiveness of purge on the target spell as a percentage.

@@ -63,6 +63,9 @@ classvars:
    viOutlaw = TRUE
    viNoNewbieOffense = TRUE
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
 
@@ -174,8 +177,11 @@ messages:
             #parm3=Send(oTarget,@GetIndef),
             #parm4=Send(oTarget,@GetName));
 
-      i = Send(oApparition,@ReturnMaxHitPoints);
-      i = i / APPARITION_FRACTION;
+      // A third of its health up to full power (99); ours: past it, more,
+      //  to about half at the most spellpower (150).
+      i = Send(oApparition,@ReturnMaxHitPoints)
+          * Bound(iSpellPower,SPELLPOWER_MAXIMUM,$)
+          / (APPARITION_FRACTION * SPELLPOWER_MAXIMUM);
 
       Send(oApparition,@SetMaxHitPoints,#amount=i);
 

@@ -64,6 +64,9 @@ classvars:
    vrSpell_intro = Haste_spell_intro
    vrSucceed_wav = Haste_sound
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    // The effectiveness of purge on the target spell as a percentage.
@@ -83,7 +86,9 @@ messages:
 
    GetStateValue(iSpellPower=0)
    {
-      return iSpellPower;
+      // Ours: past full power Haste lasts longer, but the exertion it saves
+      //  stays at most 99% (user.kod takes 100 less this).
+      return Bound(iSpellPower,0,SPELLPOWER_MAXIMUM);
    }
 
    SetSpellPlayerFlag(who=$)

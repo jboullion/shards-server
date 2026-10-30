@@ -105,7 +105,7 @@ GetSongFxColor(iSpell=0)
          return 0;
       }
 
-      return Bound(Nth(state,5),0,SPELLPOWER_MAXIMUM);
+      return Bound(Nth(state,5),0,viMax_spellpower);
    }
 
    GetPulseDamage(state=$)

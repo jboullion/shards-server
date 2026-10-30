@@ -64,6 +64,9 @@ classvars:
    viChance_To_Increase = 15
    viMeditate_ratio = 30
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
    // This controls how effective FA is at reducing CC duration.

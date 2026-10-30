@@ -54,7 +54,10 @@ classvars:
    
    viChance_To_Increase = 30
    viMeditate_ratio = 10
-   
+
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
 messages:

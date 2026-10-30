@@ -110,7 +110,7 @@ messages:
 
    GetManaGift(iSpellPower=0)
    {
-      return 10 + Bound(iSpellPower,0,SPELLPOWER_MAXIMUM);
+      return 10 + Bound(iSpellPower,0,viMax_spellpower);
    }
 
    PeriodicEffect(who = $, state = $)
@@ -126,7 +126,7 @@ messages:
       }
 
       iAmount = Send(self,@GetManaGift,
-                     #iSpellPower=Bound(Nth(state,5),0,SPELLPOWER_MAXIMUM));
+                     #iSpellPower=Bound(Nth(state,5),0,viMax_spellpower));
       iAmount = Bound(iAmount,0,
                       (2 * Send(who,@GetMaxMana)) - Send(who,@GetMana));
       if iAmount > 0

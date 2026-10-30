@@ -897,13 +897,15 @@ messages:
    // Replace this to modify range by spellpower calculations
    CalculateRange(who=$, iSpellPower=25)
    {
-      // Default is up to twice base range
-      return viBaseRange + ((viBaseRange * iSpellPower) / 99);
+      // Default is up to twice base range (ours: no wider past full power)
+      return viBaseRange
+             + ((viBaseRange * Bound(iSpellPower,0,SPELLPOWER_MAXIMUM)) / 99);
    }
 
    CalculateLightIntensity(iSpellPower=25)
    {
-      return viBaseLightIntensity * ((iSpellpower * 2) / 99);
+      return viBaseLightIntensity
+             * ((Bound(iSpellpower,0,SPELLPOWER_MAXIMUM) * 2) / 99);
    }
 
    GetLightColor()

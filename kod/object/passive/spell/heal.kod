@@ -44,6 +44,9 @@ classvars:
    viHealMax = 0
    viHealPerPower = 0
 
+   // Ours: keeps growing past full power, up to SPELLPOWER_EMPOWERED_MAXIMUM.
+   viMax_spellpower = SPELLPOWER_EMPOWERED_MAXIMUM
+
 properties:
 
 messages:

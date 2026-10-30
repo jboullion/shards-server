@@ -2803,6 +2803,9 @@ SID_ICEWALL             = 241
    // Constants for spellpower
    SPELLPOWER_MINIMUM = 1
    SPELLPOWER_MAXIMUM = 99
+   // Ours: the most a spell that opts in (Spell.viMax_spellpower) can reach. Its
+   //  formulas carry on past full power (SPELLPOWER_MAXIMUM) on the same curve.
+   SPELLPOWER_EMPOWERED_MAXIMUM = 150
 
    // Ours (spell revamp D10): the element a Faren mage attunes to, once
    //  (Player.piFarenAttunement), and a Faren spell's element (Spell.viFarenElement)
