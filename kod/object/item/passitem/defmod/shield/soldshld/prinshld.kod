@@ -10,8 +10,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 PrincessShield is SoldierShield
 
-// Stats affected: Mysticism and Agility
-// Special bonus: Using a Princess shield makes your spells cost up to 2 less mana.
+// Health: as every soldier's shield, 5 a rank (SoldierShield.UpdateRankPowers). Until 2026-10-30
+// it raised Intellect, Mysticism and Aim instead (RemoveOldStats takes that off).
+// Special bonus: spellpower to all spells, as the Duke's (2026-10-30; it was a mana cut and
+// defence): 1.5 a shield rank (renown / 10), 1 to 15.
 
 constants:
 
@@ -46,9 +48,8 @@ resources:
       "RANKS: Your rank is the renown you have earned. Win battles, claim flagpoles for "
       "the Crown and defeat enemy soldiers, and you will be promoted. Your renown will "
       "not fade while you serve me.\n\n"
-      "ABILITIES: As a soldier of the Crown, you will grow wiser and more attuned to "
-      "all things mystical, steadier of aim, and better defended, and I will teach you "
-      "to spend less mana on your spells. These gifts grow with your rank.\n\n"
+      "ABILITIES: As a soldier of the Crown, you will be hardier, and Shal'ille's light "
+      "will strengthen all your spells. These gifts grow with your rank.\n\n"
       "THE WAR: Our army takes the field every two hours. Stand with it, shield on, and "
       "you will be rewarded whether we win or lose. Only soldiers may carry the flags "
       "in my chambers and claim territory for the Crown.\n\n"
@@ -80,7 +81,9 @@ properties:
 
 messages:
 
-   RemoveStats()
+   RemoveOldStats()
+   "Ours (2026-10-30): the stats this shield used to raise, taken back off a shield worn from "
+   "before. Their properties can go once no saved shield gives any."
    {
       if poOwner <> $
          AND IsClass(poOwner,&User)
@@ -97,74 +100,10 @@ messages:
       return;
    }
 
-   UpdateRankPowers()
-   "Updates any rank powers.  Affects stats."
+   GetBaseSpellModifier(oSpell=$)
+   "Ours (2026-10-30): as the Duke's shield."
    {
-      local iStatAdjustment, iNewAdjustment;
-
-      if poOwner = $
-         OR NOT IsClass(poOwner,&User)
-      {
-         return;
-      }
-
-      if piFactionRank <= 2
-      {
-         iStatAdjustment = 0;
-      }
-      else if piFactionRank <= 6
-      {
-         iStatAdjustment = 3;
-      }
-      else
-      {
-         iStatAdjustment = 5;
-      }
-
-      // In the following:
-      //  iNewAdjustment is how much the stat changed this time around.
-      //  pi(stat)Change is the cumulative change to that stat.
-      if iStatAdjustment <> piIntellectChange
-      {
-         iNewAdjustment = Send(poOwner,@AddIntellect,
-                                 #points=(iStatAdjustment-piIntellectChange));
-         piIntellectChange += iNewAdjustment;
-      }
-
-      if iStatAdjustment <> piMysticismChange
-      {
-         iNewAdjustment = Send(poOwner,@AddMysticism,
-                                 #points=(iStatAdjustment-piMysticismChange));
-         piMysticismChange += iNewAdjustment;
-      }
-
-      if iStatAdjustment <> piAimChange
-      {
-         iNewAdjustment = Send(poOwner,@AddAim,
-                                 #points=(iStatAdjustment-piAimChange));
-         piAimChange += iNewAdjustment;
-      }
-
-      return;
-   }
-
-   GetSpellManaReduction()
-   {
-      local iReduction;
-
-      iReduction = ((piFactionRank / 3) - 1);
-      // Ours: ranks 1 and 2 came to -1, which made every spell cost a point more
-      if iReduction < 0
-      {
-         iReduction = 0;
-      }
-
-      return iReduction;
-   }
-
-   ModifyDefensePower(who = $,what = $,defense_power = 0)
-   {
-      return defense_power + (piFactionRank*20);
+      return (15 * piFactionRank) / 10;
    }
 
 end

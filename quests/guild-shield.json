@@ -8,28 +8,32 @@
     "QST_ID_GUILDSHIELD_INTRO"
   ],
   "giver": {
-    "class": "TosBlacksmith"
+    "class": "GuildCreator"
   },
   "band": {
     "min": 30,
     "max": 150
   },
   "requires": {
-    "guildMaster": true
+    "inGuild": true
   },
   "repeat": {
-    "cooldownHours": 2
+    "cooldownHours": 24
   },
   "text": {
-    "offer": "Aye, someone eager to do this favor for me. Undoubtedly you've heard that the orc mines have reopened. Well, them orcs mine a strain of iron ore that's of a much higher grade than what we can get out of the stripped out Jasper mines. Bring me some ore, and I'll use the last of what I have now to make you a coat of arms.",
-    "progress": "Find a chunk of ore in the orc caves and bring it back to the blacksmith of Tos.",
-    "complete": "Ah, this will make for some fine weapons and armor! Thank you greatly. In your absence, I have fashioned a shield which displays your guild's crest and colors. Wear it forth proudly, you have done well for your guild this day."
+    "offer": "Frular says, \"Every member of a guild may carry its shield, and thou shalt have one. The orcs mine an iron in their caves far better than anything left in the Jasper mines. Bring a chunk of it to the smith of Tos, and he will forge thee a shield in thy guild's colours. It weighs nothing, never breaks, and grows stronger as thy guild's prestige grows.\"",
+    "progress": "Find a chunk of ore in the orc caves and take it to the blacksmith of Tos.",
+    "complete": "The blacksmith turns the ore over in his hands. \"Fine iron, this. Here: I've fashioned a shield in your guild's crest and colours. Wear it proudly. And if you want a god's blessing on it, the temples will mark it with their sign.\""
   },
   "steps": [
     {
       "kind": "collect",
       "item": "OreChunk",
-      "count": 1
+      "count": 1,
+      "turnin": {
+        "class": "TosBlacksmith"
+      },
+      "objective": "Ore for the smith of Tos"
     }
   ],
   "rewards": {

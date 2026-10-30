@@ -19,6 +19,10 @@ constants:
    UNUSED = 2
    DEFENDING = 3
 
+   // Ours (2026-10-30): the most health worn shield gives, a rank (NamedRank: Recruit 5 to
+   //  Champion 30)
+   HEALTH_PER_RANK = 5
+
 resources:
 
    include soldshld.lkod
@@ -94,6 +98,8 @@ properties:
 
    // 1 to 10: the owner's renown / 10 (RenownChanged); the subclasses' powers read it
    piFactionRank = 1
+   // Ours: the most health this shield has given its owner, to take back off (as a circlet's)
+   piHealthChange = 0
 
    poLastEnemyToAttack = $
 
@@ -171,6 +177,19 @@ messages:
       return viFaction;
    }
 
+   NamedRank()
+   "Ours (2026-10-30): the owner's rank (Player.GetRenownRank), 1 Recruit to 6 Champion: the "
+   "shield gives HEALTH_PER_RANK health for each, and Jonas's absorbs that much damage."
+   {
+      if poOwner <> $
+         AND IsClass(poOwner,&Player)
+      {
+         return Send(poOwner,@GetRenownRank);
+      }
+
+      return RENOWN_RANK_RECRUIT;
+   }
+
    RenownChanged()
    "Ours (the faction revamp): the rank, 1 to 10, is the owner's renown / 10, and the "
    "powers follow it."
@@ -187,14 +206,53 @@ messages:
    }
 
    UpdateRankPowers()
-   "Updates any rank powers.  EG, called after gaining a faction rank."
+   "Ours (2026-10-30): worn, the shield gives HEALTH_PER_RANK health for each of its owner's "
+   "ranks (GainMaxHealth, as a circlet does); put away, none. Its old stat bonuses come off."
    {
+      local iWant;
+
+      Send(self,@RemoveOldStats);
+      if poOwner = $
+         OR NOT IsClass(poOwner,&User)
+      {
+         return;
+      }
+
+      iWant = 0;
+      if Send(poOwner,@FindUsing,#class=&SoldierShield) = self
+      {
+         iWant = HEALTH_PER_RANK * Send(self,@NamedRank);
+      }
+
+      if iWant <> piHealthChange
+      {
+         piHealthChange = piHealthChange
+                          + Send(poOwner,@GainMaxHealth,#amount=iWant - piHealthChange);
+      }
+
       return;
    }
 
    RemoveStats()
+   "The shield comes off: the health it gave goes."
    {
-      // Set in each subclass;
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+         AND piHealthChange <> 0
+      {
+         Send(poOwner,@GainMaxHealth,#amount=-piHealthChange);
+         piHealthChange = 0;
+      }
+
+      Send(self,@RemoveOldStats);
+
+      return;
+   }
+
+   RemoveOldStats()
+   "Ours (2026-10-30): until then each liege's shield raised three stats; a shield worn since "
+   "takes them back off (the subclasses). Nothing here."
+   {
       return;
    }
 

@@ -2162,7 +2162,7 @@ messages:
 
    AddPrestige(amount=0)
    {
-      local i, iOldTier;
+      local i, iOldTier, oShield;
 
       if amount <= 0
       {
@@ -2176,6 +2176,13 @@ messages:
       {
          foreach i in plMembers
          {
+            // Ours (2026-10-30): a guild shield worn grows with the tier
+            oShield = Send(First(i),@FindUsing,#class=&GuildShield);
+            if oShield <> $
+            {
+               Post(oShield,@UpdateGuildPowers);
+            }
+
             if Send(First(i),@IsLoggedOn)
             {
                Send(First(i),@MsgSendUser,#message_rsc=guild_prestige_tier,

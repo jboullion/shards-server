@@ -14,6 +14,14 @@ constants:
 
    include blakston.khd
 
+   // Ours (2026-10-30, as the soldier's shield): worn, the shield gives this much health for
+   //  each step of its wearer's guild's prestige (GuildRank: tier 0 is 1, tier 4 is 5), and
+   //  absorbs one more point of damage a step from 2 (GuildRank + 1)
+   HEALTH_PER_RANK = 5
+   // Spellpower an insignia gives its schools: a god's sign its own, a liege's seal two
+   SIGN_SPELLPOWER = 15
+   SEAL_SPELLPOWER = 10
+
    DEFENDING = 3
 
 resources:
@@ -54,7 +62,7 @@ resources:
    guildshield_qormas_over = gshqmov.bgf
    guildshield_window_overlay_rsc = povshldE.bgf
    guildshield_desc_rsc = \
-      "\n\nHeavy metal shields of this style are decorated in the standards "
+      "\n\nLight, unbreakable shields of this style are decorated in the standards "
       "of its owner guild.  "
    guildshield_herald_guild_master = \
       "\n\nThe pattern on this shield is %s%s%s: the mark of the %q.  %s"
@@ -102,10 +110,10 @@ classvars:
    viHits_init_min = 600
    viHits_init_max = 750
 
-   // Being custom and made from ore, it's heavier than your average shield.
+   // Ours (2026-10-30): weightless and never worn down, as the soldier's shield
    viValue_average = 400
-   viWeight = 200
-   viBulk = 150
+   viWeight = 0
+   viBulk = 0
 
    viDefense_base = 20
    viDamage_base = 2
@@ -126,16 +134,33 @@ properties:
 
    piShield_shape = SHIELDSHAPE_DEFAULT
 
+   // Ours (2026-10-30): never breaks (Item.DefendingHit, BreakWornGear, Shatter)
+   piIndestructible = TRUE
+   // Ours: the health this shield has given its wearer, to take back off (as a circlet's)
+   piHealthChange = 0
+
 messages:
 
    Constructor(color1=XLAT_TO_GRAY,color2=XLAT_TO_GRAY,
-               shape=SHIELDSHAPE_DEFAULT,guildMember=$)
+               shape=SHIELDSHAPE_DEFAULT,guildMember=$,quester=$)
    {
       local oGuild;
 
+      // Ours: a QuestBook reward is made for its quester ("A Mining Expedition"), which the
+      //  old quest engine passed as guildMember
+      if guildMember = $
+      {
+         guildMember = quester;
+      }
+
+      oGuild = $;
       if guildMember <> $
       {
          oGuild = Send(guildMember,@GetGuild);
+      }
+
+      if oGuild <> $
+      {
          color1 = Send(oGuild,@GetPrimaryGuildColor);
          color2 = Send(oGuild,@GetSecondaryGuildColor);
          shape  = Send(oGuild,@GetShieldShape);
@@ -653,11 +678,6 @@ messages:
       return;
    }
 
-   GetResistanceModifiers()
-   {
-      return [ [ATCK_WEAP_PIERCE,20] ];
-   }
-
    GetHeatDamage()
    {
       return 2;
@@ -674,7 +694,7 @@ messages:
 
       iSchool = Send(oSpell,@GetSchool);
       
-      // Give a bonus to certain spells if the shield has the proper insignia
+      // A god's sign: its own school (ours, 2026-10-30: SIGN_SPELLPOWER, was 10)
       if    (piInsigniaType = INSIG_FAREN    AND iSchool = SS_FAREN)
          OR (piInsigniaType = INSIG_KRAANAN  AND iSchool = SS_KRAANAN)
          OR (piInsigniaType = INSIG_QOR      AND iSchool = SS_QOR)
@@ -682,26 +702,17 @@ messages:
          OR (piInsigniaType = INSIG_RIIJA    AND iSchool = SS_RIIJA)
          OR (piInsigniaType = INSIG_JALA     AND iSchool = SS_JALA)
       {
-         return 10;
+         return SIGN_SPELLPOWER;
       }
 
-      if    (piInsigniaType = INSIG_DUKE AND iSchool = SS_KRAANAN)
-         OR (piInsigniaType = INSIG_DUKE AND iSchool = SS_QOR)
-         OR (piInsigniaType = INSIG_DUKE AND iSchool = SS_RIIJA)
+      // A liege's seal: the liege's two schools (ours, 2026-10-30, SEAL_SPELLPOWER; it was 6
+      //  to three schools, and Jonas's to Kraanan alone)
+      if    (piInsigniaType = INSIG_DUKE AND (iSchool = SS_QOR OR iSchool = SS_RIIJA))
+         OR (piInsigniaType = INSIG_PRINCESS
+             AND (iSchool = SS_FAREN OR iSchool = SS_SHALILLE))
+         OR (piInsigniaType = INSIG_REBEL AND (iSchool = SS_KRAANAN OR iSchool = SS_JALA))
       {
-         return 6;
-      }
-
-      if    (piInsigniaType = INSIG_PRINCESS AND iSchool = SS_FAREN)
-         OR (piInsigniaType = INSIG_PRINCESS AND iSchool = SS_SHALILLE)
-         OR (piInsigniaType = INSIG_PRINCESS AND iSchool = SS_JALA)
-      {
-         return 6;
-      }
-      
-      if piInsigniaType = INSIG_REBEL AND iSchool = SS_KRAANAN
-      {
-         return 6;
+         return SEAL_SPELLPOWER;
       }
 
       if piInsigniaType = INSIG_QORMAS
@@ -710,6 +721,151 @@ messages:
       }
 
       return 0;
+   }
+
+   //// Ours (2026-10-30): the guild shield as the soldier's, its powers from the guild's prestige
+
+   GuildRank()
+   "The wearer's guild's prestige tier, 1 to 5 (Guild.GetPrestigeTier 0 to 4); 0 outside a guild."
+   {
+      local oGuild;
+
+      if poOwner = $
+         OR NOT IsClass(poOwner,&Player)
+      {
+         return 0;
+      }
+
+      oGuild = Send(poOwner,@GetGuild);
+      if oGuild = $
+      {
+         return 0;
+      }
+
+      return Send(oGuild,@GetPrestigeTier) + 1;
+   }
+
+   UpdateGuildPowers()
+   "Worn, HEALTH_PER_RANK health for each GuildRank (GainMaxHealth, as a circlet does); put "
+   "away, none. Sent as it's worn, as the guild's tier rises, and as its wearer joins or leaves "
+   "a guild (Player.SetGuild)."
+   {
+      local iWant;
+
+      if poOwner = $
+         OR NOT IsClass(poOwner,&User)
+      {
+         return;
+      }
+
+      iWant = 0;
+      if Send(poOwner,@FindUsing,#class=&GuildShield) = self
+      {
+         iWant = HEALTH_PER_RANK * Send(self,@GuildRank);
+      }
+
+      if iWant <> piHealthChange
+      {
+         piHealthChange = piHealthChange
+                          + Send(poOwner,@GainMaxHealth,#amount=iWant - piHealthChange);
+      }
+
+      return;
+   }
+
+   RemoveGuildPowers()
+   {
+      if poOwner <> $
+         AND IsClass(poOwner,&User)
+         AND piHealthChange <> 0
+      {
+         Send(poOwner,@GainMaxHealth,#amount=-piHealthChange);
+      }
+
+      piHealthChange = 0;
+
+      return;
+   }
+
+   Mended()
+   "A shield from before: never breaking, at its full strength, and in its guild's colours."
+   {
+      local oGuild;
+
+      piIndestructible = TRUE;
+      piHits = piHits_init;
+      if poOwner <> $
+         AND IsClass(poOwner,&Player)
+         AND NOT Send(self,@IsShieldColored)
+      {
+         oGuild = Send(poOwner,@GetGuild);
+         if oGuild <> $
+         {
+            Send(self,@ChangeGuildShieldColor,#color1=Send(oGuild,@GetPrimaryGuildColor),
+                 #color2=Send(oGuild,@GetSecondaryGuildColor),
+                 #shape=Send(oGuild,@GetShieldShape),#override=TRUE);
+         }
+      }
+
+      return;
+   }
+
+   NewUsed()
+   {
+      Send(self,@Mended);
+      Post(self,@UpdateGuildPowers);
+
+      propagate;
+   }
+
+   NewUnused()
+   {
+      Send(self,@RemoveGuildPowers);
+
+      propagate;
+   }
+
+   Delete()
+   {
+      Send(self,@RemoveGuildPowers);
+
+      propagate;
+   }
+
+   // Copied from DefenseModifier, as the soldier's shield: no Block check, and the damage
+   //  absorbed grows with the guild's prestige (GuildRank + 1: 2 to 6)
+   ModifyDefenseDamage(who = $,what = $,damage = $,atype = 0,aspell = 0)
+   "Affects damage done to owner."
+   {
+      local iDamageReduce;
+
+      piDamage_reduce = Bound(Send(self,@GuildRank) + 1,viDamage_base,$);
+      iDamageReduce = random(piDamage_reduce*33,piDamage_reduce*100);
+      iDamageReduce = bound(iDamageReduce,0,(damage-100));
+
+      if aspell <> 0
+      {
+         if atype <> 0
+         {
+            iDamageReduce = iDamageReduce * 2 / 3;
+         }
+         else
+         {
+            iDamageReduce = 0;
+         }
+      }
+
+      return damage - iDamageReduce;
+   }
+
+   CanMend()
+   {
+      return FALSE;
+   }
+
+   CanShatter()
+   {
+      return FALSE;
    }
 
    SetQormas()

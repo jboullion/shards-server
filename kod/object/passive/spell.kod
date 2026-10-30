@@ -79,34 +79,34 @@ resources:
    // Ours (spell revamp phase 1): three more %r after the flavour text, for
    //  what the spell does at your spellpower, its costs, and the breakdown.
    // Ours (2026-10-27): marked up for our client's Description and Stats tabs:
-   //  the description, then §, then the stats one to a line, "Label¦Value" (a
-   //  label starting · is a sub-row), and lines without ¦ are notes (an
+   //  the description, then ï¿½, then the stats one to a line, "Labelï¿½Value" (a
+   //  label starting ï¿½ is a sub-row), and lines without ï¿½ are notes (an
    //  enchantment's own lines). LookDialogs.tsx and lookText.ts read it.
-   spell_desc_rsc = "%s%s%s§\nSchool¦%s\nLevel¦%i%r%r%r%r%r%r"
+   spell_desc_rsc = "%s%s%sï¿½\nSchoolï¿½%s\nLevelï¿½%i%r%r%r%r%r%r"
    spell_nl = "\n"
    spell_nl2 = "\n\n"
 
-   spell_effect_rsc = "\nAt your spellpower¦%r"
+   spell_effect_rsc = "\nAt your spellpowerï¿½%r"
 
    spell_costs_rsc = "%r%r%r%r%r%r%r%r%r%r%r"
-   spell_costs_mana = "\nMana¦%i"
-   spell_costs_mana_upkeep = "\nMana¦%i, then %i more every %i.%i seconds while it lasts"
-   spell_costs_no_mana = "\nMana¦none"
-   spell_costs_vigor = "\nVigor¦%i"
-   spell_costs_reagent_first = "\nReagents¦%i %s"
+   spell_costs_mana = "\nManaï¿½%i"
+   spell_costs_mana_upkeep = "\nManaï¿½%i, then %i more every %i.%i seconds while it lasts"
+   spell_costs_no_mana = "\nManaï¿½none"
+   spell_costs_vigor = "\nVigorï¿½%i"
+   spell_costs_reagent_first = "\nReagentsï¿½%i %s"
    spell_costs_reagent = ", %i %s"
-   spell_costs_reagent_unknown_first = "\nReagents¦%i other reagents"
+   spell_costs_reagent_unknown_first = "\nReagentsï¿½%i other reagents"
    spell_costs_reagent_unknown = ", %i other reagents"
    spell_costs_more = ", and more"
-   spell_costs_cast_time = "\nCast time¦%i.%i seconds"
-   spell_costs_recovery = "\nRecovery¦%i seconds"
-   spell_costs_recovery_one = "\nRecovery¦a second"
+   spell_costs_cast_time = "\nCast timeï¿½%i.%i seconds"
+   spell_costs_recovery = "\nRecoveryï¿½%i seconds"
+   spell_costs_recovery_one = "\nRecoveryï¿½a second"
 
    spell_power_rsc = \
-      "\nSpellpower¦%i (the most is %i)%r"
+      "\nSpellpowerï¿½%i (the most is %i)%r"
       "%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r"
    spell_pp_unknown = "\nYou don't know this spell yet."
-   spell_pp_line = "\n·%r¦%s%i"
+   spell_pp_line = "\nï¿½%rï¿½%s%i"
    spell_pp_plus = "+"
    spell_pp_immortal = "Immortal"
    spell_pp_ability = "Half your %s ability (%i%%)"
@@ -186,7 +186,7 @@ resources:
    no_line_of_sight = \
       "Your hindered line of sight makes casting more difficult."
 
-   spell_meditate_ratio_rsc = "\nTraining¦%i points to improve"
+   spell_meditate_ratio_rsc = "\nTrainingï¿½%i points to improve"
 
    spell_Enchantment_type_default_rsc = "enchanter"
 
@@ -1884,7 +1884,7 @@ messages:
    GetManaCost(who=$,iSpellPower=0,bItemCast=FALSE)
    "Returns number of magic points needed to cast spell"
    {
-      local iCost, oPrincessShield;
+      local iCost;
 
       if iSpellpower = 0
       {
@@ -1921,12 +1921,7 @@ messages:
       // Ours (spell revamp balance): Mana Focus and the like.
       iCost = iCost + Send(self,@GetManaCostExtra,#who=who);
 
-      // Up to -2 for being a Princess soldier
-      oPrincessShield = Send(who,@FindUsing,#class=&PrincessShield);
-      if oPrincessShield <> $
-      {
-         iCost = iCost - Send(oPrincessShield,@GetSpellManaReduction);
-      }
+      // (The Princess's soldiers' mana cut is gone: her shield gives spellpower, 2026-10-30)
 	  
       return bound(iCost,1,$);
    }

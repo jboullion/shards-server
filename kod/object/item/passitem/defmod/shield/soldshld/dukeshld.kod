@@ -10,8 +10,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 DukeShield is SoldierShield
 
-// Stats affected: Intellect, Stamina and Agility
-// Special bonus: This shield gives a bonus 20 Spellpower to all spells.
+// Health: as every soldier's shield, 5 a rank (SoldierShield.UpdateRankPowers). Until 2026-10-30
+// it raised Intellect, Stamina and Agility instead (RemoveOldStats takes that off).
+// Special bonus: spellpower to all spells, 1.5 a shield rank (renown / 10): 1 to 15.
 
 constants:
 
@@ -48,9 +49,8 @@ resources:
       "name and cut down the enemy's soldiers, and you will rise. Renown does not fade: "
       "what you earn, you keep.\n\n"
       "ABILITIES: In return for your loyal service, I will give you power. While you "
-      "wear my shield, your stamina, agility and intellect will grow, and the darker "
-      "aspects of magic will strengthen all your spells. These powers grow with your "
-      "rank.\n\n"
+      "wear my shield, you will be harder to kill, and the darker aspects of magic will "
+      "strengthen all your spells. These powers grow with your rank.\n\n"
       "THE WAR: My armies march on the flagpoles every two hours. Be there, shield on, "
       "and you will be paid, win or lose. Only soldiers may carry my flags and claim "
       "territory in my name.\n\n"
@@ -82,7 +82,9 @@ properties:
 
 messages:
 
-   RemoveStats()
+   RemoveOldStats()
+   "Ours (2026-10-30): the stats this shield used to raise, taken back off a shield worn from "
+   "before. Their properties can go once no saved shield gives any."
    {
       if poOwner <> $
          AND IsClass(poOwner,&User)
@@ -94,57 +96,6 @@ messages:
          piStaminaChange = 0;
          piAgilityChange = 0;
 	     piIntellectChange = 0;
-      }
-
-      return;
-   }
-
-   UpdateRankPowers()
-   "Updates any rank powers.  Affects stats."
-   {
-      local iStatAdjustment, iNewAdjustment;
-
-      if poOwner = $
-         OR NOT IsClass(poOwner,&User)
-      {
-         return;
-      }
-
-      if piFactionRank <= 2
-      {
-         iStatAdjustment = 0;
-      }
-      else if piFactionRank <= 6
-      {
-         iStatAdjustment = 3;
-      }
-      else
-      {
-         iStatAdjustment = 5;
-      }
-
-      // In the following:
-      //  iNewAdjustment is how much the stat changed this time around.
-      //  pi(stat)Change is the cumulative change to that stat.
-      if iStatAdjustment <> piAgilityChange
-      {
-         iNewAdjustment = Send(poOwner,@AddAgility,
-                                 #points=(iStatAdjustment-piAgilityChange));
-         piAgilityChange += iNewAdjustment;
-      }
-
-      if iStatAdjustment <> piStaminaChange
-      {
-         iNewAdjustment = Send(poOwner,@AddStamina,
-                                 #points=(iStatAdjustment-piStaminaChange));
-         piStaminaChange += iNewAdjustment;
-      }
-
-      if iStatAdjustment <> piIntellectChange
-      {
-         iNewAdjustment = Send(poOwner,@AddIntellect,
-                                 #points=(iStatAdjustment-piIntellectChange));
-         piIntellectChange += iNewAdjustment;
       }
 
       return;

@@ -381,7 +381,7 @@ resources:
    qd_96_s2 = "Tell Jonas D'Accor what was said"
    qd_96_t2 = "Jonas D'Accor"
    qd_97_name = "A Mining Expedition"
-   qd_97_s1 = "chunk of ore gathered"
+   qd_97_s1 = "Ore for the smith of Tos"
    qd_97_t1 = "Fehr'loi Qan"
    qd_99_name = "Afiera D'xor's Pupil"
    qd_99_s1 = "Take a vial of sacchaqua to Frisconar"
@@ -1096,7 +1096,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 22761568;
+      return 60652482;
    }
 
    GetQuests()
@@ -1648,11 +1648,11 @@ messages:
                0, $, $, $, 0 ] ],
            0, 0, $, 0, 2, 3, $, 4, [ [ 2, 9 ] ], $, $, $ ],
          // guild-shield
-         [ 97, qd_97_name, &TosBlacksmith, 0, 30, 150, $,
-           $, $, 7200, $,
+         [ 97, qd_97_name, &GuildCreator, 0, 30, 150, $,
+           $, $, 86400, $,
            [ [ 2, &OreChunk, 1, 0, &TosBlacksmith, 0, qd_97_s1, $, $, qd_97_t1,
                0, $, $, $, 0 ] ],
-           0, 0, [ [ &GuildShield, 1 ] ], 0, 2, $, $, 2, $, $, $, $ ],
+           0, 0, [ [ &GuildShield, 1 ] ], 0, 2, $, $, 64, $, $, $, $ ],
          // pupil-dementia
          [ 99, qd_99_name, &JasperElder, 0, 30, 150, $,
            $, $, $, $,

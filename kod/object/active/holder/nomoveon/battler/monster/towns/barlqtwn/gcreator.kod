@@ -87,6 +87,16 @@ resources:
       "Barloque.  The troops at the north gate care nothing for guilds, only "
       "for a rival's colours."
 
+   // Ours (2026-10-30): asked about shields, Frular tells where a guild's member gets one
+   //  ("A Mining Expedition", 97, his) and who marks it with a god's sign (88-93)
+   gcreator_shield_word = "shield"
+   gcreator_shield_pointer =       "Every member of a guild may carry its shield.  Bring me a chunk of the "
+      "orcs' good iron from their mines, and the smith of Tos will forge it in "
+      "thy guild's colours.  Then go to the temples: each school's priestess, or "
+      "the monk of Riija, will mark it with a god's sign for a service, and "
+      "the god will lend strength to that school's spells.  Thy liege, if thou "
+      "servest one, hath a seal of their own to give."
+
 classvars:
 
    vrName = GuildCreator_name_rsc
@@ -165,6 +175,13 @@ messages:
          OR StringEqual(string,"rent")
       {
          Send(self,@ReportRent,#who=what);
+      }
+
+      // Ours: shields
+      if IsClass(what,&Player)
+         AND StringContain(string,gcreator_shield_word)
+      {
+         Send(self,@SayToOne,#target=what,#message_rsc=gcreator_shield_pointer);
       }
 
       if IsClass(what,&Player)

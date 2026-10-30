@@ -7615,6 +7615,8 @@ messages:
    SetGuild(guild_obj=$)
    "Sets the player's poGuild to be equal to the guild object."
    {
+      local oShield;
+
       // Ours: a guild joined or founded is an achievement (util/achievements.kod)
       if guild_obj <> $ AND IsClass(self,&User)
       {
@@ -7622,6 +7624,13 @@ messages:
       }
 
       poGuild = guild_obj;
+      // Ours (2026-10-30): a guild shield worn gives its guild's powers, or none
+      oShield = Send(self,@FindUsing,#class=&GuildShield);
+      if oShield <> $
+      {
+         Post(oShield,@UpdateGuildPowers);
+      }
+
       Send(self,@EvaluateNewbieStatus);
       Post(self,@NameColorsChanged);
 
@@ -9519,8 +9528,8 @@ messages:
       {
          // Ours (no random PvP, 2026-10-21): any other death, to a monster or in a
          // guild war, drops nothing and costs no skill, spell or XP, as a war death
-         // doesn't; the weapon and armour we had on break instead. Only an arena
-         // that drops loot (the Arena of Death) still takes things.
+         // doesn't; the weapon and armour we had on break instead. Only the Arena
+         // of Death (pbRealdeath) still costs anything: some spell and skill points.
          bBreakGear = TRUE;
          bNo_drop_death = TRUE;
          piDeathCost = FALSE;
@@ -9730,10 +9739,10 @@ messages:
    }
 
    ApplyDeathPenalties()
-   "Called as we leave the Underworld: the skill, spell and XP cost of a death with "
+   "Called as we leave the Underworld: the skill and spell cost of a death with "
    "piDeathCost (Killed). Only the Arena of Death charges one now."
    {
-      local iXPLoss, i;
+      local i;
 
       if (piflags & PFLAG_DEATH_RIFTING)
       {
@@ -9748,21 +9757,14 @@ messages:
          return;
       }
 
-      iXPLoss = 0;
-
       // Only do this stuff if the cost of death is not zero.
       if piDeathCost > 0
       {
+         // Ours (2026-10-30): no death takes experience, the Arena of Death's
+         // included. Younger characters pay a third of the point cost.
          if NOT (piFlags & PFLAG_TUTORIAL)
          {
             piDeathCost = piDeathCost / 3;
-         }
-         else
-         {
-            iXPLoss = Send(SYS,@GetXPDiffForLevel,#iLevel=piBase_max_health);
-            // Lose piDeathCost// of 20// of current level XP.
-            iXPLoss = Bound((iXPLoss * piDeathCost) / 500,0,MAX_XP_DEATH_LOSS);
-            Send(self,@AddXP,#iAmount=-iXPLoss);
          }
       }
       else
@@ -9772,17 +9774,7 @@ messages:
 
       if Send(self,@CheckLog)
       {
-         if iXPLoss
-         {
-            Debug("LOG:  ",vrName," died, lost XP: ",
-                  iXPLoss,Send(self,@GetBaseMaxHealth),
-                  "Death Cost = ",piDeathCost);
-         }
-         else
-         {
-            Debug("LOG:  ",vrName," died, but made death cost check: ",
-                  piDeathCost);
-         }
+         Debug("LOG:  ",vrName," died, death cost: ",piDeathCost);
       }
 
       // Remove from guild if now under min HP
