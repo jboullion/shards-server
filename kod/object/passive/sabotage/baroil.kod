@@ -1,0 +1,42 @@
+// Ours (docs/adr/0021 "Behind the Lines"): the lamp oil for the Princess's watch fires, in casks
+// down the sewers of Barloque. The Duke's soldiers foul it ("Foul the Oil Stores").
+////////////////////////////////////////////////////////////////////////////////
+BarloqueOilCasks is SabotageTarget
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   baroil_name = "casks of lamp oil"
+   baroil_icon = barrel.bgf
+   baroil_desc = \
+      "Casks of lamp oil, brought in by the smugglers' road and stamped with the Princess's "
+      "crest: enough to keep Barloque's watch fires burning all season."
+   baroil_sealed = "~IThe casks are sealed tight, and you have no business with them."
+   baroil_done = \
+      "~IYou stave in the casks and pour the sewer's silt into the oil.  It will smoke and "
+      "sputter and burn for no one.  Now get out!"
+   baroil_news = \
+      "~I~BSaboteurs have fouled the Princess's lamp oil in the sewers of Barloque!  Her watch "
+      "fires will burn low."
+   baroil_sound = fshatter.ogg
+
+classvars:
+
+   vrName = baroil_name
+   vrIcon = baroil_icon
+   vrDesc = baroil_desc
+   viFaction = FACTION_PRINCESS
+   vrSealed = baroil_sealed
+   vrDone = baroil_done
+   vrNews = baroil_news
+   vrSound = baroil_sound
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

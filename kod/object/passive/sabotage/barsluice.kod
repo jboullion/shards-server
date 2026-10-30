@@ -1,0 +1,41 @@
+// Ours (docs/adr/0021 "Behind the Lines"): the sluice gate that holds the sewer's water back from
+// the Princess's cellars, under Barloque. Jonas's soldiers open it ("Open the Sluice").
+////////////////////////////////////////////////////////////////////////////////
+BarloqueSluice is SabotageTarget
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   barsluice_name = "sluice gate"
+   barsluice_icon = lever.bgf
+   barsluice_desc = \
+      "A great iron wheel works the sluice gate that holds the sewer's water back from the "
+      "cellars of the Bourgeois Castle, where the Princess keeps her soldiers' stores."
+   barsluice_sealed = "~IThe wheel is chained fast, and you have no business with it."
+   barsluice_done = \
+      "~IYou cut the chain and throw your weight on the wheel.  It turns, the gate grinds up, "
+      "and the sewer roars into the castle's cellars.  Now get out!"
+   barsluice_news = \
+      "~I~BSaboteurs have opened the sluice under Barloque and flooded the Princess's cellars!"
+   barsluice_sound = splash.ogg
+
+classvars:
+
+   vrName = barsluice_name
+   vrIcon = barsluice_icon
+   vrDesc = barsluice_desc
+   viFaction = FACTION_PRINCESS
+   vrSealed = barsluice_sealed
+   vrDone = barsluice_done
+   vrNews = barsluice_news
+   vrSound = barsluice_sound
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,42 @@
+// Ours (docs/adr/0021 "Behind the Lines"): the Duke's grain, in the old storage room under Tos.
+// Jonas's soldiers fire it ("Fire the Granary").
+////////////////////////////////////////////////////////////////////////////////
+TosGrainSacks is SabotageTarget
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   tosgrain_name = "sacks of grain"
+   tosgrain_icon = bigbag4.bgf
+   tosgrain_desc = \
+      "Sacks of grain are stacked to the rafters, each stamped with the Duke's seal: bread for "
+      "his soldiers through a long campaign."
+   tosgrain_sealed = "~IThe Duke's grain is none of your business, and you leave it be."
+   tosgrain_done = \
+      "~IYou soak the sacks in oil and strike the flint.  The fire takes at once, and smoke "
+      "rolls along the ceiling.  Now get out!"
+   tosgrain_news = \
+      "~I~BSaboteurs have fired the Duke's grain stores under Tos!  His soldiers will march "
+      "hungry to the next battle."
+   tosgrain_sound = fflame.ogg
+
+classvars:
+
+   vrName = tosgrain_name
+   vrIcon = tosgrain_icon
+   vrDesc = tosgrain_desc
+   viFaction = FACTION_DUKE
+   vrSealed = tosgrain_sealed
+   vrDone = tosgrain_done
+   vrNews = tosgrain_news
+   vrSound = tosgrain_sound
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

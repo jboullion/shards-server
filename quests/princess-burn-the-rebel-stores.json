@@ -1,0 +1,61 @@
+{
+  "id": 357,
+  "key": "princess-burn-the-rebel-stores",
+  "name": "Burn the Rebel Stores",
+  "tier": "main",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      76
+    ],
+    "faction": "princess",
+    "renown": 25
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "timeLimitMinutes": 45,
+  "text": {
+    "offer": "Princess Kateriina says, \"Jonas's rebels live on what the smugglers bring them, and they keep it in the sewers under Jasper. Go down through Barloque's sewers and across the Smuggler's Crossing, find their cache, and burn it. Wear your soldier's shield when you set to it, or you'll be taken for a common thief. The moment it's done a cry will go up and the guards will come for you: get back to me alive, and quickly.\"",
+    "progress": "Barloque's sewers lead west to the Ancient Smuggler's Crossing, and on into the sewers of Jasper. The cache is in the deepest of them. Wear your shield, burn it, and return to the Princess.",
+    "complete": "Princess Kateriina says, \"Hungry rebels make poor soldiers. Well done. Come back tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "sabotage",
+      "target": "JasperSmugglersCache",
+      "rooms": [
+        "RID_JAS_SEWER3"
+      ],
+      "parcel": "a tinderbox and a pot of pitch",
+      "amount": 1,
+      "objective": "Burn the rebels' smuggled stores"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "PrincessLiege",
+        "rooms": [
+          852
+        ]
+      },
+      "objective": "Escape and report to Princess Kateriina",
+      "brief": "Get out before the guards catch you, and back to your liege before your time runs out."
+    }
+  ],
+  "rewards": {
+    "renown": 3,
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 750
+  }
+}

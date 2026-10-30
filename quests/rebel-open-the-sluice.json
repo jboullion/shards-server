@@ -1,0 +1,61 @@
+{
+  "id": 355,
+  "key": "rebel-open-the-sluice",
+  "name": "Open the Sluice",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      78
+    ],
+    "faction": "rebel",
+    "renown": 25
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "timeLimitMinutes": 45,
+  "text": {
+    "offer": "Jonas D'Accor says, \"The Princess keeps her soldiers' stores in the cellars of her castle, and the only thing between them and the sewer is a sluice gate. Go down through Jasper's sewers, past the Smuggler's Crossing and into Barloque's. Cut the chain and open the gate. Wear your soldier's shield when you set to it, or you'll be taken for a common thief. The moment it's done a cry will go up and the guards will come for you: get back to me alive, and quickly.\"",
+    "progress": "Jasper's sewers lead east to the Ancient Smuggler's Crossing, and on into the sewers of Barloque. The sluice gate is in the deepest of them. Wear your shield, cut the chain, open the gate, and get back to Jonas.",
+    "complete": "Jonas D'Accor laughs. \"Her quartermasters will be bailing for a week. Good work. Come back tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "sabotage",
+      "target": "BarloqueSluice",
+      "rooms": [
+        "RID_BAR_SEWER3"
+      ],
+      "parcel": "a pair of chain cutters",
+      "amount": 2,
+      "objective": "Open the sluice under Barloque"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RebelLiege",
+        "rooms": [
+          371
+        ]
+      },
+      "objective": "Escape and report to Jonas D'Accor",
+      "brief": "Get out before the guards catch you, and back to your liege before your time runs out."
+    }
+  ],
+  "rewards": {
+    "renown": 3,
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 750
+  }
+}

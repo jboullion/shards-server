@@ -1045,6 +1045,42 @@ resources:
    qd_353_name = "A Full Belly"
    qd_353_s1 = "Eat something"
    qd_353_t1 = "Eric d'Jorn"
+   qd_354_name = "Fire the Granary"
+   qd_354_s1 = "Fire the Duke's grain under Tos"
+   qd_354_p1 = "a flask of lamp oil and a flint"
+   qd_354_t1 = "Jonas D'Accor"
+   qd_354_s2 = "Escape and report to Jonas D'Accor"
+   qd_354_t2 = "Jonas D'Accor"
+   qd_355_name = "Open the Sluice"
+   qd_355_s1 = "Open the sluice under Barloque"
+   qd_355_p1 = "a pair of chain cutters"
+   qd_355_t1 = "Jonas D'Accor"
+   qd_355_s2 = "Escape and report to Jonas D'Accor"
+   qd_355_t2 = "Jonas D'Accor"
+   qd_356_name = "Steal the Marching Orders"
+   qd_356_s1 = "Swap the Duke's marching orders"
+   qd_356_p1 = "a roll of lock picks and forged orders"
+   qd_356_t1 = "Princess Kateriina"
+   qd_356_s2 = "Escape and report to Princess Kateriina"
+   qd_356_t2 = "Princess Kateriina"
+   qd_357_name = "Burn the Rebel Stores"
+   qd_357_s1 = "Burn the rebels' smuggled stores"
+   qd_357_p1 = "a tinderbox and a pot of pitch"
+   qd_357_t1 = "Princess Kateriina"
+   qd_357_s2 = "Escape and report to Princess Kateriina"
+   qd_357_t2 = "Princess Kateriina"
+   qd_358_name = "Foul the Oil Stores"
+   qd_358_s1 = "Foul the Princess's lamp oil"
+   qd_358_p1 = "a crowbar and a sack of silt"
+   qd_358_t1 = "Duke Akardius"
+   qd_358_s2 = "Escape and report to Duke Akardius"
+   qd_358_t2 = "Duke Akardius"
+   qd_359_name = "Break the Smugglers' Ring"
+   qd_359_s1 = "Break the rebels' arms cache"
+   qd_359_p1 = "a heavy hammer"
+   qd_359_t1 = "Duke Akardius"
+   qd_359_s2 = "Escape and report to Duke Akardius"
+   qd_359_t2 = "Duke Akardius"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
@@ -1060,7 +1096,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 131997379;
+      return 22761568;
    }
 
    GetQuests()
@@ -2793,6 +2829,56 @@ messages:
            [ [ 26, $, 1, 0, &RazaBartender, 0, qd_353_s1, $, $, qd_353_t1,
                0, $, $, $, 0 ] ],
            221, 50, [ [ &Bread, 3 ], [ &Meatpie, 3 ] ], 0, 1, $, $, 0, $, $, $, $ ]
+         ],
+         [
+         // rebel-fire-the-granary
+         [ 354, qd_354_name, &RebelLiege, 0, 60, 150, [ 78 ],
+           $, $, 86400, 2700,
+           [ [ 27, &TosGrainSacks, 1, 0, &RebelLiege, 0, qd_354_s1, $, qd_354_p1, qd_354_t1,
+               1, $, $, $, 2 ],
+             [ 3, $, 1, 0, &RebelLiege, 0, qd_354_s2, $, $, qd_354_t2,
+               0, $, $, $, 0 ] ],
+           3721, 750, $, 300, 1, 3, $, 0, [ [ 4, 3 ] ], $, $, 25 ],
+         // rebel-open-the-sluice
+         [ 355, qd_355_name, &RebelLiege, 0, 60, 150, [ 78 ],
+           $, $, 86400, 2700,
+           [ [ 27, &BarloqueSluice, 1, 0, &RebelLiege, 0, qd_355_s1, $, qd_355_p1, qd_355_t1,
+               1, $, $, $, 2 ],
+             [ 3, $, 1, 0, &RebelLiege, 0, qd_355_s2, $, $, qd_355_t2,
+               0, $, $, $, 0 ] ],
+           3721, 750, $, 300, 1, 3, $, 0, [ [ 4, 3 ] ], $, $, 25 ],
+         // princess-steal-the-orders
+         [ 356, qd_356_name, &PrincessLiege, 0, 60, 150, [ 76 ],
+           $, $, 86400, 2700,
+           [ [ 27, &TosOrdersChest, 1, 0, &PrincessLiege, 0, qd_356_s1, $, qd_356_p1, qd_356_t1,
+               1, $, $, $, 1 ],
+             [ 3, $, 1, 0, &PrincessLiege, 0, qd_356_s2, $, $, qd_356_t2,
+               0, $, $, $, 0 ] ],
+           3721, 750, $, 300, 1, 2, $, 0, [ [ 4, 3 ] ], $, $, 25 ],
+         // princess-burn-the-rebel-stores
+         [ 357, qd_357_name, &PrincessLiege, 0, 60, 150, [ 76 ],
+           $, $, 86400, 2700,
+           [ [ 27, &JasperSmugglersCache, 1, 0, &PrincessLiege, 0, qd_357_s1, $, qd_357_p1, qd_357_t1,
+               1, $, $, $, 1 ],
+             [ 3, $, 1, 0, &PrincessLiege, 0, qd_357_s2, $, $, qd_357_t2,
+               0, $, $, $, 0 ] ],
+           3721, 750, $, 300, 1, 2, $, 0, [ [ 4, 3 ] ], $, $, 25 ],
+         // duke-foul-the-oil-stores
+         [ 358, qd_358_name, &DukeLiege, 0, 60, 150, [ 77 ],
+           $, $, 86400, 2700,
+           [ [ 27, &BarloqueOilCasks, 1, 0, &DukeLiege, 0, qd_358_s1, $, qd_358_p1, qd_358_t1,
+               1, $, $, $, 1 ],
+             [ 3, $, 1, 0, &DukeLiege, 0, qd_358_s2, $, $, qd_358_t2,
+               0, $, $, $, 0 ] ],
+           3721, 750, $, 300, 1, 1, $, 0, [ [ 4, 3 ] ], $, $, 25 ],
+         // duke-break-the-smugglers-ring
+         [ 359, qd_359_name, &DukeLiege, 0, 60, 150, [ 77 ],
+           $, $, 86400, 2700,
+           [ [ 27, &JasperArmsCache, 1, 0, &DukeLiege, 0, qd_359_s1, $, qd_359_p1, qd_359_t1,
+               1, $, $, $, 1 ],
+             [ 3, $, 1, 0, &DukeLiege, 0, qd_359_s2, $, $, qd_359_t2,
+               0, $, $, $, 0 ] ],
+           3721, 750, $, 300, 1, 1, $, 0, [ [ 4, 3 ] ], $, $, 25 ]
          ]
       ];
    }

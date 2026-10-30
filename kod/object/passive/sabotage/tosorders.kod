@@ -1,0 +1,43 @@
+// Ours (docs/adr/0021 "Behind the Lines"): the Duke's marching orders, in a strongbox his
+// couriers keep on the Smuggler's Way under Tos. The Princess's soldiers steal them ("Steal the
+// Marching Orders").
+////////////////////////////////////////////////////////////////////////////////
+TosOrdersChest is SabotageTarget
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   tosorders_name = "iron-bound strongbox"
+   tosorders_icon = box2.bgf
+   tosorders_desc = \
+      "A heavy strongbox, bolted to the floor and stamped with the Duke's seal.  His couriers "
+      "leave their dispatches here, out of the eyes of the city."
+   tosorders_sealed = "~IThe strongbox is locked fast, and you have no business with it."
+   tosorders_done = \
+      "~IThe picks find the lock's heart and it gives.  You swap the Duke's marching orders for "
+      "your liege's forgeries and snap the lid shut, but the hinge shrieks.  Now get out!"
+   tosorders_news = \
+      "~I~BSaboteurs have broken into the Duke's strongbox under Tos and stolen his marching "
+      "orders!"
+   tosorders_sound = fshatter.ogg
+
+classvars:
+
+   vrName = tosorders_name
+   vrIcon = tosorders_icon
+   vrDesc = tosorders_desc
+   viFaction = FACTION_DUKE
+   vrSealed = tosorders_sealed
+   vrDone = tosorders_done
+   vrNews = tosorders_news
+   vrSound = tosorders_sound
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

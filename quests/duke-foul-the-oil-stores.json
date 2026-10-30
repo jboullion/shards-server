@@ -1,0 +1,61 @@
+{
+  "id": 358,
+  "key": "duke-foul-the-oil-stores",
+  "name": "Foul the Oil Stores",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      77
+    ],
+    "faction": "duke",
+    "renown": 25
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "timeLimitMinutes": 45,
+  "text": {
+    "offer": "Duke Akardius says, \"The Princess's watch fires burn on lamp oil she has smuggled in by the sewers of Barloque, and kept there. Go down, stave in the casks, and foul the oil. Her watch will be blind for the next battle. Wear your soldier's shield when you set to it, or you'll be taken for a common thief. The moment it's done a cry will go up and the guards will come for you: get back to me alive, and quickly.\"",
+    "progress": "The sewers of Barloque open off North Barloque. The Princess's oil casks are kept in the sewers, past the first stretch. Wear your shield, foul the oil, and return to the Duke in Tos.",
+    "complete": "Duke Akardius says, \"Let her soldiers fight in the dark, then. Take your pay, and come back tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "sabotage",
+      "target": "BarloqueOilCasks",
+      "rooms": [
+        "RID_BAR_SEWER2"
+      ],
+      "parcel": "a crowbar and a sack of silt",
+      "amount": 1,
+      "objective": "Foul the Princess's lamp oil"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      },
+      "objective": "Escape and report to Duke Akardius",
+      "brief": "Get out before the guards catch you, and back to your liege before your time runs out."
+    }
+  ],
+  "rewards": {
+    "renown": 3,
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 750
+  }
+}

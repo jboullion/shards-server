@@ -175,6 +175,10 @@ constants:
    QK_SHRINE = 25
    // Ours: eating something (Food.NewApplied); the step's class, or any food
    QK_EAT = 26
+   // Ours (ADR 0021, Behind the Lines): setting to a rival liege's stores, a SabotageTarget of
+   // the step's class, with the quest's kit (the step's parcel, given as it begins). The amount
+   // is the war effort it brings our liege (Sabotaged)
+   QK_SABOTAGE = 27
 
    // Tiers: the markers' colour (gold, silver, bronze)
    QT_MAIN = 1
@@ -253,6 +257,7 @@ resources:
    quest_wait_minutes = "You've done that one recently.  It will be offered again in %i minutes."
    quest_wait_soon = "You've done that one recently.  It will be offered again in a minute or so."
    quest_parcel_given = "You are given %s to deliver."
+   quest_kit_given = "You are given %s for the job."
    quest_parcel_missing = \
       "You no longer have what you were to deliver.  Abandon the quest and take it on again."
    quest_reward_money = "You receive %i shillings."
@@ -417,6 +422,8 @@ messages:
       }
 
       Send(self,@EnsureLoaded);
+      // Ours: and its sabotage targets
+      Send(self,@PlaceTargets,#where=where);
       iRid = Send(where,@GetRoomNum);
       foreach i in plGivers
       {
@@ -1500,12 +1507,21 @@ messages:
          return;
       }
 
-      if Nth(lStep,QBS_KIND) = QK_DELIVER
+      // Ours: a sabotage step's kit, too
+      if (Nth(lStep,QBS_KIND) = QK_DELIVER OR Nth(lStep,QBS_KIND) = QK_SABOTAGE)
          AND Send(self,@FindParcel,#who=who,#id=First(qrow)) = $
       {
-         oParcel = Create(&QuestParcel,#quest=First(qrow),#parcel_name=Nth(lStep,QBS_PARCEL));
+         oParcel = Create(&QuestParcel,#quest=First(qrow),#parcel_name=Nth(lStep,QBS_PARCEL),
+                          #kit=(Nth(lStep,QBS_KIND) = QK_SABOTAGE));
          Send(self,@GiveOrDrop,#who=who,#what=oParcel);
-         Send(who,@MsgSendUser,#message_rsc=quest_parcel_given,#parm1=Nth(lStep,QBS_PARCEL));
+         if Nth(lStep,QBS_KIND) = QK_SABOTAGE
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_kit_given,#parm1=Nth(lStep,QBS_PARCEL));
+         }
+         else
+         {
+            Send(who,@MsgSendUser,#message_rsc=quest_parcel_given,#parm1=Nth(lStep,QBS_PARCEL));
+         }
       }
 
       // Reaching a health, a hometown, the mana nodes: maybe already done
@@ -2235,6 +2251,79 @@ messages:
       return;
    }
 
+   Sabotaged(who = $,target = $,use = FALSE)
+   "Ours (ADR 0021, Behind the Lines): SabotageTarget.TryActivate. Whether who is on a sabotage "
+   "step for target's class, carrying that quest's kit: the war effort the step brings (at least "
+   "1), else 0. With use, the kit is used up and the step done."
+   {
+      local i, lQuest, lStep;
+
+      if target = $ OR NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
+      {
+         return 0;
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(lStep,QBS_KIND) = QK_SABOTAGE AND Nth(i,QBL_COUNT) = 0
+               AND IsClass(target,Nth(lStep,QBS_CLASS))
+               AND Send(self,@FindParcel,#who=who,#id=First(i)) <> $
+            {
+               if use
+               {
+                  Send(self,@DeleteParcels,#who=who,#id=First(i));
+                  SetNth(i,QBL_COUNT,1);
+                  Send(self,@TellProgress,#who=who,#entry=i,#qrow=lQuest,#step=lStep,#num=1);
+               }
+
+               return Bound(Nth(lStep,QBS_AMOUNT),1,$);
+            }
+         }
+      }
+
+      return 0;
+   }
+
+   SabotageTargets()
+   "Ours (ADR 0021, Behind the Lines): where the lieges' stores stand for the sabotage quests: "
+   "[ room, class, row, col ] (PlaceTargets). Each is on a spawning place of its room."
+   {
+      return [ [ RID_TOS_STORAGE, &TosGrainSacks, 6, 9 ],
+               [ RID_TOS_SMUGGLERS_WAY, &TosOrdersChest, 22, 15 ],
+               [ RID_BAR_SEWER2, &BarloqueOilCasks, 40, 26 ],
+               [ RID_BAR_SEWER3, &BarloqueSluice, 43, 39 ],
+               [ RID_JAS_SEWER2, &JasperArmsCache, 41, 37 ],
+               [ RID_JAS_SEWER3, &JasperSmugglersCache, 23, 43 ] ];
+   }
+
+   PlaceTargets(where = $)
+   "Gives a room the sabotage targets it should have and hasn't (PlaceGivers as it's built, "
+   "EnteredRoom for a world from before them)."
+   {
+      local i, iRid;
+
+      if where = $
+      {
+         return;
+      }
+
+      iRid = Send(where,@GetRoomNum);
+      foreach i in Send(self,@SabotageTargets)
+      {
+         if First(i) = iRid
+            AND Send(where,@FindHolding,#class=Nth(i,2)) = $
+         {
+            Send(where,@NewHold,#what=Create(Nth(i,2)),#new_row=Nth(i,3),#new_col=Nth(i,4));
+         }
+      }
+
+      return;
+   }
+
    SiegeAgainst(who = $)
    "The faction a siege step who is on would besiege (its amount), or $ if they're on none "
    "(Factions.SomeoneSaid, 'march')."
@@ -2531,6 +2620,12 @@ messages:
    "Player.NewOwner: visit steps."
    {
       local i, lQuest, lStep, iRid;
+
+      // Ours: a sabotage target missing from a world from before them
+      if where <> $ AND IsClass(who,&User)
+      {
+         Send(self,@PlaceTargets,#where=where);
+      }
 
       if where = $ OR NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
       {

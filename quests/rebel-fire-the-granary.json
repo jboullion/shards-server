@@ -1,0 +1,61 @@
+{
+  "id": 354,
+  "key": "rebel-fire-the-granary",
+  "name": "Fire the Granary",
+  "tier": "main",
+  "giver": {
+    "class": "RebelLiege",
+    "rooms": [
+      371
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      78
+    ],
+    "faction": "rebel",
+    "renown": 25
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "timeLimitMinutes": 45,
+  "text": {
+    "offer": "Jonas D'Accor says, \"The Duke feeds his soldiers from a granary under Tos: the old storage room, below the Smuggler's Way. An army that marches hungry fights badly. Take this oil and flint, get in through the rat caves north of Tos, and burn every sack. Wear your soldier's shield when you set to it, or you'll be taken for a common thief. The moment it's done a cry will go up and the guards will come for you: get back to me alive, and quickly.\"",
+    "progress": "The Rat Caves, reached from the hills north of Tos, come up in Tos's secret passage. From there the Smuggler's Way leads to the old storage room where the Duke keeps his grain. Wear your shield, use the sacks, and get back to Jonas in Jasper.",
+    "complete": "Jonas D'Accor grins. \"I could smell the smoke from here. That's the Duke's next battle half lost already. Here's your pay, and come back tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "sabotage",
+      "target": "TosGrainSacks",
+      "rooms": [
+        "RID_TOS_STORAGE"
+      ],
+      "parcel": "a flask of lamp oil and a flint",
+      "amount": 2,
+      "objective": "Fire the Duke's grain under Tos"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "RebelLiege",
+        "rooms": [
+          371
+        ]
+      },
+      "objective": "Escape and report to Jonas D'Accor",
+      "brief": "Get out before the guards catch you, and back to your liege before your time runs out."
+    }
+  ],
+  "rewards": {
+    "renown": 3,
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 750
+  }
+}

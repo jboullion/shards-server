@@ -1,0 +1,42 @@
+// Ours (docs/adr/0021 "Behind the Lines"): the rebels' arms, hidden in the sewers of Jasper. The
+// Duke's soldiers break them ("Break the Smugglers' Ring").
+////////////////////////////////////////////////////////////////////////////////
+JasperArmsCache is SabotageTarget
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   jasarms_name = "rebel arms cache"
+   jasarms_icon = barrel2.bgf
+   jasarms_desc = \
+      "Barrels packed with straw hide the rebels' weapons: spearheads, arrows and short swords, "
+      "smuggled in a few at a time for the day Jonas D'Accor calls his people out."
+   jasarms_sealed = "~IThe barrels are hooped tight, and you have no business with them."
+   jasarms_done = \
+      "~IYou smash the barrels open, snap the spear shafts and tip the blades into the sewer's "
+      "deepest channel.  Now get out!"
+   jasarms_news = \
+      "~I~BSaboteurs have found the rebels' arms cache under Jasper and thrown the weapons into "
+      "the sewer!"
+   jasarms_sound = fshatter.ogg
+
+classvars:
+
+   vrName = jasarms_name
+   vrIcon = jasarms_icon
+   vrDesc = jasarms_desc
+   viFaction = FACTION_REBEL
+   vrSealed = jasarms_sealed
+   vrDone = jasarms_done
+   vrNews = jasarms_news
+   vrSound = jasarms_sound
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

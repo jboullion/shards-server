@@ -1,0 +1,61 @@
+{
+  "id": 359,
+  "key": "duke-break-the-smugglers-ring",
+  "name": "Break the Smugglers' Ring",
+  "tier": "main",
+  "giver": {
+    "class": "DukeLiege",
+    "rooms": [
+      952
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      77
+    ],
+    "faction": "duke",
+    "renown": 25
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "timeLimitMinutes": 45,
+  "text": {
+    "offer": "Duke Akardius says, \"Jonas D'Accor's smugglers bring weapons into Jasper a few at a time and hide them in the sewers, for the day he calls his rebels out. Find the cache, break the weapons and throw them in the sewer. Wear your soldier's shield when you set to it, or you'll be taken for a common thief. The moment it's done a cry will go up and the guards will come for you: get back to me alive, and quickly.\"",
+    "progress": "The sewers of Jasper open off west Jasper. The rebels' arms are hidden in barrels deeper in. Wear your shield, break them, and return to the Duke in Tos.",
+    "complete": "Duke Akardius says, \"Let them fight with their bare hands. Take your pay, and come back tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "sabotage",
+      "target": "JasperArmsCache",
+      "rooms": [
+        "RID_JAS_SEWER2"
+      ],
+      "parcel": "a heavy hammer",
+      "amount": 1,
+      "objective": "Break the rebels' arms cache"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "DukeLiege",
+        "rooms": [
+          952
+        ]
+      },
+      "objective": "Escape and report to Duke Akardius",
+      "brief": "Get out before the guards catch you, and back to your liege before your time runs out."
+    }
+  ],
+  "rewards": {
+    "renown": 3,
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 750
+  }
+}

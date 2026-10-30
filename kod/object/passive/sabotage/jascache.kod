@@ -1,0 +1,41 @@
+// Ours (docs/adr/0021 "Behind the Lines"): the rebels' smuggled stores, in a cache deep in the
+// sewers of Jasper. The Princess's soldiers burn them ("Burn the Rebel Stores").
+////////////////////////////////////////////////////////////////////////////////
+JasperSmugglersCache is SabotageTarget
+
+constants:
+
+   include blakston.khd
+
+resources:
+
+   jascache_name = "smugglers' cache"
+   jascache_icon = box1.bgf
+   jascache_desc = \
+      "Crates of cloth, salt and dried meat, smuggled in under the Duke's nose and stacked "
+      "here for Jonas D'Accor's rebels."
+   jascache_sealed = "~IThe crates are nailed shut, and you have no business with them."
+   jascache_done = \
+      "~IYou pry the crates open, heap the cloth over the salt meat and set it alight.  The "
+      "sewer fills with stinking smoke.  Now get out!"
+   jascache_news = \
+      "~I~BSaboteurs have burned the rebels' smuggled stores in the sewers of Jasper!"
+   jascache_sound = fflame.ogg
+
+classvars:
+
+   vrName = jascache_name
+   vrIcon = jascache_icon
+   vrDesc = jascache_desc
+   viFaction = FACTION_REBEL
+   vrSealed = jascache_sealed
+   vrDone = jascache_done
+   vrNews = jascache_news
+   vrSound = jascache_sound
+
+properties:
+
+messages:
+
+end
+////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 // Ours (Meridian Shards, docs/adr/0009-quests.md): what a deliver step gives you to carry, named
-// by the quest (QuestBook.BeginStep), and taken back when you hand it in.
+// by the quest (QuestBook.BeginStep), and taken back when you hand it in. A sabotage step's kit
+// is one too (docs/adr/0021 Behind the Lines), used up on its target.
 
 ////////////////////////////////////////////////////////////////////////////////
 QuestParcel is QuestItem
@@ -13,6 +14,8 @@ resources:
    questparcel_name_rsc = "parcel"
    questparcel_icon_rsc = scr04.bgf
    questparcel_desc_rsc = "Something you've agreed to deliver.  It isn't yours to open."
+   questparcel_kit_desc_rsc =       "What your liege gave you for the job.  Use whatever you were sent to wreck, and this will "
+      "do the rest."
 
 classvars:
 
@@ -34,13 +37,16 @@ properties:
    // The quest it's for, and what it's called
    piQuest = 0
    prParcelName = $
+   // A sabotage step's kit, not something to deliver
+   pbKit = FALSE
 
 messages:
 
-   Constructor(quest = 0, parcel_name = $)
+   Constructor(quest = 0, parcel_name = $, kit = FALSE)
    {
       piQuest = quest;
       prParcelName = parcel_name;
+      pbKit = kit;
 
       propagate;
    }
@@ -48,6 +54,18 @@ messages:
    GetQuestId()
    {
       return piQuest;
+   }
+
+   DoBaseDesc()
+   {
+      if pbKit
+      {
+         AddPacket(4,questparcel_kit_desc_rsc);
+
+         return;
+      }
+
+      propagate;
    }
 
    GetName()

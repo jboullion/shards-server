@@ -1,0 +1,61 @@
+{
+  "id": 356,
+  "key": "princess-steal-the-orders",
+  "name": "Steal the Marching Orders",
+  "tier": "main",
+  "giver": {
+    "class": "PrincessLiege",
+    "rooms": [
+      852
+    ]
+  },
+  "band": {
+    "min": 60,
+    "max": 150
+  },
+  "requires": {
+    "quests": [
+      76
+    ],
+    "faction": "princess",
+    "renown": 25
+  },
+  "repeat": {
+    "cooldownHours": 24
+  },
+  "timeLimitMinutes": 45,
+  "text": {
+    "offer": "Princess Kateriina says, \"The Duke's couriers leave his dispatches in a strongbox on the Smuggler's Way, under Tos, where they think no one will look. Pick the lock and put these forgeries in place of his marching orders: his captains will march to the wrong place. Get in through the rat caves north of Tos. Wear your soldier's shield when you set to it, or you'll be taken for a common thief. The moment it's done a cry will go up and the guards will come for you: get back to me alive, and quickly.\"",
+    "progress": "The Rat Caves, reached from the hills north of Tos, come up in Tos's secret passage, beside the Smuggler's Way. Find the Duke's strongbox there, wear your shield, swap the orders, and return to the Princess in Barloque.",
+    "complete": "Princess Kateriina reads the stolen orders and smiles. \"He'll send his captains to the wrong field, and wonder why. You have my thanks, and my gold. Come back tomorrow.\""
+  },
+  "steps": [
+    {
+      "kind": "sabotage",
+      "target": "TosOrdersChest",
+      "rooms": [
+        "RID_TOS_SMUGGLERS_WAY"
+      ],
+      "parcel": "a roll of lock picks and forged orders",
+      "amount": 1,
+      "objective": "Swap the Duke's marching orders"
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "PrincessLiege",
+        "rooms": [
+          852
+        ]
+      },
+      "objective": "Escape and report to Princess Kateriina",
+      "brief": "Get out before the guards catch you, and back to your liege before your time runs out."
+    }
+  ],
+  "rewards": {
+    "renown": 3,
+    "xpPoints": 1,
+    "trainingPoints": 300,
+    "shillings": 750
+  }
+}

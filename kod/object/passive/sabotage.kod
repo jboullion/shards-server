@@ -1,0 +1,216 @@
+// Ours (Meridian Shards, docs/adr/0021 "Behind the Lines", 2026-10-29): something of a liege's in
+// the sewers and cellars under their capital, that a rival's soldier on a sabotage quest sets to
+// (QuestBook QK_SABOTAGE).
+//
+// A soldier on such a step, wearing their shield and carrying the quest's kit, uses it
+// (TryActivate). The kit is used up and the step done. Their liege gains the step's war effort
+// for the next battle, and ours loses a point. A cry goes up: ALARM_TROOPS of our liege's
+// soldiers come for them, and our liege's people hear of it. Nobody can set to it again for
+// REST_SECONDS.
+//
+// Each kind is a subclass (object/passive/sabotage/), with its liege, look and lines. QuestBook
+// places them (PlaceTargets, its SabotageTargets table): when their room is built, and whenever
+// a player comes in and one is missing, so a world from before them has them too.
+////////////////////////////////////////////////////////////////////////////////
+SabotageTarget is PassiveObject
+
+constants:
+
+   include blakston.khd
+
+   // How near a player must stand, in squares
+   REACH = 2
+   // Once sabotaged, nobody can set to it again for this long (seconds): a group can't each
+   //  spend their kit on one fire
+   REST_SECONDS = 600
+   ALARM_TROOPS = 3
+
+resources:
+
+   sabotage_name = "stores"
+   sabotage_icon = box1.bgf
+   sabotage_desc = "Supplies, stacked out of sight."
+   sabotage_sealed = "~IIt's none of your business, and you leave it be."
+   sabotage_done = "~IThe deed is done."
+   sabotage_news = "~I~BSaboteurs have struck at your liege's stores!"
+   sabotage_too_far = "~IYou need to be right beside %s%s."
+   sabotage_no_shield = \
+      "~IWear your soldier's shield first: this is your liege's work, and your liege's soldiers "
+      "wear their colours to it."
+   sabotage_resting = \
+      "~ISomeone has been at %s%s already, and the guards will be watching it.  Come back later."
+   sabotage_alarm = "~B~rA cry goes up: the guards are coming!"
+   sabotage_alarm_sound = gong.ogg
+
+classvars:
+
+   vrName = sabotage_name
+   vrIcon = sabotage_icon
+   vrDesc = sabotage_desc
+   viObject_flags = OF_ACTIVATABLE
+
+   // Whose it is
+   viFaction = FACTION_NEUTRAL
+   // To one who can't set to it; to the saboteur once done; to our liege's people
+   vrSealed = sabotage_sealed
+   vrDone = sabotage_done
+   vrNews = sabotage_news
+   // What the room hears as it's done ($: nothing)
+   vrSound = $
+
+properties:
+
+   // GetTime() until which it can't be sabotaged again
+   piRestUntil = 0
+
+messages:
+
+   GetFaction()
+   {
+      return viFaction;
+   }
+
+   ReqNewOwner(what = $)
+   "Nobody carries it off."
+   {
+      return FALSE;
+   }
+
+   TryActivate(who = $)
+   "A player sets to it. Returns TRUE: we always say why not."
+   {
+      local oBook, iEffort, iFaction, oWar;
+
+      if NOT IsClass(who,&User)
+      {
+         return TRUE;
+      }
+
+      if Abs(Send(who,@GetRow) - Send(self,@GetRow)) > REACH
+         OR Abs(Send(who,@GetCol) - Send(self,@GetCol)) > REACH
+      {
+         Send(who,@MsgSendUser,#message_rsc=sabotage_too_far,
+              #parm1=Send(self,@GetDef),#parm2=Send(self,@GetName));
+
+         return TRUE;
+      }
+
+      // Only on a sabotage step for us, with its kit
+      oBook = Send(SYS,@GetQuestBook);
+      iEffort = Send(oBook,@Sabotaged,#who=who,#target=self,#use=FALSE);
+      iFaction = Send(who,@GetFaction);
+      if iEffort = 0
+         OR iFaction = FACTION_NEUTRAL
+         OR iFaction = viFaction
+      {
+         Send(who,@MsgSendUser,#message_rsc=vrSealed);
+
+         return TRUE;
+      }
+
+      if Send(who,@FindUsing,#class=&SoldierShield) = $
+      {
+         Send(who,@MsgSendUser,#message_rsc=sabotage_no_shield);
+
+         return TRUE;
+      }
+
+      if GetTime() < piRestUntil
+      {
+         Send(who,@MsgSendUser,#message_rsc=sabotage_resting,
+              #parm1=Send(self,@GetDef),#parm2=Send(self,@GetName));
+
+         return TRUE;
+      }
+
+      // Done: the kit is used up and the step counted
+      Send(oBook,@Sabotaged,#who=who,#target=self,#use=TRUE);
+      piRestUntil = GetTime() + REST_SECONDS;
+      Send(who,@MsgSendUser,#message_rsc=vrDone);
+      if vrSound <> $
+      {
+         Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=vrSound);
+      }
+
+      // The next battle: our liege weaker, theirs stronger
+      oWar = Send(SYS,@GetFactionWar);
+      Send(oWar,@AddWarEffort,#faction=iFaction,#amount=iEffort,#who=who);
+      Send(oWar,@AddWarEffort,#faction=viFaction,#amount=-1);
+
+      Send(self,@RaiseAlarm,#who=who);
+      Send(self,@TellOurs);
+
+      return TRUE;
+   }
+
+   RaiseAlarm(who = $)
+   "ALARM_TROOPS of our liege's soldiers, round the saboteur and after them."
+   {
+      local i, cTroop, oTroop, iTry, iRow, iCol, bPlaced;
+
+      if poOwner = $
+      {
+         return;
+      }
+
+      Send(who,@MsgSendUser,#message_rsc=sabotage_alarm);
+      Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=sabotage_alarm_sound);
+      cTroop = Send(Send(SYS,@GetFactionWar),@TroopClass,#faction=viFaction);
+      i = 0;
+      while i < ALARM_TROOPS
+      {
+         i = i + 1;
+         oTroop = Create(cTroop);
+         bPlaced = FALSE;
+         iTry = 0;
+         while iTry < 10 AND NOT bPlaced
+         {
+            iTry = iTry + 1;
+            iRow = Send(who,@GetRow) + Random(-4,4);
+            iCol = Send(who,@GetCol) + Random(-4,4);
+            if iRow > 0 AND iCol > 0
+               AND Send(poOwner,@ReqNewHold,#what=oTroop,#new_row=iRow,#new_col=iCol)
+               AND Send(poOwner,@ReqSomethingMoved,#what=oTroop,#new_row=iRow,#new_col=iCol)
+            {
+               Send(poOwner,@NewHold,#what=oTroop,#new_row=iRow,#new_col=iCol);
+               bPlaced = TRUE;
+            }
+         }
+
+         if NOT bPlaced
+         {
+            bPlaced = Send(poOwner,@GenerateMonster,#oMonster=oTroop,#bRandom=TRUE);
+         }
+
+         if bPlaced AND Send(oTroop,@GetOwner) = poOwner
+         {
+            Send(oTroop,@TargetSwitch,#what=who,#iHatred=100,#force=TRUE);
+            Send(oTroop,@EnterStateChase,#target=who,#actnow=TRUE);
+         }
+         else if IsObject(oTroop) AND Send(oTroop,@GetOwner) = $
+         {
+            Send(oTroop,@Delete);
+         }
+      }
+
+      return;
+   }
+
+   TellOurs()
+   "Our liege's people hear of it."
+   {
+      local i;
+
+      foreach i in Send(SYS,@GetUsersLoggedOn)
+      {
+         if Send(i,@GetFaction) = viFaction
+         {
+            Send(i,@MsgSendUser,#message_rsc=vrNews);
+         }
+      }
+
+      return;
+   }
+
+end
+////////////////////////////////////////////////////////////////////////////////
