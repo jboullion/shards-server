@@ -12395,8 +12395,10 @@ messages:
             return $;
          }
 
+         // Upstream's untaught level 50 skills (assess, thrust, kick) aren't weaponcraft levels
          nLevel = Send(nObj,@GetLevel);
          if nLevel > iWeapon
+            AND nLevel <= NUM_SKILL_SCHOOL_LEVELS
          {
             iWeapon = nLevel;
          }

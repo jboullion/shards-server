@@ -8059,7 +8059,9 @@ messages:
 
    GetLevelLearnPoints(level=0)
    {
-      if level = 0
+      // Ours: a level past the table (a level 50 skill) is no school level and costs nothing
+      if level <= 0
+         OR level > Length(vlLevelPoints)
       {
          return 0;
       }
