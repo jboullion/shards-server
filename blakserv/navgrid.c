@@ -574,41 +574,9 @@ bool NavWriteFile(room_type* Room, const char* FileName)
 }
 
 /*****************************************************************************************/
-/* NavExportAll: every loaded room's grid as Dir/<room>.nav, once per room file. Returns   */
-/*               how many were written.                                                    */
+/* NavExportAll: the grid of every room file (PATH_ROOMS *.roo), as the file has it, as    */
+/*               Dir/<room>.nav. Returns how many were written.                            */
 /*****************************************************************************************/
-static const char* navExportDir;
-static int navExportCount;
-static std::vector<int>* navExportSeen;
-
-static void NavExportRoom(room_node* r)
-{
-   int rsc = r->data.resource_id;
-   if (std::find(navExportSeen->begin(), navExportSeen->end(), rsc) != navExportSeen->end())
-      return;
-   navExportSeen->push_back(rsc);
-
-   resource_node* res = GetResourceByID(rsc);
-   if (!res || !res->resource_val[0])
-      return;
-
-   // tos.roo -> <dir>/tos.nav
-   char name[MAX_PATH];
-   snprintf(name, sizeof(name), "%s", res->resource_val[0]);
-   char* dot = strrchr(name, '.');
-   if (dot)
-      *dot = 0;
-   for (char* c = name; *c; c++)
-      *c = (char)tolower(*c);
-
-   char path[MAX_PATH + FILENAME_MAX];
-   snprintf(path, sizeof(path), "%s/%s.nav", navExportDir, name);
-   if (NavWriteFile(&r->data, path))
-      navExportCount++;
-   else
-      aprintf("Couldn't write %s\n", path);
-}
-
 int NavExportAll(const char* Dir)
 {
 #ifdef BLAK_PLATFORM_WINDOWS
@@ -616,11 +584,44 @@ int NavExportAll(const char* Dir)
 #else
    mkdir(Dir, 0755);
 #endif
-   std::vector<int> seen;
-   navExportDir = Dir;
-   navExportCount = 0;
-   navExportSeen = &seen;
-   ForEachRoom(NavExportRoom);
-   navExportSeen = NULL;
-   return navExportCount;
+
+   char spec[MAX_PATH + FILENAME_MAX];
+   snprintf(spec, sizeof(spec), "%s*.roo", ConfigStr(PATH_ROOMS));
+   StringVector files;
+   if (!FindMatchingFiles(spec, &files))
+      return 0;
+
+   int count = 0;
+   for (StringVector::iterator it = files.begin(); it != files.end(); ++it)
+   {
+      char roo[MAX_PATH + FILENAME_MAX];
+      snprintf(roo, sizeof(roo), "%s%s", ConfigStr(PATH_ROOMS), it->c_str());
+
+      room_type room;
+      memset(&room, 0, sizeof(room));
+      if (!BSPLoadRoom(roo, &room))
+      {
+         aprintf("Couldn't load %s\n", roo);
+         continue;
+      }
+
+      // tos.roo -> <dir>/tos.nav
+      char name[MAX_PATH];
+      snprintf(name, sizeof(name), "%s", it->c_str());
+      char* dot = strrchr(name, '.');
+      if (dot)
+         *dot = 0;
+      for (char* c = name; *c; c++)
+         *c = (char)tolower(*c);
+
+      char path[MAX_PATH + FILENAME_MAX];
+      snprintf(path, sizeof(path), "%s/%s.nav", Dir, name);
+      if (NavWriteFile(&room, path))
+         count++;
+      else
+         aprintf("Couldn't write %s\n", path);
+
+      BSPFreeRoom(&room);
+   }
+   return count;
 }

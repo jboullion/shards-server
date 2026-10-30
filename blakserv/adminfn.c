@@ -578,7 +578,7 @@ admin_table_type admin_save_table[] =
 {
 	{ AdminSaveConfiguration,{N},F, A|M, NULL, 0, "configuration","Save blakserv.cfg" },
 	{ AdminSaveGame,      {N},   F, A|M, NULL, 0, "game",    "Save game (will garbage collect first)" },
-	{ AdminSaveNavGrids,  {N},   F, A|M, NULL, 0, "navgrids","Write every loaded room's nav grid to nav/<room>.nav" },
+	{ AdminSaveNavGrids,  {N},   F, A|M, NULL, 0, "navgrids","Write every room file's nav grid to nav/<room>.nav" },
 };
 #define LEN_ADMIN_SAVE_TABLE (sizeof(admin_save_table)/sizeof(admin_table_type))
 
