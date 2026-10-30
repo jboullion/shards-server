@@ -55,11 +55,10 @@ resources:
       " * guild vs guild\n"
       " * battle royale (more than two guilds)\n\n"
       "Say 'champion', 'challenge' or 'renege' to enter or exit the cage.\n\n"
-      "This arena has one significant difference - dying here has the same "
-      "outcome as being killed in the rest of the game world.  You will be "
-      "sent to The Underworld where you can use the main portal (in the lava) "
-      "to travel back here.  You will keep your items, but lose ability points "
-      "and XP."
+      "This arena has one significant difference - dying here is a real "
+      "death.  You will be sent to The Underworld where you can use the main "
+      "portal (in the lava) to travel back here.  You will keep your items "
+      "and experience, but may lose a few points in your spells and skills."
 
    // Name displayed in trophy descriptions.
    deatharena_trophy_name = "Dealers of Death"
