@@ -159,7 +159,7 @@ messages:
                Send(who,@RemoveEnchantment,#what=self,#report=FALSE);
             }
             Send(who,@StartEnchantment,#what=self,#state=[oKiller,rLocationName],
-                 #time=Send(self,@GetDuration,#spellpower=ispellpower,#who=who),
+                 #time=Send(self,@GetDuration,#iSpellPower=iSpellPower,#who=who),
                  #iSpellPower=iSpellPower,#lastcall=TRUE,#addicon=FALSE);
 
             if (send(oKiller,@IsEnchanted,#what=oSpell))

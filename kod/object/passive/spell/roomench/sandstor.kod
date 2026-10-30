@@ -107,10 +107,10 @@ messages:
 
       // Store the spell power in the last two digits of the enchantment value.
       Send(oRoom,@RoomStartEnchantment,#what=self,#time=SANDSTORM_PERIOD,
-            #state=[SANDSTORM_PERIOD + iSpellPower, who],#addicon=TRUE,
+            #state=[SANDSTORM_PERIOD + iPower, who],#addicon=TRUE,
             #lastcall=FALSE);
-      Send(oRoom,@EnchantAllOccupants,#what=self,#iSpellPower=iSpellPower,
-            #state=[SANDSTORM_PERIOD + iSpellPower, who]);
+      Send(oRoom,@EnchantAllOccupants,#what=self,#iSpellPower=iPower,
+            #state=[SANDSTORM_PERIOD + iPower, who]);
 
       propagate;
    }
