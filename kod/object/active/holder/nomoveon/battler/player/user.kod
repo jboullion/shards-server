@@ -958,13 +958,19 @@ messages:
       {  
          sGuild = Send(poGuild,@GetName);
 
-         if Send(poGuild,@GetGuildHall) <> $
+         // Ours: STAT_GUILD takes only a string name and a master's name; a guild made over
+         // the maintenance port can lack either
+         if IsString(sGuild)
+            AND Send(poGuild,@GetGuildMaster) <> $
          {
-            RecordStat(STAT_GUILD, sGuild, Send(Send(poGuild,@GetGuildMaster),@GetName), Send(Send(poGuild,@GetGuildHall),@GetName) );
-         }
-         else
-         {
-            RecordStat(STAT_GUILD, sGuild, Send(Send(poGuild,@GetGuildMaster),@GetName), system_blank_resource );
+            if Send(poGuild,@GetGuildHall) <> $
+            {
+               RecordStat(STAT_GUILD, sGuild, Send(Send(poGuild,@GetGuildMaster),@GetName), Send(Send(poGuild,@GetGuildHall),@GetName) );
+            }
+            else
+            {
+               RecordStat(STAT_GUILD, sGuild, Send(Send(poGuild,@GetGuildMaster),@GetName), system_blank_resource );
+            }
          }
       }
 

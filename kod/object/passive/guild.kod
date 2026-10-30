@@ -494,7 +494,15 @@ messages:
                rApprentice_Female = guild_apprenticette
               )
    {
+      // Ours: the client's name is a string; any other (a maintenance port quote is a temp
+      // string, which no save keeps) is copied into one, so the name outlives the next save
       vrName = guildname;
+      if guildname <> $
+         AND NOT IsString(guildname)
+      {
+         vrName = CreateString();
+         SetString(vrName,guildname);
+      }
 
       // Text names for guild ranks.
       prMaster = rMaster;
