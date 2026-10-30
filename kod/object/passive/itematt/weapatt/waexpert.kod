@@ -37,6 +37,7 @@ resources:
 classvars:
 
    viMagicColour = MAGIC_COLOUR_GOLD
+   viMagicGlyph = MAGIC_GLYPH_SECOND
 
    vrDesc = weapattexpert_desc
    vbPowerDesc = TRUE

@@ -40,6 +40,7 @@ resources:
 classvars:
 
    viMagicColour = MAGIC_COLOUR_SILVER
+   viMagicGlyph = MAGIC_GLYPH_SECOND
 
    vrDesc = weapattpurger_desc
    vrInfoDesc = purger_info_desc

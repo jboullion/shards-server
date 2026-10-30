@@ -39,6 +39,7 @@ classvars:
    vrInfoDesc = aavital_info
    vrDM_trigger = aavital_dm
    viMagicColour = MAGIC_COLOUR_CRIMSON
+   viMagicGlyph = MAGIC_GLYPH_SECOND
    viDifficulty = 7
 
    viValue_slight = 3

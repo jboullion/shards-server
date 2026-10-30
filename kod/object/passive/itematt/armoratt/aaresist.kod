@@ -158,5 +158,16 @@ messages:
       return MAGIC_COLOUR_GREEN;
    }
 
+   GetMagicGlyph(lData=$)
+   "Ours: the resistance glyph of our element's colour (the weapon's own comes first)."
+   {
+      if Send(self,@GetChoice,#lData=lData) = ATCK_SPELL_FIRE
+      {
+         return MAGIC_GLYPH_SECOND;
+      }
+
+      return MAGIC_GLYPH_THIRD;
+   }
+
 end
 ////////////////////////////////////////////////////////////////////////////////

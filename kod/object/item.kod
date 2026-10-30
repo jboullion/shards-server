@@ -1948,11 +1948,12 @@ messages:
    }
 
    GetMagicShowFlags()
-   "OF_MAGIC_SHOW_* and OF_MAGIC_COLOUR_* bits for our client's ring round our icon: hidden "
-   "magic is grey (MAGIC_SHOW_UNREVEALED); revealed, a weapon shows its tier and every item "
-   "the colour of the attribute that names it (its 'of ...' phrase, else its first word)."
+   "OF_MAGIC_SHOW_*, OF_MAGIC_COLOUR_* and OF_MAGIC_GLYPH_* bits for our client's mark on "
+   "our icon: hidden magic is grey (MAGIC_SHOW_UNREVEALED); revealed, a weapon shows its tier "
+   "and every item the colour and glyph of the attribute that names it (its 'of ...' phrase, "
+   "else its first word)."
    {
-      local i, oItemAtt, iKind, bMagic, iColour, iBest, iPriority, iTier, iShow;
+      local i, oItemAtt, iKind, bMagic, iColour, iGlyph, iBest, iPriority, iTier, iShow;
 
       if plItem_Attributes = $
       {
@@ -1961,6 +1962,7 @@ messages:
 
       bMagic = FALSE;
       iColour = MAGIC_COLOUR_NONE;
+      iGlyph = MAGIC_GLYPH_FIRST;
       iBest = -1;
       foreach i in plItem_Attributes
       {
@@ -1993,6 +1995,7 @@ messages:
          {
             iBest = iPriority;
             iColour = Send(oItemAtt,@GetMagicColour,#lData=i);
+            iGlyph = Send(oItemAtt,@GetMagicGlyph,#lData=i);
          }
       }
 
@@ -2008,7 +2011,9 @@ messages:
          iShow = MAGIC_SHOW_SLIGHT + iTier;
       }
 
-      return iShow * OF_MAGIC_SHOW_MUL + Bound(iColour,0,15) * OF_MAGIC_COLOUR_MUL;
+      // Ours: and which magic of that colour, for our client's glyph on the icon
+      return iShow * OF_MAGIC_SHOW_MUL + Bound(iColour,0,15) * OF_MAGIC_COLOUR_MUL
+             + Bound(iGlyph,0,3) * OF_MAGIC_GLYPH_MUL;
    }
 
    GetWornMagicFlags()

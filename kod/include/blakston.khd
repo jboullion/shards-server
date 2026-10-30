@@ -81,6 +81,10 @@
    OF_MAGIC_SHOW_MASK  = 0x00700000
    OF_MAGIC_COLOUR_MUL = 0x00800000
    OF_MAGIC_COLOUR_MASK = 0x07800000
+   // Which magic of its colour it is (ItemAttribute.GetMagicGlyph, MAGIC_GLYPH_*): our client's
+   // glyph on the icon. Bits 14-15, which no OF_ flag uses.
+   OF_MAGIC_GLYPH_MUL  = 0x00004000
+   OF_MAGIC_GLYPH_MASK = 0x0000C000
 
    // Client preference flags (stored in piPreferences in Player)
    // Default preferences - all on. 0x0001 (safety off) and 0x0002 (a temporary
@@ -2232,6 +2236,18 @@
    MAGIC_COLOUR_PRINCESS   = 13
    MAGIC_COLOUR_REBEL      = 14
    MAGIC_COLOUR_NECROMANCER = 15
+
+   // Ours: which magic of its colour an item attribute is, 0-3 (GetMagicGlyph), so our client
+   // can draw its own glyph on the icon (apps/client ui/magicGlyphs.tsx). Within a colour:
+   //  crimson: vampiric, vitality;  yellow: shocking, blinding, storm resistance;
+   //  teal: icy, holding, frost resistance;  green: acidic, venom, acid resistance;
+   //  silver: warding, purging;  violet: unholy, sorcery, focus;  gold: enchanted, expert,
+   //  glowing, ceremonial;  amber: durable, indestructible, transcendent, adventuring;
+   //  orange: fiery, fire resistance. Every other colour has one magic.
+   MAGIC_GLYPH_FIRST  = 0
+   MAGIC_GLYPH_SECOND = 1
+   MAGIC_GLYPH_THIRD  = 2
+   MAGIC_GLYPH_FOURTH = 3
 
    // ...and where an attribute's word goes in a revealed item's full name (Item.BuildMagicName)
    ITEMATT_NAME_NONE       = 0

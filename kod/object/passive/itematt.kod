@@ -72,6 +72,8 @@ classvars:
    viNameKind = ITEMATT_NAME_NONE
    // ...and the colour of the ring on the item's icon once revealed (GetMagicColour)
    viMagicColour = MAGIC_COLOUR_NONE
+   // ...and which magic of that colour we are, for our glyph on the icon (GetMagicGlyph)
+   viMagicGlyph = MAGIC_GLYPH_FIRST
    // ...and whether, found as treasure, we carry a tier (GetTier: weapon and armor attributes)
    vbTiered = FALSE
 
@@ -865,6 +867,13 @@ messages:
    "(MAGIC_COLOUR_*). Item.GetMagicShowFlags."
    {
       return viMagicColour;
+   }
+
+   GetMagicGlyph(lData=$)
+   "Ours: which magic of our colour we are (MAGIC_GLYPH_*), for the glyph our client draws "
+   "on the item's icon. Item.GetMagicShowFlags."
+   {
+      return viMagicGlyph;
    }
 
    GetRevealTint(lData=$)

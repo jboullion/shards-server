@@ -43,6 +43,7 @@ resources:
 classvars:
 
    viMagicColour = MAGIC_COLOUR_VIOLET
+   viMagicGlyph = MAGIC_GLYPH_SECOND
 
    vrDesc = WeapAttSpellCaster_desc
    vrDesc2 = WeapAttSpellCaster_desc_target

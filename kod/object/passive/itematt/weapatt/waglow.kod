@@ -38,6 +38,7 @@ resources:
 classvars:
 
    viMagicColour = MAGIC_COLOUR_GOLD
+   viMagicGlyph = MAGIC_GLYPH_THIRD
 
    viItem_Att_Num = WA_GLOWING
    vrDesc = weapattglowing_desc

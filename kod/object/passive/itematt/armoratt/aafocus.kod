@@ -49,6 +49,7 @@ classvars:
    vrInfoDesc = aafocus_info
    vrDM_trigger = aafocus_dm
    viMagicColour = MAGIC_COLOUR_VIOLET
+   viMagicGlyph = MAGIC_GLYPH_THIRD
    viDifficulty = 6
 
    viValue_slight = 3
