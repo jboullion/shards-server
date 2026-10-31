@@ -1986,6 +1986,13 @@
    AI_FIGHT_SWITCHALOT        = 0x0800000
    // monster may strike through walls (revenants)
    AI_FIGHT_THROUGH_WALLS     = 0x1000000
+   // ours (ADR 0029): monster never plans a way round walls, only the straight step
+   AI_NO_PATHING              = 0x2000000
+
+   // Ours (ADR 0029): which monsters plan a way round walls (Settings piMonsterPathing)
+   MONSTER_PATHING_OFF        = 0
+   MONSTER_PATHING_BATTLES    = 1    // faction battle troops only
+   MONSTER_PATHING_ALL        = 2
 
    // Monster movement speeds
    SPEED_NONE          = 0

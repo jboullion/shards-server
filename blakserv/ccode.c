@@ -3539,6 +3539,103 @@ int C_GetStepTowardsBSP(int object_id, local_var_type *local_vars,
 }
 
 /*
+ * C_GetPathStepBSP: ours (ADR 0029). The next point on a monster's way from the first
+ *    coordinates to the second, round walls (navgrid.c): the farthest point on the path it can
+ *    walk to in a straight line, written into the second set. Returns TRUE with the point set,
+ *    FALSE when this moment's budget of searches is spent (step straight, ask again), and $
+ *    when there's no way there.
+ */
+int C_GetPathStepBSP(int object_id, local_var_type *local_vars,
+	int num_normal_parms, parm_node normal_parm_array[],
+	int num_name_parms, parm_node name_parm_array[])
+{
+	val_type ret_val, room_val;
+	val_type src[4], dest[4];
+	room_node *r;
+
+	ret_val.int_val = NIL;
+
+	room_val = RetrieveValue(object_id, local_vars, normal_parm_array[0].type,
+		normal_parm_array[0].value);
+	for (int k = 0; k < 4; k++)
+	{
+		src[k] = RetrieveValue(object_id, local_vars, normal_parm_array[1 + k].type,
+			normal_parm_array[1 + k].value);
+		dest[k] = RetrieveValue(object_id, local_vars, normal_parm_array[5 + k].type,
+			normal_parm_array[5 + k].value);
+	}
+
+	if (room_val.v.tag != TAG_ROOM_DATA)
+	{
+		bprintf("C_GetPathStepBSP can't use non room %i,%i\n",
+			room_val.v.tag, room_val.v.data);
+		return ret_val.int_val;
+	}
+
+	for (int k = 0; k < 4; k++)
+	{
+		if (src[k].v.tag != TAG_INT)
+		{
+			bprintf("C_GetPathStepBSP source coordinate %i can't use non int %i,%i\n",
+				k, src[k].v.tag, src[k].v.data);
+			return ret_val.int_val;
+		}
+		// the destination is a local (*var) holding an int, written back
+		if (local_vars->locals[dest[k].v.data].v.tag != TAG_INT)
+		{
+			bprintf("C_GetPathStepBSP destination coordinate %i must be a local int\n", k);
+			return ret_val.int_val;
+		}
+	}
+
+	r = GetRoomDataByID(room_val.v.data);
+	if (r == NULL)
+	{
+		bprintf("C_GetPathStepBSP can't find room %i\n", room_val.v.data);
+		return ret_val.int_val;
+	}
+
+	// row, col, finerow, finecol
+	V2 s;
+	s.X = GRIDCOORDTOROO(src[1].v.data, src[3].v.data);
+	s.Y = GRIDCOORDTOROO(src[0].v.data, src[2].v.data);
+
+	val_type *drow = &local_vars->locals[dest[0].v.data];
+	val_type *dcol = &local_vars->locals[dest[1].v.data];
+	val_type *dfinerow = &local_vars->locals[dest[2].v.data];
+	val_type *dfinecol = &local_vars->locals[dest[3].v.data];
+
+	V2 e;
+	e.X = GRIDCOORDTOROO(dcol->v.data, dfinecol->v.data);
+	e.Y = GRIDCOORDTOROO(drow->v.data, dfinerow->v.data);
+
+	V2 p;
+	int res = NavGetPathStep(&r->data, &s, &e, &p, false);
+
+	if (res == NAV_PATH_NONE)
+		return ret_val.int_val;
+
+	ret_val.v.tag = TAG_INT;
+	if (res == NAV_PATH_BUSY)
+	{
+		ret_val.v.data = False;
+		return ret_val.int_val;
+	}
+
+	dcol->v.tag = TAG_INT;
+	dcol->v.data = ROOCOORDTOGRIDBIG(p.X);
+	dfinecol->v.tag = TAG_INT;
+	dfinecol->v.data = ROOCOORDTOGRIDFINE(p.X);
+	drow->v.tag = TAG_INT;
+	drow->v.data = ROOCOORDTOGRIDBIG(p.Y);
+	dfinerow->v.tag = TAG_INT;
+	dfinerow->v.data = ROOCOORDTOGRIDFINE(p.Y);
+
+	ret_val.v.data = True;
+	return ret_val.int_val;
+}
+
+/*
  * C_AppendListElem: takes a list and an item to be appended to the list,
  *    appends the item to the end of the list. Returns the original list
  *    with the item appended to the end.

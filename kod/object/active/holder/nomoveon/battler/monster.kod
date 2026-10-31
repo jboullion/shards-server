@@ -15,6 +15,13 @@ constants:
    include blakston.khd
    include protocol.khd
 
+   // Ours (ADR 0029): a planned way is kept this long (ms, plus up to half again so a crowd
+   // doesn't plan on the same step), or until its goal moves this many squares
+   PATH_REPLAN_MS = 2000
+   PATH_REPLAN_SQUARES = 3
+   // A waypoint is reached within this many fine units each way
+   PATH_REACHED = 24
+
    // 9 minutes
    TURN_TIME = 9*60*1000   
 
@@ -406,6 +413,19 @@ classvars:
    viBonusTP = 0
 
 properties:
+
+   // Ours (ADR 0029): the way being followed round walls. poPathRoom is the room it was planned
+   // in ($: none); piPathAt when (GetTickCount); the waypoint; the goal's square it was planned
+   // to; and whether the goal was in a straight line then
+   poPathRoom = $
+   piPathAt = 0
+   piPathRow = 0
+   piPathCol = 0
+   piPathFineRow = 0
+   piPathFineCol = 0
+   piPathGoalRow = 0
+   piPathGoalCol = 0
+   pbPathDirect = FALSE
 
    piVisionDistance
    piAttackRange
@@ -3096,14 +3116,96 @@ messages:
       return;
    }
 
+   UsesPathing()
+   "Ours (ADR 0029): whether this monster plans a way round walls when the straight one is "
+   "blocked (Settings piMonsterPathing)."
+   {
+      local iScope;
+
+      if piBehavior & (AI_MOVE_WALKTHROUGH_WALLS | AI_NO_PATHING)
+      {
+         return FALSE;
+      }
+
+      iScope = Send(SETTINGS_OBJECT,@GetMonsterPathing);
+      if iScope = MONSTER_PATHING_ALL
+      {
+         return TRUE;
+      }
+
+      return iScope = MONSTER_PATHING_BATTLES AND Send(self,@IsBattleTroop);
+   }
+
+   IsBattleTroop()
+   "Ours: a faction battle's troop (FactionTroop says)."
+   {
+      return FALSE;
+   }
+
    MoveTowardsCoords(iRow=$, iCol=$, iFineRow=FINENESS_HALF, iFineCol=FINENESS_HALF,
                      face_target=FALSE, face_away=FALSE, to_master=FALSE)
    {
-      local iState, iMoveFlags;
+      local iState, iMoveFlags, iNow, rPath, iWayRow, iWayCol, iWayFineRow, iWayFineCol;
 
       if (iRow = $ or iCol = $)
       {
          return;
+      }
+
+      // Ours (ADR 0029): round walls by the room's nav grid. A way is planned when there's none,
+      // it's old, the goal has moved far from it, or we've changed rooms; while the goal is in a
+      // straight line we step straight at it as before, else at the plan's waypoint.
+      if poOwner <> $ AND Send(self,@UsesPathing)
+      {
+         iNow = GetTickCount();
+         if poPathRoom <> poOwner
+            OR iNow < piPathAt
+            OR iNow - piPathAt > PATH_REPLAN_MS + Random(0,PATH_REPLAN_MS / 2)
+            OR Abs(iRow - piPathGoalRow) > PATH_REPLAN_SQUARES
+            OR Abs(iCol - piPathGoalCol) > PATH_REPLAN_SQUARES
+         {
+            poPathRoom = $;
+            iWayRow = iRow;
+            iWayCol = iCol;
+            iWayFineRow = iFineRow;
+            iWayFineCol = iFineCol;
+
+            // TRUE: the waypoint is set. FALSE: no search this moment; $: no way there.
+            // Either of those steps straight as before, and plans again next step.
+            rPath = GetPathStepBSP(Send(poOwner,@GetRoomData),
+                                   piRow, piCol, piFine_row, piFine_col,
+                                   *iWayRow, *iWayCol, *iWayFineRow, *iWayFineCol);
+            if rPath = TRUE
+            {
+               poPathRoom = poOwner;
+               piPathAt = iNow;
+               piPathRow = iWayRow;
+               piPathCol = iWayCol;
+               piPathFineRow = iWayFineRow;
+               piPathFineCol = iWayFineCol;
+               piPathGoalRow = iRow;
+               piPathGoalCol = iCol;
+               pbPathDirect = (iWayRow = iRow AND iWayCol = iCol
+                               AND iWayFineRow = iFineRow AND iWayFineCol = iFineCol);
+            }
+         }
+
+         if poPathRoom <> $ AND NOT pbPathDirect
+         {
+            if Abs(((piRow - piPathRow) * FINENESS) + piFine_row - piPathFineRow) <= PATH_REACHED
+               AND Abs(((piCol - piPathCol) * FINENESS) + piFine_col - piPathFineCol) <= PATH_REACHED
+            {
+               // There: the next waypoint at the next step
+               poPathRoom = $;
+            }
+            else
+            {
+               iRow = piPathRow;
+               iCol = piPathCol;
+               iFineRow = piPathFineRow;
+               iFineCol = piPathFineCol;
+            }
+         }
       }
 
       // Mobs that can move outside the BSP tree set this field which is then
@@ -3151,6 +3253,9 @@ messages:
          return TRUE;		
          }
       }
+
+      // Ours (ADR 0029): stuck: plan again at the next step
+      poPathRoom = $;
 
       return FALSE;
    }

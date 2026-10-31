@@ -73,6 +73,7 @@ present in the current codebase.
   * [BlockerClearBSP](#blockerclearbsp)
   * [GetRandomPointBSP](#getrandompointbsp)
   * [GetStepTowardsBSP](#getsteptowardsbsp)
+  * [GetPathStepBSP](#getpathstepbsp)
 * [Hash Tables](#hash-tables)
   * [AddTableEntry](#addtableentry)
   * [CreateTable](#createtable)
@@ -1355,6 +1356,17 @@ into the second set of coordinate variables.
                *iRow, *iCol, *iFineRow, *iFineCol,
                piState | iMoveFlags, self);
 ```
+
+#### GetPathStepBSP
+`GetPathStepBSP(room_data, row, col, finerow, finecol, *end_row, *end_col, *end_finerow, *end_finecol)`
+
+Ours (ADR 0029). The next point on the way from the first coordinates to the second, round
+walls: a path over the room's nav grid (`blakserv/navgrid.c`, built from the same move check as
+`GetStepTowardsBSP`), pulled tight to the farthest point that can be walked to in a straight
+line. The destination variables are read as the goal and overwritten with that point. Returns
+`TRUE` with the point set, `FALSE` when the server's budget of searches for this moment is spent
+(step straight for now and ask again), and `$` when there's no way there. Objects that block
+aren't in the grid: step towards the point with `GetStepTowardsBSP`, which still checks them.
 
 ## Hash Tables
 #### AddTableEntry

@@ -1618,7 +1618,7 @@ void AdminShowNavGrid(int session_id,admin_parm_type parms[],
    }
    aprintf("%i x %i cells (half squares), %i walkable, %i linked, %i water, %i areas, built in %i ms\n",
       g->Cols, g->Rows, walk, linked, water, areas, g->BuildMs);
-   aprintf("Row 1 is the top; cell (r, c) is square row r/2+1, col c/2+1. '#' wall, '.' area 1, 'o' other areas, '~' water, ',' no links\n");
+   aprintf("Line 0 is the top. The middle of square (row, col) is line 2*row-1, character 2*col-1. '#' wall, '.' area 1, 'o' other areas, '~' water, ',' no links\n");
 
    char line[1024];
    for (int r = 0; r < g->Rows; r++)
@@ -2496,6 +2496,7 @@ void AdminShowCalls(int session_id,admin_parm_type parms[],
 		case GETLOCATIONINFOBSP: strcpy(c_name, "GetLocationInfoBSP"); break;
 		case GETRANDOMPOINTBSP: strcpy(c_name, "GetRandomPointBSP"); break;
 		case GETSTEPTOWARDSBSP: strcpy(c_name, "GetStepTowardsBSP"); break;
+		case GETPATHSTEPBSP: strcpy(c_name, "GetPathStepBSP"); break;
 		case BLOCKERADDBSP: strcpy(c_name, "BlockerAddBSP"); break;
 		case BLOCKERMOVEBSP: strcpy(c_name, "BlockerMoveBSP"); break;
 		case BLOCKERREMOVEBSP: strcpy(c_name, "BlockerRemoveBSP"); break;

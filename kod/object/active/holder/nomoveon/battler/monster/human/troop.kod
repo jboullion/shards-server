@@ -480,6 +480,12 @@ messages:
       return piBattleRole;
    }
 
+   IsBattleTroop()
+   "Ours (ADR 0029): in a battle's army (they plan their way round walls)."
+   {
+      return piBattleRole <> BATTLE_ROLE_NONE;
+   }
+
    IsBattleFoe(what = $)
    "In a battle: the other army's troops, and soldiers of a rival liege wearing their shields."
    {

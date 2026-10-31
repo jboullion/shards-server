@@ -47,6 +47,10 @@ properties:
 
    pbMonsterFactionEnabled = FALSE
 
+   // Ours (ADR 0029): which monsters plan a way round walls on the room's nav grid
+   // (MONSTER_PATHING_OFF, _BATTLES or _ALL). Off falls back to the straight step alone.
+   piMonsterPathing = MONSTER_PATHING_BATTLES
+
    pbAtrophyOn = FALSE
    
    // Stat reset options
@@ -367,6 +371,11 @@ messages:
    GetMonsterFactionEnabled()
    {
       return pbMonsterFactionEnabled;
+   }
+
+   GetMonsterPathing()
+   {
+      return piMonsterPathing;
    }
 
    IsAtrophyOn()
