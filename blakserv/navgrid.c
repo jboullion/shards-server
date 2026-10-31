@@ -16,7 +16,7 @@
  * refuse the step. Objects that block aren't in the grid; the step still checks them.
  *
  * Paths: a search goes out from the goal over the reversed links (Dijkstra), and every cell it
- * reaches learns its next step toward the goal. Monsters chasing the same target share it, so a
+ * reaches learns its next step toward the goal. Monsters chasing the same target (or one within NAV_GOAL_SHARE cells) share it, so a
  * room keeps the last few (NAV_FIELDS) for a second.
  *
  * Built the first time a room is asked for a path; freed with the room, and dropped when its
@@ -37,6 +37,7 @@
 #define NAV_RAYS      8         // short steps a cell's clearance is checked along
 #define NAV_SNAP      4         // how many cells away a point may be snapped to the grid
 #define NAV_LOOKAHEAD 24        // how far along a path the next point may be pulled
+#define NAV_GOAL_SHARE 2        // a kept search serves goals this many cells from its own
 #define NAV_SF_DEPTH  0x03      // roofile.c SF_MASK_DEPTH: the sector is water
 #define NAV_MIN_STEP  400.0f    // a waypoint is at least this far off on one axis: beyond
                                 // monster.kod's PATH_REACHED (24 fine units, 384 here)
@@ -437,14 +438,32 @@ static bool NavGridLineClear(const NavGrid* g, const V2* a, const V2* b)
    return true;
 }
 
-static unsigned char* NavFieldFor(NavGrid* g, int goal, bool ignoreBudget, bool* busy)
+// The search toward goal for a monster at from: a kept one for that goal, or for a goal within
+// NAV_GOAL_SHARE cells that from can reach (a crowd chasing one running player shares it), else
+// a new one within the budget. *found is the goal of the one given.
+static unsigned char* NavFieldFor(NavGrid* g, int goal, int from, bool ignoreBudget, bool* busy, int* found)
 {
    UINT64 now = GetMilliCount();
    *busy = false;
+   *found = goal;
 
    for (int k = 0; k < NAV_FIELDS; k++)
       if (g->Fields[k].Goal == goal && g->Fields[k].Next && now - g->Fields[k].Made < NAV_FIELD_MS)
          return g->Fields[k].Next;
+
+   for (int k = 0; k < NAV_FIELDS; k++)
+   {
+      NavField* f = &g->Fields[k];
+      if (f->Goal < 0 || !f->Next || now - f->Made >= NAV_FIELD_MS)
+         continue;
+      int dc = abs((f->Goal % g->Cols) - (goal % g->Cols));
+      int dr = abs((f->Goal / g->Cols) - (goal / g->Cols));
+      if (dc <= NAV_GOAL_SHARE && dr <= NAV_GOAL_SHARE && (from == f->Goal || f->Next[from] != 0xFF))
+      {
+         *found = f->Goal;
+         return f->Next;
+      }
+   }
 
    // a budget over time, over all rooms: there's no server tick to count in
    if (now - navWindowStart >= NAV_WINDOW_MS)
@@ -475,6 +494,13 @@ static unsigned char* NavFieldFor(NavGrid* g, int goal, bool ignoreBudget, bool*
 /*****************************************************************************************/
 int NavGetPathStep(room_type* Room, const V2* S, const V2* E, V2* P, bool IgnoreBudget)
 {
+   // a straight way needs no grid and no search
+   if (NavCanWalkLine(Room, S, E))
+   {
+      *P = *E;
+      return NAV_PATH_OK;
+   }
+
    NavGrid* g = NavGetGrid(Room);
    if (!g)
       return NAV_PATH_NONE;
@@ -490,10 +516,11 @@ int NavGetPathStep(room_type* Room, const V2* S, const V2* E, V2* P, bool Ignore
       return NAV_PATH_NONE;
 
    bool busy;
-   unsigned char* next = NavFieldFor(g, to, IgnoreBudget, &busy);
+   int goal;
+   unsigned char* next = NavFieldFor(g, to, from, IgnoreBudget, &busy, &goal);
    if (busy)
       return NAV_PATH_BUSY;
-   if (from != to && next[from] == 0xFF)
+   if (from != goal && next[from] == 0xFF)
       return NAV_PATH_NONE;
 
    // the path's cells, from the start, as far as we may look ahead
@@ -501,7 +528,7 @@ int NavGetPathStep(room_type* Room, const V2* S, const V2* E, V2* P, bool Ignore
    int len = 0;
    int i = from;
    path[len++] = i;
-   while (i != to && len <= NAV_LOOKAHEAD)
+   while (i != goal && len <= NAV_LOOKAHEAD)
    {
       int d = next[i];
       if (d == 0xFF)
@@ -510,12 +537,6 @@ int NavGetPathStep(room_type* Room, const V2* S, const V2* E, V2* P, bool Ignore
       path[len++] = i;
    }
 
-   // the goal itself when the path ends there and it's in a straight line
-   if (path[len - 1] == to && NavGridLineClear(g, S, E) && NavCanWalkLine(Room, S, E))
-   {
-      *P = *E;
-      return NAV_PATH_OK;
-   }
 
    // The first cell far enough off to be worth walking to: Kod counts a waypoint within
    // PATH_REACHED of the monster as reached, so one that near would be reached at once and

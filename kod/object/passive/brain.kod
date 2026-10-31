@@ -860,6 +860,15 @@ messages:
          }
       }
 
+      // Ours (ADR 0029, the leash): too far from where the chase began, or the target long out
+      // of sight: give up and go back
+      if Send(mob,@LeashBreaks,#target=target)
+      {
+         Send(mob,@Evade);
+
+         return;
+      }
+
       if Send(mob,@GetOwner) = Send(target,@GetOwner)
       {
          Send(mob,@MoveTowards,#oTarget=target,#face_target=TRUE);
@@ -1271,6 +1280,13 @@ messages:
       //  it just struck us.
       if event <> TS_FIGHT_ME_VICTIM
          AND Send(mob,@LosesSightOf,#who=what)
+      {
+         return FALSE;
+      }
+
+      // Ours (ADR 0029, aggro): someone moving about is noticed only near and in sight
+      if event = TS_MOVE
+         AND NOT Send(mob,@NoticesPasserby,#who=what)
       {
          return FALSE;
       }

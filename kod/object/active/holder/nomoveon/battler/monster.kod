@@ -21,6 +21,8 @@ constants:
    PATH_REPLAN_SQUARES = 3
    // A waypoint is reached within this many fine units each way
    PATH_REACHED = 24
+   // After giving up a chase, passers-by go unnoticed this long (seconds) on the way back
+   EVADE_SECONDS = 10
 
    // 9 minutes
    TURN_TIME = 9*60*1000   
@@ -426,6 +428,14 @@ properties:
    piPathGoalRow = 0
    piPathGoalCol = 0
    pbPathDirect = FALSE
+
+   // Ours (ADR 0029, the leash): where the chase began, when the target was last seen
+   // (GetTime), when that was last looked at, and until when passers-by go unnoticed
+   piLeashRow = 0
+   piLeashCol = 0
+   piLeashSeen = 0
+   piLeashChecked = 0
+   piEvadeUntil = 0
 
    piVisionDistance
    piAttackRange
@@ -3140,6 +3150,108 @@ messages:
    "Ours: a faction battle's troop (FactionTroop says)."
    {
       return FALSE;
+   }
+
+   UsesLeash()
+   "Ours (ADR 0029): whether this monster gives up a chase that goes too far or too long out of "
+   "sight. Not battle troops, arena fighters or anyone's minion."
+   {
+      return NOT Send(self,@IsBattleTroop)
+             AND NOT IsClass(self,&ArenaFighter)
+             AND Send(self,@GetMaster) = $;
+   }
+
+   NoticesPasserby(who = $)
+   "Ours (ADR 0029, aggro): whether a player moving about catches this monster's notice: near "
+   "(Settings piAggroRadius squares) and in its sight. Not while going back from a chase. "
+   "Battle troops and minions are told their targets, and keep the old rule."
+   {
+      local iRadius, iDist;
+
+      if who = $ OR poOwner = $
+      {
+         return FALSE;
+      }
+
+      if NOT Send(self,@UsesLeash)
+      {
+         return TRUE;
+      }
+
+      if GetTime() < piEvadeUntil
+      {
+         return FALSE;
+      }
+
+      iRadius = Send(SETTINGS_OBJECT,@GetAggroRadius);
+      iDist = Send(self,@SquaredDistanceTo,#what=who);
+      if iDist = $
+         OR iDist > iRadius * iRadius
+      {
+         return FALSE;
+      }
+
+      return Send(poOwner,@LineOfSight,#obj1=self,#obj2=who);
+   }
+
+   LeashBreaks(target = $)
+   "Ours (ADR 0029, the leash): whether this chase should end: more than Settings "
+   "piLeashSquares from where it began, or the target unseen for piLeashLostSeconds. Sight is "
+   "looked at once a second."
+   {
+      local iNow, iSquares, iRow, iCol;
+
+      if target = $ OR poOwner = $
+         OR NOT Send(self,@UsesLeash)
+      {
+         return FALSE;
+      }
+
+      iNow = GetTime();
+      if piLeashSeen = 0
+      {
+         // A chase begun before the leash was here: it begins now
+         piLeashRow = piRow;
+         piLeashCol = piCol;
+         piLeashSeen = iNow;
+      }
+
+      iSquares = Send(SETTINGS_OBJECT,@GetLeashSquares);
+      iRow = piRow - piLeashRow;
+      iCol = piCol - piLeashCol;
+      if (iRow * iRow) + (iCol * iCol) > iSquares * iSquares
+      {
+         return TRUE;
+      }
+
+      if iNow <> piLeashChecked
+      {
+         piLeashChecked = iNow;
+         if Send(poOwner,@LineOfSight,#obj1=self,#obj2=target)
+         {
+            piLeashSeen = iNow;
+         }
+      }
+
+      return iNow - piLeashSeen > Send(SETTINGS_OBJECT,@GetLeashLostSeconds);
+   }
+
+   Evade()
+   "Ours (ADR 0029, the leash): give up the chase, heal, and walk back to where it began, "
+   "noticing nobody on the way for EVADE_SECONDS."
+   {
+      local iRow, iCol;
+
+      iRow = piLeashRow;
+      iCol = piLeashCol;
+      piLeashSeen = 0;
+      piEvadeUntil = GetTime() + EVADE_SECONDS;
+      piHit_points = piMax_hit_points * 100;
+
+      Send(self,@EnterStateMove);
+      Send(self,@GotoCoords,#iRow=iRow,#iCol=iCol);
+
+      return;
    }
 
    MoveTowardsCoords(iRow=$, iCol=$, iFineRow=FINENESS_HALF, iFineCol=FINENESS_HALF,
@@ -7952,6 +8064,14 @@ if isClass(self,&Reflection)
       }
 
       piHatred = iHatred;
+
+      // Ours (ADR 0029, the leash): a chase begins here
+      if poTarget = $
+      {
+         piLeashRow = piRow;
+         piLeashCol = piCol;
+         piLeashSeen = GetTime();
+      }
 
       if poTarget <> $
          AND IsClass(poTarget,&User)
