@@ -55,7 +55,7 @@ properties:
    // squares and in its sight; it gives up a chase this many squares from where it began it, or
    // when it hasn't seen its target for this many seconds, and goes back healed.
    piAggroRadius = 6
-   piLeashSquares = 20
+   piLeashSquares = 50
    piLeashLostSeconds = 6
 
    pbAtrophyOn = FALSE
