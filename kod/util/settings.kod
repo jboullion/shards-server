@@ -48,15 +48,8 @@ properties:
    pbMonsterFactionEnabled = FALSE
 
    // Ours (ADR 0029): which monsters plan a way round walls on the room's nav grid
-   // (MONSTER_PATHING_OFF, _BATTLES or _ALL). Off falls back to the straight step alone.
-   piMonsterPathing = MONSTER_PATHING_ALL
-
-   // Ours (ADR 0029, aggro and the leash): a monster notices a player who comes within this many
-   // squares and in its sight; it gives up a chase this many squares from where it began it, or
-   // when it hasn't seen its target for this many seconds, and goes back healed.
-   piAggroRadius = 6
-   piLeashSquares = 50
-   piLeashLostSeconds = 6
+   // (MONSTER_PATHING_OFF, _NPCS or _ALL). Off falls back to the straight step alone.
+   piMonsterPathing = MONSTER_PATHING_NPCS
 
    pbAtrophyOn = FALSE
    
@@ -383,21 +376,6 @@ messages:
    GetMonsterPathing()
    {
       return piMonsterPathing;
-   }
-
-   GetAggroRadius()
-   {
-      return piAggroRadius;
-   }
-
-   GetLeashSquares()
-   {
-      return piLeashSquares;
-   }
-
-   GetLeashLostSeconds()
-   {
-      return piLeashLostSeconds;
    }
 
    IsAtrophyOn()

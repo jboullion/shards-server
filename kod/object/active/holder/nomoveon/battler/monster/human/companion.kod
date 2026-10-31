@@ -111,6 +111,12 @@ properties:
 
 messages:
 
+   IsPathingNPC()
+   "Ours (ADR 0029): companions find their way round walls to keep up with their master."
+   {
+      return TRUE;
+   }
+
    Constructor(kind = 1,owner = $)
    {
       piKind = kind;

@@ -40,6 +40,9 @@ properties:
    // engage in very deadly behavior.  Used to make orcs deadly.
    piHyperAggressive_factor = 60
 
+   // The higher this is, the less likely monsters will 'swarm'.
+   piChaser_factor = 100
+
    // The higher this number is, the more likely a wizard hater
    // will chase after wizards.
    piWizard_factor = 25
@@ -840,10 +843,8 @@ messages:
 
       // Check here if we need to break target, perhaps they are now
       // too far away and have escaped us. This is the same vision check
-      // as used in GetHatred, with 5 added to the monster vision. Ours (ADR 0029): a monster on
-      // the leash gives up by the leash's rules instead.
+      // as used in GetHatred, with 5 added to the monster vision.
       if NOT (behavior & AI_FIGHT_HYPERAGGRESSIVE)
-         AND NOT Send(mob,@UsesLeash)
          AND NOT (behavior & AI_FIGHT_SINGLEMINDED)
          AND (Send(mob,@GetTimeAttacked) + 10) < GetTime()
       {
@@ -857,15 +858,6 @@ messages:
 
             return;
          }
-      }
-
-      // Ours (ADR 0029, the leash): too far from where the chase began, or the target long out
-      // of sight: give up and go back
-      if Send(mob,@LeashBreaks,#target=target)
-      {
-         Send(mob,@Evade);
-
-         return;
       }
 
       if Send(mob,@GetOwner) = Send(target,@GetOwner)
@@ -1230,6 +1222,13 @@ messages:
          // Give newbies a break.
          iHatred = (iHatred + (Bound(Send(what,@GetMaxHealth)-20,0,150)
                                     * piPlayer_factor)/100);
+
+         // If they already have a lot of people chasing them, run away.
+         if NOT (event = TS_FIGHT_ME_VICTIM)
+         {
+            iHatred = iHatred - (Send(what,@GetMonsterChasers)
+                                       * piChaser_factor)/100;
+         }
       }
 
       if (behavior & AI_FIGHT_HYPERAGGRESSIVE)
@@ -1272,13 +1271,6 @@ messages:
       //  it just struck us.
       if event <> TS_FIGHT_ME_VICTIM
          AND Send(mob,@LosesSightOf,#who=what)
-      {
-         return FALSE;
-      }
-
-      // Ours (ADR 0029, aggro): someone moving about is noticed only near and in sight
-      if event = TS_MOVE
-         AND NOT Send(mob,@NoticesPasserby,#who=what)
       {
          return FALSE;
       }

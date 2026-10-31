@@ -1991,7 +1991,7 @@
 
    // Ours (ADR 0029): which monsters plan a way round walls (Settings piMonsterPathing)
    MONSTER_PATHING_OFF        = 0
-   MONSTER_PATHING_BATTLES    = 1    // faction battle troops only
+   MONSTER_PATHING_NPCS       = 1    // NPCs only: battle troops and companions (IsPathingNPC)
    MONSTER_PATHING_ALL        = 2
 
    // Monster movement speeds
