@@ -38,6 +38,8 @@
 #define NAV_SNAP      4         // how many cells away a point may be snapped to the grid
 #define NAV_LOOKAHEAD 24        // how far along a path the next point may be pulled
 #define NAV_SF_DEPTH  0x03      // roofile.c SF_MASK_DEPTH: the sector is water
+#define NAV_MIN_STEP  400.0f    // a waypoint is at least this far off on one axis: beyond
+                                // monster.kod's PATH_REACHED (24 fine units, 384 here)
 
 // neighbour offsets by link bit: E, SE, S, SW, W, NW, N, NE
 static const int DirCol[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
@@ -515,13 +517,25 @@ int NavGetPathStep(room_type* Room, const V2* S, const V2* E, V2* P, bool Ignore
       return NAV_PATH_OK;
    }
 
+   // The first cell far enough off to be worth walking to: Kod counts a waypoint within
+   // PATH_REACHED of the monster as reached, so one that near would be reached at once and
+   // the monster would never leave its cell (an ant at a corner in the Flatlands)
+   int first = 1;
+   while (first < len - 1)
+   {
+      V2 q = NavCentre(g, path[first]);
+      if (fabsf(q.X - S->X) > NAV_MIN_STEP || fabsf(q.Y - S->Y) > NAV_MIN_STEP)
+         break;
+      first++;
+   }
+
    // pull it tight: the farthest cell on the way a straight line reaches
-   for (int k = len - 1; k > 0; k--)
+   for (int k = len - 1; k >= first && k > 0; k--)
    {
       V2 q = NavCentre(g, path[k]);
-      if (k > 1 && !NavGridLineClear(g, S, &q))
+      if (k > first && !NavGridLineClear(g, S, &q))
          continue;
-      if (k == 1 || NavCanWalkLine(Room, S, &q))
+      if (k == first || NavCanWalkLine(Room, S, &q))
       {
          *P = q;
          return NAV_PATH_OK;
