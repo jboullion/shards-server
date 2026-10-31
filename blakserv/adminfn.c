@@ -236,6 +236,19 @@ void AdminUnsuspendAccount(int session_id,admin_parm_type parms[],
 void AdminCheckTimerHeap(int session_id, admin_parm_type parms[],
                          int num_blak_parm, parm_node blak_parm[]);
 
+void AdminAccountByID(int session_id, admin_parm_type parms[],
+                      int num_blak_parm, parm_node blak_parm[]);
+void AdminAccountByName(int session_id, admin_parm_type parms[],
+                        int num_blak_parm, parm_node blak_parm[]);
+void AdminAccountByEmail(int session_id, admin_parm_type parms[],
+                         int num_blak_parm, parm_node blak_parm[]);
+void AdminAccountCheck(int session_id, admin_parm_type parms[],
+                       int num_blak_parm, parm_node blak_parm[]);
+void AdminAccountDigest(int session_id, admin_parm_type parms[],
+                        int num_blak_parm, parm_node blak_parm[]);
+void AdminAccountEmail(int session_id, admin_parm_type parms[],
+                       int num_blak_parm, parm_node blak_parm[]);
+
 void AdminCreateAccount(int session_id,admin_parm_type parms[],
                         int num_blak_parm,parm_node blak_parm[]);
 void AdminCreateAutomated(int session_id,admin_parm_type parms[],
@@ -582,8 +595,23 @@ admin_table_type admin_save_table[] =
 };
 #define LEN_ADMIN_SAVE_TABLE (sizeof(admin_save_table)/sizeof(admin_table_type))
 
+// Account recovery (meridian-browser tools/accounts). Replies are one-line
+// "ACCOUNT ..." records so the service can parse them; the stored password
+// digest never leaves the server, only a stamp (MD5 of it) that changes with it.
+admin_table_type admin_account_table[] =
+{
+	{ AdminAccountByEmail, {S,N},   F, A|M, NULL, 0, "byemail", "Machine-readable: every account with an email" },
+	{ AdminAccountByID,    {I,N},   F, A|M, NULL, 0, "byid",    "Machine-readable: one account by id" },
+	{ AdminAccountByName,  {R,N},   F, A|M, NULL, 0, "byname",  "Machine-readable: one account by name" },
+	{ AdminAccountCheck,   {S,R,N}, F, A|M, NULL, 0, "check",   "Check a password digest (hex) against an account name" },
+	{ AdminAccountDigest,  {I,S,N}, F, A|M, NULL, 0, "digest",  "Set an account's password digest (hex) by id" },
+	{ AdminAccountEmail,   {I,S,N}, F, A|M, NULL, 0, "email",   "Set an account's email by id, - clears it" },
+};
+#define LEN_ADMIN_ACCOUNT_TABLE (sizeof(admin_account_table)/sizeof(admin_table_type))
+
 admin_table_type admin_main_table[] = 
 { 
+	{ NULL, {N}, F, A|M, admin_account_table, LEN_ADMIN_ACCOUNT_TABLE, "account", "Account recovery subcommand" },
 	{ NULL, {N}, F, A|M, admin_add_table,    LEN_ADMIN_ADD_TABLE,    "add",    "Add subcommand" },
 	{ NULL, {N}, F, A|M, admin_check_table,  LEN_ADMIN_CHECK_TABLE,  "check",  "Check subcommand" },
 	{ NULL, {N}, F, A|M, admin_create_table, LEN_ADMIN_CREATE_TABLE, "create", "Create subcommand" },
@@ -5369,4 +5397,122 @@ void AdminMark(int session_id,admin_parm_type parms[],
 	lprintf("-------------------------------------------------------------------------------------\n");
 	dprintf("-------------------------------------------------------------------------------------\n");
 	eprintf("-------------------------------------------------------------------------------------\n");
+}
+
+/* Account recovery commands */
+
+// Reads 32 hex characters into a 16-byte digest, null-terminated. Zero bytes
+// become 1, as MDString does, so the digest stays a C string.
+static Bool AdminParseDigest(char *hex, char *digest)
+{
+   unsigned int ch;
+
+   if (hex == NULL || strlen(hex) != ENCRYPT_LEN * 2)
+      return False;
+   for (int i = 0; i < ENCRYPT_LEN; i++)
+   {
+      if (!isxdigit((unsigned char)hex[i*2]) || !isxdigit((unsigned char)hex[i*2+1]))
+         return False;
+      sscanf(hex + i*2, "%02x", &ch);
+      digest[i] = ch == 0 ? 1 : (char)ch;
+   }
+   digest[ENCRYPT_LEN] = 0;
+   return True;
+}
+
+static void AdminPrintAccountRecord(account_node *a)
+{
+   unsigned char stamp[ENCRYPT_LEN];
+
+   MDStringBytes(a->password, stamp, (unsigned int)strlen(a->password));
+   aprintf("ACCOUNT id=%i stamp=", a->account_id);
+   for (int i = 0; i < ENCRYPT_LEN; i++)
+      aprintf("%02x", stamp[i]);
+   aprintf(" email=%s name=%s\n", a->email[0] ? a->email : "-", a->name);
+}
+
+static void AdminPrintAccountRecordByEmail(account_node *a, char *email)
+{
+   if (a->email[0] && !stricmp(a->email, email))
+      AdminPrintAccountRecord(a);
+}
+
+void AdminAccountByID(int session_id, admin_parm_type parms[],
+                      int num_blak_parm, parm_node blak_parm[])
+{
+   account_node *a = GetAccountByID((int)parms[0]);
+
+   if (a == NULL)
+      aprintf("ACCOUNT NONE\n");
+   else
+      AdminPrintAccountRecord(a);
+}
+
+void AdminAccountByName(int session_id, admin_parm_type parms[],
+                        int num_blak_parm, parm_node blak_parm[])
+{
+   char *name = (char *)parms[0];
+   account_node *a = name ? GetAccountByName(name) : NULL;
+
+   if (a == NULL)
+      aprintf("ACCOUNT NONE\n");
+   else
+      AdminPrintAccountRecord(a);
+}
+
+void AdminAccountByEmail(int session_id, admin_parm_type parms[],
+                         int num_blak_parm, parm_node blak_parm[])
+{
+   char *email = (char *)parms[0];
+
+   if (email && *email)
+      ForEachAccountWithString(AdminPrintAccountRecordByEmail, email);
+   aprintf("ACCOUNT END\n");
+}
+
+void AdminAccountCheck(int session_id, admin_parm_type parms[],
+                       int num_blak_parm, parm_node blak_parm[])
+{
+   char digest[ENCRYPT_LEN + 1];
+   char *name = (char *)parms[1];
+   account_node *a = name ? GetAccountByName(name) : NULL;
+
+   if (a == NULL || !AdminParseDigest((char *)parms[0], digest)
+       || strcmp(a->password, digest) != 0)
+   {
+      aprintf("ACCOUNT FAIL\n");
+      return;
+   }
+   aprintf("ACCOUNT OK id=%i\n", a->account_id);
+}
+
+void AdminAccountDigest(int session_id, admin_parm_type parms[],
+                        int num_blak_parm, parm_node blak_parm[])
+{
+   char digest[ENCRYPT_LEN + 1];
+   account_node *a = GetAccountByID((int)parms[0]);
+
+   if (a == NULL || !AdminParseDigest((char *)parms[1], digest))
+   {
+      aprintf("ACCOUNT FAIL\n");
+      return;
+   }
+   lprintf("AdminAccountDigest setting password for %s\n", a->name);
+   SetAccountPasswordAlreadyEncrypted(a, digest);
+   aprintf("ACCOUNT OK id=%i\n", a->account_id);
+}
+
+void AdminAccountEmail(int session_id, admin_parm_type parms[],
+                       int num_blak_parm, parm_node blak_parm[])
+{
+   char *email = (char *)parms[1];
+   account_node *a = GetAccountByID((int)parms[0]);
+
+   if (a == NULL || email == NULL || (strcmp(email, "-") && !AccountValidateEmail(email)))
+   {
+      aprintf("ACCOUNT FAIL\n");
+      return;
+   }
+   SetAccountEmail(a, strcmp(email, "-") ? email : (char *)"");
+   aprintf("ACCOUNT OK id=%i\n", a->account_id);
 }
