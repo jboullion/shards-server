@@ -346,13 +346,6 @@ resources:
    
    invisible_admin_rsc = res0002o.bgf
 
-   // Spell messages
-   dm_spell_base = "~B[%s cast %s%s%s.]"
-   dm_spell_blank = ""
-   dm_spell_on = " on "
-   dm_spell_a_group = "a group"
-   dm_spell_you = "you"
-
    dm_server = "server"
 
    dm_system_message = "%q"
@@ -2511,46 +2504,6 @@ messages:
       {
          // Don't add exertion if we're immortal.
          return;
-      }
-
-      propagate;
-   }
-
-   SpellCast(who=$,oSpell=$,lItems=$)
-   "Notification sent when a spell is cast in the room."
-   {
-      local rOn, rTarget;
-
-      if who <> self
-      {
-         if lItems = $ OR Length(lItems) = 0
-         {
-            rOn = dm_spell_blank;
-            rTarget = dm_spell_blank;
-         }
-         else
-         {
-            // Spell will be cast "on" something.
-            rOn = dm_spell_on;
-
-            if Length(lItems) > 1
-            {
-               rTarget = dm_spell_a_group;
-            }
-            else if First(lItems) = self
-            {
-               // Length of targets is exactly 1
-               rTarget = dm_spell_you;
-            }
-            else
-            {
-               rTarget = Send(First(lItems),@GetTrueName);
-            }
-         }
-
-         Send(self,@MsgSendUser,#message_rsc=dm_spell_base,
-               #parm1=Send(who,@GetTrueName),#parm2=Send(oSpell,@GetName),
-               #parm3=rOn,#parm4=rTarget);
       }
 
       propagate;
