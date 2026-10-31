@@ -248,6 +248,8 @@ void AdminAccountDigest(int session_id, admin_parm_type parms[],
                         int num_blak_parm, parm_node blak_parm[]);
 void AdminAccountEmail(int session_id, admin_parm_type parms[],
                        int num_blak_parm, parm_node blak_parm[]);
+void AdminAccountCharacters(int session_id, admin_parm_type parms[],
+                            int num_blak_parm, parm_node blak_parm[]);
 
 void AdminCreateAccount(int session_id,admin_parm_type parms[],
                         int num_blak_parm,parm_node blak_parm[]);
@@ -603,6 +605,7 @@ admin_table_type admin_account_table[] =
 	{ AdminAccountByEmail, {S,N},   F, A|M, NULL, 0, "byemail", "Machine-readable: every account with an email" },
 	{ AdminAccountByID,    {I,N},   F, A|M, NULL, 0, "byid",    "Machine-readable: one account by id" },
 	{ AdminAccountByName,  {R,N},   F, A|M, NULL, 0, "byname",  "Machine-readable: one account by name" },
+	{ AdminAccountCharacters, {I,N}, F, A|M, NULL, 0, "characters", "Machine-readable: an account's characters by id" },
 	{ AdminAccountCheck,   {S,R,N}, F, A|M, NULL, 0, "check",   "Check a password digest (hex) against an account name" },
 	{ AdminAccountDigest,  {I,S,N}, F, A|M, NULL, 0, "digest",  "Set an account's password digest (hex) by id" },
 	{ AdminAccountEmail,   {I,S,N}, F, A|M, NULL, 0, "email",   "Set an account's email by id, - clears it" },
@@ -5428,7 +5431,8 @@ static void AdminPrintAccountRecord(account_node *a)
    aprintf("ACCOUNT id=%i stamp=", a->account_id);
    for (int i = 0; i < ENCRYPT_LEN; i++)
       aprintf("%02x", stamp[i]);
-   aprintf(" email=%s name=%s\n", a->email[0] ? a->email : "-", a->name);
+   aprintf(" email=%s login=%i name=%s\n", a->email[0] ? a->email : "-",
+           a->last_login_time, a->name);
 }
 
 static void AdminPrintAccountRecordByEmail(account_node *a, char *email)
@@ -5515,4 +5519,96 @@ void AdminAccountEmail(int session_id, admin_parm_type parms[],
    }
    SetAccountEmail(a, strcmp(email, "-") ? email : (char *)"");
    aprintf("ACCOUNT OK id=%i\n", a->account_id);
+}
+
+// A Kod resource or string as one field of a CHAR line: "-" when it's neither, and no
+// '|' or line break, which separate the fields
+static void AdminPrintCharField(val_type v)
+{
+   const char *text = NULL;
+   int len = 0;
+   resource_node *r;
+   string_node *snod;
+
+   if (v.v.tag == TAG_RESOURCE && (r = GetResourceByID(v.v.data)) != NULL)
+   {
+      text = r->resource_val[0];
+      len = (int)strlen(text);
+   }
+   else if (v.v.tag == TAG_STRING && (snod = GetStringByID(v.v.data)) != NULL)
+   {
+      text = snod->data;
+      len = snod->len_data;
+   }
+
+   if (text == NULL || len == 0)
+   {
+      aprintf(" | -");
+      return;
+   }
+   char buf[128];
+   if (len > (int)sizeof(buf) - 1)
+      len = sizeof(buf) - 1;
+   for (int i = 0; i < len; i++)
+      buf[i] = (text[i] == '|' || text[i] == '\n' || text[i] == '\r') ? '/' : text[i];
+   buf[len] = 0;
+   aprintf(" | %s", buf);
+}
+
+// An int property of a character by name, or -1 when the class has none
+static int AdminCharInt(object_node *o, const char *name)
+{
+   int id = GetPropertyIDByName(GetClassByID(o->class_id), name);
+   val_type v;
+
+   if (id == INVALID_PROPERTY)
+      return -1;
+   v = RetrieveProperty(o->object_id, id);
+   return v.v.tag == TAG_INT ? v.v.data : -1;
+}
+
+// One CHAR line for a character that has been in the game: id, online, max hit points,
+// faction (FACTION_*), renown, then | name | guild | renown rank
+static void AdminPrintCharacterRecord(user_node *u)
+{
+   object_node *o = GetObjectByID(u->object_id);
+   val_type v, guild;
+   int id;
+
+   if (o == NULL || AdminCharInt(o, "piMax_Health") < 0)
+      return;
+   v.int_val = SendTopLevelBlakodMessage(u->object_id, IS_FIRST_TIME_MSG, 0, NULL);
+   if (v.v.data != 0)
+      return;   // IsFirstTime: a slot never played, no character made in it
+
+   aprintf("CHAR id=%i online=%i hp=%i faction=%i renown=%i", u->object_id,
+           AdminCharInt(o, "pbLogged_on") > 0 ? 1 : 0, AdminCharInt(o, "piMax_Health"),
+           AdminCharInt(o, "piFaction"), AdminCharInt(o, "piFactionRenown"));
+
+   v.int_val = SendTopLevelBlakodMessage(u->object_id, USER_NAME_MSG, 0, NULL);
+   AdminPrintCharField(v);
+
+   v.int_val = NIL;
+   id = GetPropertyIDByName(GetClassByID(o->class_id), "poGuild");
+   if (id != INVALID_PROPERTY)
+   {
+      guild = RetrieveProperty(u->object_id, id);
+      if (guild.v.tag == TAG_OBJECT)
+         v.int_val = SendTopLevelBlakodMessage(guild.v.data, GetIDByName("GetName"), 0, NULL);
+   }
+   AdminPrintCharField(v);
+
+   v.int_val = SendTopLevelBlakodMessage(u->object_id, GetIDByName("GetRenownRankName"), 0, NULL);
+   AdminPrintCharField(v);
+   aprintf("\n");
+}
+
+void AdminAccountCharacters(int session_id, admin_parm_type parms[],
+                            int num_blak_parm, parm_node blak_parm[])
+{
+   account_node *a = GetAccountByID((int)parms[0]);
+
+   if (a != NULL)
+      ForEachUserByAccountID(AdminPrintCharacterRecord, a->account_id);
+   aprintf("ACCOUNT END\n");
 }
