@@ -42,7 +42,7 @@ classvars:
 
 properties:
 
-   viNutrition = 30
+   viNutrition = 60
    viFilling = 40
    piNumber = 2
 

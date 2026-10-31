@@ -44,7 +44,7 @@ properties:
 
 
    viFilling = 50   
-   viNutrition = 30
+   viNutrition = 75
    piNumber = 2
 
 messages:

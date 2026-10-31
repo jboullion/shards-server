@@ -9182,10 +9182,19 @@ messages:
             Send(self,@WaveSendUser,#what=self,#wave_rsc=player_tougher_wav_rsc);
 
             // Boost the player to max health. Ours: no longer to 200 vigor too (2026-10-28):
-            //  from 20 to 50 health the gains came so often that nobody had to eat
+            //  from 20 to 50 health the gains came so often that nobody had to eat.
             Send(self,@MsgSendUser,#message_rsc=player_improve_health_invigorate);
             piHealth = piMax_Health * 100;
             Send(self,@DrawHealth);
+
+            // Ours (2026-10-31): vigor comes up to 100 if it is lower, never above,
+            //  so food is still the only way past it
+            if piVigor < 100
+            {
+               piVigor = 100;
+               Send(self,@NewVigor);
+            }
+
             Post(self,@DrawOffense);
             Post(self,@DrawDefense);
 
