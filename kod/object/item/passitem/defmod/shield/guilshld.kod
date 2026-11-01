@@ -29,6 +29,7 @@ resources:
    include guilshld.lkod
 
    guildshield_name_rsc = "herald shield"
+   guildshield_in_battle = "You can't put your shield away in the middle of a fight."
 
    guildshield_base_sash = gshA.bgf
    guildshield_base_halvesv = gshB.bgf
@@ -823,6 +824,21 @@ messages:
    {
       Send(self,@Mended);
       Post(self,@UpdateGuildPowers);
+
+      propagate;
+   }
+
+   ReqUnuse()
+   "Ours: not put away while the PvP lockout runs (Player.IsInPvP), as the soldier's shield."
+   {
+      if IsClass(poOwner,&Player)
+         AND NOT IsClass(poOwner,&DM)
+         AND Send(poOwner,@IsInPvP)
+      {
+         Send(poOwner,@MsgSendUser,#message_rsc=guildshield_in_battle);
+
+         return FALSE;
+      }
 
       propagate;
    }

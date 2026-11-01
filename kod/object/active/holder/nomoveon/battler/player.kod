@@ -15387,18 +15387,6 @@ messages:
          ptPhaseVisualEffectTimer = CreateTimer(self,@PhaseVisualEffectTimer,2000);
       }
 
-      // Add phase time to piTimeAttackedPlayer if it is currently
-      // preventing the player from casting escape spells.
-      if piTimeAttackedPlayer
-            + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec)
-            > GetTime()
-      {
-         piTimeAttackedPlayer = piTimeAttackedPlayer
-                                 + (Send(self,@GetRemainingPhaseTime) / 1000);
-         // Ours: our client's countdown (UC_PVP_UNTIL) takes the longer lockout
-         Send(self,@SendPvPUntil);
-      }
-
       return;
    }
    
@@ -15443,18 +15431,6 @@ messages:
             DeleteTimer(ptPhaseVisualEffectTimer);
             ptPhaseVisualEffectTimer = $;
          }
-      }
-
-      // If we added phase time to piTimeAttackedPlayer before,
-      // remove what is remaining (restore to original time).
-      if piTimeAttackedPlayer
-            + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec)
-            > GetTime()
-      {
-         piTimeAttackedPlayer = piTimeAttackedPlayer
-                                 - (Send(self,@GetRemainingPhaseTime) / 1000);
-         // Ours: and the shorter one when the phase ends early
-         Send(self,@SendPvPUntil);
       }
 
       // Possibly start phase time regen.
@@ -15551,15 +15527,6 @@ messages:
    {
       piRemainingPhaseTime = amount;
 
-      // Logoff ghosts call this when the player returns, so we remove
-      // the phase time remaining from piTimeAttackedPlayer here if we
-      // added it when the user logged off.
-      if piTimeAttackedPlayer + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec)
-            > GetTime()
-      {
-         piTimeAttackedPlayer -= (Send(self,@GetRemainingPhaseTime) / 1000);
-      }
-
       return;
    }
 
@@ -15614,12 +15581,14 @@ messages:
 
    // Ours (Meridian Shards, docs/adr/0011-fast-travel.md 4): fighting another player, either
    // way, locks out fast travel, Elusion and Rescue for TeleportAttackDelaySec after the last
-   // blow. The two times are the state.
+   // blow. The two times are the state. Nothing else moves them: Phase and logging off once
+   // pushed them ahead by the phase time, which stacked into lockouts of most of an hour.
 
    PvPSecondsLeft()
-   "Seconds until this player may travel again; 0 when not in PvP."
+   "Seconds until this player may travel again; 0 when not in PvP. Never more than "
+   "TeleportAttackDelaySec."
    {
-      local iLast;
+      local iLast, iDelay;
 
       iLast = Bound(piTimeAttackedPlayer,piTimeAttackedByPlayer,$);
       if iLast = 0
@@ -15627,7 +15596,9 @@ messages:
          return 0;
       }
 
-      return Bound(iLast + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec) - GetTime(),0,$);
+      iDelay = Send(SETTINGS_OBJECT,@TeleportAttackDelaySec);
+
+      return Bound(iLast + iDelay - GetTime(),0,iDelay);
    }
 
    IsInPvP()

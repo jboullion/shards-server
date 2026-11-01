@@ -1006,7 +1006,10 @@ messages:
       // Ours (ADR 0028): our standing in each school, for our client's Abilities tab
       pbSchoolsQueued = FALSE;
       Send(self,@QueueSchools);
-      // Ours: a PvP lockout still running (logging off in one adds the phase time to it)
+      // Ours: a PvP lockout still running. Times saved before 2026-11-01 can lie ahead of
+      // now (logging off and Phase added to them); they count from now instead.
+      piTimeAttackedPlayer = Bound(piTimeAttackedPlayer,$,GetTime());
+      piTimeAttackedByPlayer = Bound(piTimeAttackedByPlayer,$,GetTime());
       if Send(self,@IsInPvP)
       {
          Send(self,@SendPvPUntil);
@@ -1088,16 +1091,6 @@ messages:
       {
          Create(&LogoffGhost,#GhostedPlayer=self,
                #iPenaltyTime=Send(self,@GetRemainingPhaseTime));
-
-         // Add phase time remaining to piTimeAttackedPlayer if it is currently
-         // preventing the player from casting escape spells.
-         if Send(self,@GetLastPlayerAttackTime)
-               + Send(SETTINGS_OBJECT,@TeleportAttackDelaySec)
-               > GetTime()
-         {
-            piTimeAttackedPlayer = piTimeAttackedPlayer
-                                   + (Send(self,@GetRemainingPhaseTime) / 1000);
-         }
       }
       else
       {
