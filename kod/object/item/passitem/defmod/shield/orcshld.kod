@@ -67,7 +67,9 @@ messages:
    {
       local i, oSpell, oFound;
 
-      if Send(poOwner,@PlayerIsImmortal)
+      // Ours: a monster wearing one (an arena fighter of Qor) has no spells to check
+      if NOT IsClass(poOwner,&Player)
+         OR Send(poOwner,@PlayerIsImmortal)
          OR IsClass(poOwner,&EscapedConvict)
       {
          return TRUE;

@@ -98,7 +98,9 @@ resources:
       "Great choice.  I've been waiting for a good %s.  Now, who'll "
       "say the magic word, \"champion\"?"
 
-   DeathArenaWatcher_welcome = "~kJohlan tells you, \"Welcome to the real death arena.\""
+   DeathArenaWatcher_welcome = \
+      "~kJohlan tells you, \"Welcome to the Arena of Death.  A mock bout "
+      "spares you; a match of players does not.\""
    DeathArenaWatcher_worship_admin = \
       "Oh how exciting . . . it's %s, %s is sooo important."
    DeathArenaWatcher_worship_dm = \
@@ -110,8 +112,20 @@ resources:
       "~kJohlan tells you, \"You cannot offer me commands while "
       "a fight is still going on.\""
    DeathArenaWatcher_wont_fight = \
-      "`kApparently %s%s is too cowardly to fight.  Cowards should "
+      "~kApparently %s%s is too cowardly to fight.  Cowards should "
       "die . . . slowly."
+
+   // Ours: Johlan's own for the parent's lines that name the Arena of Kraanan
+   DeathArenaWatcher_champ_reneges = \
+      "%s%s, our Champion, has crawled away from %s title.  How dull."
+   DeathArenaWatcher_welcome_champion_guild = \
+      "All hail %s%s, of %s%q, the guild that spills the most blood here."
+   DeathArenaWatcher_new_champion_guild = \
+      "%s%s has offered up %s%q as our new Champions.  Such generous blood."
+   DeathArenaWatcher_new_champion_guild_win = \
+      "~B%s%q are our new Champions, ripe for the killing.~B"
+   DeathArenaWatcher_defended_guild_title = \
+      "%s%q remain our Champions.  Won't someone bleed them?"
 
 classvars:
 
@@ -153,6 +167,11 @@ classvars:
    vrRetainTitle = DeathArenaWatcher_retain_title
    vrVictor = DeathArenaWatcher_victor
    vrNoCmdsDuringFight = DeathArenaWatcher_not_during_fight
+   vrChampionSurrenders = DeathArenaWatcher_champ_reneges
+   vrWorshipChampGuild = DeathArenaWatcher_welcome_champion_guild
+   vrNewChampGuild = DeathArenaWatcher_new_champion_guild
+   vrNewGuildWin = DeathArenaWatcher_new_champion_guild_win
+   vrOldGuildWin = DeathArenaWatcher_defended_guild_title
 
    viDefinite = ARTICLE_NONE
    viIndefinite = ARTICLE_NONE

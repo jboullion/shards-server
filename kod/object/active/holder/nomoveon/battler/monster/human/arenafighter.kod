@@ -2,11 +2,18 @@
 // (util/arenabouts.kod) makes one or three for a player who joins a bout, scales them to that
 // player, frees them when the bout begins and deletes them when it ends. It looks like a player
 // (Human, wearing real items), fights only the others in its bout, nearest first, and leaves
-// no treasure: what it wears goes with it (Human.Delete).
+// no treasure or body: what it wears goes with it (Human.Delete), and a beaten one is carried off.
+//
+// Its strength is its player's (ArenaBouts.MakeFighter): their offense, defense, weapon damage,
+// armour, health and mana, with an edge in the Arena of Death. What it wears is only for show.
+// It swings as often as a player, its attack spells hit as hard as its player's would
+// (ScaleSpellDamage, from AttackSpell.CastSpell), and players' damage caps hold for its blows
+// (Player.AssessDamage). It drinks a healing draught or two when hard pressed, and sounds like a
+// player: hits, misses and cries of pain.
 //
 // The Arena of Death's elites are warriors in heavy armour with fine (not magic) weapons or a
 // bow, and battle mages of Qor, Faren and Riija, who hold, web and blind; the Arena of Kraanan's
-// are brawlers and adepts, a tier below.
+// are brawlers and adepts.
 
 ////////////////////////////////////////////////////////////////////////////////
 ArenaFighter is Human
@@ -22,6 +29,18 @@ constants:
    // Seconds between spells, and between spells that hold, web or blind
    ARENA_CAST_SECONDS = 3
    ARENA_CONTROL_SECONDS = 12
+   // A player's swing (ms), as Player's attack timer
+   ARENA_ATTACK_MS = 1000
+
+   // A draught is drunk below this share of its health (percent), heals this share, and can't
+   // be drunk again for this many seconds
+   ARENA_DRAUGHT_BELOW_PCT = 35
+   ARENA_DRAUGHT_HEAL_PCT = 25
+   ARENA_DRAUGHT_SECONDS = 8
+   // Below this share of its health it says so, once
+   ARENA_HURT_PCT = 50
+   // A melee fighter's chance to speak at those moments (percent); an elite always does
+   ARENA_MELEE_TALK_PCT = 35
 
 resources:
 
@@ -35,6 +54,22 @@ resources:
    arenafighter_kind_riija = "a battle mage of Riija"
    arenafighter_kind_brawler = "a brawler"
    arenafighter_kind_adept = "an adept"
+
+   arenafighter_drinks = "%s drinks a healing draught."
+   arenafighter_sound_drink = drkptn.ogg
+
+   arenafighter_begin_1 = "Let's give them a show."
+   arenafighter_begin_2 = "I've buried better than you."
+   arenafighter_begin_3 = "The sand is thirsty today."
+   arenafighter_begin_4 = "Come, then. Show me what you've learned."
+   arenafighter_hurt_1 = "Lucky blow. It won't happen twice."
+   arenafighter_hurt_2 = "Now I'm angry."
+   arenafighter_hurt_3 = "Is that blood? Mine?"
+   arenafighter_hurt_4 = "You fight better than they said."
+   arenafighter_won_1 = "Carry this one out. Gently, they paid to come in."
+   arenafighter_won_2 = "Train harder, then come back."
+   arenafighter_won_3 = "The crowd wanted a fight. I gave them one."
+   arenafighter_won_4 = "Down you go."
 
    arenafighter_m1 = "Brakkus"
    arenafighter_m2 = "Corvane"
@@ -82,6 +117,9 @@ classvars:
 
 properties:
 
+   // Monster plays this on hits as well as misses; ours plays its own (AssessHit, AssessMiss)
+   vrSound_miss = $
+
    piKind = ARENA_FIGHTER_WARRIOR
    prName = $
    // Still until its bout begins (Unfreeze)
@@ -96,6 +134,19 @@ properties:
    piCastSeconds = ARENA_CAST_SECONDS
    piNextCast = 0
    piNextControl = 0
+
+   // The player it was made from, and its edge over them (percent): its attack spells hit as
+   // theirs would, times the edge
+   poMirror = $
+   piEdge = 100
+   // Ms between its swings
+   piAttackTime = ARENA_ATTACK_MS
+   // Healing draughts left, and GetTime before which it can't drink another
+   piDraughts = 0
+   piNextDraught = 0
+   // Whether it has spoken of being hurt, and whether it speaks at all (elites always do)
+   pbSaidHurt = FALSE
+   pbTalker = FALSE
 
 messages:
 
@@ -365,27 +416,79 @@ messages:
       return;
    }
 
-   ApplyFighter(level = 50,health = 50,fight = 200,min_damage = 3,max_damage = 6,
+   ApplyFighter(mirror = $,level = 50,health = 50,min_damage = 3,max_damage = 6,reduce = 0,
                 power = 50,mana = 60,difficulty = 6,cast_chance = 0,
-                cast_seconds = ARENA_CAST_SECONDS)
+                cast_seconds = ARENA_CAST_SECONDS,edge = 100,draughts = 0,talker = FALSE)
    "Its strength, from the player it was made for (ArenaBouts.MakeFighter)."
    {
+      poMirror = mirror;
       viLevel = level;
       viDifficulty = difficulty;
-      piOffense = fight;
-      piDefense = fight;
-      piMinDamage = min_damage;
-      piMaxDamage = max_damage;
+      piMinDamage = Bound(min_damage,1,$);
+      piMaxDamage = Bound(max_damage,piMinDamage,$);
+      piArmor = Bound(reduce,0,$);
       piMax_hit_points = Bound(health,1,$);
       piHit_points = piMax_hit_points * 100;
-      piSpellPower = Bound(power,1,99);
+      piSpellPower = Bound(power,1,SPELLPOWER_MAXIMUM);
       piCastChance = cast_chance;
       piCastSeconds = cast_seconds;
       piMax_Mana = mana;
       piMana = mana;
+      piEdge = edge;
+      piDraughts = draughts;
+      pbTalker = talker;
       Send(self,@NewMana);
 
       return;
+   }
+
+   SetCombat(offense = 200,defense = 200)
+   "Its player's offense and defense against it (ArenaBouts.MirrorCombat)."
+   {
+      piOffense = Bound(offense,1,2000);
+      piDefense = Bound(defense,1,2000);
+
+      return;
+   }
+
+   GetAttackTime()
+   "A player's swing, slowed as Monster's by chills and Jala's songs."
+   {
+      local iTime, i;
+
+      iTime = piAttackTime;
+      foreach i in plEnchantments
+      {
+         iTime = Send(Nth(i,2),@ModifyMonsterAttackTime,#mob=self,#iTime=iTime,
+                      #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
+      foreach i in plRadiusEnchantments
+      {
+         iTime = Send(Nth(i,2),@ModifyMonsterAttackTime,#mob=self,#iTime=iTime,
+                      #state=Send(self,@GetEnchantmentEntryState,#lEntry=i));
+      }
+
+      return iTime;
+   }
+
+   ScaleSpellDamage(oSpell = $,iDamage = 0)
+   "AttackSpell.CastSpell: its attack spell hits as hard as its player's would, at no less than "
+   "full power, times its edge. Monsters' spells otherwise ignore their spellpower."
+   {
+      local iPower;
+
+      // Its player's spellpower depends on where they stand
+      if oSpell = $ OR poMirror = $ OR NOT IsObject(poMirror)
+         OR Send(poMirror,@GetOwner) = $
+      {
+         return iDamage * piEdge / 100;
+      }
+
+      iPower = Bound(Send(oSpell,@GetSpellPower,#who=poMirror),SPELLPOWER_MAXIMUM,$);
+      iDamage = Send(oSpell,@ScaleDamage,#who=poMirror,#iDamage=iDamage,#iSpellPower=iPower);
+
+      return iDamage * piEdge / 100;
    }
 
    ////////////////////////////////////////////////////////////// fighting
@@ -395,8 +498,47 @@ messages:
    {
       pbFrozen = FALSE;
       Send(self,@ResetBehaviorFlags);
+      Send(self,@Taunt,#lines=[ arenafighter_begin_1, arenafighter_begin_2,
+                                arenafighter_begin_3, arenafighter_begin_4 ]);
 
       return;
+   }
+
+   Taunt(lines = $)
+   "One of these lines, aloud: an elite always, a melee fighter now and then."
+   {
+      if lines = $ OR poOwner = $
+         OR (NOT pbTalker AND Random(1,100) > ARENA_MELEE_TALK_PCT)
+      {
+         return;
+      }
+
+      Send(poOwner,@SomeoneSaid,#what=self,#type=SAY_RESOURCE,
+           #string=Nth(lines,Random(1,Length(lines))));
+
+      return;
+   }
+
+   TryDraught()
+   "A healing draught when hard pressed, as a player would drink one. Returns whether it drank."
+   {
+      if piDraughts <= 0 OR GetTime() < piNextDraught OR poOwner = $
+         OR piHit_points >= piMax_hit_points * ARENA_DRAUGHT_BELOW_PCT
+         OR NOT Send(self,@CanBeHealed)
+      {
+         return FALSE;
+      }
+
+      piDraughts = piDraughts - 1;
+      piNextDraught = GetTime() + ARENA_DRAUGHT_SECONDS;
+      // piHit_points is in hundredths: this is ARENA_DRAUGHT_HEAL_PCT percent of its health
+      Send(self,@GainHealthNormal,#amount=piMax_hit_points * ARENA_DRAUGHT_HEAL_PCT,
+           #precision=TRUE);
+      Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=arenafighter_sound_drink);
+      Send(poOwner,@SomeoneSaid,#what=self,#type=SAY_MESSAGE,#string=arenafighter_drinks,
+           #parm1=prName);
+
+      return TRUE;
    }
 
    TweakBehavior()
@@ -561,8 +703,22 @@ messages:
    }
 
    TryAttack(what = $,stroke_obj = $)
-   "A mage tries a spell before its fists."
+   "A draught when hard pressed (its swing for now), else a mage tries a spell before its fists."
    {
+      if NOT pbSaidHurt
+         AND piHit_points < piMax_hit_points * ARENA_HURT_PCT
+      {
+         pbSaidHurt = TRUE;
+         Send(self,@Taunt,#lines=[ arenafighter_hurt_1, arenafighter_hurt_2,
+                                   arenafighter_hurt_3, arenafighter_hurt_4 ]);
+      }
+
+      if NOT (piBehavior & AI_NOFIGHT)
+         AND Send(self,@TryDraught)
+      {
+         return TRUE;
+      }
+
       if plSpellBook <> $
          AND NOT (piBehavior & AI_NOFIGHT)
          AND Send(self,@MonsterCanCastSpell)
@@ -575,9 +731,120 @@ messages:
    }
 
    HealHitPoint()
-   "No healing in a bout."
+   "No healing in a bout, but draughts and drains."
    {
       return;
+   }
+
+   GainHealth(amount = $,precision = FALSE)
+   "Player's name for it, which Vampiric Drain sends its caster (a battle mage of Qor)."
+   {
+      return Send(self,@GainHealthNormal,#amount=amount,#precision=precision);
+   }
+
+   ////////////////////////////////////////////////////////////// sounds, as a player's
+
+   GetOuchSound()
+   "As Player's: worse the more it's hurt. Player.DoHitMessageSound plays it too."
+   {
+      local iPct;
+
+      iPct = 0;
+      if piMax_hit_points > 0
+      {
+         iPct = piHit_points / piMax_hit_points;
+      }
+
+      if viGender = GENDER_FEMALE
+      {
+         if iPct > 75
+         {
+            return human_female_sound_ouch1;
+         }
+
+         if iPct > 50
+         {
+            return human_female_sound_ouch2;
+         }
+
+         if iPct > 25
+         {
+            return human_female_sound_ouch3;
+         }
+
+         return human_female_sound_ouch4;
+      }
+
+      if iPct > 75
+      {
+         return human_male_sound_ouch1;
+      }
+
+      if iPct > 50
+      {
+         return human_male_sound_ouch2;
+      }
+
+      if iPct > 25
+      {
+         return human_male_sound_ouch3;
+      }
+
+      return human_male_sound_ouch4;
+   }
+
+   AssessHit(what = $,stroke_obj = $,damage = $,use_weapon = $)
+   "A hit sounds like one, as Player.DoHitMessageSound: by its weight, and its victim cries out "
+   "(a spell's hit only the cry). Monster's own plays its swing (vrSound_miss), which is $ here."
+   {
+      local rSound, iRoll;
+
+      if poOwner <> $ AND what <> $
+      {
+         if use_weapon = $ OR NOT IsClass(use_weapon,&Spell)
+         {
+            iRoll = Random(1,3);
+            if damage <> $ AND damage <= 300
+            {
+               rSound = Nth([ human_sound_hit_monster_flesh1, human_sound_hit_monster_flesh2,
+                              human_sound_hit_monster_flesh3 ],iRoll);
+            }
+            else if damage <> $ AND damage <= 600
+            {
+               rSound = Nth([ human_sound_hit_monster_leather1,
+                              human_sound_hit_monster_leather2,
+                              human_sound_hit_monster_leather3 ],iRoll);
+            }
+            else
+            {
+               rSound = Nth([ human_sound_hit_monster_metal1, human_sound_hit_monster_metal2,
+                              human_sound_hit_monster_metal3 ],iRoll);
+            }
+
+            Send(poOwner,@SomethingWaveRoom,#what=self,#wave_rsc=rSound);
+         }
+
+         if damage <> $
+            AND (IsClass(what,&Player) OR IsClass(what,&ArenaFighter))
+         {
+            Send(poOwner,@SomethingWaveRoom,#what=what,#wave_rsc=Send(what,@GetOuchSound));
+         }
+      }
+
+      propagate;
+   }
+
+   AssessMiss(what = $,stroke_obj = $)
+   {
+      if poOwner <> $
+      {
+         Send(poOwner,@SomethingWaveRoom,#what=self,
+              #wave_rsc=Nth([ human_sound_swish1, human_sound_swish2, human_sound_swish3 ],
+                            Random(1,3)),
+              #flags=SOUND_RANDOM_PITCH);
+      }
+
+      propagate;
    }
 
    GainMaxHealth(amount = 0)
@@ -651,10 +918,10 @@ messages:
    ////////////////////////////////////////////////////////////// death
 
    Killed(what = $)
-   "A body where it fell and its cry, then its bout hears of it. No treasure, reputation or "
-   "quest credit: arenas give none."
+   "Its cry, then it's carried off (no body: a mock bout kills nobody) and its bout hears of "
+   "it. No treasure, reputation or quest credit: arenas give none."
    {
-      local oBody, oRoom;
+      local oRoom;
 
       oRoom = poOwner;
       if oRoom = $
@@ -668,16 +935,9 @@ messages:
          what = Send(what,@GetMaster);
       }
 
-      oBody = Send(self,@CreateDeadBody,#killer=what);
-      if oBody <> $
-      {
-         Send(oRoom,@NewHold,#what=oBody,#new_row=piRow,#new_col=piCol,
-              #fine_row=piFine_row,#fine_col=piFine_col,#new_angle=Send(self,@GetAngle));
-      }
-
       if vrSound_death <> $
       {
-         Send(oRoom,@SomethingWaveRoom,#what=oBody,#wave_rsc=vrSound_death,
+         Send(oRoom,@SomethingWaveRoom,#what=self,#wave_rsc=vrSound_death,
               #flags=SOUND_RANDOM_PITCH);
       }
 
@@ -687,9 +947,15 @@ messages:
       return;
    }
 
-   EndOfBout()
-   "Its bout deletes it."
+   EndOfBout(won = FALSE)
+   "Its bout deletes it; with won, it beat its player, and may say so first."
    {
+      if won
+      {
+         Send(self,@Taunt,#lines=[ arenafighter_won_1, arenafighter_won_2,
+                                   arenafighter_won_3, arenafighter_won_4 ]);
+      }
+
       pbBoutOver = TRUE;
       Send(self,@Delete);
 

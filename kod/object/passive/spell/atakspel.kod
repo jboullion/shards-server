@@ -209,6 +209,11 @@ messages:
             }
          }
       }
+      else if IsClass(who,&ArenaFighter)
+      {
+         // Ours (ADR 0019): an arena fighter's spell hits as its player's would
+         iDamage = Send(who,@ScaleSpellDamage,#oSpell=self,#iDamage=iDamage);
+      }
 
       // A spell (eg. earthquake) might harm the caster also. If so, use this function.
       if vbSelfHarming

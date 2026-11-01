@@ -5,7 +5,10 @@
 // and given fighters (battler/monster/human/arenafighter.kod) scaled to their health:
 //
 //   ARENA_KRAANAN  a melee: the player and three fighters, everyone against everyone; any level
-//   ARENA_DEATH    a duel: one elite with about the player's health, at least 100
+//   ARENA_DEATH    a duel: one elite, the player's mirror with an edge
+//
+// A fighter is made from its player's own numbers (MakeFighter): offense, defense, weapon damage,
+// armour, health and mana, each times the arena's share (BOUT_ELITE_*, BOUT_MELEE_*).
 //
 // After a countdown the fighters move. The player wins when every fighter is down, and loses when
 // beaten, when time runs out, or by leaving (fleeing the floor, logging off, "arena leave").
@@ -66,8 +69,23 @@ constants:
    // A loser keeps this share of their health (percent)
    BOUT_LOSER_HEALTH_PCT = 10
 
-   // The Arena of Death's elites have at least this much health
-   BOUT_ELITE_MIN_HEALTH = 100
+   // Fighters are their player's mirror (MakeFighter): these are their shares of the player's
+   // health, offense, defense and damage (percent; damage covers blows and attack spells). The
+   // Arena of Death's elite has an edge of about a quarter: 112 health and 112 damage make its
+   // player last 1/1.25 as long. The Arena of Kraanan's three fight each other too.
+   BOUT_ELITE_HEALTH_PCT = 112
+   BOUT_ELITE_OFFENSE_PCT = 100
+   BOUT_ELITE_DEFENSE_PCT = 100
+   BOUT_ELITE_DAMAGE_PCT = 112
+   BOUT_MELEE_HEALTH_PCT = 80
+   BOUT_MELEE_OFFENSE_PCT = 100
+   BOUT_MELEE_DEFENSE_PCT = 100
+   BOUT_MELEE_DAMAGE_PCT = 100
+   // Healing draughts each carries
+   BOUT_ELITE_DRAUGHTS = 2
+   BOUT_MELEE_DRAUGHTS = 1
+   // Swings of the player's weapon sampled for the fighter's damage
+   BOUT_DAMAGE_SAMPLES = 12
    // The Arena of Kraanan's melees have adepts (mages) only for players with this much health
    BOUT_ADEPT_MIN_HEALTH = 60
 
@@ -102,6 +120,7 @@ resources:
    bouts_say_begin = "~BFight!~B"
    bouts_say_won = "~B%s%s wins the bout!~B"
    bouts_say_beaten = "%s%s is beaten, and carried from the floor."
+   bouts_say_fighter_out = "%s is beaten, and carried from the floor."
    bouts_say_fled = "%s%s has fled the bout."
    bouts_say_time = "Time!  %s%s could not finish them."
 
@@ -821,7 +840,7 @@ messages:
             i = ARENA_FIGHTER_RIIJA;
          }
 
-         lFighters = [ Send(self,@MakeFighter,#kind=i,#health=iH,#elite=TRUE) ];
+         lFighters = [ Send(self,@MakeFighter,#who=who,#kind=i,#elite=TRUE) ];
       }
       else
       {
@@ -830,13 +849,13 @@ messages:
          {
             if iH < BOUT_ADEPT_MIN_HEALTH OR Random(1,100) <= 65
             {
-               lFighters = Cons(Send(self,@MakeFighter,#kind=ARENA_FIGHTER_BRAWLER,
-                                     #health=iH,#elite=FALSE),lFighters);
+               lFighters = Cons(Send(self,@MakeFighter,#who=who,#kind=ARENA_FIGHTER_BRAWLER,
+                                     #elite=FALSE),lFighters);
             }
             else
             {
-               lFighters = Cons(Send(self,@MakeFighter,#kind=ARENA_FIGHTER_ADEPT,
-                                     #health=iH,#elite=FALSE),lFighters);
+               lFighters = Cons(Send(self,@MakeFighter,#who=who,#kind=ARENA_FIGHTER_ADEPT,
+                                     #elite=FALSE),lFighters);
             }
          }
       }
@@ -881,6 +900,11 @@ messages:
               #parm3=Send(oFirst,@GetName),#parm4=Send(oFirst,@GetKindName));
       }
 
+      foreach i in lFighters
+      {
+         Send(self,@MirrorCombat,#who=who,#fighter=i,#elite=(arena = ARENA_DEATH));
+      }
+
       Send(self,@BroadcastStatus,#arena=arena);
       Send(self,@KeepTicking);
 
@@ -895,53 +919,132 @@ messages:
       return;
    }
 
-   MakeFighter(kind = ARENA_FIGHTER_WARRIOR,health = 50,elite = FALSE)
-   "A fighter scaled to a player of this much health: an elite has at least 100, a melee "
-   "fighter four fifths of the player's (there are three of them, fighting each other too)."
+   MakeFighter(who = $,kind = ARENA_FIGHTER_WARRIOR,elite = FALSE)
+   "A fighter made from this player: their weapon's damage, armour, health and mana, each times "
+   "the arena's share (BOUT_ELITE_*, BOUT_MELEE_*). A mage's blows are half that, and its spells "
+   "hit as the player's would (ScaleSpellDamage). Its offense and defense come once it's on the "
+   "floor (MirrorCombat)."
    {
-      local oFighter, iH, iFight, iMin, iMax, bMage;
+      local oFighter, iH, iHealthPct, iDmgPct, lDamage, iMin, iMax, iMana, iPower;
 
       oFighter = Create(&ArenaFighter,#kind=kind);
-      bMage = Send(oFighter,@IsMage);
+
+      iHealthPct = BOUT_MELEE_HEALTH_PCT;
+      iDmgPct = BOUT_MELEE_DAMAGE_PCT;
       if elite
       {
-         iH = Bound(health,BOUT_ELITE_MIN_HEALTH,$);
-         // A monster of the player's level fights at 4 x level + 8 x 50 (Monster.GetOffense)
-         iFight = 4 * iH + 400;
-         iMin = iH * 50 / 1000;
-         iMax = iH * 110 / 1000;
-         if bMage
-         {
-            iMin = iH * 25 / 1000;
-            iMax = iH * 55 / 1000;
-         }
+         iHealthPct = BOUT_ELITE_HEALTH_PCT;
+         iDmgPct = BOUT_ELITE_DAMAGE_PCT;
+      }
 
-         Send(oFighter,@ApplyFighter,#level=iH,#health=iH,#fight=iFight,
-              #min_damage=Bound(iMin,1,$),#max_damage=Bound(iMax,2,$),
-              #power=40 + iH / 4,#mana=60 + iH / 2,#difficulty=9,#cast_chance=50,
-              #cast_seconds=4);
+      iH = Bound(Send(who,@GetMaxHealth),1,$);
+      lDamage = Send(self,@MirrorDamage,#who=who,#victim=oFighter);
+      iMin = First(lDamage) * iDmgPct / 100;
+      iMax = Nth(lDamage,2) * iDmgPct / 100;
+      if Send(oFighter,@IsMage)
+      {
+         iMin = iMin / 2;
+         iMax = iMax / 2;
+      }
+
+      // A mage needs mana for its spells, whatever its player has; spellpower here only sets
+      // how long its holds, webs and blinds last
+      iMana = Bound(Send(who,@GetMaxMana),30 + iH / 2,$);
+      iPower = Bound(30 + iH / 2,1,SPELLPOWER_MAXIMUM);
+
+      if elite
+      {
+         Send(oFighter,@ApplyFighter,#mirror=who,#level=iH,#health=iH * iHealthPct / 100,
+              #min_damage=iMin,#max_damage=iMax,#reduce=Send(who,@SumDamageReduction),
+              #power=iPower,#mana=iMana,#difficulty=9,#cast_chance=50,#cast_seconds=3,
+              #edge=iDmgPct,#draughts=BOUT_ELITE_DRAUGHTS,#talker=TRUE);
       }
       else
       {
-         iH = Bound(health * 80 / 100,10,$);
-         iFight = (4 * health + 400) * 75 / 100;
-         iMin = health * 40 / 1000;
-         iMax = health * 90 / 1000;
-         if bMage
-         {
-            iMin = health * 20 / 1000;
-            iMax = health * 45 / 1000;
-         }
-
-         Send(oFighter,@ApplyFighter,#level=health,#health=iH,#fight=iFight,
-              #min_damage=Bound(iMin,1,$),#max_damage=Bound(iMax,2,$),
-              #power=10 + health / 5,#mana=30 + health / 3,#difficulty=6,#cast_chance=25,
-              #cast_seconds=6);
+         Send(oFighter,@ApplyFighter,#mirror=who,#level=iH,
+              #health=Bound(iH * iHealthPct / 100,10,$),
+              #min_damage=iMin,#max_damage=iMax,#reduce=Send(who,@SumDamageReduction),
+              #power=iPower * 3 / 4,#mana=iMana,#difficulty=6,#cast_chance=25,#cast_seconds=5,
+              #edge=iDmgPct,#draughts=BOUT_MELEE_DRAUGHTS,#talker=FALSE);
       }
 
       Send(oFighter,@ResetBehaviorFlags);
 
       return oFighter;
+   }
+
+   MirrorCombat(who = $,fighter = $,elite = FALSE)
+   "The player's offense and defense against this fighter, times the arena's shares. Asked once "
+   "both are on the floor: a ranged weapon's offense halves without a line of sight."
+   {
+      local iOffPct, iDefPct;
+
+      iOffPct = BOUT_MELEE_OFFENSE_PCT;
+      iDefPct = BOUT_MELEE_DEFENSE_PCT;
+      if elite
+      {
+         iOffPct = BOUT_ELITE_OFFENSE_PCT;
+         iDefPct = BOUT_ELITE_DEFENSE_PCT;
+      }
+
+      Send(fighter,@SetCombat,
+           #offense=Send(who,@GetOffense,#what=fighter) * iOffPct / 100,
+           #defense=Send(who,@GetDefense,#what=fighter) * iDefPct / 100);
+
+      return;
+   }
+
+   MirrorDamage(who = $,victim = $)
+   "The player's blow, [ min, max ] in whole points from BOUT_DAMAGE_SAMPLES tries, as "
+   "Stroke.FindDamage reckons it but from the weapon's base damage (and magic tier): a weapon "
+   "attribute's ModifyDamage can blind, hold or drain, so isn't tried. Bare hands are the punch's."
+   {
+      local oWeapon, oStroke, i, iDamage, iMin, iMax;
+
+      oWeapon = Send(who,@GetWeapon);
+      oStroke = $;
+      if oWeapon <> $ AND IsClass(oWeapon,&Weapon)
+      {
+         oStroke = Send(SYS,@FindSkillByNum,#num=Send(oWeapon,@GetDefaultStrokeNumber));
+      }
+
+      if oStroke = $
+      {
+         oWeapon = $;
+         oStroke = Send(SYS,@FindSkillByNum,#num=SKID_PUNCH);
+      }
+
+      iMin = $;
+      iMax = $;
+      i = 0;
+      while i < BOUT_DAMAGE_SAMPLES
+      {
+         if oWeapon = $
+         {
+            iDamage = Send(oStroke,@FindDamage,#who=who,#victim=victim);
+         }
+         else
+         {
+            iDamage = (Send(oWeapon,@GetBaseDamage,#who=who,#target=victim)
+                       + Send(oWeapon,@GetMagicTierDamageBonus)) * 100;
+            iDamage = Send(oStroke,@DamageFactors,#damage=iDamage,#who=who,
+                           #weapon_used=oWeapon);
+         }
+
+         if iMin = $ OR iDamage < iMin
+         {
+            iMin = iDamage;
+         }
+
+         if iMax = $ OR iDamage > iMax
+         {
+            iMax = iDamage;
+         }
+
+         i = i + 1;
+      }
+
+      return [ Bound(iMin / 100,1,$), Bound((iMax + 99) / 100,1,$) ];
    }
 
    Commence(arena = ARENA_KRAANAN)
@@ -1010,7 +1113,7 @@ messages:
    FighterFell(fighter = $,killer = $)
    "ArenaFighter.Killed."
    {
-      local a;
+      local a, oWatcher;
 
       a = Send(self,@SlotOf,#who=fighter);
       if a = 0
@@ -1021,11 +1124,18 @@ messages:
       SetNth(plFighters,a,DelListElem(Nth(plFighters,a),fighter));
       if Nth(plFighters,a) = $
       {
-         // After the kill is done with
+         // After the kill is done with; the win is called, not this one's fall
          Post(self,@CheckWon,#arena=a);
       }
       else
       {
+         oWatcher = Send(self,@WatcherOf,#arena=a);
+         if oWatcher <> $
+         {
+            Send(oWatcher,@Say,#message_rsc=bouts_say_fighter_out,
+                 #parm1=Send(fighter,@GetName));
+         }
+
          Send(self,@BroadcastStatus,#arena=a);
       }
 
@@ -1093,11 +1203,14 @@ messages:
       SetNth(plSaved,arena,$);
       SetNth(plNextStart,arena,GetTime() + BOUT_REST_SECONDS);
 
+      // One still standing over a beaten player may say so
+      j = (result = BOUT_END_BEATEN);
       foreach i in Nth(plFighters,arena)
       {
          if IsObject(i)
          {
-            Send(i,@EndOfBout);
+            Send(i,@EndOfBout,#won=j);
+            j = FALSE;
          }
       }
 

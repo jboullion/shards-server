@@ -592,39 +592,25 @@ resources:
       "  -- Your guardian angel"
 
    player_death_mail = "Subject: Death\n"
-      "It saddens me that you fell in combat and into the underworld.  It is "
-      "a dangerous life as an adventurer, as you have undoubtedly learned."
+      "It saddens me that you fell, and into the underworld.  Most deaths in "
+      "this land cost you nothing but the gear you wore; a death in an arena "
+      "where death is real, such as the Arena of Death in East Ende, costs a "
+      "little more."
       "\n\n"
-      "Since you are so young, I have pleaded to the gods that you should be "
-      "spared some of the penalty for death.  Normally, the shock of leaving "
-      "the underworld would reduce your maximum health and penalize you a "
-      "small part of the spells and skills you have learned so far.  I will "
-      "spare you the cost of your health, and only a few of your spells and "
-      "skill will be reduced after you leave the underworld."
+      "You keep your possessions and your experience.  Nothing was left at "
+      "your corpse.  But the shock of leaving the underworld may cost you a "
+      "point in some of your spells and skills.  The hardier you are, the "
+      "fewer you lose."
       "\n\n"
-      "You will also notice that your possessions are gone.  They were left "
-      "behind at your corpse where you died.  The items will only remain "
-      "there a limited amount of time, so you must act quickly."
-      "\n\n"
-      "If you don't know where you died, then you should broadcast for help.  "
-      "Type \"broadcast Can someone help me find my items?\" right now and "
-      "watch for someone to respond to you.  Tell that person what you can "
-      "remember about where you were fighting.  Often you will find someone "
-      "kind to help you, or they might even help you get better equipment "
-      "than you had before.  There are many kind souls in this land"
-      "\n\n"
-      "If you know where you died, the portal archways in the underworld will "
-      "take you directly to the inns of the cities of the mainland.  The "
-      "large rip in space in the western side of the underworld is often the "
-      "quickest way back.  It randomly switches between the different inns.  "
-      "Look (right-click by default) the portal to see where it leads.  If it "
-      "leads to the place you want to go, enter it quickly!  It will not lead "
-      "there for very long."
+      "The portal archways in the underworld lead to the inns of the cities "
+      "of the mainland.  The large rip in space in the western side of the "
+      "underworld leads back to the blood-stained floor of the arena where "
+      "you fell.  Look (right-click by default) at a portal to see where it "
+      "leads."
       "\n\n"
       "Do not be discouraged!  Many powerful warriors have stumbled into the "
       "fires of the underworld.  What makes them powerful is that they "
-      "decided to fight on, gaining power and ability to vanquish the "
-      "terrible monsters that felled them before!"
+      "decided to fight on."
       "\n\n"
       "  -- Your guardian angel"
 
@@ -5670,9 +5656,10 @@ messages:
          }
       }
 
+      // Ours (ADR 0019): an arena fighter is a player's mirror, and its blows are capped as one's
       if NOT absolute
          AND what <> $
-         AND IsClass(what,&Player)
+         AND (IsClass(what,&Player) OR IsClass(what,&ArenaFighter))
       {
          // If we have more health than twice our max, no percent limit on damage.
          if piHealth < (Send(self,@GetBaseMaxHealth) * 200)
@@ -6151,10 +6138,10 @@ messages:
 
       if (stroke_obj = $)
       {
-         // Play a hurt sound for attack spells.
+         // Play a hurt sound for attack spells. Ours: an arena fighter cries out as a player.
          if (use_weapon <> $
             AND IsClass(use_weapon,&AttackSpell)
-            AND IsClass(what,&User))
+            AND (IsClass(what,&User) OR IsClass(what,&ArenaFighter)))
          {
             Send(poOwner,@SomethingWaveRoom,#what=what,
                   #wave_rsc=Send(what,@GetOuchSound));
@@ -6178,6 +6165,12 @@ messages:
 
       if IsClass(what,&Monster)
       {
+         // Ours (ADR 0019): an arena fighter cries out as a player does
+         if damage <> $ AND IsClass(what,&ArenaFighter)
+         {
+            Send(poOwner,@SomethingWaveRoom,#what=what,#wave_rsc=Send(what,@GetOuchSound));
+         }
+
          if damage <> $
          {
             if damage <= 300
