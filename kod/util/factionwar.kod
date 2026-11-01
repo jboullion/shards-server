@@ -78,7 +78,8 @@ constants:
    //  while their own army forms up round them (NoteParticipants)
    GRACE_SECONDS = 8
    // A soldier who comes once the armies are out brings this many of their liege's soldiers
-   //  (Reinforce): only the first comer has the whole army formed round them
+   //  (Reinforce), but only one on a battle or siege step (QuestBook.OnBattleStep, since
+   //  2026-11-01); the first comer has the whole army formed round them either way
    REINFORCEMENTS = 3
 
    // The attackers form up at the room's spawning place nearest this many squares from the
@@ -1430,8 +1431,8 @@ messages:
    }
 
    Reinforce(who = $,faction = $)
-   "who came to a battle whose armies are already out: REINFORCEMENTS of their liege's soldiers "
-   "come up with them."
+   "who came to a battle whose armies are already out, on a battle or siege step: REINFORCEMENTS "
+   "of their liege's soldiers come up with them."
    {
       local i, oTroop, bHome, lAt;
 
@@ -1468,8 +1469,8 @@ messages:
 
    NoteParticipants(bReinforce = TRUE)
    "Soldiers of either liege in the room, shields worn, fight in it (and stop regrouping). One "
-   "who comes once the armies are out brings reinforcements (unless bReinforce is FALSE: the "
-   "armies are being raised round them)."
+   "who comes once the armies are out on a battle or siege step brings reinforcements (unless "
+   "bReinforce is FALSE: the armies are being raised round them); anyone else comes alone."
    {
       local i, j, oThing, oShield, iFaction, bKnown;
 
@@ -1512,6 +1513,7 @@ messages:
             Send(oThing,@EndRegrouping,#report=FALSE);
             Send(oThing,@MsgSendUser,#message_rsc=fw_rally);
             if bReinforce AND pbSpawned
+               AND Send(Send(SYS,@GetQuestBook),@OnBattleStep,#who=oThing)
             {
                Send(self,@Reinforce,#who=oThing,#faction=iFaction);
             }

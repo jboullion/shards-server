@@ -2242,6 +2242,34 @@ messages:
       return;
    }
 
+   OnBattleStep(who = $)
+   "FactionWar.NoteParticipants (2026-11-01): is who on a battle or siege step not yet done? "
+   "Only then do their liege's soldiers come up with them (FactionWar.Reinforce)."
+   {
+      local i, lQuest, lStep;
+
+      if NOT IsClass(who,&User) OR Send(who,@GetQuestLog) = $
+      {
+         return FALSE;
+      }
+
+      foreach i in Send(who,@GetQuestLog)
+      {
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest <> $
+         {
+            lStep = Send(self,@GetStep,#qrow=lQuest,#num=Nth(i,QBL_STEP));
+            if lStep <> $ AND Nth(i,QBL_COUNT) = 0
+               AND (Nth(lStep,QBS_KIND) = QK_BATTLE OR Nth(lStep,QBS_KIND) = QK_SIEGE)
+            {
+               return TRUE;
+            }
+         }
+      }
+
+      return FALSE;
+   }
+
    FallenHallCleared(who = $,rid = 0)
    "Ours (guild revamp): FallenHall.BossSlain: who was there when the hall's boss fell, having "
    "struck it (QK_FALLEN)."
