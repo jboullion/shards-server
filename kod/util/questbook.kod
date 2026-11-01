@@ -220,7 +220,7 @@ constants:
    // A player must stand this near an NPC (squares)
    QUEST_REACH = 4
    // Quests a player can have going at once
-   QUEST_MAX_ACTIVE = 10
+   QUEST_MAX_ACTIVE = 20
    // A quest shows a grey "!" this much health below its band
    QUEST_SOON_HEALTH = 10
 
