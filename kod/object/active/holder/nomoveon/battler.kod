@@ -1585,6 +1585,9 @@ messages:
 
          // Flag them as "dodging", so they can potentially improve.
          Send(what,@SetPlayerFlag,#flag=PFLAG_DODGED,#value=TRUE);
+
+         // Ours: dodge and parry practise on every blow that misses them (block still on a kill)
+         Send(what,@PracticeDodge,#attacker=self);
       }
 
       return;

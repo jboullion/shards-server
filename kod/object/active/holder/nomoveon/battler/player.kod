@@ -8858,6 +8858,39 @@ messages:
       return;
    }
 
+   PracticeDodge(attacker=$)
+   "Ours (2026-11-01): a blow that missed us (Battler.AssessMiss) practises dodge, and parry "
+   "with a melee weapon in hand, each one roll (Skill.ImproveAbility) against the attacker. "
+   "They practised once per kill in which we dodged; block still does (AdvancementCheck)."
+   {
+      local oWeapon, oSkill;
+
+      oWeapon = Send(self,@LookupPlayerWeapon);
+      if oWeapon <> $
+         AND (NOT IsClass(oWeapon,&RangedWeapon))
+         AND Send(self,@HasSkill,#num=SKID_PARRY)
+         AND Send(self,@GetSkillAbility,#skill_num=SKID_PARRY) < 99
+      {
+         oSkill = Send(SYS,@FindSkillByNum,#num=SKID_PARRY);
+         if Send(oSkill,@CanPayCosts,#who=self)
+         {
+            Send(oSkill,@ImproveAbility,#who=self,#target=attacker);
+         }
+      }
+
+      if Send(self,@HasSkill,#num=SKID_DODGE)
+         AND Send(self,@GetSkillAbility,#skill_num=SKID_DODGE) < 99
+      {
+         oSkill = Send(SYS,@FindSkillByNum,#num=SKID_DODGE);
+         if Send(oSkill,@CanPayCosts,#who=self)
+         {
+            Send(oSkill,@ImproveAbility,#who=self,#target=attacker);
+         }
+      }
+
+      return;
+   }
+
    CanPlayerAdvanceOnMe()
    {
       return (Send(self,@FindUsing,#class=&Token) = $);
@@ -8868,7 +8901,7 @@ messages:
    "their maxhealth to gain a HP.  This number is reduced by the player's"
    "stamina, all the way down to half for those with high staminas."
    {
-      local i, iMaxHealth, dodgeskill, oSkill, monster_level, iXP, oWeapon,
+      local i, iMaxHealth, dodgeskill, oSkill, monster_level, iXP,
             iItemBonus, iBonusXP, iBonusTP, iGuildBonus, iGainTP;
 
       iXP = 0;
@@ -9110,31 +9143,15 @@ messages:
          Post(self,@DrawTraining);
       }
 
+      // Ours: parry and dodge practise on every blow that misses us instead (PracticeDodge)
       if (piFlags & PFLAG_DODGED)
          AND NOT group_member_kill
       {
-         oWeapon = Send(self,@LookupPlayerWeapon);
-         if oWeapon <> $
-            AND (NOT IsClass(oWeapon,&RangedWeapon))
-            AND Send(self,@HasSkill,#num=SKID_PARRY)
-            AND Send(self,@GetSkillAbility,#skill_num=SKID_PARRY) < 99
-         {
-            oSkill = Send(SYS,@FindSkillByNum,#num=SKID_PARRY);
-            Send(oSkill,@ImproveAbility,#who=self,#target=poKill_Target);
-         }
-
          if (Send(self,@LookupPlayerShield) <> $)
             AND Send(self,@HasSkill,#num=SKID_BLOCK)
             AND Send(self,@GetSkillAbility,#skill_num=SKID_BLOCK) < 99
          {
             oSkill = Send(SYS,@FindSkillByNum,#num=SKID_BLOCK);
-            Send(oSkill,@ImproveAbility,#who=self,#target=poKill_Target);
-         }
-
-         if Send(self,@HasSkill,#num=SKID_DODGE)
-            AND Send(self,@GetSkillAbility,#skill_num=SKID_DODGE) < 99
-         {
-            oSkill = Send(SYS,@FindSkillByNum,#num=SKID_DODGE);
             Send(oSkill,@ImproveAbility,#who=self,#target=poKill_Target);
          }
       }
