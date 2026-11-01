@@ -27,8 +27,10 @@ constants:
    PRACTICE_RAMP = 20
    // The most a single use can have
    PRACTICE_MAX_CHANCE = 5000
-   // The foe's level against 10 + half our ability, as thousandths, kept within these
-   PRACTICE_FOE_MIN = 250
+   // The foe's level against 10 + half our ability, as thousandths, kept within these. Below
+   // even it is squared (since 2026-11-01: weaker foes teach much less), so a foe at half the even
+   // level teaches a quarter as much and one at a quarter a sixteenth; the floor was 250
+   PRACTICE_FOE_MIN = 50
    PRACTICE_FOE_MAX = 1500
    // A target that isn't a monster counts as this level
    PRACTICE_FOE_LEVEL = 60
@@ -650,8 +652,9 @@ messages:
    "Ours (practice): the chance of a gain on a use, in hundredths of a percent, before practice: "
    "the pace (GetInitialChance: viChance_to_Increase, Intellect, the faction bonus) times "
    "(1 - ability/110) squared, halved above twice the requisite stat (the soft cap), times the "
-   "foe (its level against 10 + ability/2), times the learn points' penalty, times the "
-   "settings' rate. 0 when the skill can't be learned this way (Second Wind's tokens)."
+   "foe (its level against 10 + ability/2, squared when below), times the learn points' "
+   "penalty, times the settings' rate. 0 when the skill can't be learned this way (Second "
+   "Wind's tokens)."
    {
       local iChance, iInitial, iStat, iFoe, iTarget, iLearn, iLP;
 
@@ -674,15 +677,19 @@ messages:
       }
 
       // The foe: a monster about our level (10 + half our ability) is even, tougher ones teach
-      // more, trivial ones less
+      // more, weaker ones less: below even the ratio is squared (PRACTICE_FOE_MIN)
       iFoe = PRACTICE_FOE_LEVEL;
       if target <> $ AND IsClass(target,&Monster)
       {
          iFoe = Bound(Send(target,@GetLevel),1,150);
       }
       iTarget = 10 + (ability / 2);
-      iChance = (iChance * Bound((iFoe * 1000) / iTarget,PRACTICE_FOE_MIN,PRACTICE_FOE_MAX))
-                / 1000;
+      iFoe = (iFoe * 1000) / iTarget;
+      if iFoe < 1000
+      {
+         iFoe = (iFoe * iFoe) / 1000;
+      }
+      iChance = (iChance * Bound(iFoe,PRACTICE_FOE_MIN,PRACTICE_FOE_MAX)) / 1000;
 
       // The penalty for generalization (System's learn points by the highest level known in
       // weaponcraft and each school of magic)
