@@ -273,6 +273,14 @@ messages:
    {
       local iDamage, iIntellect;
 
+      // Ours: a monster caster (a Riija arena fighter) has no Intellect, and no bonus, as
+      //  AttackSpell gives monsters none (CastSpell's ScaleDamage is for players).
+      if who = $
+         OR NOT IsClass(who,&Player)
+      {
+         return damage;
+      }
+
       // Get int damage bonus.
       iIntellect = Send(who,@GetIntellect);
       iDamage = ((100+Bound(iIntellect-25,0,40))*damage)/100;
