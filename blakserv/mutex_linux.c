@@ -52,6 +52,15 @@ bool MutexRelease(Mutex mutex) {
 }
 
 bool MutexClose(Mutex mutex) {
-   // TODO: delete() &mutex->mutex?
-   return pthread_mutex_destroy(&mutex->mutex) == 0;
+   int error = pthread_mutex_destroy(&mutex->mutex);
+   if (error != 0)
+   {
+      // pthread calls return their error rather than setting errno, which the caller's
+      // GetLastErrorStr reads. A mutex that wouldn't close may still be in use: keep it.
+      errno = error;
+      return false;
+   }
+
+   delete mutex;
+   return true;
 }

@@ -153,7 +153,7 @@ void* NetworkWorker (void* _args)
               (!(events[i].events & EPOLLIN)))
          {
             // error on socket
-            eprintf ("error in network worker thread! (socket error)");
+            eprintf ("error in network worker thread! (socket error)\n");
             close (events[i].data.fd);
 
             continue;

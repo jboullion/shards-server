@@ -449,13 +449,11 @@ void CloseSession(int session_id)
 		{
 			DeleteBufferList(s->send_list);
 			s->send_list = NULL;
-			
-			/* no need to release mutex... we're closing it */
-			/*
-			if (!ReleaseMutex(s->muxSend))
-			eprintf("File %s line %i release of non-owned mutex\n",__FILE__,__LINE__);
-			*/
-			
+
+			/* Released before it's closed: Windows closes a held mutex, but Linux's
+			   pthread_mutex_destroy refuses a locked one (two error.txt lines a session) */
+			if (!MutexRelease(s->muxSend))
+				eprintf("File %s line %i release of non-owned mutex\n",__FILE__,__LINE__);
 		}
 
 		if (!MutexAcquireWithTimeout(s->muxReceive,10000))
@@ -464,13 +462,10 @@ void CloseSession(int session_id)
 		{
 			DeleteBufferList(s->receive_list);
 			s->receive_list = NULL;
-			
-			/* no need to release mutex... we're closing it */
-			/*
+
+			/* Released before it's closed, as muxSend above */
 			if (!MutexRelease(s->muxReceive))
-			eprintf("File %s line %i release of non-owned mutex\n",__FILE__,__LINE__);
-			*/
-			
+				eprintf("File %s line %i release of non-owned mutex\n",__FILE__,__LINE__);
 		}
 		
 		if (!MutexClose(s->muxSend))
