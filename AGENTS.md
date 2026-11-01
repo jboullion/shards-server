@@ -10,7 +10,7 @@ The server half of Meridian Shards: `blakserv` (C), the game code in Blakod (`ko
 **meridian-browser** (`E:\2026_Experiments\meridian-browser`), whose `AGENTS.md` is the main
 developer guide. That repo's `server\src` is a junction to this working tree.
 
-- **ADRs are over there**, in `docs/adr/` (0001 to 0026). Kod comments here cite them
+- **ADRs are over there**, in `docs/adr/` (0001 to 0031). Kod comments here cite them
   (`ADR 0009` quests, `0011` fast travel, `0021` factions, `0022` guilds, `0023` spells,
   `0025` achievements, `0026` the Justicar). Read the ADR before reworking a system.
 - The user makes the commits. Do not commit or push unless asked.

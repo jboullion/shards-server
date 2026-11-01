@@ -15,8 +15,8 @@ Developer and agent notes are in [AGENTS.md](AGENTS.md).
 
 ## What is different from Server 104
 
-Decisions and designs are recorded as ADRs in meridian-browser's `docs/adr/` (0001 to 0026).
-In short, as of release 0.13.0 (2026-10-24) and after:
+Decisions and designs are recorded as ADRs in meridian-browser's `docs/adr/` (0001 to 0031).
+In short, as of release 0.14.1 (2026-10-31) and after:
 
 - **No random PvP.** Players fight each other only in the faction war, guild wars, the arena
   (and its bouts) and Frenzies. Name colours mark enemies per viewer. (ADR 0021)
@@ -33,6 +33,16 @@ In short, as of release 0.13.0 (2026-10-24) and after:
   **cosmetics** (barber, tailor, dyes; ADR 0012), pets, followers and companions, an arena.
 - **The Office of the Justicar:** the Barloque Assizes (an NPC court always in session),
   Caramo's daily bounties, and name changes from Caramo. (ADR 0026)
+- **Offerings and shrines:** an offering dedicates a shrine to its god for one real day,
+  +6 spell power for everyone; the market shrine takes offerings too, temples give a daily,
+  and quests have a `shrine` step. (ADR 0027)
+- **School progress for the Abilities tab:** the server reckons each school's level and how far
+  the next one is, with the trainers' own rule, and sends it as `UC_SCHOOLS`. (ADR 0028)
+- **Pathfinding for NPCs:** blakserv builds a nav grid for each room from its own move rule,
+  and battle troops and companions find their way round walls with the `GetPathStepBSP`
+  builtin. Monsters move as the original's. (ADR 0029)
+- **Account recovery:** `account` maintenance commands for the account service, which links an
+  email on the website and resets a password through it. (ADR 0030)
 - Skills improve at half speed. Shopkeepers have a Sell window.
 - **Removed:** the crafting school (school slot 7 stays reserved so client wire formats do not
   change), curses, and the old random-PvP and karma systems. Parts of `design/` and `doc/`
