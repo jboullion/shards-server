@@ -146,6 +146,11 @@ char* GetNameByID(int id)
 {
    nameid_node *n;
 
+   // INVALID_ID (-1) gave a negative index before the table: "show status" asks for the slow
+   // message's name before any message was slow, and the Linux server crashed
+   if (id < 0)
+      return "Unknown";
+
    n = nameids[id % nameids_size];
    while (n != NULL)
    {

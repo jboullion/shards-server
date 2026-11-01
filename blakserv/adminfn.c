@@ -1427,8 +1427,17 @@ void AdminShowStatus(int session_id,admin_parm_type parms[],
 	
 	aprintf("System Status -----------------------------\n");
 	
-	aprintf("%s on %s\n",BlakServLongVersionString(),LockConfigStr(CONSOLE_LOCAL_MACHINE_NAME));
-	UnlockConfigStr();
+	/* Copied out before printing: aprintf takes the dynamic config lock again (ConfigBool of
+	   CHANNEL_FLUSH), which Windows' critical section allows and Linux's mutex doesn't (the
+	   server hung on "show status") */
+	{
+		char machine[MAX_PATH];
+		char *name = LockConfigStr(CONSOLE_LOCAL_MACHINE_NAME);
+		snprintf(machine,sizeof(machine),"%s",name ? name : "?");
+		if (name)
+			UnlockConfigStr();
+		aprintf("%s on %s\n",BlakServLongVersionString(),machine);
+	}
 	
 	kstat = GetKodStats();
 	
