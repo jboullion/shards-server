@@ -16,12 +16,18 @@
 // Form while worn (Item's poSpell, cast at full power when it's put on and
 // taken away when it comes off), and comes off like any other amulet. Shadow
 // Form breaks as the spell's does; put the amulet on again to call it back.
+// Since 2026-11-01 its power runs out: a charge (piHits) every minute it's
+// worn while its wearer is logged on, and it crumbles at none (as the ring of
+// invisibility and the torch do).
 
 ShadowAmulet is Necklace
 
 constants:
 
    include blakston.khd
+
+   // Use a charge every x milliseconds worn
+   SHADOWAMULET_CHARGE_RATE = 60000
 
 resources:
 
@@ -32,6 +38,10 @@ resources:
    shadowAmulet_desc_rsc = \
       "You cannot get a good look at the amulet.  "
       "Shadows seem to cling to it even in direct sunlight."
+
+   shadowAmulet_power_rsc = "\nIts shadows will hold for about %i more minutes worn."
+   shadowAmulet_dead_rsc = \
+      "The shadows let go of your amulet, and it crumbles to dust, its power spent."
 
 classvars:
 
@@ -46,11 +56,112 @@ classvars:
    viBulk = 25
    viWeight = 25
 
+   // Minutes worn before it's spent
+   viHits_init_min = 60
+   viHits_init_max = 120
+
 properties:
 
    poSpell = SID_SHADOW_FORM
 
+   ptCharge = $
+
 messages:
+
+   NewUsed(what=$)
+   {
+      Send(self,@StartCharge);
+
+      propagate;
+   }
+
+   NewUnused(what=$)
+   {
+      Send(self,@StopCharge);
+
+      propagate;
+   }
+
+   UserLogon()
+   {
+      if pbIn_use
+      {
+         Send(self,@StartCharge);
+      }
+
+      propagate;
+   }
+
+   UserLogoff()
+   {
+      Send(self,@StopCharge);
+
+      propagate;
+   }
+
+   StartCharge()
+   {
+      if ptCharge <> $
+      {
+         DeleteTimer(ptCharge);
+      }
+      ptCharge = CreateTimer(self,@ChargeTimer,SHADOWAMULET_CHARGE_RATE);
+
+      return;
+   }
+
+   StopCharge()
+   {
+      if ptCharge <> $
+      {
+         DeleteTimer(ptCharge);
+         ptCharge = $;
+      }
+
+      return;
+   }
+
+   ChargeTimer()
+   "Called every minute worn to drain a charge; at none it comes off and crumbles."
+   {
+      ptCharge = $;
+
+      // Not while its wearer is away (a timer saved over a restart); UserLogon starts it again
+      if poOwner = $
+         OR NOT IsClass(poOwner,&Player)
+         OR NOT Send(poOwner,@IsLoggedOn)
+      {
+         return;
+      }
+
+      piHits = piHits - 1;
+      if piHits <= 0
+      {
+         Send(poOwner,@TryUnuseItem,#what=self);
+         Send(poOwner,@MsgSendUser,#message_rsc=shadowAmulet_dead_rsc);
+         Post(self,@Delete);
+
+         return;
+      }
+
+      ptCharge = CreateTimer(self,@ChargeTimer,SHADOWAMULET_CHARGE_RATE);
+
+      return;
+   }
+
+   AppendItemCondition()
+   {
+      AddPacket(4,shadowAmulet_power_rsc, 4,piHits);
+
+      return;
+   }
+
+   Delete()
+   {
+      Send(self,@StopCharge);
+
+      propagate;
+   }
 
    SendInventoryAnimation()
    {

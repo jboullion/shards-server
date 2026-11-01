@@ -33,7 +33,7 @@ messages:
                      [ &Scimitar, 18 ],
                      [ &MetalShield, 10 ],
                      [ &LeatherArmor, 5],
-                     [ &ShadowAmulet, 6],
+                     [ &ShadowAmulet, 2],
                      [ &DarknessScroll,1]
                    ];
       propagate;
