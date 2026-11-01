@@ -3605,10 +3605,26 @@ messages:
 
    ToCliSpells()
    {
-      local i, oSpell;
+      local i, oSpell, lGone;
 
       if pbLogged_on
       {
+         // Ours: a spell since removed (Summon Bovine, 2026-10-26) is forgotten first. One left
+         // in plSpells cut this list short, and our client dropped the connection over it.
+         lGone = $;
+         foreach i in plSpells
+         {
+            if Send(SYS,@FindSpellByNum,#num=Send(self,@DecodeSpellNum,#compound=i)) = $
+            {
+               lGone = Cons(i,lGone);
+            }
+         }
+
+         foreach i in lGone
+         {
+            plSpells = DelListElem(plSpells,i);
+         }
+
          AddPacket(1,BP_SPELLS, 2,Length(plSpells));
 
          foreach i in plSpells
