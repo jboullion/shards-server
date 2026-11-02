@@ -800,7 +800,9 @@ def cmd_install(a):
 
 def cmd_turnaround(a):
     """Draw a creature's standing pose from every angle in one request (--variants of them), or --pick one.
-    The picked one goes with every later batch of that creature as the design its sheets follow."""
+    The picked one goes with every later batch of that creature as the design its sheets follow.
+    --revise N redraws from turnaround vN instead of the sprite, keeping what was right about it; --note
+    says what to change. New variants are numbered after the existing ones."""
     inv = inventory()
     names = [normalise(n) for n in a.names]
     if a.pick is not None:
@@ -823,15 +825,28 @@ def cmd_turnaround(a):
             continue
         b = BGF.read(creature_source(n, e, a.from_original))
         frames = turnaround_frames(b)
-        text = " ".join([TURNAROUND % (len(frames), monster_what(ovr.get(n, {}), e["classes"])), monster_style()[0]])
+        parts = [TURNAROUND % (len(frames), monster_what(ovr.get(n, {}), e["classes"]))]
+        if a.note:
+            parts.append("Corrections: %s." % "; ".join(x.rstrip(".") for x in a.note))
+        text = " ".join(parts + [monster_style()[0]])
         original = sheets.compose(b, frames, pal)
-        images = [original] + mrefs
         d = TURNAROUNDS / n.removesuffix(".bgf")
         d.mkdir(parents=True, exist_ok=True)
         original.save(d / "original.png")
+        start, base = 0, []
+        if a.revise is not None:
+            src = d / ("v%d.png" % a.revise)
+            if not src.exists():
+                raise SystemExit("no %s to revise" % src.relative_to(REPO))
+            # its cells are laid out like the sprite's own sheet, so it stands in for it
+            base = [("v%d (revised)" % a.revise, [Image.open(src).convert("RGB")])]
+            images = [base[0][1][0]] + mrefs
+            start = 1 + max(int(q.stem[1:]) for q in d.glob("v*.png") if q.stem[1:].isdigit())
+        else:
+            images = [original] + mrefs
         got = []
         with ThreadPoolExecutor(max_workers=a.workers) as pool:
-            futs = {pool.submit(generate, a.provider, images, text, o, v): v for v in range(a.variants)}
+            futs = {pool.submit(generate, a.provider, images, text, o, v): start + v for v in range(a.variants)}
             for f in as_completed(futs):
                 v = futs[f]
                 try:
@@ -842,7 +857,7 @@ def cmd_turnaround(a):
                 img.save(d / ("v%d.png" % v))
                 got.append((v, img))
         got.sort(key=lambda t: t[0])
-        tiles = [("original", [original])] + [("v%d" % v, [img]) for v, img in got]
+        tiles = [("original", [original])] + base + [("v%d" % v, [img]) for v, img in got]
         contact_sheet(tiles, d / "choices.png", cell=512, cols=len(tiles))
         print("%s: %d turnarounds in %s (choices.png side by side)" % (n, len(got), d.relative_to(REPO)))
         print("   pick one: forge.py turnaround %s --pick N" % n)
@@ -954,6 +969,8 @@ def main():
     p.add_argument("--opt", action="append", default=[])
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--pick", type=int, help="use this variant (vN.png) as the design")
+    p.add_argument("--revise", type=int, help="redraw from turnaround vN instead of the sprite")
+    p.add_argument("--note", action="append", default=[], help="what to change (repeatable)")
     p.add_argument("--from-original", action="store_true", help="draw from the original art, not our installed restyle")
     p = sub.add_parser("ground", help="creatures' feet on the ground: report, ground sheets, --seat to fix")
     p.add_argument("names", nargs="*", help="sprites (default: every installed creature)")

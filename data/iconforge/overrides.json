@@ -68,16 +68,16 @@
   "describe": "a dead huge, hulking ogre sprawled on the ground (keep its colours, gear and proportions)"
  },
  "knight.bgf": {
-  "describe": "an undead knight of a long-forgotten legion in battered plate armour (keep its colours, gear and proportions)"
+  "describe": "an undead knight of a long-forgotten legion in battered plate armour, bareheaded: no helmet, a bare skull (keep its colours, gear and proportions)"
  },
  "knightx.bgf": {
-  "describe": "a fallen undead knight in battered plate armour lying dead on the ground (keep its colours, gear and proportions)"
+  "describe": "a fallen undead knight in battered plate armour lying dead on the ground, bareheaded: no helmet, a bare skull (keep its colours, gear and proportions)"
  },
  "cknight.bgf": {
-  "describe": "an undead captain: a commanding knight in ornate, battered plate armour (keep its colours, gear and proportions)"
+  "describe": "an undead captain: a crowned skeleton knight in ornate, battered plate armour with a gold sword in the right hand and no shield: the left hand is empty, a bare armoured gauntlet at his side or raised in a fist, and nothing is held or strapped on the left arm (keep its colours, gear and proportions)"
  },
  "cknightx.bgf": {
-  "describe": "a fallen undead captain in ornate, battered plate armour lying dead on the ground (keep its colours, gear and proportions)"
+  "describe": "a fallen undead captain, a crowned skeleton knight in ornate, battered plate armour lying dead on the ground, his gold sword beside him and no shield (keep its colours, gear and proportions)"
  },
  "hknight.bgf": {
   "describe": "an undead half knight: a gruesome knight who met a terrible death, in broken plate armour (keep its colours, gear and proportions)"

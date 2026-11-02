@@ -1,5 +1,5 @@
 {
- "next_batch": 38,
+ "next_batch": 41,
  "icons": {
   "apple.bgf": {
    "status": "installed",
@@ -2341,11 +2341,18 @@
   },
   "knight.bgf": {
    "status": "installed",
-   "attempts": 1,
+   "attempts": 2,
    "notes": [],
    "history": [
     {
      "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "038",
      "providers": [
       "openai"
      ],
@@ -2354,19 +2361,26 @@
    ],
    "output": "knight.bgf",
    "chosen": {
-    "batch": "021",
+    "batch": "038",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\021\\knight\\v0.bgf"
+    "bgf": "build\\iconforge\\batches\\038\\knight\\v0.bgf"
    }
   },
   "knightx.bgf": {
    "status": "installed",
-   "attempts": 1,
+   "attempts": 2,
    "notes": [],
    "history": [
     {
      "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "038",
      "providers": [
       "openai"
      ],
@@ -2375,19 +2389,32 @@
    ],
    "output": "knightx.bgf",
    "chosen": {
-    "batch": "021",
+    "batch": "038",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\021\\knightx\\v0.bgf"
+    "bgf": "build\\iconforge\\batches\\038\\knightx\\v0.bgf"
    }
   },
   "cknight.bgf": {
    "status": "installed",
-   "attempts": 1,
+   "attempts": 3,
    "notes": [],
    "history": [
     {
      "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "039",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "040",
      "providers": [
       "openai"
      ],
@@ -2396,19 +2423,32 @@
    ],
    "output": "cknight.bgf",
    "chosen": {
-    "batch": "021",
+    "batch": "040",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\021\\cknight\\v0.bgf"
+    "bgf": "build\\iconforge\\batches\\040\\cknight\\v0.bgf"
    }
   },
   "cknightx.bgf": {
    "status": "installed",
-   "attempts": 1,
+   "attempts": 3,
    "notes": [],
    "history": [
     {
      "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "039",
+     "providers": [
+      "openai"
+     ]
+    },
+    {
+     "batch": "040",
      "providers": [
       "openai"
      ],
@@ -2417,19 +2457,26 @@
    ],
    "output": "cknightx.bgf",
    "chosen": {
-    "batch": "021",
+    "batch": "040",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\021\\cknightx\\v0.bgf"
+    "bgf": "build\\iconforge\\batches\\040\\cknightx\\v0.bgf"
    }
   },
   "hknight.bgf": {
    "status": "installed",
-   "attempts": 1,
+   "attempts": 2,
    "notes": [],
    "history": [
     {
      "batch": "021",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
+    },
+    {
+     "batch": "038",
      "providers": [
       "openai"
      ],
@@ -2438,15 +2485,15 @@
    ],
    "output": "hknight.bgf",
    "chosen": {
-    "batch": "021",
+    "batch": "038",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\021\\hknight\\v0.bgf"
+    "bgf": "build\\iconforge\\batches\\038\\hknight\\v0.bgf"
    }
   },
   "hknightx.bgf": {
    "status": "installed",
-   "attempts": 1,
+   "attempts": 2,
    "notes": [],
    "history": [
     {
@@ -2455,14 +2502,21 @@
       "openai"
      ],
      "decision": "keep"
+    },
+    {
+     "batch": "038",
+     "providers": [
+      "openai"
+     ],
+     "decision": "keep"
     }
    ],
    "output": "hknightx.bgf",
    "chosen": {
-    "batch": "021",
+    "batch": "038",
     "spec": "openai",
     "variant": 0,
-    "bgf": "build\\iconforge\\batches\\021\\hknightx\\v0.bgf"
+    "bgf": "build\\iconforge\\batches\\038\\hknightx\\v0.bgf"
    }
   },
   "gbeetle.bgf": {
