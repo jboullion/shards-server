@@ -33,6 +33,10 @@ resources:
 
    DetectEvil_sound = sdevil.ogg
 
+   DetectEvil_effect_rsc = \
+      "Evil creatures and players who know Qor spells flash in your view, "
+      "even invisible ones, for %r."
+
    DetectEvil_spell_intro = \
       "Shal'ille Lv. 1: Allows you to detect evil people and monsters."
 
@@ -120,6 +124,22 @@ messages:
    GetPotionClass()
    {
       return &DetectEvilPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): whom it shows (user.kod's PFLAG2_DETECT_EVIL: a "
+   "monster under -10 karma, a player who knows Qor), and how long."
+   {
+      AddPacket(4,DetectEvil_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

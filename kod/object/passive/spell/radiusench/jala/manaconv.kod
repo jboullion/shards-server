@@ -39,6 +39,10 @@ resources:
    Mana_Convergence_leave = \
       "The empowered crackling of energy in the air around you fades."
 
+   ManaConvergence_effect_rsc = \
+      "You and your guildmates within %i squares deal %i%% more damage with "
+      "attack spells."
+
 classvars:
 
    vrMusic = ManaConvergence_song
@@ -89,6 +93,21 @@ messages:
       //  barely moved the damage.
 
       return iSpellPower;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how far, and the damage it adds (AttackSpell's "
+   "ScaleDamage)."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,ManaConvergence_effect_rsc,
+                4,Send(self,@GetSummaryReach,#state=lState),
+                4,Bound(Nth(lState,5),0,SPELLPOWER_MAXIMUM) * 20
+                  / SPELLPOWER_MAXIMUM);
+
+      return;
    }
 
 end

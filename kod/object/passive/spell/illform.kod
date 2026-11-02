@@ -38,6 +38,10 @@ resources:
    illusionaryform_off = \
       "Your illusionary form wears off; you appear to be yourself."
 
+   illusionaryform_effect_rsc = \
+      "You take the shape of a random monster, likeliest near level %i, for "
+      "%r to %r, and your Riija spells gain %i spellpower while it lasts."
+
 classvars:
 
    vrSucceed_wav = illusionaryform_cast_sound
@@ -587,6 +591,26 @@ messages:
       return TRUE;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the forms it favours, how long, and the Riija bonus "
+   "(Spell.GetSpellPower)."
+   {
+      local iTime;
+
+      iTime = 1000 * (90 + 2 * iSpellPower);
+      AddPacket(4,illusionaryform_effect_rsc, 4,(iSpellPower * 130) / 100);
+      Send(self,@SendDurationPhrase,#iTime=iTime / 2);
+      Send(self,@SendDurationPhrase,#iTime=iTime);
+      AddPacket(4,Bound((iSpellPower + 9) / 10,0,10));
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

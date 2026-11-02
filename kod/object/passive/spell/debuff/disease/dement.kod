@@ -33,6 +33,9 @@ resources:
    dement_already_enchanted = "That poor soul is already demented."
    dementia_start = "Somehow you feel less sharp than you used to be."
    dementia_stop  = "The fullness of your mental capacities returns to bear."
+   dement_effect_rsc = \
+      "For %r a player loses %i intellect, and a monster casts half as often "
+      "with %i less spellpower.%r"
 
    classvars:
 
@@ -117,6 +120,31 @@ messages:
            #oTarget=oTarget);
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long (GetDuration's range), the intellect a "
+   "player loses and the spellpower a monster loses (GetAmount), and the "
+   "bewilderment after."
+   {
+      local iTime, iAmount;
+
+      iTime = piBaseDuration + (iSpellPower + 1) * piSpellPowerModifier;
+      iAmount = Send(self,@GetAmount,#iSpellPower=iSpellPower);
+
+      AddPacket(4,dement_effect_rsc);
+      Send(self,@SendTimeRange,#iLow=iTime * (100 - piDeviation) / 100,
+           #iHigh=iTime);
+      AddPacket(4,iAmount, 4,iAmount);
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),
+           @SendBewilderSummary);
+
+      return;
    }
 
    ModifyMonsterSpellPower(mob=$,iSpellPower=0,state=$)

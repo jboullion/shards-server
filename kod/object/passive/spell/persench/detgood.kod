@@ -34,6 +34,10 @@ resources:
 
    DetectGood_sound = qdetgood.ogg
 
+   DetectGood_effect_rsc = \
+      "Good creatures and players who know Shal'ille spells flash in your "
+      "view, even invisible ones, for %r."
+
    DetectGood_spell_intro = \
       "Qor Lv. 1: Allows you to detect good people and monsters."
 
@@ -121,6 +125,22 @@ messages:
    GetPotionClass()
    {
       return &DetectGoodPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): whom it shows (user.kod's PFLAG2_DETECT_GOOD: a "
+   "monster over 10 karma, a player who knows Shal'ille), and how long."
+   {
+      AddPacket(4,DetectGood_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

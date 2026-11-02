@@ -88,7 +88,9 @@ messages:
          piHitBonus = iToHitBonus;
       }
 
-      ptLongevity = CreateTimer(self,@WeaponExpires,7200000);
+      // Ours (2026-11-02): the time the spell gives (CreateSpiritualHammer
+      //  GetLongevity); this was always 2 hours.
+      ptLongevity = CreateTimer(self,@WeaponExpires,iLongevity);
 
       Send(self,@SetSpellFlag,#flag=ATCK_SPELL_HOLY,#value=TRUE);
 

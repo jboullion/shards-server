@@ -30,6 +30,9 @@ resources:
    deflect_enchantment_rsc = \
       "\n\nYour current %s enchantment will reflect enemy splash and bolt "
       "spells %i%% of the time."
+   deflect_effect_rsc = \
+      "A single-target attack spell cast at you bounces back on its caster, "
+      "at half its spellpower, about %i%% of the time, for %r."
    Deflect_on_rsc = "A magical barrier surrounds you."
    Deflect_success_rsc = "You sense a magical barrier surround %s%s."
    Deflect_off_rsc = "The magical barrier protecting you seems to be waning."
@@ -176,7 +179,25 @@ messages:
    {
       AddPacket(4,deflect_enchantment_rsc, 4,Send(self,@GetName),
                 4,Send(who,@GetEnchantedState,#what=self));
-      
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the chance TryDeflect turns a spell (Random(0,100) < "
+   "the state, so the state in 101), which spell.kod then casts back at "
+   "half spellpower.  And how long."
+   {
+      AddPacket(4,deflect_effect_rsc,
+                4,Send(self,@GetStateValue,#iSpellPower=iSpellPower));
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
       return;
    }
 

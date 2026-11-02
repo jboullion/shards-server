@@ -39,6 +39,15 @@ resources:
 
    Eavesdrop_sound = riija.ogg
 
+   Eavesdrop_effect_rsc = \
+      "While you hold the trance you hear players talk and come and go in a "
+      "random nearby room, for %i mana every %i.%i seconds; it never names "
+      "them."
+   Eavesdrop_effect_named_rsc = \
+      "While you hold the trance you hear players talk and come and go in a "
+      "random nearby room, for %i mana every %i.%i seconds; it names them "
+      "%i%% of the time."
+
 classvars:
 
    vrName = Eavesdrop_name_rsc
@@ -159,6 +168,35 @@ messages:
       iPower = (iSpellPower / 10) * 100;
 
       return 500 + iPower;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the mana each pulse costs and how often (GetDuration "
+   "is the pulse), and how often the Listener names who it hears: "
+   "Random(1,spellpower) > 70."
+   {
+      local iTime;
+
+      iTime = Send(self,@GetDuration,#iSpellPower=iSpellPower);
+
+      if iSpellPower <= 70
+      {
+         AddPacket(4,Eavesdrop_effect_rsc, 4,viManaDrain,
+                   4,iTime / 1000, 4,(iTime % 1000) / 100);
+
+         return;
+      }
+
+      AddPacket(4,Eavesdrop_effect_named_rsc, 4,viManaDrain,
+                4,iTime / 1000, 4,(iTime % 1000) / 100,
+                4,(iSpellPower - 70) * 100 / iSpellPower);
+
+      return;
    }
 
    // State value is: list containing the drain time as the first element,

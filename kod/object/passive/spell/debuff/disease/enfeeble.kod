@@ -22,6 +22,9 @@ resources:
    enfeeble_already_enchanted = "That poor soul is already enfeebled."
    palsy_start = "Your muscles turn to water."
    palsy_stop  = "You feel your old strength coming back."
+   enfeeble_effect_rsc = \
+      "For %r a player loses %i might, and a monster's offense and damage "
+      "drop by a quarter.  It ends any %s on the target first."
 
    enfeeble_name_rsc = "enfeeble"
    enfeeble_icon_rsc = ienfeebl.bgf
@@ -119,6 +122,29 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long (GetDuration's range), the might a player "
+   "loses (GetAmount), a monster's palsy, and the spell it ends."
+   {
+      local iTime;
+
+      iTime = piBaseDuration + (iSpellPower + 1) * piSpellPowerModifier;
+
+      AddPacket(4,enfeeble_effect_rsc);
+      Send(self,@SendTimeRange,#iLow=iTime * (100 - piDeviation) / 100,
+           #iHigh=iTime);
+      AddPacket(4,Send(self,@GetAmount,#iSpellPower=iSpellPower),
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_SUPER_STRENGTH),
+                       @GetName));
+
+      return;
    }
 
    EndEnchantment(who=$,state=0,report=TRUE)

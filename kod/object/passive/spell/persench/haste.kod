@@ -40,6 +40,8 @@ resources:
 
    Haste_sound = khaste.ogg
 
+   haste_effect_rsc = "Moving costs you %i%% less vigor, for %r."
+
 classvars:
 
    vrName = Haste_name_rsc
@@ -117,6 +119,23 @@ messages:
    {
       AddPacket(4,haste_enchantment_rsc, 4,Send(self,@GetName),
                 4,Send(who,@GetEnchantedState,#what=self));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the share of movement's exertion it takes off "
+   "(user.kod's move code, at GetStateValue's state), and how long."
+   {
+      AddPacket(4,haste_effect_rsc,
+                4,Send(self,@GetStateValue,#iSpellPower=iSpellPower));
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
       
       return;
    }

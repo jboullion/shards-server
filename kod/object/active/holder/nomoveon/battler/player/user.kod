@@ -6410,7 +6410,9 @@ messages:
       return;
    }
 
-   SendLook(what = $, bShow_All = FALSE)
+   SendLook(what = $, bShow_All = FALSE, iShowPower = $)
+   "Ours (2026-11-02): with iShowPower, a spell's or skill's stats are shown at that spellpower "
+   "or ability rather than ours (the website's ability-stats capture, over the maintenance port)."
    {
       local byInscription, oOwner;
 
@@ -6452,7 +6454,8 @@ messages:
 
          AddPacket(1, byInscription);
 
-         Send(what,@ShowDesc,#bShowAll = bShow_All,#who=self);
+         Send(what,@ShowDesc,#bShowAll = bShow_All,#who=self,
+              #iPower=iShowPower);
 
          if (byInscription)
          {

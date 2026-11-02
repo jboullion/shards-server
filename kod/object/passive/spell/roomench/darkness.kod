@@ -37,6 +37,10 @@ resources:
       "the servants of Qor."
    darkness_sound = qinvis.ogg
 
+   darkness_effect_rsc = \
+      "Darkens the room by %i light levels for %r to %r, which strengthens Qor "
+      "spells cast there and weakens Shal'ille's."
+
 classvars:
 
    vrName = darkness_name_rsc
@@ -120,6 +124,26 @@ messages:
       iState = First(Send(Send(who,@GetOwner),@GetEnchantedState,#what=self));
 
       AddPacket(4, darkness_enchantment_rsc, 4, Send(self,@GetName), 4, -iState);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how much darker, and how long."
+   {
+      local iTime;
+
+      // GetDuration rolls Random(iTime / 2, iTime).
+      iTime = (30 + (iSpellPower * 2)) * 1000;
+
+      AddPacket(4,darkness_effect_rsc, 4,iSpellPower + 25);
+      Send(self,@SendDurationPhrase,#iTime=iTime / 2);
+      Send(self,@SendDurationPhrase,#iTime=iTime);
 
       return;
    }

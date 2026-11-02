@@ -26,6 +26,9 @@ resources:
    cloak_enchantment_rsc = \
       "\n\nYour current %s enchantment will keep you hidden from enemy "
       "scrying %i%% of the time."
+   cloak_effect_rsc = \
+      "Hunters and seances seeking you are shown a wrong room %i%% of the "
+      "time, for %r."
    Cloak_on_rsc = \
       "It feels as though your very spirit has become somehow indistinct."
    Cloak_off_rsc = "You feel more conspicuous."
@@ -132,6 +135,24 @@ messages:
    {
       AddPacket(4,cloak_enchantment_rsc, 4,Send(self,@GetName),
                 4,Send(who,@GetEnchantedState,#what=self));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the chance that Hunt (player.kod InformHunters) and "
+   "Seance are misled: both test Random(1,100) < the state, so one less "
+   "than it in a hundred.  And how long."
+   {
+      AddPacket(4,cloak_effect_rsc,
+                4,Send(self,@GetStateValue,#iSpellPower=iSpellPower) - 1);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

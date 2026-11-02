@@ -79,34 +79,43 @@ resources:
    // Ours (spell revamp phase 1): three more %r after the flavour text, for
    //  what the spell does at your spellpower, its costs, and the breakdown.
    // Ours (2026-10-27): marked up for our client's Description and Stats tabs:
-   //  the description, then ï¿½, then the stats one to a line, "Labelï¿½Value" (a
-   //  label starting ï¿½ is a sub-row), and lines without ï¿½ are notes (an
+   //  the description, then §, then the stats one to a line, "Label¦Value" (a
+   //  label starting · is a sub-row), and lines without ¦ are notes (an
    //  enchantment's own lines). LookDialogs.tsx and lookText.ts read it.
-   spell_desc_rsc = "%s%s%sï¿½\nSchoolï¿½%s\nLevelï¿½%i%r%r%r%r%r%r"
+   spell_desc_rsc = "%s%s%s§\nSchool¦%s\nLevel¦%i%r%r%r%r%r%r"
    spell_nl = "\n"
    spell_nl2 = "\n\n"
 
-   spell_effect_rsc = "\nAt your spellpowerï¿½%r"
+   spell_effect_rsc = "\nAt your spellpower¦%r"
+   // Ours (2026-11-02): a length of time for an effect summary
+   //  (SendDurationPhrase).
+   spell_time_seconds = "%i seconds"
+   spell_time_second = "a second"
+   spell_time_minute = "a minute"
+   spell_time_minutes = "%i minutes"
+   spell_time_minutes_seconds = "%i minutes and %i seconds"
+   spell_time_hours = "%i hours"
+   spell_time_hours_minutes = "%i hours and %i minutes"
 
    spell_costs_rsc = "%r%r%r%r%r%r%r%r%r%r%r"
-   spell_costs_mana = "\nManaï¿½%i"
-   spell_costs_mana_upkeep = "\nManaï¿½%i, then %i more every %i.%i seconds while it lasts"
-   spell_costs_no_mana = "\nManaï¿½none"
-   spell_costs_vigor = "\nVigorï¿½%i"
-   spell_costs_reagent_first = "\nReagentsï¿½%i %s"
+   spell_costs_mana = "\nMana¦%i"
+   spell_costs_mana_upkeep = "\nMana¦%i, then %i more every %i.%i seconds while it lasts"
+   spell_costs_no_mana = "\nMana¦none"
+   spell_costs_vigor = "\nVigor¦%i"
+   spell_costs_reagent_first = "\nReagents¦%i %s"
    spell_costs_reagent = ", %i %s"
-   spell_costs_reagent_unknown_first = "\nReagentsï¿½%i other reagents"
+   spell_costs_reagent_unknown_first = "\nReagents¦%i other reagents"
    spell_costs_reagent_unknown = ", %i other reagents"
    spell_costs_more = ", and more"
-   spell_costs_cast_time = "\nCast timeï¿½%i.%i seconds"
-   spell_costs_recovery = "\nRecoveryï¿½%i seconds"
-   spell_costs_recovery_one = "\nRecoveryï¿½a second"
+   spell_costs_cast_time = "\nCast time¦%i.%i seconds"
+   spell_costs_recovery = "\nRecovery¦%i seconds"
+   spell_costs_recovery_one = "\nRecovery¦a second"
 
    spell_power_rsc = \
-      "\nSpellpowerï¿½%i (the most is %i)%r"
+      "\nSpellpower¦%i (the most is %i)%r"
       "%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r%r"
    spell_pp_unknown = "\nYou don't know this spell yet."
-   spell_pp_line = "\nï¿½%rï¿½%s%i"
+   spell_pp_line = "\n·%r¦%s%i"
    spell_pp_plus = "+"
    spell_pp_immortal = "Immortal"
    spell_pp_ability = "Half your %s ability (%i%%)"
@@ -186,7 +195,7 @@ resources:
    no_line_of_sight = \
       "Your hindered line of sight makes casting more difficult."
 
-   spell_meditate_ratio_rsc = "\nTrainingï¿½%i points to improve"
+   spell_meditate_ratio_rsc = "\nTraining¦%i points to improve"
 
    spell_Enchantment_type_default_rsc = "enchanter"
 
@@ -385,7 +394,10 @@ messages:
       return rSchool;
    }
 
-   ShowDesc(who=$)
+   ShowDesc(who=$,iPower=$)
+   "Ours (2026-11-02): with iPower, the stats are at that spellpower, and "
+   "nothing of who's own shows (their spellpower's parts, an enchantment "
+   "they have and its time left)."
    {
       local rSchool, rOutlaw, rExtra;
 
@@ -404,10 +416,19 @@ messages:
          AddPacket(4,spell_desc_rsc, 4,vrDesc, 4,rOutlaw, 4,rExtra,
                    4,rSchool, 4,viSpell_Level);
 
-         Send(self,@SendTrueEffectsDesc,#who=who);
+         Send(self,@SendTrueEffectsDesc,#who=who,#iPower=iPower);
 
-         Send(self,@SendStatsDesc,#who=who);
-         Send(self,@SendTimeDesc,#who=who);
+         if iPower = $
+         {
+            Send(self,@SendStatsDesc,#who=who);
+            Send(self,@SendTimeDesc,#who=who);
+         }
+         else
+         {
+            // As spell.kod's own SendStatsDesc and SendTimeDesc
+            AddPacket(4,spell_blank);
+            Send(self,@SendTimeRemaining,#iTime=0,#parm1=self);
+         }
 
          if piMeditate_ratio = 0
          {
@@ -424,11 +445,12 @@ messages:
       propagate;
    }
 
-   SendTrueEffectsDesc(who=$)
+   SendTrueEffectsDesc(who=$,iPower=$)
    "Ours (spell revamp D1): fills spell_desc_rsc's effect, costs and "
-   "spellpower slots for the player looking at the spell."
+   "spellpower slots for the player looking at the spell. With iPower, at "
+   "that spellpower (ShowDesc)."
    {
-      local lPower, iSpellPower, bEffect;
+      local lPower, iSpellPower, bEffect, bFixed;
 
       if who = $
          OR NOT IsClass(who,&Player)
@@ -438,14 +460,24 @@ messages:
          return;
       }
 
-      lPower = Send(self,@GetSpellPower,#who=who,#bParts=TRUE);
+      bFixed = FALSE;
+      if iPower = $
+      {
+         lPower = Send(self,@GetSpellPower,#who=who,#bParts=TRUE);
+      }
+      else
+      {
+         bFixed = TRUE;
+         lPower = [Bound(iPower,SPELLPOWER_MINIMUM,viMax_spellpower), $];
+      }
       iSpellPower = First(lPower);
 
       bEffect = Send(self,@HasEffectSummary);
       if bEffect
       {
          AddPacket(4,spell_effect_rsc);
-         Send(self,@SendEffectSummary,#who=who,#iSpellPower=iSpellPower);
+         Send(self,@SendEffectSummary,#who=who,#iSpellPower=iSpellPower,
+              #bFixed=bFixed);
       }
       else
       {
@@ -454,7 +486,7 @@ messages:
 
       Send(self,@SendCostsDesc,#who=who,#iSpellPower=iSpellPower,
            #bAfterEffect=bEffect);
-      Send(self,@SendSpellPowerDesc,#who=who,#lPower=lPower);
+      Send(self,@SendSpellPowerDesc,#who=who,#lPower=lPower,#bFixed=bFixed);
 
       return;
    }
@@ -466,11 +498,69 @@ messages:
       return FALSE;
    }
 
-   SendEffectSummary(who=$,iSpellPower=0)
+   SendEffectSummary(who=$,iSpellPower=0,bFixed=FALSE)
    "Ours (spell revamp D3): adds one resource (and its parameters) saying "
-   "what the spell does at iSpellPower, for spell_effect_rsc."
+   "what the spell does at iSpellPower, for spell_effect_rsc. bFixed: a set "
+   "spellpower (ShowDesc's iPower), so nothing of who's own should show."
    {
       AddPacket(4,spell_blank);
+
+      return;
+   }
+
+   SendDurationPhrase(iTime=0)
+   "Ours (2026-11-02): adds one resource (and its parameters) for a length "
+   "of time in milliseconds, such as '5 minutes and 40 seconds', for an "
+   "effect summary's %r."
+   {
+      local iSeconds;
+
+      iSeconds = iTime / 1000;
+      if iSeconds < 120
+      {
+         if iSeconds = 60
+         {
+            AddPacket(4,spell_time_minute);
+
+            return;
+         }
+
+         if iSeconds = 1
+         {
+            AddPacket(4,spell_time_second);
+
+            return;
+         }
+
+         AddPacket(4,spell_time_seconds, 4,iSeconds);
+
+         return;
+      }
+
+      if iSeconds < 7200
+      {
+         if iSeconds % 60 = 0
+         {
+            AddPacket(4,spell_time_minutes, 4,iSeconds / 60);
+
+            return;
+         }
+
+         AddPacket(4,spell_time_minutes_seconds, 4,iSeconds / 60,
+                   4,iSeconds % 60);
+
+         return;
+      }
+
+      if (iSeconds / 60) % 60 = 0
+      {
+         AddPacket(4,spell_time_hours, 4,iSeconds / 3600);
+
+         return;
+      }
+
+      AddPacket(4,spell_time_hours_minutes, 4,iSeconds / 3600,
+                4,(iSeconds / 60) % 60);
 
       return;
    }
@@ -490,8 +580,10 @@ messages:
       if lUpkeep <> $
          AND First(lUpkeep) > 0
       {
+         // To the nearest tenth of a second
          AddPacket(4,spell_costs_mana_upkeep, 4,iNumber, 4,First(lUpkeep),
-                   4,Nth(lUpkeep,2) / 1000, 4,(Nth(lUpkeep,2) % 1000) / 100);
+                   4,(Nth(lUpkeep,2) + 50) / 1000,
+                   4,((Nth(lUpkeep,2) + 50) % 1000) / 100);
       }
       else if iNumber > 0
       {
@@ -596,15 +688,19 @@ messages:
       return;
    }
 
-   SendSpellPowerDesc(who=$,lPower=$)
+   SendSpellPowerDesc(who=$,lPower=$,bFixed=FALSE)
    "Ours (spell revamp D1): the spellpower and every part of it, from "
-   "GetSpellPower's bParts list."
+   "GetSpellPower's bParts list. bFixed: a set spellpower, with no parts."
    {
       local i, j, lShown, iOther, iSlots, lAlways;
 
       AddPacket(4,spell_power_rsc, 4,First(lPower), 4,viMax_spellpower);
 
-      if Send(who,@GetSpellAbility,#spell_num=viSpell_num) = 0
+      if bFixed
+      {
+         AddPacket(4,spell_blank);
+      }
+      else if Send(who,@GetSpellAbility,#spell_num=viSpell_num) = 0
       {
          AddPacket(4,spell_pp_unknown);
       }

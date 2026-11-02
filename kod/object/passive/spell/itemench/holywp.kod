@@ -41,6 +41,11 @@ resources:
 
    holyweapon_label_rsc = "sanctifier"
 
+   holyweapon_effect_rsc = \
+      "For %r the weapon you target adds 1 to 5 holy damage to every hit, "
+      "against a player only one who knows a Qor spell; it takes the place "
+      "of Kraanan's enchantment."
+
 classvars:
 
    vrSucceed_wav = holyweapon_cast_sound
@@ -64,6 +69,21 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the edge lasts (GetDuration) and what it "
+   "adds (WeapAttSpellType's ModifyDamage)."
+   {
+      AddPacket(4,holyweapon_effect_rsc);
+      Send(self,@SendDurationRange,#iSpellPower=iSpellPower);
+
+      return;
+   }
 
    ResetReagents()
    {

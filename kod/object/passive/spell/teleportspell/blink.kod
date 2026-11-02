@@ -29,6 +29,9 @@ resources:
 
    blink_spell_intro = "Riija Level 1: The Trickster's most basic spell teleports you to the local place of power."
 
+   blink_effect_rsc = \
+      "Moves you at once to the spot in this room where teleports arrive."
+
 classvars:
 
    vrSucceed_wav = blink_cast_sound
@@ -52,6 +55,19 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): where it takes you (the room's Teleport)."
+   {
+      AddPacket(4,blink_effect_rsc);
+
+      return;
+   }
 
    ResetReagents()
    {

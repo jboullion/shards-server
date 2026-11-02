@@ -31,6 +31,8 @@ resources:
 
    bless_enchantment_rsc = \
       "\n\nYour current %s enchantment adds %i offense and 0-%i attack damage."
+   bless_effect_rsc = \
+      "Adds %i offense and 0 to %i damage a blow, for %r."
 
    bless_already_enchanted_rsc = "You are already blessed."
    bless_on_rsc = "Kraanan fills you with the spirit of battle."
@@ -137,6 +139,22 @@ messages:
 
       AddPacket(4,bless_enchantment_rsc, 4,Send(self,@GetName),
                 4,iState, 4,iState/33);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the offense and damage it adds (its state is the "
+   "spellpower: ModifyHitRoll, ModifyDamage), and how long."
+   {
+      AddPacket(4,bless_effect_rsc, 4,iSpellPower, 4,iSpellPower / 33);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

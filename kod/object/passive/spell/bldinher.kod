@@ -38,6 +38,14 @@ resources:
       "Qor's blade appears in the air before you, but before you can drop something and "
       "grab it, it vanishes."
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary). 4 to 9 is
+   //  weapon.kod's damage for a high quality thrusting weapon; 15%, 6 to 12
+   //  are qorblade.kod's DRINK_PERCENT, DRINK_MIN and DRINK_MAX.
+   BloodInheritance_effect_rsc = \
+      "Summons Qor's blade, bound to you: 4 to 9 unholy damage a blow and %i more "
+      "offense, and 15%% of blows on the living drink 6 to 12 health and heal you "
+      "by as much."
+
 classvars:
 
    vrName = BloodInheritance_name_rsc
@@ -99,6 +107,19 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the blade's offense bonus, as CastSpell gives it."
+   {
+      AddPacket(4,BloodInheritance_effect_rsc, 4,(iSpellPower * 3) / 2);
+
+      return;
    }
 
 end

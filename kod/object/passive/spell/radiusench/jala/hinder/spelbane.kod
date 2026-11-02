@@ -54,6 +54,10 @@ resources:
    //   "Deines Zauberspruches und lösen diese schneller auf, als Deine Zunge "
    //   "sie weben kann."
 
+   Spellbane_effect_rsc = \
+      "Foes within %i squares cast with %i less spellpower, and foe monsters "
+      "cast half as often."
+
 classvars:
 
    vrMusic = Spellbane_song
@@ -125,6 +129,20 @@ messages:
       }
 
       return Random(1,2) = 1;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how far, the spellpower a foe loses "
+   "(ModifySpellPower) and MonsterCanCast."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,Spellbane_effect_rsc,
+                4,Send(self,@GetSummaryReach,#state=lState),
+                4,Send(self,@GetSongPower,#state=lState) / 3);
+
+      return;
    }
 
 end

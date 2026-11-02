@@ -44,6 +44,11 @@ resources:
 
    sandstorm_sound = fheat.ogg
 
+   sandstorm_effect_rsc = \
+      "Every %r for %r it buffets each foe in the room for %i damage (never "
+      "the last point of health) and a player for %i vigor; a player foe loses "
+      "%i aim and %i%% of their shots, a monster %i%% of its offense."
+
 classvars:
 
    vrName = sandstorm_name_rsc
@@ -333,6 +338,30 @@ messages:
    HasConditionalEffect()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the gust's hurt and vigor, the aim, shots and offense it spoils, and how long."
+   {
+      local iPower;
+
+      // CastSpell bounds it so.
+      iPower = Bound(iSpellPower,0,99);
+
+      AddPacket(4,sandstorm_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=SANDSTORM_PERIOD);
+      Send(self,@SendDurationPhrase,#iTime=(80 + iPower) * 1000);
+      // ComputeDamage, StartEnchantment, TryRuinShot (Random(1,100) under the
+      //  chance), ModifyMonsterOffense.
+      AddPacket(4,1 + iPower / 40, 4,(iPower + 1) / 25, 4,iPower / 3,
+                4,Bound(iPower / 3 + 10,15,40) - 1, 4,iPower / 3);
+
+      return;
    }
 
 end

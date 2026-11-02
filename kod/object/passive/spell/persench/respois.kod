@@ -37,6 +37,9 @@ resources:
 
    resistpoison_sound = kresistp.ogg
 
+   rpoison_effect_rsc = \
+      "Each attempt to poison you fails %i%% of the time, for %r."
+
 classvars:
 
    vrName = ResistPoison_name_rsc
@@ -114,6 +117,24 @@ messages:
    {
       AddPacket(4,rpoison_enchantment_rsc, 4,Send(self,@GetName),
                 4,Send(who,@GetEnchantedState,#what=self));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the chance poison.kod MakePoisoned is turned "
+   "(Random(1,100) < the state, so one less than it in a hundred), and how "
+   "long."
+   {
+      AddPacket(4,rpoison_effect_rsc,
+                4,Send(self,@GetStateValue,#iSpellPower=iSpellPower) - 1);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

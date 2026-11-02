@@ -32,6 +32,8 @@ resources:
 
    swap_sound = qswap.ogg
 
+   swap_effect_rsc = "You and your target trade places, whatever your spellpower."
+
 classvars:
 
    vrName = swap_name_rsc
@@ -207,6 +209,19 @@ messages:
    SpellBannedInArena()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it does (spellpower changes nothing)."
+   {
+      AddPacket(4,swap_effect_rsc);
+
+      return;
    }
 
 end

@@ -38,6 +38,11 @@ resources:
 
    SummonPoisonFog_sound = qor.ogg
 
+   SummonPoisonFog_effect_rsc = \
+      "The fog stands %r.  About every 1.5 seconds each foe in it has a %i%% "
+      "chance to breathe it: a player is poisoned, losing %i health every 10 "
+      "seconds for %r (never below 1), and a monster takes 2 to 4 damage."
+
 classvars:
 
    vrName = SummonPoisonFog_name_rsc
@@ -68,6 +73,31 @@ properties:
 
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the fog stands (PlaceWallElements and "
+   "PoisonFogCloud's GetDuration), the chance a breath does harm, and "
+   "PoisonFogCloud's poison and damage."
+   {
+      AddPacket(4,SummonPoisonFog_effect_rsc);
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 4) / 3 + 20,20,130));
+
+      // PoisonFogCloud: Random(1,100) < the odds.
+      AddPacket(4,Bound(50 + (iSpellPower / 2),50,90) - 1);
+
+      // PoisonFogCloud's POISON_LOSSRATE (5000) and POISON_DURATION; the
+      //  player loses a tenth of the strength (hundredths) every 10 seconds.
+      AddPacket(4,5000 / 1000);
+      Send(self,@SendDurationPhrase,#iTime=180000);
+
+      return;
+   }
 
    ResetReagents()
    {

@@ -8,6 +8,10 @@ constants:
 
    include blakston.khd
 
+   // Ours (2026-11-02): how long a companion's body lasts, for the effect
+   //  summary (CompanionCorpse's CORPSE_MS, body/compcorp.kod).
+   RESTORECOMPANION_BODY_TIME = 600000
+
 resources:
 
    // Ours (spell revamp phase 9, V7): its own cast sound, from the game's
@@ -21,6 +25,10 @@ resources:
       "Calls a fallen companion back from the edge of death, to stand where its body lies "
       "with half its strength.  Requires two emeralds and two elderberries to cast."
    restorecompanion_not_corpse = "Only a fallen companion's body answers %s."
+
+   restorecompanion_effect_rsc = \
+      "Brings a fallen companion back where its body lies, with half its "
+      "health, at any spellpower; a body waits %r."
 
 classvars:
 
@@ -84,6 +92,21 @@ messages:
       Send(First(lTargets),@ReviveCompanion,#caster=who);
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it restores, and how long a companion's body "
+   "lasts."
+   {
+      AddPacket(4,restorecompanion_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=RESTORECOMPANION_BODY_TIME);
+
+      return;
    }
 
 end

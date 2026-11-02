@@ -31,13 +31,16 @@ resources:
       "Please report it.  Have a nice day."
 
    touchattack_effect_rsc = \
-      "Your bare-handed blows deal %i to %i %s damage, %i mana a blow, for "
-      "%i minutes (a wielded weapon ignores it).  A new touch spell "
+      "Your bare-handed blows deal %i to %i %s damage%r, %i mana a blow, for "
+      "%i minutes (a wielded weapon ignores it).%r  A new touch spell "
       "replaces it."
    touchattack_effect_day_rsc = \
-      "Your bare-handed blows deal %i to %i %s damage, %i mana a blow, "
-      "until the day turns (a wielded weapon ignores it).  A new touch "
+      "Your bare-handed blows deal %i to %i %s damage%r, %i mana a blow, "
+      "until the day turns (a wielded weapon ignores it).%r  A new touch "
       "spell replaces it."
+   // Ours (2026-11-02): the damage grows with the ability in the spell, not
+   //  spellpower: one who doesn't know it, or a set spellpower, sees it at 99.
+   touchattack_effect_full_rsc = " at 99%% ability in the spell"
    touchattack_no_mana_rsc = \
       "Your hands tingle, but you lack the mana to strike with your %s."
 
@@ -316,12 +319,17 @@ messages:
       return;
    }
 
-   FindMinDamage(who=$)
+   FindMinDamage(who=$,iAbility=$)
+   "Ours (2026-11-02): iAbility, the ability in the spell to work it out at "
+   "(by default who's own)."
    {
-      local damage, iAbility;
+      local damage;
 
       damage = viMin_Damage;
-      iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
+      if iAbility = $
+      {
+         iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
+      }
       damage = (damage * (iAbility+1));
       damage = Send(self,@DamageFactors,#damage=damage,#who=who);
       damage = Send(self,@ApplyAttunementDamage,#who=who,#iDamage=damage)/100;
@@ -329,12 +337,16 @@ messages:
       return bound(damage,0,$);
    }
    
-   FindMaxDamage(who=$)
+   FindMaxDamage(who=$,iAbility=$)
+   "Ours (2026-11-02): iAbility as FindMinDamage."
    {
-      local damage, iAbility;
+      local damage;
 
       damage = viMax_Damage;
-      iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
+      if iAbility = $
+      {
+         iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
+      }
       damage = (damage * (iAbility+1));
       damage = Send(self,@DamageFactors,#damage=damage,#who=who);
       damage = Send(self,@ApplyAttunementDamage,#who=who,#iDamage=damage)/100;
@@ -526,10 +538,12 @@ messages:
       return TRUE;
    }
 
-   SendEffectSummary(who=$,iSpellPower=0)
-   "Ours (spell revamp playtest): the touch's damage and how long it lasts."
+   SendEffectSummary(who=$,iSpellPower=0,bFixed=FALSE)
+   "Ours (spell revamp playtest): the touch's damage and how long it lasts. "
+   "The damage is at who's ability in the spell (FindDamage), or at 99 when "
+   "they don't know it or the spellpower is set (bFixed)."
    {
-      local iTime, rEffect;
+      local iTime, rEffect, iAbility, rAbility;
 
       iTime = Send(self,@GetDuration,#iSpellPower=iSpellPower);
       rEffect = touchattack_effect_rsc;
@@ -538,16 +552,40 @@ messages:
          rEffect = touchattack_effect_day_rsc;
       }
 
+      iAbility = 0;
+      if NOT bFixed
+      {
+         iAbility = Send(who,@GetSpellAbility,#spell_num=viSpell_num);
+      }
+
+      rAbility = spell_blank;
+      if iAbility = 0
+      {
+         iAbility = 99;
+         rAbility = touchattack_effect_full_rsc;
+      }
+
       AddPacket(4,rEffect,
-                4,Send(self,@FindMinDamage,#who=who),
-                4,Send(self,@FindMaxDamage,#who=who),
+                4,Send(self,@FindMinDamage,#who=who,#iAbility=iAbility),
+                4,Send(self,@FindMaxDamage,#who=who,#iAbility=iAbility),
                 4,Send(SYS,@GetSpellDamageTypeName,
                        #type=(viSpellType & ~ATCK_SPELL_ALL)),
+                4,rAbility,
                 4,Send(self,@GetManaPerBlow));
       if rEffect = touchattack_effect_rsc
       {
          AddPacket(4,iTime / 60000);
       }
+      Send(self,@SendTouchExtraSummary);
+
+      return;
+   }
+
+   SendTouchExtraSummary()
+   "Ours (2026-11-02): one resource after the touch's summary, for what a "
+   "touch does beyond its damage range (Holy Touch)."
+   {
+      AddPacket(4,spell_blank);
 
       return;
    }

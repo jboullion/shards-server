@@ -43,6 +43,10 @@ resources:
 
    FreeAction_sound = kfreeact.ogg
 
+   freeaction_effect_rsc = \
+      "Attempts to paralyze you fail outright about %i%% of the time and "
+      "otherwise last %i%% less, for %r."
+
 classvars:
 
    vrName = FreeAction_name_rsc
@@ -174,6 +178,29 @@ messages:
       AddPacket(4,freeaction_enchantment_rsc, 4,Send(self,@GetName),
                 4,iState * piResistPercent / 100,
                 4,100 * iState / piReductionFactor);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): DoFreeAction's chance to turn Hold (Random(0,100) <= "
+   "state * piResistPercent / 100, so one more than it in 101) and its cut "
+   "in the hold's length, at GetStateValue's state.  And how long."
+   {
+      local iState;
+
+      iState = Send(self,@GetStateValue,#iSpellPower=iSpellPower);
+
+      AddPacket(4,freeaction_effect_rsc,
+                4,(iState * piResistPercent) / 100 + 1,
+                4,100 * iState / piReductionFactor);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

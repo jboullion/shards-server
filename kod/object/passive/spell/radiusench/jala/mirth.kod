@@ -38,6 +38,11 @@ resources:
    Mirth_enter = "%s%s's mirthful song lifts your spirits a bit."
    Mirth_leave = "You can no longer hear the mirthful notes of %s%s's song."
 
+   Mirth_effect_rsc = \
+      "Each player within %i squares strikes evil creatures, and players "
+      "who know a Qor spell, with %i more offense and 2 to %i more damage "
+      "a blow."
+
 classvars:
 
    vrMusic = Mirth_song
@@ -182,6 +187,20 @@ messages:
       }
 
       return damage;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how far, and what ModifyHitRoll and ModifyDamage add."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,Mirth_effect_rsc,
+                4,Send(self,@GetSummaryReach,#state=lState),
+                4,2 * Nth(lState,5),
+                4,2 * Bound(Nth(lState,5) / 24,1,4));
+
+      return;
    }
 
 end

@@ -41,6 +41,10 @@ resources:
 
    manabomb_sound = kmbomb.ogg
 
+   manabomb_effect_rsc = \
+      "Burns all your mana; everyone else closer than %i squares, friend or "
+      "foe, monsters included, loses half as much and %i%% of that again."
+
 classvars:
 
    vrName = manabomb_name_rsc
@@ -178,6 +182,21 @@ messages:
    StartEnchantment(who = $)
    "Starts enchantment effect on one player"
    {
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): its reach and how much mana the others lose."
+   {
+      AddPacket(4,manabomb_effect_rsc,
+                4,Send(self,@GetBombRange,#iSpellPower=iSpellPower),
+                4,iSpellPower);
+
       return;
    }
 

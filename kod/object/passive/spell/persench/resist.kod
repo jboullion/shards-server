@@ -21,6 +21,8 @@ resources:
    resist_enchantment_rsc = \
       "\n\nYour current %s enchantment adds %i%% %s."
 
+   resist_effect_rsc = "Gives you %i%% %s for %r."
+
 classvars:
 
    viPersonal_ench = True
@@ -110,6 +112,24 @@ messages:
    GetNumSpellTargets()
    {
       return 0;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the resistance it gives, and how long."
+   {
+      AddPacket(4,resist_effect_rsc,
+                4,Send(self,@GetStateValue,#who=who,#iSpellPower=iSpellPower,
+                       #target=who),
+                4,Send(SYS,@GetResistanceName,#type=viResistanceType));
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
    EffectDesc(who=$)

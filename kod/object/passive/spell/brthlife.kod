@@ -38,6 +38,11 @@ resources:
 
    breathoflife_sound = sbrthlf.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   breathoflife_effect_rsc = \
+      "Gives 10 to 80%% of your health (never leaving you under 10) to the "
+      "target, who gains %i%% of it, up to one and a half times its maximum or %i."
+
 classvars:
 
    vrName = breathoflife_name_rsc
@@ -159,6 +164,21 @@ messages:
       propagate;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the share of the sacrifice the target gains, and its "
+   "caps, as CastSpell works them out."
+   {
+      AddPacket(4,breathoflife_effect_rsc, 4,75 + iSpellPower / 2,
+                4,MAX_TOTAL_AMOUNT);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

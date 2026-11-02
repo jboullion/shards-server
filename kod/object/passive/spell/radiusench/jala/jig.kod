@@ -38,6 +38,11 @@ resources:
 
    Jig_cannot_do_that = "You can't do that while you're dancing to %s%s's song!"
 
+   Jig_effect_rsc = \
+      "You and the players within %i squares (your guild and its allies, "
+      "newbies, and any you may attack) dance while they hear it: they "
+      "can't attack, and monsters can't attack them."
+
 classvars:
 
    vrMusic = jig_song
@@ -107,6 +112,17 @@ messages:
    SpellBannedInArena()
    {
       return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): who dances, and how far."
+   {
+      AddPacket(4,Jig_effect_rsc,
+                4,Send(self,@GetSummaryReach,
+                       #state=Send(self,@GetSummaryState,#who=who,
+                                   #iSpellPower=iSpellPower)));
+
+      return;
    }
 
 end

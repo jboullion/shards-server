@@ -18,6 +18,10 @@ resources:
 
    Jala_sound = lute_equip.ogg
 
+   // Ours (2026-11-02): a song's quick pulse, for an effect summary
+   //  (SendTenthsPhrase).
+   jala_tenths_seconds = "%i.%i seconds"
+
 classvars:
 
    viSchool = SS_JALA
@@ -152,6 +156,43 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   "Ours (2026-11-02): every song says what it does (SendEffectSummary)."
+   {
+      return TRUE;
+   }
+
+   GetSummaryState(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the state a cast at iSpellPower would make, as "
+   "RadiusEnchantment's CastSpell makes it (caster, centre, range, pulse, "
+   "power), with who at its centre, for an effect summary."
+   {
+      return [ who, who,
+               Send(self,@CalculateRange,#who=who,#iSpellPower=iSpellPower),
+               Send(self,@GetDuration,#iSpellPower=iSpellPower),
+               Send(self,@GetStateValue,#iSpellpower=iSpellPower,#who=who,
+                    #target=who) ];
+   }
+
+   GetSummaryReach(state=$)
+   "Ours (2026-11-02): how far the song reaches, in squares."
+   {
+      return Send(self,@GetRange,#state=state) / FINENESS;
+   }
+
+   SendTenthsPhrase(iTime=0)
+   "Ours (2026-11-02): adds one resource for a time in milliseconds, to the "
+   "nearest tenth of a second ('2.0 seconds'), for a pulse too quick for "
+   "SendDurationPhrase."
+   {
+      local iTenths;
+
+      iTenths = (iTime + 50) / 100;
+      AddPacket(4,jala_tenths_seconds, 4,iTenths / 10, 4,iTenths % 10);
+
+      return;
    }
 
 end

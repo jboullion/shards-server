@@ -38,6 +38,11 @@ resources:
    feigndeath_giantrat = "a giant rat"
    feigndeath_nuthin = ""
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   feigndeath_effect_rsc = \
+      "You lie as a corpse while you hold the trance: monsters lose sight of you, "
+      "your defense rises by %i, and players nearby are told you were killed."
+
 classvars:
 
    vrSucceed_wav = feigndeath_cast_sound
@@ -483,6 +488,19 @@ messages:
    GetPotionClass()
    {
       return &FeignDeathPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the defense it adds (ModifyDefensePower)."
+   {
+      AddPacket(4,feigndeath_effect_rsc, 4,3 * iSpellPower);
+
+      return;
    }
 
 end

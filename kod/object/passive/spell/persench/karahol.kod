@@ -42,6 +42,10 @@ resources:
 
    KaraholsCurse_sound = qkcurse.ogg
 
+   karahol_effect_rsc = \
+      "Adds %i offense and 1 to %i damage a blow for %r, but when it ends you "
+      "are held for %i.%i seconds, which Free Action can't stop."
+
 classvars:
 
    viPersonal_ench = TRUE
@@ -161,6 +165,29 @@ messages:
       AddPacket(4,karahol_enchantment_rsc, 4,Send(self,@GetName),
                 4,100 + iState * 2, 4,1 + iState / 20,
                 4,Bound((120 - iState) / 10,2,8));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): ModifyHitRoll's offense and ModifyDamage's damage (the "
+   "state is the spellpower), how long, and EndEnchantment's Hold, "
+   "Bound((100 - state) * 100 + 2000,2000,8000) milliseconds."
+   {
+      local iHold;
+
+      iHold = Bound((100 - iSpellPower) * 100 + 2000,2000,8000);
+
+      AddPacket(4,karahol_effect_rsc, 4,100 + iSpellPower * 2,
+                4,1 + iSpellPower / 20);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+      AddPacket(4,iHold / 1000, 4,(iHold % 1000) / 100);
 
       return;
    }

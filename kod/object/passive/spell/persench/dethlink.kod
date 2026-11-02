@@ -40,6 +40,10 @@ resources:
 
    deathlink_sound = qdeathlk.ogg
 
+   deathlink_effect_rsc = \
+      "Each creature that dies in your room restores 1 health and 1 mana to "
+      "you for every full 20 of its level (3 of each for a player), for %r."
+
 classvars:
 
    vrName = deathlink_name_rsc
@@ -161,6 +165,23 @@ messages:
    ModifyDamage(who=$,what=$,damage=$)
    {
       return damage;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what each death in the room gives (GiveKilledBenefits, "
+   "from player.kod SomethingKilled; spellpower doesn't change it), and how "
+   "long."
+   {
+      AddPacket(4,deathlink_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

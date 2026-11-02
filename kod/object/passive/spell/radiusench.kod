@@ -110,8 +110,11 @@ properties:
 messages:
 
    GetManaUpkeep(iSpellPower=0)
+   "Ours (2026-11-02): StartPeriodicEnchantment drains viManaDrain at each "
+   "pulse, and a pulse is GetDuration (Rejuvenate's quickens with spellpower), "
+   "not viDrainTime."
    {
-      return [viManaDrain, viDrainTime];
+      return [viManaDrain, Send(self,@GetDuration,#iSpellPower=iSpellPower)];
    }
 
 #region Casting Infrastructure

@@ -36,6 +36,10 @@ resources:
 
    fade_sound = qfade.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   fade_effect_rsc = \
+      "Makes you invisible for %r; casting, fighting or using anything ends it."
+
 classvars:
 
    viPersonal_ench = True
@@ -157,6 +161,21 @@ messages:
       return TRUE;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long it lasts."
+   {
+      AddPacket(4,fade_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

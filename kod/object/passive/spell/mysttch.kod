@@ -47,6 +47,10 @@ resources:
 
    MysticTouch_sound = fmystic.ogg
 
+   MysticTouch_effect_rsc = \
+      "Gives another player %i%% of your mana, but never past half again "
+      "their max mana or %i mana."
+
 classvars:
 
    vrName = MysticTouch_name_rsc
@@ -168,6 +172,20 @@ messages:
       propagate;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the share of mana it gives."
+   {
+      AddPacket(4,MysticTouch_effect_rsc, 4,Bound(iSpellPower / 2,10,55),
+                4,MAX_TOTAL_AMOUNT);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

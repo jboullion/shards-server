@@ -49,6 +49,11 @@ resources:
    // Plus, Ill. Wounds wasn't using it anymore.
    Elusion_sound = riluswnd.ogg
 
+   Elusion_effect_rsc = \
+      "It shows you %i places, drawn from the six towns, the inn on Ko'catan "
+      "(when you are on the island or it shows 7 or more) and your guild's "
+      "hall; say one's name within %r to go there at once."
+
 classvars:
 
    vrName = Elusion_name_rsc
@@ -73,6 +78,36 @@ properties:
    pbCanCastFromAnywhere = TRUE
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how many places it offers (GetLocations) and how long "
+   "you have to name one (TRANCE_TIME)."
+   {
+      local oGuild, iMost;
+
+      iMost = 7;
+      if who <> $
+      {
+         oGuild = Send(who,@GetGuild);
+         if oGuild <> $
+         {
+            if Send(oGuild,@GetGuildHall) <> $
+            {
+               iMost = 8;
+            }
+         }
+      }
+
+      AddPacket(4,Elusion_effect_rsc, 4,Bound(iSpellPower / 12,1,iMost));
+      Send(self,@SendDurationPhrase,#iTime=TRANCE_TIME);
+
+      return;
+   }
 
    ResetReagents()
    {

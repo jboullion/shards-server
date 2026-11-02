@@ -41,6 +41,11 @@ resources:
 
    paralyze_sound= qparalyz.ogg
 
+   paralyze_effect_rsc = \
+      "Whoever swings or shoots at you is paralyzed for %i.%i to %i.%i "
+      "seconds (a player with a ranged weapon escapes it 49%% of the time), "
+      "for %r."
+
 classvars:
 
    viSpell_num = SID_GAZE_OF_THE_BASILISK
@@ -158,6 +163,31 @@ messages:
 
       AddPacket(4,gaze_enchantment_rsc, 4,Send(self,@GetName),
                 4,Bound(iState * 20,1300,2500), 4,Bound(iState * 25,1300,4500));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the Hold that ModifyDefensePower casts on each "
+   "attacker, Bound(state * Random(20,45),1300,4500) milliseconds, as a "
+   "range (the state is the spellpower); a player with a ranged weapon "
+   "escapes it on Random(1,100) < 50.  And how long."
+   {
+      local iLow, iHigh;
+
+      iLow = Bound(iSpellPower * 20,1300,4500);
+      iHigh = Bound(iSpellPower * 45,1300,4500);
+
+      AddPacket(4,paralyze_effect_rsc,
+                4,iLow / 1000, 4,(iLow % 1000) / 100,
+                4,iHigh / 1000, 4,(iHigh % 1000) / 100);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

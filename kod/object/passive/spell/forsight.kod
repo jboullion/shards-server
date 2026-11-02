@@ -82,6 +82,11 @@ resources:
    Foresight_look_empty = "nothing worth knowing."
 
 
+   Foresight_effect_rsc = \
+      "On a player it reveals up to %i of their spells and skills and how "
+      "well they know each; on a monster, its level, health, resistances and "
+      "the spells it casts.  The reading stays in their description for %r."
+
 classvars:
 
    vrSucceed_wav = foresight_cast_sound
@@ -540,6 +545,21 @@ messages:
    IsIllusion()
    {
       return FALSE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how many abilities it reads, and how long the reading "
+   "shows."
+   {
+      AddPacket(4,Foresight_effect_rsc, 4,Bound(iSpellPower / 4,1,10));
+      Send(self,@SendDurationPhrase,#iTime=FORESIGHT_LOOK_SECONDS * 1000);
+
+      return;
    }
 
 end

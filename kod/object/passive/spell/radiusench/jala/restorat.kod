@@ -34,6 +34,10 @@ resources:
    Restorate_enter = "%s%s's soothing song eases the pain of your wounds."
    Restorate_leave = "You can no longer hear the soothing notes of %s%s's song."
 
+   Restorate_effect_rsc = \
+      "Every %r, everyone within %i squares regains 1 health, up to their "
+      "maximum."
+
 classvars:
 
    vrMusic = Restorate_song
@@ -90,6 +94,20 @@ messages:
       {
          Send(who,@GainHealthNormal,#amount=1);
       }
+
+      return;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how often, how far, and what each pulse gives."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,Restorate_effect_rsc);
+      Send(self,@SendTenthsPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState));
 
       return;
    }

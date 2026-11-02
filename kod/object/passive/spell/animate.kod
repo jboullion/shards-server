@@ -40,6 +40,24 @@ resources:
 
    Animate_sound = qanimate.ogg
 
+   // Ours (2026-11-02): MAX_RISEN_CONTROL_SECS is up (EndEnchantment).
+   Animate_crumbles_rsc = "%s%s crumbles back into dust."
+
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   Animate_effect_rsc = \
+      "Raises the corpse as %r to follow and fight for you for %r, then it "
+      "crumbles to dust."
+   Animate_effect_one_rsc = "a %s (level %i, %i to %i health)"
+   Animate_effect_first_rsc = "a %s (level %i, %i to %i health)%r"
+   Animate_effect_more_rsc = ", a %s (level %i, %i to %i health)%r"
+   Animate_effect_last_rsc = " or a %s (level %i, %i to %i health)"
+   Animate_mummy_rsc = "mummy"
+   Animate_spectral_mummy_rsc = "spectral mummy"
+   Animate_battered_skeleton_rsc = "battered skeleton"
+   Animate_skeleton_rsc = "skeleton"
+   Animate_tusked_skeleton_rsc = "tusked skeleton"
+   Animate_daemon_skeleton_rsc = "daemon skeleton"
+
 classvars:
 
    vrName = Animate_name_rsc
@@ -219,6 +237,12 @@ messages:
       // Set initial minion behavior
       Send(self,@ModifyMonsterBehavior,#mob=oRisen);
 
+      // Ours (2026-11-02): it crumbles when MAX_RISEN_CONTROL_SECS is up
+      //  (EndEnchantment); the constant was never used, so risen minions
+      //  stayed for good.
+      Send(oRisen,@StartEnchantment,#what=self,
+           #time=MAX_RISEN_CONTROL_SECS * 1000,#iSpellPower=iSpellPower);
+
       if Send(oTarget,@WasPlayer)
       {
          Send(who,@MsgSendUser,#message_rsc=Animate_human_cast_rsc,
@@ -236,12 +260,130 @@ messages:
       propagate;
    }
 
+   EndEnchantment(who=$)
+   "Ours (2026-11-02): the risen's time is up (Monster.EnchantmentTimer): it "
+   "crumbles, and its master is told."
+   {
+      local oMaster;
+
+      if who = $
+      {
+         return;
+      }
+
+      oMaster = Send(who,@GetMaster);
+      if oMaster <> $
+         AND IsClass(oMaster,&User)
+      {
+         Send(oMaster,@MsgSendUser,#message_rsc=Animate_crumbles_rsc,
+              #parm1=Send(who,@GetCapDef),#parm2=Send(who,@GetName));
+      }
+
+      // Posted: EnchantmentTimer is still going through the risen's list.
+      Post(who,@Delete);
+
+      return;
+   }
+
+   RemoveEnchantmentEffects()
+   "Ours (2026-11-02): removed, not run out (the risen dying or deleted, "
+   "Monster.RemoveEnchantment): nothing to do, as Spell's would end it."
+   {
+      return;
+   }
+
+   CanBeRemovedByPlayer()
+   "Ours (2026-11-02): it's the risen's time left, not magic to strip."
+   {
+      return FALSE;
+   }
+
    ModifyMonsterBehavior(mob=$)
    {
       Send(mob,@SetBehaviorFlag,#flag=AI_MOVE_FOLLOW_MASTER,#value=TRUE);
       Send(mob,@SetBehaviorFlag,#flag=AI_FIGHT_AGGRESSIVE,#value=FALSE);
       Send(mob,@SetBehaviorFlag,#flag=AI_FIGHT_NEWBIESAFE);
       Send(mob,@SetBehaviorFlag,#flag=AI_FIGHT_MONSTERS);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   GetRisenKinds()
+   "Ours (2026-11-02): what CastSpell raises for each number it rolls, for the "
+   "effect summary: [lowest roll, highest roll, name, level]. The levels are "
+   "the monsters' viLevel (mummy.kod, specmum.kod, skel.kod, skel/batrskel.kod, "
+   "skel/tuskskel.kod, skel/daemskel.kod): keep them in step."
+   {
+      return [ [0,19,Animate_mummy_rsc,30],
+               [20,39,Animate_spectral_mummy_rsc,40],
+               [40,59,Animate_battered_skeleton_rsc,60],
+               [60,74,Animate_skeleton_rsc,75],
+               [75,89,Animate_tusked_skeleton_rsc,120],
+               [90,10000,Animate_daemon_skeleton_rsc,140] ];
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what the corpse can rise as at this spellpower "
+   "(CastSpell rolls iSpellPower / 3 * 2 to iSpellPower), each with its level "
+   "and the health Monster's Constructor gives it (GetMaxHitPoints, Fuzzy)."
+   {
+      local i, iLow, iHigh, iCount, iLength, iLevel, iHealth, rPhrase;
+
+      iLow = iSpellPower / 3 * 2;
+      iHigh = iSpellPower;
+      iLength = 0;
+      foreach i in Send(self,@GetRisenKinds)
+      {
+         if (First(i) <= iHigh) AND (Nth(i,2) >= iLow)
+         {
+            iLength = iLength + 1;
+         }
+      }
+
+      AddPacket(4,Animate_effect_rsc);
+      iCount = 0;
+      foreach i in Send(self,@GetRisenKinds)
+      {
+         if (First(i) <= iHigh) AND (Nth(i,2) >= iLow)
+         {
+            iCount = iCount + 1;
+            if iLength = 1
+            {
+               rPhrase = Animate_effect_one_rsc;
+            }
+            else if iCount = 1
+            {
+               rPhrase = Animate_effect_first_rsc;
+            }
+            else if iCount = iLength
+            {
+               rPhrase = Animate_effect_last_rsc;
+            }
+            else
+            {
+               rPhrase = Animate_effect_more_rsc;
+            }
+
+            // Monster.GetMaxHitPoints, then Monster.Fuzzy's range (scale 4)
+            iLevel = Nth(i,4);
+            iHealth = iLevel;
+            if iLevel >= 40
+            {
+               iHealth = (120 * iLevel) / 100;
+            }
+
+            AddPacket(4,rPhrase, 4,Nth(i,3), 4,iLevel,
+                      4,iHealth - iHealth / 4,
+                      4,iHealth - iHealth / 4 + iHealth * 2 / 4);
+         }
+      }
+
+      Send(self,@SendDurationPhrase,#iTime=MAX_RISEN_CONTROL_SECS * 1000);
 
       return;
    }

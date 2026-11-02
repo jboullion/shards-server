@@ -41,6 +41,10 @@ resources:
       "Your guardian angel tells you, \"You are not ready to cast this spell.\""
    truce_sound = shalille.ogg
 
+   truce_effect_rsc = \
+      "For %r to %r no one in the room can attack a monster or be attacked by "
+      "one, and monsters can't cast; players may still fight each other."
+
 classvars:
 
    vrIcon = truce_icon_rsc
@@ -174,6 +178,26 @@ messages:
    SpellBannedInArena()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it stops, and how long."
+   {
+      local iTime;
+
+      // GetDuration rolls Random(iTime / 2, iTime).
+      iTime = (20 + iSpellPower) * 1000;
+
+      AddPacket(4,truce_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=iTime / 2);
+      Send(self,@SendDurationPhrase,#iTime=iTime);
+
+      return;
    }
 
 end

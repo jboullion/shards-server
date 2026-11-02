@@ -39,6 +39,11 @@ resources:
    truth_enter = "A song of truth played by %s%s fills your mind."
    truth_leave = "You can no longer hear the song of truth played by %s%s."
 
+   truth_effect_rsc = \
+      "Foes within %i squares lose %i%% of their defense.  Foe players there "
+      "lose invisibility, fade, shadow form and illusionary form, and foe "
+      "illusions vanish."
+
 classvars:
 
    vrEnchantmentOn = truth_cast
@@ -143,6 +148,19 @@ messages:
       }
 
       return defense_power * (100 - Send(self,@SongPercent,#state=state)) / 100;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how far, the defense a foe loses, and RevealFoe."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,truth_effect_rsc,
+                4,Send(self,@GetSummaryReach,#state=lState),
+                4,Send(self,@SongPercent,#state=lState));
+
+      return;
    }
 
 end

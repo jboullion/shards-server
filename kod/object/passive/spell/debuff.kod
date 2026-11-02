@@ -38,6 +38,11 @@ resources:
    debuff_display_duration = \
       "Duration of ~k~B%s~n is ~k~B%i~n seconds."
 
+   // Ours (2026-11-02): SendTimeRange's, for an effect summary's %r.
+   debuff_time_seconds_rsc = "%i seconds"
+   debuff_time_seconds_range_rsc = "%i to %i seconds"
+   debuff_time_range_rsc = "%r to %r"
+
 classvars:
 
    vrName = debuff_name_rsc
@@ -175,6 +180,45 @@ messages:
 
    SendEffectData()
    {
+      return;
+   }
+
+   SendTimeRange(iLow=0,iHigh=0)
+   "Ours (2026-11-02): adds one resource (and its parameters) for a random "
+   "length of time from iLow to iHigh milliseconds, for an effect summary's "
+   "%r: '7 to 8 seconds' (to the nearest second) under five minutes, else "
+   "two SendDurationPhrases."
+   {
+      local iLowSeconds, iHighSeconds;
+
+      if iHigh < 300000
+      {
+         iLowSeconds = (iLow + 500) / 1000;
+         iHighSeconds = (iHigh + 500) / 1000;
+         if iLowSeconds = iHighSeconds
+         {
+            AddPacket(4,debuff_time_seconds_rsc, 4,iHighSeconds);
+
+            return;
+         }
+
+         AddPacket(4,debuff_time_seconds_range_rsc, 4,iLowSeconds,
+                   4,iHighSeconds);
+
+         return;
+      }
+
+      if iLow / 1000 = iHigh / 1000
+      {
+         Send(self,@SendDurationPhrase,#iTime=iHigh);
+
+         return;
+      }
+
+      AddPacket(4,debuff_time_range_rsc);
+      Send(self,@SendDurationPhrase,#iTime=iLow);
+      Send(self,@SendDurationPhrase,#iTime=iHigh);
+
       return;
    }
 

@@ -31,6 +31,12 @@ resources:
       "There is too much summoning magic focused here to cause a spore burst."
    SporeBurst_sound = farenspore822m.ogg
 
+   SporeBurst_effect_rsc = \
+      "For %r, a foe who moves within %r of where you stood has a %i%% "
+      "chance to be held for %r (one try about every 1.5 seconds at most)."
+   SporeBurst_range_one_rsc = "a square"
+   SporeBurst_range_rsc = "%i squares"
+
 classvars:
 
    vrName = SporeBurst_name_rsc
@@ -67,6 +73,43 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the cloud stands, how far it reaches "
+   "(PlaceWallElements), the chance a move is held (ActiveSporeCloud's "
+   "DoEffect) and Hold's GetDuration range."
+   {
+      local iRadius, oHold, iTime;
+
+      AddPacket(4,SporeBurst_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      iRadius = Bound(iSpellPower / 30,1,3);
+      if iRadius = 1
+      {
+         AddPacket(4,SporeBurst_range_one_rsc);
+      }
+      else
+      {
+         AddPacket(4,SporeBurst_range_rsc, 4,iRadius);
+      }
+
+      // ActiveSporeCloud: viHoldMinPercent (40) plus half the spellpower.
+      AddPacket(4,Bound(40 + (iSpellPower / 2),0,100));
+
+      // Hold's GetDuration, with its piDeviation of 10.
+      oHold = Send(SYS,@FindSpellByNum,#num=SID_HOLD);
+      iTime = 4000 + Bound(iSpellPower,0,Send(oHold,@GetMaxSpellPower)) * 40;
+      Send(self,@SendTimeRange,#iLow=iTime * 90 / 100,#iHigh=iTime);
+
+      return;
+   }
 
    ResetReagents()
    {

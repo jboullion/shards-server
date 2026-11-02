@@ -32,6 +32,12 @@ resources:
 
    discordance_sound = kdiscord.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   discordance_effect_rsc = \
+      "Each enchantment on the room, and each song or aura reaching you, has a "
+      "%i%% chance to break (%i%% for a Jala song), if you may attack whoever "
+      "cast it."
+
 classvars:
 
    vrName = discordance_name_rsc
@@ -203,6 +209,21 @@ messages:
       }
 
       return bRemovedSomething;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): DoDiscordance's chance for each enchantment, "
+   "iChance > Random(1,100)."
+   {
+      AddPacket(4,discordance_effect_rsc, 4,Bound(iSpellPower - 1,0,100),
+                4,Bound((iSpellPower * JALA_PERCENT) / 100 - 1,0,100));
+
+      return;
    }
 
 end

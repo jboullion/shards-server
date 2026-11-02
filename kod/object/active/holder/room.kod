@@ -4686,7 +4686,10 @@ messages:
    }
 
    DispelIllusionEnchantments(who = $, report = TRUE, iChance = 100,
-                              stroke_obj = $)
+                              stroke_obj = $, bAll = TRUE)
+   "Ours (2026-11-02): without bAll (a caster under newbie protection), only "
+   "the battlers who may attack, not the room's own enchantments, "
+   "which have no safety check."
    {
       local i, each_obj, oSpell;
 
@@ -4695,13 +4698,16 @@ messages:
          return;
       }
 
-      foreach i in plEnchantments
+      if bAll
       {
-         oSpell = Nth(i,2);
-         if Send(oSpell,@IsIllusion)
-            AND Random(1,100) <= iChance
+         foreach i in plEnchantments
          {
-            Send(self,@RemoveEnchantment,#what=Nth(i,2),#report=report);
+            oSpell = Nth(i,2);
+            if Send(oSpell,@IsIllusion)
+               AND Random(1,100) <= iChance
+            {
+               Send(self,@RemoveEnchantment,#what=Nth(i,2),#report=report);
+            }
          }
       }
 
@@ -4730,13 +4736,11 @@ messages:
          return;
       }
 
-      if NOT bAll
-      {
-         // This means we just want to dispel room illusions, not the specific
-         //  illusions in the room.  Usually because the caster is angeled.
-         return;
-      }
-
+      // Ours (2026-11-02): without bAll (a caster under newbie protection)
+      //  this returned here, so it dispelled nothing at all, not even the
+      //  illusory monsters attacking them.  Now only the passive illusions
+      //  below, deleted without a safety check, need bAll; the rest ask
+      //  AllowBattlerAttack.
       foreach i in plActive
       {
          each_obj = First(i);
@@ -4779,7 +4783,7 @@ messages:
                   Send(each_obj,@Delete);
                }
             }
-            else
+            else if bAll
             {
                // Delete any unhandled illusions without a safety check
                Send(each_obj,@Delete);

@@ -112,7 +112,7 @@ GetSongFxColor(iSpell=0)
    "A damage song's hit each pulse (every 5 seconds), in whole points: 1 to "
    "3, and up to 4 more with spellpower."
    {
-      return Random(1,3) + (Send(self,@GetSongPower,#state=state) / 25);
+      return Random(1,3) + Send(self,@GetPulseBonus,#state=state);
    }
 
    SongDamage(who=$,state=$,iDamage=0,iSpell=ATCK_SPELL_ALL)
@@ -143,6 +143,13 @@ GetSongFxColor(iSpell=0)
    "A debuff song's strength: 10 to 29 percent."
    {
       return 10 + (Send(self,@GetSongPower,#state=state) / 5);
+   }
+
+   GetPulseBonus(state=$)
+   "Ours (2026-11-02): what spellpower adds to a damage song's hit "
+   "(GetPulseDamage), in whole points."
+   {
+      return Send(self,@GetSongPower,#state=state) / 25;
    }
 
 end

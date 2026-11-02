@@ -36,6 +36,11 @@ resources:
    curedisease_on = "The power of Shal'ille burns the disease from your body."
    curedisease_abates = "You feel the disease grow weaker."
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   curedisease_effect_rsc = \
+      "Cures the disease %i%% of the time; otherwise it gives back %i%% of the "
+      "might or intellect it took, curing it if %i or less would still be lost."
+
 classvars:
 
    vrSucceed_wav = curedisease_cast_sound
@@ -176,6 +181,21 @@ messages:
    GetPotionClass()
    {
       return &CureDiseasePotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): CastSpell's chance (Random(1,100) < iSpellPower) and "
+   "what it gives back otherwise."
+   {
+      AddPacket(4,curedisease_effect_rsc, 4,Bound(iSpellPower - 1,0,100),
+                4,iSpellPower, 4,MAX_PENALTY_TO_ELIMINATE);
+
+      return;
    }
 
 end

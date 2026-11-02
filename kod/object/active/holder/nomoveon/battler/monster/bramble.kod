@@ -21,6 +21,11 @@ constants:
    // 1.5 seconds
    EFFECT_INTERVAL = 1500
 
+   // Ours (2026-11-02): the longest a bramble stands: Bramble Wall's longest
+   //  (270 seconds) and the 20 the Constructor may add.  This was 200 seconds,
+   //  which cut off every cast from about spellpower 52.
+   BRAMBLE_MAX_TIME = 290000
+
 resources:
 
    include bramble.lkod
@@ -106,7 +111,7 @@ messages:
       {
          iDuration = Random(Duration-20,Duration+20);
          iDuration = iDuration * 1000;
-         iDuration = bound(iDuration,30000,200000);
+         iDuration = bound(iDuration,30000,BRAMBLE_MAX_TIME);
          ptExpire = CreateTimer(self,@Expire,iDuration);
       }
 

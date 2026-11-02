@@ -32,6 +32,12 @@ resources:
    Rescue_depart_rsc = "%s vanishes in a burst of protective light!"
    rescue_sound = srescue.ogg
 
+   rescue_effect_rsc = \
+      "After %i.%i seconds (half the time %i.%i to %i.%i seconds) Shal'ille "
+      "carries you to safety: to your guild hall if it is in this region and "
+      "you may fight other players, to the inn from anywhere on Ko'catan, to "
+      "the Pool of Vigor from the orc caves, or else to your hometown."
+
 classvars:
 
    vrName = rescue_name_rsc
@@ -52,6 +58,30 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): CastSpell's delay, to a tenth of a second, and where "
+   "DoRescue sends you."
+   {
+      local iDelay, iTenths;
+
+      iDelay = 5000 - ((iSpellPower + 1) * 40);
+      AddPacket(4,rescue_effect_rsc);
+
+      iTenths = (iDelay + 50) / 100;
+      AddPacket(4,iTenths / 10, 4,iTenths % 10);
+      iTenths = (iDelay + 2000 + 50) / 100;
+      AddPacket(4,iTenths / 10, 4,iTenths % 10);
+      iTenths = (iDelay + 4000 + 50) / 100;
+      AddPacket(4,iTenths / 10, 4,iTenths % 10);
+
+      return;
+   }
 
    ResetReagents()
    {

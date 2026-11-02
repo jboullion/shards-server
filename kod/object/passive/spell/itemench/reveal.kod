@@ -29,6 +29,10 @@ resources:
       "You concentrate on %s%s, and gradually its secrets become plain for all to see!"
    reveal_sound = sreveal.ogg
 
+   reveal_effect_rsc = \
+      "Shows every hidden property of the item you target to anyone who "
+      "looks, for good."
+
 classvars:
 
    vrName = reveal_name_rsc
@@ -53,6 +57,19 @@ properties:
    piAdvance = 0
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it does (RevealHiddenAttributes)."
+   {
+      AddPacket(4,reveal_effect_rsc);
+
+      return;
+   }
 
    ResetReagents()
    {

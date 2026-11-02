@@ -36,6 +36,9 @@ resources:
    Invigorate_leave = \
       "You can no longer hear the invigorating notes of %s%s's song."
 
+   Invigorate_effect_rsc = \
+      "Every %r, each player within %i squares regains 1 vigor, up to %i."
+
 classvars:
 
    vrMusic = Invigorate_song
@@ -90,6 +93,30 @@ messages:
       {
          Send(who,@RestAddExertion,#amount=-10000,#Bonus=TRUE);
       }
+
+      return;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the vigor each pulse, how often, how far, and the "
+   "most it brings a listener to (RestAddExertion's Bonus: 40 past where "
+   "resting stops)."
+   {
+      local lState, iMost;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      // player.kod's piVigor_rest_threshold starts at 80.
+      iMost = 80 + 40;
+      if who <> $
+         AND IsClass(who,&Player)
+      {
+         iMost = Send(who,@GetVigorRestThreshold) + 40;
+      }
+
+      AddPacket(4,Invigorate_effect_rsc);
+      Send(self,@SendTenthsPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState), 4,iMost);
 
       return;
    }

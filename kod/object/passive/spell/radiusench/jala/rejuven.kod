@@ -35,6 +35,10 @@ resources:
    Rejuvenate_leave = \
       "You can no longer hear the energizing notes of %s%s's song."
 
+   Rejuvenate_effect_rsc = \
+      "Every %r, everyone within %i squares regains 2 mana, unless "
+      "that would take them past their maximum."
+
 classvars:
 
    vrMusic = Rejuvenate_song
@@ -92,6 +96,20 @@ messages:
          // Ours (spell revamp balance): doubled.
          Send(who,@GainMana,#amount=2,#bRespectMax=TRUE);
       }
+
+      return;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how often, how far, and what each pulse gives."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,Rejuvenate_effect_rsc);
+      Send(self,@SendTenthsPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState));
 
       return;
    }

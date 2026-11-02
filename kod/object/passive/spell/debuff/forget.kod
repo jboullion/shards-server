@@ -43,6 +43,11 @@ resources:
    forgetspell_caster_failed = \
       "%s%s is too stupid to make any stupider!"
 
+   forgetspell_effect_rsc = \
+      "A player forgets %i of their spells and skills, picked at random (the "
+      "same one can come up twice), for %r.  A monster can't cast for that "
+      "long, and forgets its foe for %r.%r"
+
    forgetspell_sound = rforget.ogg
 
 classvars:
@@ -225,6 +230,38 @@ messages:
       iDuration = Random(iDuration*(100-piDeviation)/100,iDuration);
 
       return iDuration;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how many abilities a player forgets (DoSpell's picks, "
+   "one for each 24 spellpower or part of it), for how long (GetDuration's "
+   "range), a monster's quarter of it, and the bewilderment after."
+   {
+      local iPicks, iPowerLeft, iTime, iLow;
+
+      iPicks = 0;
+      iPowerLeft = iSpellPower;
+      while iPowerLeft > 0
+      {
+         iPicks = iPicks + 1;
+         iPowerLeft = iPowerLeft - 24;
+      }
+
+      iTime = piBaseDuration + (iSpellPower + 1) * piSpellPowerModifier;
+      iLow = iTime * (100 - piDeviation) / 100;
+
+      AddPacket(4,forgetspell_effect_rsc, 4,iPicks);
+      Send(self,@SendTimeRange,#iLow=iLow,#iHigh=iTime);
+      Send(self,@SendTimeRange,#iLow=iLow / 4,#iHigh=iTime / 4);
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),
+           @SendBewilderSummary);
+
+      return;
    }
 
    EndEnchantment(who=$,report=TRUE)

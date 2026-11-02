@@ -29,6 +29,11 @@ resources:
 
    summonEvilTwin_sound = rmirrimg.ogg
 
+   summonEvilTwin_effect_rsc = \
+      "A copy of your target hunts it with %i%% of its max health, its "
+      "offense and defense and three quarters of its damage, until it, its "
+      "target or you die."
+
 classvars:
 
    vrName = summonEvilTwin_name_rsc
@@ -176,6 +181,21 @@ messages:
       Send(who,@EvilTwinsCreated,#what=oTwin);
 
       Send(oTwin,@PlaceEvilTwin,#who=oTarget);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the twin's health (EvilTwin.SetOriginal)."
+   {
+      AddPacket(4,summonEvilTwin_effect_rsc,
+                4,40 + Bound(iSpellPower,1,SPELLPOWER_EMPOWERED_MAXIMUM) * 30
+                       / 99);
 
       return;
    }

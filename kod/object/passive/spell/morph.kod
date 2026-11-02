@@ -45,6 +45,12 @@ resources:
 
    morph_sound = rmorph.ogg
    
+   morph_effect_rsc = \
+      "You become a random beast, likeliest near level %i, and put away your "
+      "gear, your max health moving %i%% of the way to its level; it lasts "
+      "80%% to 120%% of %r times your max health over its level.  Your Riija "
+      "spells gain %i spellpower while it lasts."
+
 classvars:
 
    vrName = morph_name_rsc
@@ -674,6 +680,22 @@ messages:
       propagate;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the forms it favours, the health shift, how long, and "
+   "the Riija bonus (Spell.GetSpellPower)."
+   {
+      AddPacket(4,morph_effect_rsc, 4,iSpellPower, 4,iSpellPower);
+      Send(self,@SendDurationPhrase,#iTime=1000 * (60 + 3 * iSpellPower));
+      AddPacket(4,Bound((iSpellPower + 9) / 10,0,10));
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

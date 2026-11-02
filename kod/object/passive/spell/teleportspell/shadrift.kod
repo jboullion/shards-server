@@ -51,6 +51,11 @@ resources:
    DeathsDoor_succeeded = "A shimmering portal springs into being!"
    DeathsDoor_bound_desc = "\n\nYour shadow rift is bound to %s."
 
+   DeathsDoor_effect_rsc = \
+      "Cast outside a safe haven, it binds that spot.  Cast in one, it opens "
+      "a portal for up to %r that carries any player who steps in to the "
+      "bound spot."
+
 classvars:
 
    vrName = DeathsDoor_name_rsc
@@ -73,6 +78,22 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it does out in the world and in a safe haven, "
+   "and how long the portal stays (NecropolisPortal's "
+   "NECROPORTAL_LIFE_TIME)."
+   {
+      AddPacket(4,DeathsDoor_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=60000);
+
+      return;
+   }
 
    ResetReagents()
    {

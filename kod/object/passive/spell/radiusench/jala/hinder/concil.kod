@@ -14,6 +14,9 @@ constants:
 
    include blakston.khd
 
+   // Ours (2026-11-02): how long a calmed monster stops fighting (CalmFor).
+   CONCILIATION_CALM_TIME = 4000
+
 resources:
 
    include concil.lkod
@@ -37,6 +40,10 @@ resources:
    Conciliation_caster_enter = "You feel your song of peace reaching for your foes."
    Conciliation_enter = "A song of peace played by %s%s fills your mind."
    Conciliation_leave = "You can no longer hear the song of peace played by %s%s."
+
+   Conciliation_effect_rsc = \
+      "Every %r, each foe monster within %i squares has a %i%% chance to stop "
+      "fighting for %r."
 
 classvars:
 
@@ -90,8 +97,25 @@ messages:
       // Ours (spell revamp playtest): CalmFor, so it fights again after.
       if Random(1,100) <= 20 + (Send(self,@GetSongPower,#state=state) / 3)
       {
-         Send(who,@CalmFor,#delay=4000);
+         Send(who,@CalmFor,#delay=CONCILIATION_CALM_TIME);
       }
+
+      return;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how often, how far, the chance each pulse and how "
+   "long a calmed monster stays calm."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,Conciliation_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState),
+                4,20 + (Send(self,@GetSongPower,#state=lState) / 3));
+      Send(self,@SendDurationPhrase,#iTime=CONCILIATION_CALM_TIME);
 
       return;
    }

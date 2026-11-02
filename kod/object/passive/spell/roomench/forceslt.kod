@@ -40,6 +40,11 @@ resources:
 
    forcesoflight_sound = sforcelt.ogg
 
+   forcesoflight_effect_rsc = \
+      "For %r the caster's allies here gain %i to hit (not those who know a "
+      "Qor spell) and companions %i%% more offense, and every Shal'ille spell "
+      "cast here gains %i spellpower."
+
 classvars:
 
    vrName = forcesoflight_name_rsc
@@ -242,6 +247,27 @@ messages:
 
       AddPacket(4, forcesoflight_enchantment_rsc, 4, Send(self,@GetName),
                 4, iState + 50, 4, iState / 10);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the allies' hit bonus, the companions' offense, the Shal'ille spellpower, and how long."
+   {
+      local iPower;
+
+      iPower = Bound(iSpellPower,0,99);
+
+      AddPacket(4,forcesoflight_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellpower=iSpellPower));
+      // ModifyHitRoll, ModifyMonsterOffense, and Spell's Shal'ille bonus.
+      AddPacket(4,50 + iPower, 4,10 + iPower / 5, 4,iSpellPower / 10);
 
       return;
    }

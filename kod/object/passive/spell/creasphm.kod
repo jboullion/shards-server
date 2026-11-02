@@ -29,6 +29,12 @@ resources:
 
    createspiritualhammer_sound = sspham.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary). 5 to 9 is
+   //  weapon.kod's damage for a high quality bludgeoning weapon.
+   createspiritualhammer_effect_rsc = \
+      "Summons a spiritual hammer for %r: 5 to 9 holy damage a blow and %i more "
+      "offense."
+
 classvars:
 
    vrName = createspiritualhammer_name_rsc
@@ -70,7 +76,7 @@ messages:
    {
       local iLongevity;
 
-      iLongevity = 70 + ((50 * iSpellpower) / 100);  // lasts 10 - 60 minutes
+      iLongevity = 70 + ((50 * iSpellpower) / 100);  // 70 minutes, and half a minute a point
       iLongevity = iLongevity * 60 * 1000;  // Convert to ms
 
       return iLongevity;   
@@ -97,6 +103,22 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the hammer lasts and its offense bonus."
+   {
+      AddPacket(4,createspiritualhammer_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetLongevity,#iSpellPower=iSpellPower));
+      AddPacket(4,(iSpellPower * 3) / 2);
+
+      return;
    }
 
 end

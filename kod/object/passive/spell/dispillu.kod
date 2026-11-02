@@ -32,6 +32,12 @@ resources:
 
    dispelillusion_sound = kdispill.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   dispelillusion_effect_rsc = \
+      "Each illusion here has a %i%% chance to fade: the illusory creatures, "
+      "walls and enchantments of anyone you may attack, and once you are past "
+      "newbie protection, the room's own illusions too."
+
 classvars:
    vrName = dispelillusion_name_rsc
    vrIcon = dispelillusion_icon_rsc
@@ -84,14 +90,12 @@ messages:
          iChance = Bound(iSpellPower,10,99);
       }
 
-      // Only attempt to dispell all illusions if the player can PvP.
+      // Only the illusions with no safety check need the player able to PvP;
+      //  the rest ask AllowBattlerAttack (Room.DispelIllusions).
       bAll = Send(who,@CanPlayerPvP);
 
-      if bAll
-      {
-         Send(oRoom,@DispelIllusionEnchantments,#who=who,#iChance=iChance,
-               #stroke_obj=self);
-      }
+      Send(oRoom,@DispelIllusionEnchantments,#who=who,#iChance=iChance,
+            #stroke_obj=self,#bAll=bAll);
 
       Send(oRoom,@DispelIllusions,#who=who,#what=self,#iChance=iChance,
             #bAll=bAll,#stroke_obj=self);
@@ -99,6 +103,20 @@ messages:
       Send(who,@MsgSendUser,#message_rsc=dispelillusion_castermsg_rsc);
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): CastSpell's chance for each illusion. Without "
+   "CanPlayerPvP, the room's illusions with no safety check stay."
+   {
+      AddPacket(4,dispelillusion_effect_rsc, 4,Bound(iSpellPower,10,99));
+
+      return;
    }
 
 end

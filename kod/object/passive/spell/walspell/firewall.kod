@@ -29,6 +29,11 @@ resources:
       "fire." 
    FireWall_sound = farenwala822m.ogg
 
+   FireWall_effect_rsc = \
+      "The wall stands %r.  Each foe who walks into or stands in it burns "
+      "for 0 to %i fire damage about every 1.5 seconds (15%% more if you "
+      "are attuned to flame)."
+
 classvars:
 
    vrName = FireWall_name_rsc
@@ -58,6 +63,23 @@ properties:
 
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the flames stand (PlaceWallElements and "
+   "WallOfFire's GetDuration) and the most a touch burns for."
+   {
+      AddPacket(4,FireWall_effect_rsc);
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 2) + 30,30,180));
+      AddPacket(4,Bound(iSpellPower / 6,1,16));
+
+      return;
+   }
 
    ResetReagents()
    {

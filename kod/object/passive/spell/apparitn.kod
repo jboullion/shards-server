@@ -43,6 +43,15 @@ resources:
 
    summonapparition_sound = rapparit.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   summonapparition_effect_rsc = \
+      "Raises an illusion to attack the target with %i%% of its health: one of "
+      "the monsters that live here %i%% of the time, where any do, otherwise %s."
+   summonapparition_weak_rsc = \
+      "a giant rat, baby spider, spider or giant scorpion"
+   summonapparition_middle_rsc = "a centipede, baby spider, slime or mutant ant"
+   summonapparition_strong_rsc = "a slime, mutant ant, fungus beast or troll"
+
 classvars:
 
    vrName = summonapparition_name_rsc
@@ -255,6 +264,39 @@ messages:
       }
 
       return Create(&GiantRat);
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the share of its health it has (CastSpell), how often it "
+   "copies one of the room's own monsters, and CreateRandomMonster's list."
+   {
+      local rKinds;
+
+      if iSpellPower < 35
+      {
+         rKinds = summonapparition_weak_rsc;
+      }
+      else if iSpellPower < 66
+      {
+         rKinds = summonapparition_middle_rsc;
+      }
+      else
+      {
+         rKinds = summonapparition_strong_rsc;
+      }
+
+      AddPacket(4,summonapparition_effect_rsc,
+                4,Bound(iSpellPower,SPELLPOWER_MAXIMUM,$) * 100
+                  / (APPARITION_FRACTION * SPELLPOWER_MAXIMUM),
+                4,Bound(iSpellPower,0,100),
+                4,rKinds);
+
+      return;
    }
 
 end

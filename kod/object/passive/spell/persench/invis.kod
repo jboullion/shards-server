@@ -38,6 +38,11 @@ resources:
 
    invisibility_sound = qinvis.ogg
 
+   invisibility_effect_rsc = \
+      "You turn invisible and gain %i defense for %r: monsters lose sight of "
+      "you unless they see the invisible or you struck them, and players "
+      "without Detect Invisible see only a shimmer."
+
 classvars:
 
    viPersonal_ench = TRUE
@@ -154,6 +159,22 @@ messages:
    {
       AddPacket(4,invis_enchantment_rsc, 4,Send(self,@GetName),
                 4,25 + Send(who,@GetEnchantedState,#what=self));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): ModifyDefensePower's defense (25 + the state, which is "
+   "the spellpower), monster.kod LosesSightOf, and how long."
+   {
+      AddPacket(4,invisibility_effect_rsc, 4,25 + iSpellPower);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

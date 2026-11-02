@@ -38,6 +38,11 @@ resources:
    ProfaneResonance_enter = "A dirge played by %s%s fills your mind."
    ProfaneResonance_leave = "You can no longer hear the dirge played by %s%s."
 
+   ProfaneResonance_effect_rsc = \
+      "Every %r it hits each foe within %i squares for %i to %i %s damage, "
+      "before resistances, and you regain 1 "
+      "health, up to your maximum, for each one it hurts."
+
 classvars:
 
    vrEnchantmentOn = ProfaneResonance_cast
@@ -99,6 +104,24 @@ messages:
          //  let it climb to twice the maximum).
          Send(oCaster,@GainHealthNormal,#amount=1);
       }
+
+      return;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how often, how far, the hit (GetPulseDamage) and "
+   "the singer's health."
+   {
+      local lState, iBonus;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      iBonus = Send(self,@GetPulseBonus,#state=lState);
+      AddPacket(4,ProfaneResonance_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState),
+                4,1 + iBonus, 4,3 + iBonus,
+                4,Send(SYS,@GetSpellDamageTypeName,#type=ATCK_SPELL_UNHOLY));
 
       return;
    }

@@ -63,6 +63,7 @@ resources:
    skill_ability_rsc = "\nAbility¦%i%%"
    skill_unknown_rsc = "\nYou don't know this skill yet."
    skill_stat_rsc = "\nMain stat¦%s %i"
+   skill_stat_name_rsc = "\nMain stat¦%s"
    skill_stat_might = "Might"
    skill_stat_agility = "Agility"
    skill_stat_stamina = "Stamina"
@@ -172,11 +173,12 @@ messages:
       return FALSE;
    }
 
-   ShowDesc(who=$)
+   ShowDesc(who=$,iPower=$)
    "Ours (2026-10-27): the description, then the stats as rows for our client's Stats tab: what "
    "the skill does at who's ability (HasEffectSummary), the ability, the stat it rests on, a "
    "stroke's vigor, Second Wind's wait and the training cost. Only reads: no CanPayCosts, which "
-   "marks a skill as used."
+   "marks a skill as used. With iPower (2026-11-02), at that ability, and nothing of who's own "
+   "(their stat's value, Second Wind's wait)."
    {
       local rSchool, bPlayer, iAbility, iStat, rStat, iValue, iVigor;
 
@@ -200,6 +202,10 @@ messages:
          {
             bPlayer = TRUE;
             iAbility = Send(who,@GetSkillAbility,#skill_num=viSkill_num);
+            if iPower <> $
+            {
+               iAbility = Bound(iPower,1,100);
+            }
          }
       }
 
@@ -258,6 +264,11 @@ messages:
       }
 
       if rStat <> $
+         AND iPower <> $
+      {
+         AddPacket(4,skill_stat_name_rsc, 4,rStat);
+      }
+      else if rStat <> $
       {
          AddPacket(4,skill_stat_rsc, 4,rStat, 4,iValue);
       }
@@ -278,7 +289,14 @@ messages:
       }
 
       // Add time resource if appropriate.
-      Send(self,@SendTimeDesc,#who=who);
+      if iPower = $
+      {
+         Send(self,@SendTimeDesc,#who=who);
+      }
+      else
+      {
+         AddPacket(4,skill_nothing);
+      }
 
       // Add meditate ratio.
       if piMeditate_ratio = 0

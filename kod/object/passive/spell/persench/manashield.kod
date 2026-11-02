@@ -33,6 +33,10 @@ resources:
    ManaShield_enchantment_rsc = \
       "\n\nYour mana shield enchantment reduces damage as long as you have mana"
     
+   ManaShield_effect_rsc = \
+      "Each blow you take costs 1.5 mana per point of damage instead of "
+      "health, for %r; a blow your mana can't cover takes what mana is left, "
+      "the rest from your health, and ends it."
    ManaShield_already_enchanted_rsc = "You already have a mana shield."
 
    ManaShield_on_rsc = \
@@ -115,6 +119,22 @@ messages:
       Send(who,@RemoveDefenseModifier,#what=self);
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what player.kod AssessDamage does under it (the mana "
+   "a blow costs, damage * 150 / 100), and how long."
+   {
+      AddPacket(4,ManaShield_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

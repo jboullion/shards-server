@@ -45,6 +45,13 @@ resources:
    Purge_spell_intro = \
       "Shal'ille Lv. 5: Removes helpful personal enchantments on the target."
 
+   Purge_effect_rsc = \
+      "Each of a player's helpful enchantments loses its share of %i "
+      "spellpower (%i%% for Haste, %i%% for Bless, %i%% for Resist Fire, %i%% "
+      "for Mana Focus, %i%% for Mana Shield) and ends if none is left.  A "
+      "monster loses all its helpful magic, and an illusion or a bound minion "
+      "is destroyed."
+
 classvars:
 
    vrSucceed_wav = purge_cast_sound
@@ -401,6 +408,30 @@ messages:
       }
 
       return bRemovedSomething;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the spellpower it strips, by each enchantment's "
+   "viPurgeFactor (DoPurge)."
+   {
+      AddPacket(4,Purge_effect_rsc, 4,iSpellPower,
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_HASTE),
+                       @GetPurgeFactor),
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_BLESS),
+                       @GetPurgeFactor),
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_RESIST_FIRE),
+                       @GetPurgeFactor),
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_MANA_FOCUS),
+                       @GetPurgeFactor),
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_MANA_SHIELD),
+                       @GetPurgeFactor));
+
+      return;
    }
 
 end

@@ -38,6 +38,11 @@ resources:
    Disharmony_enter = "A jarring melody played by %s%s fills your mind."
    Disharmony_leave = "You can no longer hear the jarring melody played by %s%s."
 
+   Disharmony_effect_rsc = \
+      "Every %r it hits each foe within %i squares for %i to %i %s damage, "
+      "before resistances, and foe monsters "
+      "there can't cast spells."
+
 classvars:
 
    vrEnchantmentOn = Disharmony_cast
@@ -95,6 +100,24 @@ messages:
    MonsterCanCast(mob=$,state=$)
    {
       return NOT Send(self,@IsSongFoe,#who=mob,#state=state);
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how often, how far, the hit (GetPulseDamage) and "
+   "MonsterCanCast."
+   {
+      local lState, iBonus;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      iBonus = Send(self,@GetPulseBonus,#state=lState);
+      AddPacket(4,Disharmony_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState),
+                4,1 + iBonus, 4,3 + iBonus,
+                4,Send(SYS,@GetSpellDamageTypeName,#type=ATCK_SPELL_QUAKE));
+
+      return;
    }
 
 end

@@ -50,6 +50,10 @@ resources:
 
    ShalilleBane_sound = qshalban.ogg
 
+   ShalilleBane_effect_rsc = \
+      "For %r to %r any foe who casts a Shal'ille spell here takes %i to %i "
+      "unholy damage for a level 1 spell, up to %i to %i for a level 6."
+
 classvars:
 
    vrName = ShalilleBane_name_rsc
@@ -141,6 +145,29 @@ messages:
    {
       // Conceptually: ((iSpellPower/15) * (iLevel/2) * Random(8,12))/10
       return (iSpellPower * iLevel * Random(8,12))/300;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the unholy damage to a Shal'ille caster, and how long."
+   {
+      local iTime;
+
+      // GetDuration rolls Random(iTime / 2, iTime).
+      iTime = (45 + (iSpellPower * 3)) * 1000;
+
+      AddPacket(4,ShalilleBane_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=iTime / 2);
+      Send(self,@SendDurationPhrase,#iTime=iTime);
+      // ComputeDamage: (spellpower * level * Random(8,12)) / 300.
+      AddPacket(4,(iSpellPower * 8) / 300, 4,(iSpellPower * 12) / 300,
+                4,(iSpellPower * 6 * 8) / 300, 4,(iSpellPower * 6 * 12) / 300);
+
+      return;
    }
 
 end

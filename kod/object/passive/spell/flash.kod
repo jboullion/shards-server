@@ -30,6 +30,11 @@ resources:
 
    flash_sound = rflash.ogg
 
+   Flash_effect_rsc = \
+      "Everyone within %i squares but you and your allies has a %i%% chance "
+      "to be caught: a monster is held for %r, a player is blinded for a "
+      "moment and shaken out of any trance.%r"
+
 classvars:
 
    vrSucceed_wav = flash_sound
@@ -172,6 +177,25 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): its reach, its chance, the hold, and the bewilderment."
+   {
+      AddPacket(4,Flash_effect_rsc,
+                4,Send(self,@GetFlashRange,#iSpellPower=iSpellPower) / FINENESS,
+                4,33 + ((2 * iSpellPower) / 3));
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetHoldTime,#iSpellPower=iSpellPower));
+      Send(Send(SYS,@FindSpellByNum,#num=SID_BEWILDERED),
+           @SendBewilderSummary);
+
+      return;
    }
 
 end

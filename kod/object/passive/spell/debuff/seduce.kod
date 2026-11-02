@@ -37,6 +37,12 @@ resources:
    seduce_stolen = "%s%s has seduced your %s!"
    seduce_too_many = "You are unable to control another minion."
 
+   seduce_effect_rsc = \
+      "Charms a monster up to level %i (from your health, intellect and "
+      "spellpower) to follow you and fight for you for %r, then it turns on "
+      "you if you're in its room.  Fail against one of level %i or more and "
+      "it attacks you."
+
    seduce_sound = rperappr.ogg
 
 classvars:
@@ -259,6 +265,55 @@ messages:
       iDuration = Random(iDuration*(100-piDeviation)/100,iDuration);
 
       return iDuration;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the strongest monster who can charm (DoSpell's roll "
+   "beats its GetMaxHitPoints: its level under 40, else 120 percent of it), the "
+   "weakest that attacks on a failure (a roll under a quarter of that), and "
+   "how long (GetDuration's range)."
+   {
+      local iRoll, iMaxLevel, iHostile, iHostileLevel, iTime;
+
+      iRoll = Send(who,@GetBaseMaxHealth) / 3;
+      iRoll = iRoll + Send(who,@GetIntellect);
+      iRoll = iRoll + iSpellPower / 2;
+      iRoll = Bound(iRoll,0,Send(who,@GetBaseMaxHealth) + 5);
+
+      // The highest level whose GetMaxHitPoints is under iRoll.
+      if iRoll <= 40
+      {
+         iMaxLevel = iRoll - 1;
+      }
+      else
+      {
+         iMaxLevel = Bound((100 * iRoll - 1) / 120,39,$);
+      }
+
+      // The lowest level whose GetMaxHitPoints / 4 is over iRoll.
+      iHostile = 4 * (iRoll + 1);
+      if iHostile < 40
+      {
+         iHostileLevel = iHostile;
+      }
+      else
+      {
+         iHostileLevel = Bound((100 * iHostile + 119) / 120,40,$);
+      }
+
+      iTime = piBaseDuration + (iSpellPower + 1) * piSpellPowerModifier;
+
+      AddPacket(4,seduce_effect_rsc, 4,iMaxLevel);
+      Send(self,@SendTimeRange,#iLow=iTime * (100 - piDeviation) / 100,
+           #iHigh=iTime);
+      AddPacket(4,iHostileLevel);
+
+      return;
    }
 
    EndEnchantment(who=$,report=TRUE,state=$)

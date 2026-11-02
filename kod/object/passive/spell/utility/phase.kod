@@ -65,6 +65,12 @@ resources:
    phase_time_header = \
       "\n\nYou have %r%r%r%r%r%r%r of %s time remaining."
 
+   Phase_effect_rsc = \
+      "Until you cast it again you are phased out: nothing can harm you, and "
+      "you can't move, fight or cast.  You have %r of it, refilled in any "
+      "safe place or second for second once you are back; run out and you "
+      "are hurled to the last safe place you visited."
+
 classvars:
 
    vrSucceed_wav = phase_cast_sound
@@ -89,6 +95,33 @@ properties:
    piPhaseDelay = 1500
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what being phased does, and the phase time a player "
+   "has (Player's GetBasePhaseTime)."
+   {
+      local iTime;
+
+      if who <> $
+         AND IsClass(who,&Player)
+      {
+         iTime = Send(who,@GetBasePhaseTime);
+      }
+      else
+      {
+         iTime = Send(SETTINGS_OBJECT,@GetLogPenGhostTime) + 160000;
+      }
+
+      AddPacket(4,Phase_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=iTime);
+
+      return;
+   }
 
    ResetReagents()
    {

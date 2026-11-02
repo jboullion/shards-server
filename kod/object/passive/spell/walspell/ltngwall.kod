@@ -36,6 +36,11 @@ resources:
 
    LightningWall_sound = faren.ogg
 
+   LightningWall_effect_rsc = \
+      "The wall stands %r.  Each foe who walks into or stands in it takes 0 "
+      "to %i shock damage about every 1.5 seconds (15%% more if you are "
+      "attuned to storm) and is held for a second."
+
 classvars:
 
    vrName = LightningWall_name_rsc
@@ -63,6 +68,24 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the lightning stands (PlaceWallElements and "
+   "WallOfLightning's GetDuration), the most a touch does, and its "
+   "one-second hold."
+   {
+      AddPacket(4,LightningWall_effect_rsc);
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 2) + 20,20,120));
+      AddPacket(4,Bound(iSpellPower / 4,1,25));
+
+      return;
+   }
 
    ResetReagents()
    {

@@ -38,6 +38,11 @@ resources:
    SacredResonance_enter = "A hymn played by %s%s fills your mind."
    SacredResonance_leave = "You can no longer hear the hymn played by %s%s."
 
+   SacredResonance_effect_rsc = \
+      "Every %r it hits each foe within %i squares for %i to %i %s damage, "
+      "before resistances, and undead "
+      "monsters for twice that."
+
 classvars:
 
    vrEnchantmentOn = SacredResonance_cast
@@ -97,6 +102,24 @@ messages:
 
       Send(self,@SongDamage,#who=who,#state=state,#iDamage=iDamage,
            #iSpell=ATCK_SPELL_HOLY);
+
+      return;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how often, how far, and the hit (GetPulseDamage), "
+   "doubled for the undead."
+   {
+      local lState, iBonus;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      iBonus = Send(self,@GetPulseBonus,#state=lState);
+      AddPacket(4,SacredResonance_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetStateDuration,#state=lState));
+      AddPacket(4,Send(self,@GetSummaryReach,#state=lState),
+                4,1 + iBonus, 4,3 + iBonus,
+                4,Send(SYS,@GetSpellDamageTypeName,#type=ATCK_SPELL_HOLY));
 
       return;
    }

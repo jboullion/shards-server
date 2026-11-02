@@ -30,6 +30,10 @@ resources:
       "Something burns in your eyes, causing excruciating pain and a loss "
       "of vision."
    blind_off = "Your eyes begin to function again."
+   blind_effect_rsc = \
+      "Blinds the target for %r: a player can't see, fight or cast, and a "
+      "monster wanders and won't fight.  A helmet shortens it, and eagle "
+      "eyes shortens it or wards it off."
 
    blind_sound = qblind.ogg
    
@@ -168,6 +172,26 @@ messages:
       iDuration = Random(iDuration * (100 - piDeviation) / 100,iDuration);
 
       return iDuration;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long it blinds (GetDuration's range, bound as "
+   "DoSpell bounds it), and what it does to a player and a monster."
+   {
+      local iTime;
+
+      iTime = piBaseDuration + iSpellPower * piSpellPowerModifier;
+      AddPacket(4,blind_effect_rsc);
+      Send(self,@SendTimeRange,
+           #iLow=Bound(iTime * (100 - piDeviation) / 100,piMinBlind,piMaxBlind),
+           #iHigh=Bound(iTime,piMinBlind,piMaxBlind));
+
+      return;
    }
 
    EndEnchantment(who=$,report=TRUE)

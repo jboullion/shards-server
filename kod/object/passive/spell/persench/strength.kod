@@ -34,6 +34,8 @@ resources:
       "%s%s reels under the impact of Kraanan's power."
    ss_enchantment_rsc = \
       "\n\nYour current %s enchantment adds %i Might."
+   superstrength_effect_rsc = \
+      "Ends any Enfeeble on you and adds %i Might, for %r."
    superstrength_name_rsc = "super strength"
    superstrength_icon_rsc = istreng.bgf
    superstrength_desc_rsc = \
@@ -146,6 +148,23 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): CastSpell's ending of Enfeeble, the Might "
+   "GetStateValue adds (spellpower / 5 + 1; its AddMight not called here), "
+   "and how long."
+   {
+      AddPacket(4,superstrength_effect_rsc, 4,iSpellPower / 5 + 1);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

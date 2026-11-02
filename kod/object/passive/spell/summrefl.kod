@@ -37,6 +37,11 @@ resources:
 
    summonreflection_sound = rmirrimg.ogg
 
+   summonreflection_effect_rsc = \
+      "Up to %i reflections fight at your side, each with %i%% of your max "
+      "health, your offense and defense and half your damage; each costs 1 "
+      "mana every 8 seconds and fades when you run out."
+
 classvars:
 
    vrName = summonreflection_name_rsc
@@ -157,6 +162,21 @@ messages:
       }
 
       return 0;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how many, and their health (Reflection.SetOriginal)."
+   {
+      AddPacket(4,summonreflection_effect_rsc,
+                4,Send(SETTINGS_OBJECT,@GetPlayerReflectionLimit),
+                4,25 + Bound(iSpellPower,1,SPELLPOWER_EMPOWERED_MAXIMUM) / 2);
+
+      return;
    }
 
 end

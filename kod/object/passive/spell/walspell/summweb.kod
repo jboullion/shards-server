@@ -31,6 +31,10 @@ resources:
       "There is too much summoning magic focused here to create a web." 
    SummonWeb_sound = farenwala822m.ogg
 
+   SummonWeb_effect_rsc = \
+      "The webs stand %r.  A foe who walks into one is stuck for %r (a "
+      "monster for %r); spiders, ghosts and some other creatures pass freely."
+
 classvars:
 
    vrName = SummonWeb_name_rsc
@@ -61,6 +65,32 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the webs stand (PlaceWallElements and Web's "
+   "GetDuration) and how long they hold (Web's DoEffect)."
+   {
+      local iMaxHoldTime, iLow, iHigh;
+
+      AddPacket(4,SummonWeb_effect_rsc);
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 4) / 3 + 20,20,130),
+           #iMin=20000,#iMax=150000);
+
+      iMaxHoldTime = Bound(3 + (iSpellPower / 33),$,5);
+      iLow = Bound(iMaxHoldTime - 2,1,$);
+      iHigh = Bound(iMaxHoldTime,1,$);
+      Send(self,@SendTimeRange,#iLow=iLow * 1000,#iHigh=iHigh * 1000);
+      Send(self,@SendTimeRange,#iLow=(iLow * 3 / 2) * 1000,
+           #iHigh=(iHigh * 3 / 2) * 1000);
+
+      return;
+   }
 
    ResetReagents()
    {

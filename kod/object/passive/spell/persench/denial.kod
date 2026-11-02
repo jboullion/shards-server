@@ -34,6 +34,9 @@ resources:
       "least not at the same time."
 
    denial_off_rsc = "Ouch - you are reminded of your previous weariness."
+   denial_effect_rsc = \
+      "Heals you to full health for %i to %i seconds; when it ends you lose "
+      "%i%% of that healing again, though never below 1 hit point."
    denial_sound = rdenial.ogg
 
 classvars:
@@ -151,6 +154,24 @@ messages:
    SpellBannedInArena()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long, as GetDuration's Random(10000,20000) range, "
+   "Bounds included; and the share of the healing GetStateValue takes back "
+   "(all but (iSpellPower + 1) / 5 percent)."
+   {
+      AddPacket(4,denial_effect_rsc,
+                4,Bound(10000 + iSpellPower * 1000,20000,120000) / 1000,
+                4,Bound(20000 + iSpellPower * 1000,20000,120000) / 1000,
+                4,100 - (iSpellPower + 1) / 5);
+
+      return;
    }
 
 end

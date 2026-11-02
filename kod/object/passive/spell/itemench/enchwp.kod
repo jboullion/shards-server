@@ -41,6 +41,10 @@ resources:
 
    enchantweapon_label_rsc = "blood-letter"
 
+   enchantweapon_effect_rsc = \
+      "The weapon you target counts as magic for %r, so it strikes creatures "
+      "only magic can harm; it takes the place of a holy or unholy edge."
+
 classvars:
 
    vrSucceed_wav = enchantweapon_cast_sound
@@ -65,6 +69,21 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what the enchantment does, and for how long "
+   "(GetDuration)."
+   {
+      AddPacket(4,enchantweapon_effect_rsc);
+      Send(self,@SendDurationRange,#iSpellPower=iSpellPower);
+
+      return;
+   }
 
    ResetReagents()
    {

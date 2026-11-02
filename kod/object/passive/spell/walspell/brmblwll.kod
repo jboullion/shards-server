@@ -37,6 +37,11 @@ resources:
 
    BrambleWall_sound = faren.ogg
 
+   BrambleWall_effect_rsc = \
+      "Five patches of bramble, each with %i hit points, stand %r.  A foe "
+      "who walks through one is scratched for 0 to %i slashing damage, no "
+      "more than about every 1.5 seconds; one who stands still is not."
+
 classvars:
 
    vrName = BrambleWall_name_rsc
@@ -64,6 +69,25 @@ properties:
 
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the patches' hit points, how long they stand "
+   "(PlaceWallElements and Brambles' Constructor) and the most a scratch "
+   "does."
+   {
+      AddPacket(4,BrambleWall_effect_rsc, 4,Bound(iSpellPower / 2,10,50));
+      // iMax: Brambles' BRAMBLE_MAX_TIME
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 3) + 45,45,270),#iMax=290000);
+      AddPacket(4,Bound(iSpellPower / 15,$,5));
+
+      return;
+   }
 
    ResetReagents()
    {

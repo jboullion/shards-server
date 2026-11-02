@@ -42,6 +42,10 @@ resources:
    Sweep_spell_intro_rsc = "Faren Lv. 1: Summons the winds of Faren to remove all loose items from the area."
    Sweep_sound = faren.ogg
    
+   Sweep_effect_rsc = \
+      "Gathers up to %i loose items in the room into your pack, as many as "
+      "you can carry."
+
 classvars:
 
    vrName = Sweep_name_rsc
@@ -265,6 +269,20 @@ messages:
 
       Post(oRoom,@SomeoneSaid,#what=who,#string=rRant,#type=SAY_MESSAGE,
            #parm1=Send(who,@GetDef),#parm2=Send(who,@GetName));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how many items it gathers."
+   {
+      AddPacket(4,Sweep_effect_rsc,
+                4,Send(self,@GetNumDeleted,#iSpellPower=iSpellPower));
 
       return;
    }

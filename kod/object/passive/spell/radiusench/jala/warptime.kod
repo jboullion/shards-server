@@ -44,6 +44,10 @@ resources:
    Warp_Time_leave = \
       "You can no longer hear the eerily slow notes of %s%s's song."
 
+   WarpTime_effect_rsc = \
+      "Foe monsters within %i squares take %i%% longer between attacks, and "
+      "foe players take %r longer to cast a spell that has a cast time."
+
 classvars:
 
    vrMusic = warptime_song
@@ -122,6 +126,21 @@ messages:
 
       return Send(oCaster,@AllowBattlerAttack,#victim=who,#report=FALSE,
                   #stroke_obj=self);
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how far, a foe monster's slower attacks "
+   "(ModifyMonsterAttackTime) and a foe player's longer trance (trance.kod)."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,WarpTime_effect_rsc,
+                4,Send(self,@GetSummaryReach,#state=lState),
+                4,25 + (Nth(lState,5) / 4));
+      Send(self,@SendTenthsPhrase,#iTime=Nth(lState,5) * 10);
+
+      return;
    }
 
 end

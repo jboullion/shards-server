@@ -42,6 +42,10 @@ resources:
       "combat less effective."
    winds_sound = fwinds.ogg
 
+   winds_effect_rsc = \
+      "For %r its gusts spoil the aim of each foe in the room: a player loses "
+      "%i aim and %i%% of their shots, a monster %i%% of its offense."
+
 classvars:
 
    vrName = winds_name_rsc
@@ -290,6 +294,30 @@ messages:
    HasConditionalEffect()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the aim, shots and offense it spoils, and how long."
+   {
+      local iPower;
+
+      // CastSpell bounds it so.
+      iPower = Bound(iSpellPower,0,99);
+
+      AddPacket(4,winds_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iPower));
+      // StartEnchantment, TryRuinShot (Random(1,100) under the chance),
+      //  ModifyMonsterOffense.
+      AddPacket(4,iPower / 3, 4,Bound(iPower / 2 + 10,25,60) - 1,
+                4,iPower / 3);
+
+      return;
    }
 
 end

@@ -34,6 +34,10 @@ resources:
       "fully magical damage to 25.  Only the better of these two effects "
       "applies.  Armor of Gort modifies damage received before any "
       "other armor or spells."
+   gort_effect_rsc = \
+      "Each blow you take is cut by 0 to %i.%i damage (half that if it is "
+      "partly magical, none for spells), and none does more than 15 (20 if "
+      "partly magical, 25 for spells), for %r."
    ArmorOfGort_already_enchanted_rsc = "You already have the Armor of Gort."
 
    ArmorOfGort_on_rsc = \
@@ -201,6 +205,28 @@ messages:
    {
       AddPacket(4,gort_enchantment_rsc,
                 4,Send(who,@GetEnchantedState,#what=self) / 25);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): PriorityModifyDefenseDamage's most absorbed (it "
+   "absorbs Random(0,state * 4) hundredths, Bound to viMax_spellpower * 4; "
+   "the state is the spellpower) and its caps of 1500, 2000 and 2500 "
+   "hundredths a blow.  And how long."
+   {
+      local iMost;
+
+      iMost = Bound(iSpellPower * 4,0,viMax_spellpower * 4);
+
+      AddPacket(4,gort_effect_rsc, 4,iMost / 100, 4,(iMost % 100) / 10);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

@@ -31,6 +31,12 @@ resources:
 
    Bait_sound = rdistrac.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   Bait_effect_rsc = \
+      "Each monster less than %i squares away has a %i%% chance to come for you, "
+      "%i%% if it is already fighting (faction troops %i%% and %i%%), never one "
+      "of your own faction."
+
 classvars:
 
    vrName = Bait_name_rsc
@@ -124,6 +130,24 @@ messages:
    GetPotionClass()
    {
       RETURN &BaitPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): CastSpell's chance for each monster, Random(1,100) < "
+   "base + iSpellPower / modifier."
+   {
+      AddPacket(4,Bait_effect_rsc, 4,piBaitRange,
+                4,Bound(25 + iSpellPower / 2 - 1,0,100),
+                4,Bound(25 + iSpellPower / 4 - 1,0,100),
+                4,Bound(iSpellPower / 6 - 1,0,100),
+                4,Bound(iSpellPower / 8 - 1,0,100));
+
+      return;
    }
 
 end

@@ -43,6 +43,10 @@ resources:
       "Battle fury fills your heart.  The very earth thirsts for freshly "
       "shed blood."
 
+   killingfields_effect_rsc = \
+      "Every player in the room, friend or foe, deals 2 to 5 more damage a "
+      "blow, for %r."
+
 classvars:
 
    vrSucceed_wav = killingfields_cast_sound
@@ -154,6 +158,21 @@ messages:
    EffectDesc(who=$)
    {
       AddPacket(4,killingfields_enchantment_rsc, 4,Send(self,@GetName));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the damage it adds, and how long."
+   {
+      AddPacket(4,killingfields_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

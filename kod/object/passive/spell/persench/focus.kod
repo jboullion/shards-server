@@ -37,6 +37,10 @@ resources:
    manafocus_on = "You feel newly focused magic raging through your body."
    manafocus_break_trance = "You have lost your mana focus."
    manafocus_already_enchanted = "You already have %s%s."
+   manafocus_effect_rsc = \
+      "While you hold the trance your mana comes back in %i%% of the usual "
+      "time, and most attack spells deal %i.%i more damage (%i.%i for bolts, "
+      "Firestorm and Ice Nova) for 2 more mana each."
 
 classvars:
 
@@ -120,6 +124,30 @@ messages:
    GetDuration(iSpellPower=0)
    {
       return SPELL_INDEFINITE_DURATION;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): AdjustManaTime's share of the regen time "
+   "((200 - spellpower) / 200), and atakspel.kod's bonus damage, "
+   "(spellpower * piManaFocusBonus * 100) / SPELLPOWER_MAXIMUM hundredths, "
+   "for its piManaFocusBonus of 5, and 10 on BoltSpell and "
+   "RadiusProjectile; atakspel.kod GetManaCostExtra adds the 2 mana."
+   {
+      local iBonus, iBoltBonus;
+
+      iBonus = (iSpellPower * 5 * 100) / SPELLPOWER_MAXIMUM;
+      iBoltBonus = (iSpellPower * 10 * 100) / SPELLPOWER_MAXIMUM;
+
+      AddPacket(4,manafocus_effect_rsc, 4,(200 - iSpellPower) / 2,
+                4,iBonus / 100, 4,(iBonus % 100) / 10,
+                4,iBoltBonus / 100, 4,(iBoltBonus % 100) / 10);
+
+      return;
    }
 
    EffectDesc(who=$)

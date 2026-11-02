@@ -37,6 +37,10 @@ resources:
 
    Relay_sound = krelay.ogg
 
+   Relay_effect_rsc = \
+      "You give another player up to %i of your vigor (keeping 10), and they "
+      "gain a quarter more than you give, up to about %i."
+
 classvars:
 
    vrName = Relay_name_rsc
@@ -156,6 +160,19 @@ messages:
       propagate;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the vigor it gives."
+   {
+      AddPacket(4,Relay_effect_rsc, 4,iSpellPower, 4,MAX_TOTAL_AMOUNT);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

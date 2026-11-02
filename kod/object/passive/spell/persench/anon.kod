@@ -32,6 +32,10 @@ resources:
 
    anonymity_sound = ranonym.ogg
 
+   anonymity_effect_rsc = \
+      "Others see you only as someone, and your Riija spells gain %i "
+      "spellpower, for %r."
+
 classvars:
 
    vrName = anonymity_name_rsc
@@ -130,6 +134,23 @@ messages:
    GetPotionClass()
    {
       return &AnonymityPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): it hides your name, and the Riija spellpower a guise "
+   "of this power gives (spell.kod GetSpellPower's guise bonus), and how "
+   "long."
+   {
+      AddPacket(4,anonymity_effect_rsc, 4,Bound((iSpellPower + 9) / 10,0,10));
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

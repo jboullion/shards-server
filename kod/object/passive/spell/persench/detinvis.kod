@@ -32,6 +32,9 @@ resources:
    DetectInvisible_already_enchanted_rsc = \
       "You can already see the invisible."
    DetectInvisible_Success_rsc = "%s%s eyes pulse briefly."
+   DetectInvisible_effect_rsc = \
+      "You see invisible players and creatures, which flash in your view, "
+      "for %r."
 
 classvars:
 
@@ -111,6 +114,22 @@ messages:
    GetPotionClass()
    {
       return &DetectInvisibilityPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it shows (user.kod's PFLAG2_DETECT_INVIS), and "
+   "how long."
+   {
+      AddPacket(4,DetectInvisible_effect_rsc);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
+      return;
    }
 
 end

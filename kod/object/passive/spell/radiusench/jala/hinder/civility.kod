@@ -38,6 +38,10 @@ resources:
    Civility_enter = "A courtly air played by %s%s fills your mind."
    Civility_leave = "You can no longer hear the courtly air played by %s%s."
 
+   Civility_effect_rsc = \
+      "Foe monsters within %i squares deal %i%% less damage, and foe players "
+      "%i less damage a blow."
+
 classvars:
 
    vrEnchantmentOn = Civility_cast
@@ -98,6 +102,20 @@ messages:
       }
 
       return damage - 1 - (Send(self,@GetSongPower,#state=state) / 33);
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how far, and how much weaker a foe's blows are."
+   {
+      local lState;
+
+      lState = Send(self,@GetSummaryState,#who=who,#iSpellPower=iSpellPower);
+      AddPacket(4,Civility_effect_rsc,
+                4,Send(self,@GetSummaryReach,#state=lState),
+                4,Send(self,@SongPercent,#state=lState),
+                4,1 + (Send(self,@GetSongPower,#state=lState) / 33));
+
+      return;
    }
 
 end

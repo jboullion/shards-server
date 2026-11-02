@@ -31,6 +31,9 @@ resources:
 
    mend_sound = kmend.ogg
 
+   mend_effect_rsc = \
+      "Restores the item you target to full condition, even if it is broken."
+
 classvars:
 
    vrName = mend_name_rsc
@@ -49,6 +52,20 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it does (CastSpell sets the item's hits to its "
+   "most)."
+   {
+      AddPacket(4,mend_effect_rsc);
+
+      return;
+   }
 
    ResetReagents()
    {

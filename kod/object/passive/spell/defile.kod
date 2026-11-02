@@ -37,6 +37,11 @@ resources:
 
    defile_sound = qdefile.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   defile_effect_rsc = \
+      "Turns a player's corpse into %i mana, and a creature's into a share of it "
+      "by its level (all of it at level 100), never past your maximum."
+
 classvars:
 
    vrName = defile_name_rsc
@@ -136,6 +141,20 @@ messages:
       Send(oTarget,@Delete);
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the mana a player's corpse gives, as CastSpell works it "
+   "out."
+   {
+      AddPacket(4,defile_effect_rsc, 4,viMana_bonus + (iSpellPower / 3));
+
+      return;
    }
 
 end

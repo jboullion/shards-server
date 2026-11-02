@@ -48,6 +48,12 @@ resources:
       "You are quite sure that none of the despicable creatures around you are worthy "
       "of your martyrdom."
 
+   martyrsgrace_effect_rsc = \
+      "Heals everyone you can see that you couldn't fight with, and the "
+      "companions you may heal, %i health for every 100 of yours it spends "
+      "(down to a tenth of your maximum), split by what each is missing.  "
+      "You get an eighth of the healing back as mana."
+
    martyrsgrace_notargetsaround_rsc = \
       "Your martyrdom would be quite pointless with no one around to see it."
 
@@ -358,6 +364,22 @@ messages:
 
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how much it heals for the health it spends "
+   "(CastSpell's iBonus, from who's karma and the spellpower)."
+   {
+      AddPacket(4,martyrsgrace_effect_rsc,
+                4,Bound((Send(who,@GetKarma) - 60) * 5 / 2,0,100)
+                  + iSpellPower);
+
+      return;
    }
 
 end

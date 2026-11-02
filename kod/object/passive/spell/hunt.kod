@@ -49,6 +49,10 @@ resources:
    hunt_lost_trackers = "You seem to have managed to lose your trackers!"
    hunt_gain_trackers = "You sense that someone knows where you are..."
 
+   Hunt_effect_rsc = \
+      "Speak a player's name during the trance (%r), and for %r you hear "
+      "where they are as they move."
+
 classvars:
 
    vrName = Hunt_name_rsc
@@ -267,6 +271,22 @@ messages:
    {
       // You cannot remove this spell by spells.
       return FALSE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the trance and how long the hunt lasts (spellpower "
+   "changes neither)."
+   {
+      AddPacket(4,Hunt_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=HUNT_TRANCE);
+      Send(self,@SendDurationPhrase,#iTime=HUNT_TIME);
+
+      return;
    }
 
 end

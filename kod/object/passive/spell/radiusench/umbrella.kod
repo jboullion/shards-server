@@ -44,6 +44,12 @@ resources:
    Umbrella_leave = \
       "You have passed outside the dome of magical energy emanating from %s%s."
    Umbrella_deflected = "%s%s's umbrella dampens the force of your attack."
+   Umbrella_effect_rsc = \
+      "Everyone within %i.%i squares of you that it covers (you, your "
+      "guildmates and anyone you could attack, monsters included) resists "
+      "%i%% of all spell and weapon damage, and players inside get %i more "
+      "defense against attackers it doesn't cover.  It lasts until you rest, "
+      "cast it again or run out of mana."
 
 classvars:
 
@@ -100,6 +106,28 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): its reach (CalculateRange), and the resistance "
+   "(ModifyResistance) and defense (ModifyDefensePower) its state gives."
+   {
+      local iRange, iState;
+
+      iRange = Send(self,@CalculateRange,#who=who,#iSpellPower=iSpellPower);
+      iState = Send(self,@GetStateValue,#who=who,#target=who,
+                    #iSpellPower=iSpellPower);
+
+      AddPacket(4,Umbrella_effect_rsc, 4,iRange / FINENESS,
+                4,(iRange % FINENESS) * 10 / FINENESS, 4,iState / 5,
+                4,iState * 2);
+
+      return;
    }
 
    ModifyDefensePower(who=$,what=$,defense_power=0,state=$)

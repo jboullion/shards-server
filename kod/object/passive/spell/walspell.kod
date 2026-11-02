@@ -22,6 +22,10 @@ resources:
    WallSpell_failed_rsc = \
       "There is too much summoning magic focused here to cast that spell." 
 
+   // Ours (2026-11-02): SendTimeRange's, for an effect summary's %r.
+   walspell_seconds_rsc = "%i seconds"
+   walspell_seconds_range_rsc = "%i to %i seconds"
+
 classvars:
 
    viHarmful = TRUE
@@ -93,6 +97,39 @@ messages:
       }
 
       return TRUE;
+   }
+
+   SendTimeRange(iLow=0,iHigh=0)
+   "Ours (2026-11-02): adds one resource (and its parameters) for a random "
+   "length of time from iLow to iHigh milliseconds, for an effect summary's "
+   "%r: '110 to 150 seconds', to the nearest second."
+   {
+      local iLowSeconds, iHighSeconds;
+
+      iLowSeconds = (iLow + 500) / 1000;
+      iHighSeconds = (iHigh + 500) / 1000;
+      if iLowSeconds = iHighSeconds
+      {
+         AddPacket(4,walspell_seconds_rsc, 4,iHighSeconds);
+
+         return;
+      }
+
+      AddPacket(4,walspell_seconds_range_rsc, 4,iLowSeconds, 4,iHighSeconds);
+
+      return;
+   }
+
+   SendStandTime(iDuration=0,iSpread=20,iUnit=1000,iMin=30000,iMax=200000)
+   "Ours (2026-11-02): one resource for how long a wall element stands, as "
+   "the elements work it out: Random(iDuration - iSpread, iDuration + "
+   "iSpread) * iUnit milliseconds, bounded to iMin and iMax."
+   {
+      Send(self,@SendTimeRange,
+           #iLow=Bound((iDuration - iSpread) * iUnit,iMin,iMax),
+           #iHigh=Bound((iDuration + iSpread) * iUnit,iMin,iMax));
+
+      return;
    }
 
 

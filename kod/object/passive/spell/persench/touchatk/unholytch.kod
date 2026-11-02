@@ -47,6 +47,13 @@ resources:
 
    UnholyTouch_sound = qcurweap.ogg
 
+   // Ours (2026-11-02): FindDamage and DamageFactors, for the Stats tab.
+   UnholyTouch_effect_extra_rsc = \
+      "  Each blow heals you 2 health, or 1 one time in six, but not against "
+      "the undead or those immune to draining.  It deals half damage to the "
+      "undead and 6 to 15 more to a player who knows a Shal'ille spell, and "
+      "more to good monsters, less to evil ones, by an eighth of their karma."
+
 classvars:
 
    vrName = UnholyTouch_name_rsc
@@ -181,6 +188,15 @@ messages:
       }
 
       return iDamage;
+   }
+
+   SendTouchExtraSummary()
+   "Ours (2026-11-02): the healing FindDamage gives, and what DamageFactors "
+   "does against each kind of foe."
+   {
+      AddPacket(4,UnholyTouch_effect_extra_rsc);
+
+      return;
    }
 
    PlayerKilledSomethingMsg(who=$,victim=$,damage=$)

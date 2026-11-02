@@ -28,6 +28,14 @@ resources:
 
    CreateSpiritualSword_sound = sspham.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary). 4 to 9 is
+   //  weapon.kod's damage for a high quality thrusting weapon; 15%, 6 to 12
+   //  are spirsword.kod's WeaponHitTarget.
+   CreateSpiritualSword_effect_rsc = \
+      "Summons a spiritual sword, bound to you: 4 to 9 holy damage a blow and %i "
+      "more offense, and 15%% of blows add 6 to 12 holy damage, twice that to the "
+      "undead."
+
 classvars:
 
    vrName = CreateSpiritualSword_name_rsc
@@ -92,6 +100,19 @@ messages:
       }
 
       propagate;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the sword's offense bonus, as CastSpell gives it."
+   {
+      AddPacket(4,CreateSpiritualSword_effect_rsc, 4,(iSpellPower * 3) / 2);
+
+      return;
    }
 
 end

@@ -37,6 +37,10 @@ resources:
 
    AntiMagicAura_sound = kantimag.ogg
 
+   AntiMagicAura_effect_rsc = \
+      "Every spell cast in the room but Mana Convergence, the caster's own "
+      "too, loses %i spellpower, for %r to %r."
+
 classvars:
 
    vrIcon = AntiMagicAura_icon_rsc
@@ -147,6 +151,27 @@ messages:
    AffectsSpellPower()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it takes off every spell cast here, and how long."
+   {
+      local iTime;
+
+      // GetDuration rolls Random(iTime / 2, iTime) seconds.
+      iTime = 60 + iSpellPower;
+
+      AddPacket(4,AntiMagicAura_effect_rsc,
+                4,iSpellPower * piAMAEffectPercent / 100);
+      Send(self,@SendDurationPhrase,#iTime=(iTime / 2) * 1000);
+      Send(self,@SendDurationPhrase,#iTime=iTime * 1000);
+
+      return;
    }
 
 end

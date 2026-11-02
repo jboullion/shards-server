@@ -45,6 +45,11 @@ resources:
       "Qor Level 6: Draws a curtain of Silence over the room, stirring the "
       "servants of Qor."
 
+   Silence_effect_rsc = \
+      "While the caster holds the trance, their foes in the room can't speak "
+      "or cast spells, nor can most monsters; it draws %i mana every %i.%i "
+      "seconds."
+
 classvars:
 
    vrSucceed_wav = silence_cast_sound
@@ -190,6 +195,25 @@ messages:
    SpellBannedInArena()
    {
       return TRUE;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it stops, and the mana it draws and how often."
+   {
+      local iTime;
+
+      // GetDuration is the time between drains, in milliseconds.
+      iTime = Send(self,@GetDuration,#iSpellPower=iSpellPower);
+
+      AddPacket(4,Silence_effect_rsc, 4,viManaDrain, 4,iTime / 1000,
+                4,(iTime % 1000) / 100);
+
+      return;
    }
 
 end

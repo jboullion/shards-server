@@ -39,6 +39,10 @@ resources:
       "The item already has a stronger glow enchantment upon it."
    GlowWeapon_cap_your = "Your "
 
+   GlowWeapon_effect_rsc = \
+      "The weapon or instrument you target, or the one a player wields, "
+      "gives off %i to %i light while wielded, for %r (a torch gives 40)."
+
 classvars:
 
    vrName = GlowWeapon_name_rsc
@@ -64,6 +68,24 @@ properties:
    piLightLevel
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): GetLightLevel's range and how long it glows "
+   "(GetDuration)."
+   {
+      local iPower;
+
+      iPower = 20 + (iSpellPower / 3);
+      AddPacket(4,GlowWeapon_effect_rsc, 4,iPower / 2, 4,iPower);
+      Send(self,@SendDurationRange,#iSpellPower=iSpellPower);
+
+      return;
+   }
 
    ResetReagents()
    {

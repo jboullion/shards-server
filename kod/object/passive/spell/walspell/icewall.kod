@@ -28,6 +28,13 @@ resources:
    IceWall_cast_rsc = "Chilling spikes of ice appear before you!"
    IceWall_sound = faren.ogg
 
+   IceWall_effect_rsc = \
+      "The wall stands %r.  Each foe who walks into or stands in it takes 0 "
+      "to %i cold damage about every 1.5 seconds (15%% more if you are "
+      "attuned to frost) and is chilled for %i seconds: a monster moves and "
+      "attacks half again as slowly, a player recovers half again as slowly "
+      "from attacks and spells."
+
 classvars:
 
    vrName = IceWall_name_rsc
@@ -55,6 +62,25 @@ properties:
 
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the ice stands (PlaceWallElements and "
+   "WallOfIce's GetDuration), the most a touch does and its chill."
+   {
+      AddPacket(4,IceWall_effect_rsc);
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 2) + 20,20,120));
+      AddPacket(4,Bound(iSpellPower / 4,1,25),
+                4,Send(Send(SYS,@FindSpellByNum,#num=SID_CHILL),
+                       @GetChillTime,#iSpellPower=0) / 1000);
+
+      return;
+   }
 
    ResetReagents()
    {

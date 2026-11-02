@@ -44,6 +44,10 @@ resources:
    bond_report_room = "Somehow, you sense that your %s is in %s."
    bond_report_user = "Somehow, you sense that your %s is in %q's possession."
 
+   Bond_effect_rsc = \
+      "The item you target stays with you when you die, for good.  Gold, "
+      "reagents and ammunition can't be bonded."
+
 classvars:
 
    vrName = Bond_name_rsc
@@ -71,6 +75,20 @@ properties:
    pbEnabled = TRUE
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what the transcendent attribute does, and what can't "
+   "take it (CanPayCosts)."
+   {
+      AddPacket(4,Bond_effect_rsc);
+
+      return;
+   }
 
    ResetReagents()
    {

@@ -32,6 +32,11 @@ resources:
 
    RingOfFlames_sound = frngfir.ogg
 
+   RingOfFlames_effect_rsc = \
+      "Eight flames ring you, or the one you target, for %r.  Each burns a "
+      "foe who walks into or stands in it for 0 to %i fire damage about "
+      "every 1.5 seconds (15%% more if you are attuned to flame)."
+
 classvars:
 
    vrName = RingOfFlames_name_rsc
@@ -62,6 +67,23 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the flames stand (PlaceWallElements and "
+   "WallOfFire's GetDuration) and the most a touch burns for."
+   {
+      AddPacket(4,RingOfFlames_effect_rsc);
+      Send(self,@SendStandTime,
+           #iDuration=Bound((iSpellPower * 2) + 30,30,180));
+      AddPacket(4,Bound(iSpellPower / 5,1,20));
+
+      return;
+   }
 
    ResetReagents()
    {

@@ -29,6 +29,7 @@ resources:
       "Requires three elderberries to cast."
    nightvision_enchantment_rsc = \
       "\n\nYour current %s enchantment adds %i visual light."
+   nightvision_effect_rsc = "Adds %i to the light you see by, for %r."
    nightvision_already_enchanted_rsc = "You already have night vision."
 
    nightvision_on_rsc = "Your eyes burn with magical energy."
@@ -115,6 +116,22 @@ messages:
    {
       AddPacket(4,nightvision_enchantment_rsc, 4,Send(self,@GetName),
                 4,Send(who,@GetEnchantedState,#what=self));
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the light GetStateValue adds (spellpower + 50; its "
+   "GainLight not called here), and how long."
+   {
+      AddPacket(4,nightvision_effect_rsc, 4,iSpellPower + 50);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
 
       return;
    }

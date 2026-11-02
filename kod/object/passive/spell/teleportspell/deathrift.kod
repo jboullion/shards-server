@@ -52,6 +52,12 @@ resources:
       "~BYou sense a nearby connection forming between dimensions!"
    deathrift_bound_desc = "\n\nYour soul is bound to %s."
 
+   DeathRift_effect_rsc = \
+      "Cast outside a safe haven, it binds your soul to that spot.  Cast in "
+      "one, it takes you alive into the Underworld, whose portal then carries "
+      "you to the bound spot; linger there %r and you are cast out to your "
+      "hometown."
+
 classvars:
 
    vrName = DeathRift_name_rsc
@@ -75,6 +81,22 @@ classvars:
 properties:
 
 messages:
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): what it does out in the world and in a safe haven, "
+   "and how long you may stay in the Underworld (Player's "
+   "DEATH_RIFT_INTERVAL)."
+   {
+      AddPacket(4,DeathRift_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=60000);
+
+      return;
+   }
 
    ResetReagents()
    {

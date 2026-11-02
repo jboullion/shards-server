@@ -31,6 +31,20 @@ resources:
    createfood_inv_full_rsc = \
       "%s%s appears in the air before you, but before you can drop something and grab it, it vanishes."
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   createfood_effect_rsc = "Conjures %r."
+   createfood_list_one_rsc = "%s"
+   createfood_list_first_rsc = "%s%r"
+   createfood_list_more_rsc = ", %s%r"
+   createfood_list_last_rsc = " or %s"
+   createfood_apple_rsc = "an apple"
+   createfood_bread_rsc = "a loaf of bread"
+   createfood_grapes_rsc = "a bunch of grapes (five on Ko'catan)"
+   createfood_turkeyleg_rsc = "a turkey leg"
+   createfood_meatpie_rsc = "a meat pie"
+   createfood_cheese_rsc = "a wheel of cheese"
+   createfood_inkycap_rsc = "an inky-cap mushroom"
+
 classvars:
 
    vrName = createfood_name_rsc
@@ -147,6 +161,71 @@ messages:
 //  If we use the IA_MADE attribute again:
 //  GetDuration(iSpellpower=$)
 //     iDuration = iSpellpower;  ///In minutes
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   GetSummaryFoods()
+   "Ours (2026-11-02): what CastSpell makes for each number it rolls, for the "
+   "effect summary: [lowest roll, highest roll, name]. From 95 it makes an "
+   "inky-cap one time in three, cheese otherwise."
+   {
+      return [ [0,29,createfood_apple_rsc],
+               [30,39,createfood_bread_rsc],
+               [40,59,createfood_grapes_rsc],
+               [60,69,createfood_turkeyleg_rsc],
+               [70,79,createfood_meatpie_rsc],
+               [80,10000,createfood_cheese_rsc],
+               [95,10000,createfood_inkycap_rsc] ];
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the foods it can make at this spellpower (CastSpell "
+   "rolls iSpellPower / 2 to iSpellPower)."
+   {
+      local i, iLow, iHigh, iCount, iLength;
+
+      iLow = iSpellPower / 2;
+      iHigh = iSpellPower;
+      iLength = 0;
+      foreach i in Send(self,@GetSummaryFoods)
+      {
+         if (First(i) <= iHigh) AND (Nth(i,2) >= iLow)
+         {
+            iLength = iLength + 1;
+         }
+      }
+
+      AddPacket(4,createfood_effect_rsc);
+      iCount = 0;
+      foreach i in Send(self,@GetSummaryFoods)
+      {
+         if (First(i) <= iHigh) AND (Nth(i,2) >= iLow)
+         {
+            iCount = iCount + 1;
+            if iLength = 1
+            {
+               AddPacket(4,createfood_list_one_rsc, 4,Nth(i,3));
+            }
+            else if iCount = 1
+            {
+               AddPacket(4,createfood_list_first_rsc, 4,Nth(i,3));
+            }
+            else if iCount = iLength
+            {
+               AddPacket(4,createfood_list_last_rsc, 4,Nth(i,3));
+            }
+            else
+            {
+               AddPacket(4,createfood_list_more_rsc, 4,Nth(i,3));
+            }
+         }
+      }
+
+      return;
+   }
 
 end
 

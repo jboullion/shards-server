@@ -31,6 +31,12 @@ resources:
 
    portaloflife_sound = sraised.ogg
 
+   portaloflife_effect_rsc = \
+      "A rip in the Underworld leads the fallen player back to their body for "
+      "%r.  Where a death costs spell and skill points (the Arena of Death), "
+      "it lowers that cost by %i, by up to 60 more within a minute of the "
+      "death and less after, to no less than 5."
+
 classvars:
 
    vrName = portaloflife_name_rsc
@@ -131,6 +137,22 @@ messages:
       return iDeathCost;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): how long the portal stands (CorpsePortal's "
+   "Constructor) and the death cost it takes off."
+   {
+      AddPacket(4,portaloflife_effect_rsc);
+      Send(self,@SendDurationPhrase,#iTime=(10 + (iSpellPower / 2)) * 1000);
+      AddPacket(4,iSpellPower);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

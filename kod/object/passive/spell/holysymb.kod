@@ -43,6 +43,12 @@ resources:
    holysymbol_intro = \
       "Shal'ille Lv. 1: Weaves a holy symbol in the air which repels any nearby undead."
 
+   HolySymbol_effect_rsc = \
+      "Each undead in the room may flee from you, at a chance of %i plus your "
+      "base max health, less half its level, plus its karma (below 0 for most "
+      "undead), 5 less if it is already fighting, from 2%% to 98%%.  A roll "
+      "that misses by over 25 enrages it at you instead."
+
 classvars:
 
    vrName = HolySymbol_name_rsc
@@ -169,6 +175,19 @@ messages:
       iDuration = iSpellpower/10;  //seconds
 
       return iDuration;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the spellpower part of the chance to turn each undead."
+   {
+      AddPacket(4,HolySymbol_effect_rsc, 4,iSpellPower * 3 / 4);
+
+      return;
    }
 
 end

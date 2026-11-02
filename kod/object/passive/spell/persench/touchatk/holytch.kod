@@ -44,6 +44,12 @@ resources:
 
    holytouch_sound = sholytch.ogg
 
+   // Ours (2026-11-02): DamageFactors, for the Stats tab.
+   holytouch_effect_extra_rsc = \
+      "  Each blow deals 5 to 10 more to the undead and 5 to 15 more to a "
+      "player who knows a Qor spell, and more to evil monsters, less to good "
+      "ones, by a twelfth of their karma."
+
 classvars:
 
    vrName = HolyTouch_name_rsc
@@ -141,6 +147,14 @@ messages:
       }
 
       return iDamage;
+   }
+
+   SendTouchExtraSummary()
+   "Ours (2026-11-02): what DamageFactors adds against each kind of foe."
+   {
+      AddPacket(4,holytouch_effect_extra_rsc);
+
+      return;
    }
 
 

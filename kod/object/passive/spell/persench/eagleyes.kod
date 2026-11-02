@@ -45,6 +45,11 @@ resources:
 
    EagleEyes_sound = keagleye.ogg
 
+   eagleeyes_effect_rsc = \
+      "With a ranged weapon you get %i offense and 1 more damage; Blind and "
+      "Dazzle miss you outright about %i%% and %i%% of the time and "
+      "otherwise last %i%% less, for %r."
+
 classvars:
 
    vrName = EagleEyes_name_rsc
@@ -222,6 +227,32 @@ messages:
       AddPacket(4,eagleeyes_enchantment_rsc, 4,Send(self,@GetName),
                 4,iState, 4,iState * piResistPercent / 100,
                 4,100 * iState / piReductionFactor);
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): GetStateValue's state (without its attack modifier), "
+   "the ranged bonus (ModifyHitRoll, ModifyDamage), DoEagleEyes's chance to "
+   "turn Blind (iFactor 1) and Dazzle (iFactor 2): Random(0,100) <= the "
+   "chance, so one more than it in 101; and the cut in their length.  And "
+   "how long."
+   {
+      local iState;
+
+      iState = Bound(iSpellPower + 1,10,100);
+
+      AddPacket(4,eagleeyes_effect_rsc, 4,iState,
+                4,(iState * piResistPercent) / 100 + 1,
+                4,(iState * (piResistPercent * 2)) / 100 + 1,
+                4,100 * iState / piReductionFactor);
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+
       return;
    }
 

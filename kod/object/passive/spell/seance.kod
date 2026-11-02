@@ -37,6 +37,12 @@ resources:
 
    Seance_sound = sseance.ogg
 
+   Seance_effect_rsc = \
+      "Names a random enemy of your guild or faction and where they are, "
+      "right %i%% of the time plus a quarter of your max health (25 at most), "
+      "from 15%% to 99%%, and less often against Cloak.  A wrong answer keeps "
+      "repeating for %r to %r."
+
 classvars:
 
    vrName = Seance_name_rsc
@@ -219,6 +225,26 @@ messages:
       return;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the chance to be right (GetSeanceStrength) and how "
+   "long a wrong answer repeats (GetDuration)."
+   {
+      local iDuration;
+
+      iDuration = Bound(300 - (((7 * iSpellPower) / 5) + Send(who,@GetKarma)),
+                        60,300) * 1000;
+      AddPacket(4,Seance_effect_rsc, 4,iSpellPower / 2);
+      Send(self,@SendDurationPhrase,#iTime=iDuration / 2);
+      Send(self,@SendDurationPhrase,#iTime=iDuration);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

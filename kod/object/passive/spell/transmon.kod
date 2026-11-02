@@ -33,6 +33,11 @@ resources:
 
    transmon_sound = rmorph.ogg
 
+   transmon_effect_rsc = \
+      "Turns a monster into a random other one, likeliest near level %i, "
+      "keeping its share of wounds, its target and its master; the new one "
+      "drops no loot."
+
 classvars:
 
    vrName = transmon_name_rsc
@@ -223,6 +228,19 @@ messages:
             #parm3=Send(oNewMonster,@GetIndef),#parm4=Send(oNewMonster,@GetName));
 
       Post(victim,@Delete);
+
+      return;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the forms it favours."
+   {
+      AddPacket(4,transmon_effect_rsc, 4,iSpellPower);
 
       return;
    }

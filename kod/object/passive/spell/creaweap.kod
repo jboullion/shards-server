@@ -39,6 +39,23 @@ resources:
 
    createweapon_sound = kraanan.ogg
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   createweapon_effect_rsc = \
+      "Conjures %r that vanishes after %r, with %i%% of its usual durability. "
+      "Saying a weapon's name in the trance picks one your ability in this spell "
+      "allows."
+   createweapon_list_one_rsc = "%s"
+   createweapon_list_first_rsc = "%s%r"
+   createweapon_list_more_rsc = ", %s%r"
+   createweapon_list_last_rsc = " or %s"
+   createweapon_mace_rsc = "a mace"
+   createweapon_shortsword_rsc = "a short sword"
+   createweapon_hammer_rsc = "a hammer"
+   createweapon_axe_rsc = "an axe"
+   createweapon_longsword_rsc = "a long sword"
+   createweapon_scimitar_rsc = "a scimitar"
+   createweapon_mysticsword_rsc = "a mystic sword"
+
 classvars:
 
    vrName = createweapon_name_rsc
@@ -262,6 +279,76 @@ messages:
       iDuration = iDuration * 60 * 1000;
 
       return iDuration;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   GetSummaryWeapons()
+   "Ours (2026-11-02): what CastSpell makes for each number it rolls, for the "
+   "effect summary: [lowest roll, highest roll, name]."
+   {
+      return [ [0,19,createweapon_mace_rsc],
+               [20,29,createweapon_shortsword_rsc],
+               [30,44,createweapon_hammer_rsc],
+               [45,59,createweapon_axe_rsc],
+               [60,74,createweapon_longsword_rsc],
+               [75,94,createweapon_scimitar_rsc],
+               [95,10000,createweapon_mysticsword_rsc] ];
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the weapons it can make at this spellpower (CastSpell "
+   "rolls iSpellPower / 3 to iSpellPower), how long they last (GetDuration, "
+   "the IA_MADE timer) and their hits."
+   {
+      local i, iLow, iHigh, iCount, iLength;
+
+      iLow = iSpellPower / 3;
+      iHigh = iSpellPower;
+      iLength = 0;
+      foreach i in Send(self,@GetSummaryWeapons)
+      {
+         if (First(i) <= iHigh) AND (Nth(i,2) >= iLow)
+         {
+            iLength = iLength + 1;
+         }
+      }
+
+      AddPacket(4,createweapon_effect_rsc);
+      iCount = 0;
+      foreach i in Send(self,@GetSummaryWeapons)
+      {
+         if (First(i) <= iHigh) AND (Nth(i,2) >= iLow)
+         {
+            iCount = iCount + 1;
+            if iLength = 1
+            {
+               AddPacket(4,createweapon_list_one_rsc, 4,Nth(i,3));
+            }
+            else if iCount = 1
+            {
+               AddPacket(4,createweapon_list_first_rsc, 4,Nth(i,3));
+            }
+            else if iCount = iLength
+            {
+               AddPacket(4,createweapon_list_last_rsc, 4,Nth(i,3));
+            }
+            else
+            {
+               AddPacket(4,createweapon_list_more_rsc, 4,Nth(i,3));
+            }
+         }
+      }
+
+      Send(self,@SendDurationPhrase,
+           #iTime=Send(self,@GetDuration,#iSpellPower=iSpellPower));
+      // SetHits: (hits * (iSpellPower + 100)) / 200
+      AddPacket(4,(iSpellPower + 100) / 2);
+
+      return;
    }
 
 end

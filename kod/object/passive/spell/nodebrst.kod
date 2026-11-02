@@ -40,6 +40,11 @@ resources:
    
    Nodeburst_sound = qor.ogg
 
+   Nodeburst_effect_rsc = \
+      "Tears away one of your mana node links for mana equal to your node "
+      "count squared and %i%% of that again (at least what the link took, never past %i "
+      "mana) and half that in health; once a Meridian day."
+
 classvars:
 
    vrName = Nodeburst_name_rsc
@@ -155,6 +160,19 @@ messages:
       return &NodeburstPotion;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the burst of mana and health."
+   {
+      AddPacket(4,Nodeburst_effect_rsc, 4,iSpellPower, 4,MAX_MANA_ALLOWED);
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////

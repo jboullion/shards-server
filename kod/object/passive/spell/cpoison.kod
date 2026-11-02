@@ -35,6 +35,12 @@ resources:
       "Shal'ille Lv. 2: Fights the effects of any poisons which may flow "
       "through the target's body."
 
+   // Ours (2026-11-02): the effect summary (SendEffectSummary)
+   curepoison_effect_rsc = \
+      "Cures the poison %i%% of the time; otherwise it weakens it by %i%%, curing "
+      "it anyway if that leaves it under a tenth as strong or taking less than "
+      "10 health every 10 seconds."
+
 classvars:
 
    vrSucceed_wav = curepoison_cast_sound
@@ -164,6 +170,22 @@ messages:
    GetPotionClass()
    {
       return &CurePoisonPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): CastSpell's chance (Random(1,100) < iSpellPower) and "
+   "how much it weakens the poison otherwise (a strength under 100 is under "
+   "10 health a tick, Player.PoisonTimer)."
+   {
+      AddPacket(4,curepoison_effect_rsc, 4,Bound(iSpellPower - 1,0,100),
+                4,iSpellPower);
+
+      return;
    }
 
 end

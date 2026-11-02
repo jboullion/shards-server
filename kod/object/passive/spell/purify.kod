@@ -41,6 +41,12 @@ resources:
    purify_spell_intro = \
       "Shal'ille Lv. 4: Removes harmful personal enchantments on the target."
 
+   purify_effect_rsc = \
+      "Each harmful enchantment on a player or companion has a %i%% chance to "
+      "be lifted.%r"
+   purify_effect_sure_rsc = \
+      "  With two or more on them, one is always lifted first."
+
 classvars:
 
    vrSucceed_wav = purify_cast_sound
@@ -236,6 +242,28 @@ messages:
    GetPotionClass()
    {
       return &PurifyPotion;
+   }
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the chance to lift each harmful enchantment "
+   "(DoPurify: iChance > Random(1,100))."
+   {
+      AddPacket(4,purify_effect_rsc, 4,iSpellPower - 1);
+      if iSpellPower >= MIN_CHANCE_FOR_AUTOREMOVE
+      {
+         AddPacket(4,purify_effect_sure_rsc);
+      }
+      else
+      {
+         AddPacket(4,spell_blank);
+      }
+
+      return;
    }
 
 end

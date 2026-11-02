@@ -43,6 +43,10 @@ resources:
 
    FinalRites_sound = sfrites.ogg
 
+   FinalRites_effect_rsc = \
+      "Every undead creature in the room takes %i to %i holy damage, before "
+      "resistances."
+
 classvars:
 
    vrName = FinalRites_name_rsc
@@ -158,6 +162,20 @@ messages:
       propagate;
    }
 
+
+   HasEffectSummary()
+   {
+      return TRUE;
+   }
+
+   SendEffectSummary(who=$,iSpellPower=0)
+   "Ours (2026-11-02): the holy damage each undead takes."
+   {
+      AddPacket(4,FinalRites_effect_rsc, 4,12 + (iSpellPower / 6),
+                4,20 + (iSpellPower / 6));
+
+      return;
+   }
 
 end
 ////////////////////////////////////////////////////////////////////////////////
