@@ -44,8 +44,7 @@ messages:
    Constructor()
    {
       plContents = [ &StoneTrollMask, &WolfMask,         &DuskRatMask,                    
-                     &TriangleMask,   &SquareMask,       &FrontMask,
-                     &CircleMask,     &PlagueMask,       &RiceMask,
+                     &PlagueMask,  &RiceMask,
                      &PumpkinMask,    &HornedSkullMask,  &ForestMask,
                      &LegionHelm,     &SteelHelm,        &WarHelm ];
 

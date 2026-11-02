@@ -7,9 +7,9 @@
 DEPEND = ..\mask.bof
 BOFS = antmask.bof kriipmsk.bof ratmask.bof skullmsk.bof trollmsk.bof \
        cowmask.bof daemmask.bof feymask.bof mummymsk.bof xeomask.bof \
-       shrnkmsk.bof dratmask.bof strollmsk.bof frontmask.bof ricemask.bof \
-       smask.bof tmask.bof wolfmask.bof cmask.bof superstonetrollmask.bof \
-       indianhat.bof pilgrimhat.bof feymaskevil.bof rednosemsk.bof carrotnose.bof \
+       shrnkmsk.bof dratmask.bof strollmsk.bof ricemask.bof \
+       wolfmask.bof \
+       indianhat.bof pilgrimhat.bof feymaskevil.bof \
        plaguemask.bof pumpkinmask.bof hornedskull.bof forestmask.bof 
 
 !include $(KODDIR)\kod.mak

@@ -49,8 +49,7 @@ messages:
       plContents = [ &KriipaMask,    &StoneTrollMask,   &TrollMask, 
                      &AntMask,       &DuskRatMask,      &RatMask,
                      &SkullMask,     &RiceMask,         &WolfMask,
-                     &TriangleMask,  &SquareMask,       &FrontMask,
-                     &CircleMask,    &CowMask,          &ShrunkenHeadMask,
+                     &CowMask,  &ShrunkenHeadMask,
                      &FeyMaskEvil,   &FeyMask,          &MummyMask,
                      &DaemonMask,    &XeoMask,          &PlagueMask,
                      &PumpkinMask,   &HornedSkullMask,  &ForestMask ];
