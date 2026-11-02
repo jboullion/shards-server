@@ -532,7 +532,8 @@ messages:
       iTier = Send(self,@TierOf,#points=Send(who,@GetCompanionBond));
       iBonus = Send(self,@BondBonus,#tier=iTier);
 
-      iHealth = iH * COMPANION_HEALTH_PCT / 100 * (100 + iBonus) / 100;
+      iHealth = Bound(iH * COMPANION_HEALTH_PCT / 100 * (100 + iBonus) / 100,1,
+                      COMPANION_HEALTH_MAX);
       // A monster of its owner's level fights at 4 x level + 8 x 50 (Monster.GetOffense)
       iFight = (4 * iH + 400) * (COMPANION_FIGHT_PCT + iBonus) / 100;
       lDamage = Send(self,@GetDamage,#kind=Send(oComp,@GetKind));
@@ -546,7 +547,7 @@ messages:
          Send(oComp,@SetTier,#tier=iTier);
       }
 
-      // A caster's spells and mana (nothing for a fighter)
+      // Its spells and mana
       Send(oComp,@ApplyCaster,#tier=iTier,#health=iH);
 
       return;

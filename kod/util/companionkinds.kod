@@ -2,12 +2,14 @@
 // leader who gives them, and the numbers they grow by. CompanionBook (util/companionbook.kod)
 // inherits these tables, as QuestBook inherits QuestDefs.
 //
-// Since the 2026-10-19 revamp each fights with a weapon and a school's spells, and supports its
-// owner with another's (GetSupport, Companion.SupportTimer); both come as its owner grows
-// (COMPANION_SPELL2_HEALTH, COMPANION_SPELL3_HEALTH). The Duke's: an axe, Qor's acids, Riija's
-// shadows and reflections and Qor's unholy weapon. The Princess's: a hammer, Faren's fire or ice,
-// Shal'ille's heal, holy weapon and umbrella. The rebels': a scimitar, Kraanan's blessings and
-// Jala's songs. Its bond tier betters its kit. The schools' own companions (kinds 4-7) are gone.
+// Since the 2026-11-01 rework each is a fighter first: its weapon does the work, and four spells
+// of its school help its owner, one more as its owner grows (COMPANION_SPELL2_HEALTH to
+// COMPANION_SPELL4_HEALTH; GetSupport, Companion.SupportTimer). The Duke's: an axe, then a
+// scimitar; Qor's unholy weapon, enfeeble and blind, and Riija's seduce on a second foe.
+// The Princess's: a long sword, then a mystic sword; Shal'ille's holy weapon, hospice, dazzle
+// and forces of light. Jonas's: a hammer, then a scimitar; Kraanan's bless, super strength,
+// magic shield and armor of Gort. Its bond tier betters its kit. The schools' own companions
+// (kinds 4-7) are gone.
 
 ////////////////////////////////////////////////////////////////////////////////
 CompanionKinds is UtilityFunctions
@@ -136,7 +138,7 @@ messages:
    {
       if kind = COMPANION_PRINCESS
       {
-         return SS_FAREN;
+         return SS_SHALILLE;
       }
 
       if kind = COMPANION_REBEL
@@ -148,8 +150,13 @@ messages:
    }
 
    SpellsKnown(health = 50)
-   "How many of its kind's three spells it has, by its owner's base health."
+   "How many of its kind's four spells it has, by its owner's base health."
    {
+      if health >= COMPANION_SPELL4_HEALTH
+      {
+         return 4;
+      }
+
       if health >= COMPANION_SPELL3_HEALTH
       {
          return 3;
@@ -163,99 +170,45 @@ messages:
       return 1;
    }
 
-   GetSpellBook(kind = 0,health = 50)
-   "Its attack spells for its owner's base health, as Monster.plSpellBook has them: [ spell, "
-   "mana, cumulative chance ]. Fireball turns to Ice Shard against a target that resists cold "
-   "less (GetColdTwin)."
+   GetSpells(kind = 0)
+   "Its kind's four spells, in the order they come: [ spell, mana, COMP_SUP_* ] each."
    {
       if kind = COMPANION_DUKE
       {
-         if Send(self,@SpellsKnown,#health=health) = 1
-         {
-            return [ [SID_SPLASH_OF_ACID,6,100] ];
-         }
-
-         return [ [SID_SPLASH_OF_ACID,6,75], [SID_BLIND,6,100] ];
+         return [ [SID_UNHOLY_WEAPON,10,COMP_SUP_WEAPON], [SID_ENFEEBLE,8,COMP_SUP_DEBUFF],
+                  [SID_BLIND,6,COMP_SUP_DEBUFF], [SID_SEDUCE,18,COMP_SUP_TURN] ];
       }
 
       if kind = COMPANION_PRINCESS
       {
-         if Send(self,@SpellsKnown,#health=health) = 1
-         {
-            return [ [SID_FIREBALL,6,100] ];
-         }
-
-         return [ [SID_FIREBALL,6,60], [SID_LIGHTNING_BOLT,8,100] ];
+         return [ [SID_HOLY_WEAPON,10,COMP_SUP_WEAPON], [SID_HOSPICE,10,COMP_SUP_HEAL],
+                  [SID_DAZZLE,6,COMP_SUP_DEBUFF], [SID_FORCES_OF_LIGHT,15,COMP_SUP_ROOM] ];
       }
 
-      return $;
+      return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_SUPER_STRENGTH,8,COMP_SUP_ENCHANT],
+               [SID_MAGIC_SHIELD,9,COMP_SUP_ENCHANT], [SID_ARMOR_OF_GORT,10,COMP_SUP_ENCHANT] ];
    }
 
    GetSupport(kind = 0,health = 50)
-   "How it supports its owner, for its owner's base health: [ spell, mana, COMP_SUP_* ] each "
-   "(Companion.SupportTimer)."
+   "The spells it has for its owner's base health: the first SpellsKnown of GetSpells "
+   "(Companion.SupportTimer, Companion.WeakenFoe)."
    {
-      local iKnown;
+      local i, iKnown, lSpells;
 
       iKnown = Send(self,@SpellsKnown,#health=health);
-      if kind = COMPANION_DUKE
+      lSpells = $;
+      foreach i in Send(self,@GetSpells,#kind=kind)
       {
-         if iKnown = 1
+         if iKnown <= 0
          {
-            return [ [SID_SHADOW_FORM,5,COMP_SUP_ENCHANT] ];
+            break;
          }
 
-         if iKnown = 2
-         {
-            return [ [SID_SHADOW_FORM,5,COMP_SUP_ENCHANT],
-                     [SID_UNHOLY_WEAPON,10,COMP_SUP_WEAPON] ];
-         }
-
-         return [ [SID_SHADOW_FORM,5,COMP_SUP_ENCHANT], [SID_UNHOLY_WEAPON,10,COMP_SUP_WEAPON],
-                  [SID_REFLECTION,10,COMP_SUP_REFLECT] ];
+         lSpells = Cons(i,lSpells);
+         --iKnown;
       }
 
-      if kind = COMPANION_PRINCESS
-      {
-         if iKnown = 1
-         {
-            return [ [SID_MINOR_HEAL,4,COMP_SUP_HEAL] ];
-         }
-
-         if iKnown = 2
-         {
-            return [ [SID_MINOR_HEAL,4,COMP_SUP_HEAL], [SID_HOLY_WEAPON,10,COMP_SUP_WEAPON] ];
-         }
-
-         return [ [SID_MINOR_HEAL,4,COMP_SUP_HEAL], [SID_HOLY_WEAPON,10,COMP_SUP_WEAPON],
-                  [SID_UMBRELLA,15,COMP_SUP_AURA] ];
-      }
-
-      if iKnown = 1
-      {
-         return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_INVIGORATE,5,COMP_SUP_SONG] ];
-      }
-
-      if iKnown = 2
-      {
-         return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_MAGIC_SHIELD,9,COMP_SUP_ENCHANT],
-                  [SID_INVIGORATE,5,COMP_SUP_SONG], [SID_RESTORATE,5,COMP_SUP_SONG] ];
-      }
-
-      return [ [SID_BLESS,6,COMP_SUP_ENCHANT], [SID_MAGIC_SHIELD,9,COMP_SUP_ENCHANT],
-               [SID_ARMOR_OF_GORT,10,COMP_SUP_ENCHANT], [SID_INVIGORATE,5,COMP_SUP_SONG],
-               [SID_RESTORATE,5,COMP_SUP_SONG], [SID_REJUVENATE,5,COMP_SUP_SONG] ];
-   }
-
-   GetColdTwin(sid = 0)
-   "The cold spell a fire spell turns into, or $."
-   {
-      if sid = SID_FIREBALL
-      {
-         return SID_ICESHARD;
-      }
-
-      return $;
+      return lSpells;
    }
 
    GetCasterNumbers(kind = 0,tier = 1,health = 50)
@@ -303,15 +256,9 @@ messages:
    GetDamage(kind = 0)
    "[ least, most ] damage, in thousandths of the owner's base health."
    {
-      // A monster of the owner's level hits for about 8 per 100 levels (Monster.GetDamage)
-      if kind = COMPANION_REBEL
-      {
-         // It only buffs: its blade does the work
-         return [ 50, 110 ];
-      }
-
-      // Its spells add to it
-      return [ 45, 100 ];
+      // A monster of the owner's level hits for about 8 per 100 levels (Monster.GetDamage).
+      // Every kind fights with its weapon alone, so all hit the same, a little harder.
+      return [ 70, 140 ];
    }
 
    GetGear(kind = 0,tier = 1)
@@ -327,55 +274,50 @@ messages:
 
          if tier = 2
          {
-            return [ &BerserkerAxe ];
+            return [ &Axe, &ThornCirclet ];
          }
 
-         if tier = 3
+         if tier <= 4
          {
-            return [ &BerserkerAxe, &ThornCirclet ];
+            return [ &Scimitar, &ThornCirclet ];
          }
 
-         if tier = 4
-         {
-            return [ &NeruditeAxe, &ThornCirclet ];
-         }
-
-         return [ &NeruditeAxe, &QormasHelm ];
+         return [ &Scimitar, &QormasHelm ];
       }
 
       if kind = COMPANION_PRINCESS
       {
          if tier <= 1
          {
-            return [ &Hammer ];
+            return [ &LongSword ];
          }
 
          if tier = 2
          {
-            return [ &Hammer, &Circlet ];
+            return [ &LongSword, &Circlet ];
          }
 
          if tier = 3
          {
-            return [ &Maul, &Circlet ];
+            return [ &MysticSword, &Circlet ];
          }
 
          if tier = 4
          {
-            return [ &Maul, &Circlet, &Gauntlet ];
+            return [ &MysticSword, &Circlet, &Gauntlet ];
          }
 
-         return [ &Maul, &Wizardhat, &Gauntlet ];
+         return [ &MysticSword, &Wizardhat, &Gauntlet ];
       }
 
       if tier <= 1
       {
-         return [ &Scimitar ];
+         return [ &Hammer ];
       }
 
       if tier = 2
       {
-         return [ &Scimitar, &SimpleHelm ];
+         return [ &Hammer, &SimpleHelm ];
       }
 
       if tier = 3
