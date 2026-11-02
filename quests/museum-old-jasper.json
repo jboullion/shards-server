@@ -1,0 +1,53 @@
+{
+  "id": 366,
+  "key": "museum-old-jasper",
+  "name": "Snow on Old Jasper",
+  "tier": "story",
+  "giver": {
+    "class": "CorNothMuseumGuard"
+  },
+  "band": {
+    "min": 40,
+    "max": 80
+  },
+  "requires": {
+    "quests": [
+      255
+    ]
+  },
+  "text": {
+    "offer": "Mychel says, \"The southernmost portal on the west wall goes to Jasper, back when winter held it half the year. If you go, look for Tobin. He cried the news in Jasper's square in those days, and the portal still seems to remember him. Hear what he has to say, then come and tell me.\"",
+    "complete": "Mychel says, \"Lamps and snow and quiet, and a crier with no news to cry. Hard to believe it's the same town where Jonas drinks today and talks about rebellion. Every town forgets it was ever peaceful. That's what my museum is for. Thank you.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_JASPER"
+      ],
+      "auto": true,
+      "objective": "Step through to old Jasper",
+      "brief": "The southernmost of the five portals on the museum's west wall leads to Jasper as it was long ago."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "placed": "old-jasper-crier"
+      },
+      "objective": "Hear out Tobin the crier",
+      "brief": "Tobin, the crier of old Jasper, stands in the square a few steps from where the portal set you down. Talk to him."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "CorNothMuseumGuard"
+      },
+      "objective": "Tell Mychel what you found",
+      "brief": "Tobin says, \"Hear ye, hear ye! The lake is frozen past the reeds, the lamps are lit at the fourth hour, and the king's peace holds from Barloque to the sea! That's all the news there is, traveller. There's never much in Jasper.\" Step back through the portal, return to the Meridian Museum, and tell Mychel what he said."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3,
+    "shillings": 75
+  }
+}

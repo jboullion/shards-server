@@ -1,0 +1,35 @@
+{
+  "id": 360,
+  "key": "cornoth-flatland-ants",
+  "name": "Ants in the Flatlands",
+  "tier": "main",
+  "giver": {
+    "class": "CorNothSergeant"
+  },
+  "band": {
+    "min": 40,
+    "max": 45
+  },
+  "text": {
+    "offer": "Rook says, \"The farmers out in the Flatlands can't get a crop in for the ants. Giant ones, chewing through everything that grows and biting anyone who stands in the way. They're slow, so they're good practice for a new blade. Kill ten of them.\"",
+    "progress": "Rook says, \"The Flatlands are south and east of Cor Noth. You'll find more ants up at the source of the river, too.\"",
+    "complete": "Rook says, \"Ten fewer mouths in the fields. The farmers will thank you, and you hit a little harder than you did this morning.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Ant",
+      "count": 10,
+      "exact": true,
+      "rooms": [
+        584,
+        563
+      ],
+      "objective": "Ants slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 150
+  }
+}

@@ -14,9 +14,9 @@
     "max": 75
   },
   "text": {
-    "offer": "Castle Victoria was the seat of kings, once. Now its halls are full of the walking bones of Far'Nohl's court. I'd see the place cleansed - start with fifteen of the skeletons in its halls, and we'll talk about what lies deeper.",
-    "progress": "The skeletons walk the halls of Castle Victoria and the rooms upstairs.",
-    "complete": "Fifteen. The castle is a little quieter. But Far'Nohl's guard still holds the upper rooms."
+    "offer": "Drechx says, \"The main hall belongs to the skeletons of Far'Nohl's court, and they're stronger than the broken things upstairs. Destroy fifteen of them in the hall, and we'll talk about what lies deeper.\"",
+    "progress": "The skeletons walk the main hall of Castle Victoria.",
+    "complete": "Drechx says, \"Fifteen. The hall is a little quieter. But Far'Nohl's tusked guard still holds the antechamber.\""
   },
   "steps": [
     {
@@ -25,15 +25,23 @@
       "exact": true,
       "count": 15,
       "rooms": [
-        38,
-        39
+        "RID_CASTLE1"
       ],
       "inRooms": true,
-      "objective": "Skeletons destroyed in Castle Victoria"
+      "objective": "Skeletons destroyed in the main hall of Castle Victoria"
     }
   ],
   "rewards": {
     "xpPoints": 0.75,
-    "shillings": 1000
+    "shillings": 500
+  },
+  "requires": {
+    "quests": [
+      368,
+      369
+    ]
+  },
+  "repeat": {
+    "cooldownHours": 2
   }
 }

@@ -49,8 +49,14 @@ properties:
 
 messages:
 
-   Constructor()
+   Constructor(charges = $)
+   "Ours: charges, more than the default 5 (the crate under Castle Victoria)."
    {
+      if charges <> $
+      {
+         piCharges = charges;
+      }
+
       Send(self,@SetColor,#iColor=piCharges);
       
       propagate;

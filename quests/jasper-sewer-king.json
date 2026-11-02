@@ -1,0 +1,39 @@
+{
+  "id": 382,
+  "key": "jasper-sewer-king",
+  "name": "The King Below Jasper",
+  "tier": "main",
+  "giver": {
+    "class": "JasperBartender"
+  },
+  "band": {
+    "min": 55,
+    "max": 70
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Pietro says, \"Kill the soldiers and more come. They've got a king down there, deep in the sewers, a fat old rat who breeds them faster than you can kill them. Find him and kill him.\"",
+    "progress": "Pietro says, \"The rat king keeps to the deeper tunnels of the Sewers of Jasper. Bring friends: his soldiers guard him.\"",
+    "complete": "Pietro says, \"The king's dead? Then my cellar might stay dry a little longer. Here.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GiantRatKing",
+      "count": 1,
+      "rooms": [
+        377,
+        378,
+        379
+      ],
+      "inRooms": true,
+      "objective": "The rat king of the Sewers of Jasper slain"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 300
+  }
+}

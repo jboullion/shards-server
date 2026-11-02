@@ -11,7 +11,7 @@
     "max": 50
   },
   "text": {
-    "offer": "Merchants are refusing to use the East Merchant Way and the Flatlands - spiders, big ones, dropping on the carts. Cor Noth lives on that trade. Kill fifteen of them and the merchants will have no more excuses.",
+    "offer": "Merchants are refusing to use the East Merchant Way and the Flatlands - spiders, big ones, dropping on the carts. Cor Noth lives on that trade. Kill ten of them and the merchants will have no more excuses.",
     "progress": "The East Merchant Way and the Flatlands are south and east of Cor Noth.",
     "complete": "The merchants are already back on the road. Good work."
   },
@@ -19,7 +19,7 @@
     {
       "kind": "kill",
       "target": "Spider",
-      "count": 15,
+      "count": 10,
       "rooms": [
         564,
         584

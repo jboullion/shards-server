@@ -1,0 +1,54 @@
+{
+  "id": 365,
+  "key": "museum-old-barloque",
+  "name": "Both Halves of the Crown",
+  "tier": "story",
+  "giver": {
+    "class": "CorNothMuseumGuard"
+  },
+  "band": {
+    "min": 40,
+    "max": 80
+  },
+  "requires": {
+    "quests": [
+      255
+    ]
+  },
+  "text": {
+    "offer": "Mychel says, \"Two of my portals lead to the same place, which confuses everyone. Old Barloque was split in two, a north town and a south town, with the king's road running between them. Take the middle portal on the west wall into the north town, then walk south into the other half. Walk the whole royal city and come back to me.\"",
+    "complete": "Mychel says, \"Two towns that thought of themselves as one city, and quarrelled like brothers about it. The crown sat between them and kept the peace. Barloque has grown a great deal since, but it's still the crown's city. Thank you for walking it for me.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_BAR_NORTH"
+      ],
+      "auto": true,
+      "objective": "Walk the north town of old Barloque",
+      "brief": "The middle portal on the museum's west wall leads to the north town of old Barloque."
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_BAR_SOUTH"
+      ],
+      "auto": true,
+      "objective": "Walk the south town of old Barloque",
+      "brief": "Old Barloque's south town lies beyond the north town's southern edge. Walk south until you cross into it (the next portal along the museum's wall also leads there)."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "CorNothMuseumGuard"
+      },
+      "objective": "Tell Mychel what you found",
+      "brief": "You have walked both halves of old Barloque. Step back through a portal, return to the Meridian Museum, and tell Mychel what you saw."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3,
+    "shillings": 75
+  }
+}

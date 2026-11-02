@@ -1,0 +1,37 @@
+{
+  "id": 388,
+  "key": "barloque-badlands-worms",
+  "name": "Worms Under the Badlands",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueBlacksmith"
+  },
+  "band": {
+    "min": 75,
+    "max": 99
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Fehr'loi Qan says, \"The caravans that bring my iron cross the Badlands, and the groundworms swallow them, oxen and all. Kill ten of the beasts and the iron will come through.\"",
+    "progress": "Fehr'loi Qan says, \"The groundworms burrow under the Badlands, and in the Rumbling Cavern below them.\"",
+    "complete": "Fehr'loi Qan says, \"Ten worms. The caravans will be through by the week's end. Here's your pay.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GroundWorm",
+      "count": 10,
+      "rooms": [
+        45,
+        860
+      ],
+      "objective": "Groundworms slain in the Badlands"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 800
+  }
+}

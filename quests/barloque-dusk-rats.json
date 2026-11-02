@@ -1,0 +1,39 @@
+{
+  "id": 387,
+  "key": "barloque-dusk-rats",
+  "name": "Dusk Rats Under the Crown",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueBartender"
+  },
+  "band": {
+    "min": 80,
+    "max": 89
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Meidei says, \"The sewer men won't go into the deep tunnels any more. Dusk rats, they say, black and quick and hungry. One took a man's hand. Kill ten of them, would you?\"",
+    "progress": "Meidei says, \"The dusk rats are in the deepest tunnels of the Sewers of Barloque.\"",
+    "complete": "Meidei says, \"Ten of them? The sewer men will drink to you tonight.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DuskRat",
+      "count": 10,
+      "rooms": [
+        108,
+        111,
+        112
+      ],
+      "inRooms": true,
+      "objective": "Dusk rats slain in the Sewers of Barloque"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.9,
+    "shillings": 600
+  }
+}

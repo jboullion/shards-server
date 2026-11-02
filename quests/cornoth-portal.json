@@ -10,14 +10,9 @@
     "min": 40,
     "max": 50
   },
-  "requires": {
-    "quests": [
-      252
-    ]
-  },
   "text": {
     "offer": "Rook says, \"Meridian's a big place, and walking it gets old. Every major town has a travel portal. Walk into one and it knows you; walk into any other you've touched, and you can step straight back to it. There's one here in Cor Noth. Go and touch it. You'll thank me the first time you're a long way from home and hurting.\"",
-    "complete": "Rook says, \"Now Cor Noth is one step away, wherever you've got another portal. Touch one in every town you reach. You'll need them for what I've got planned for you next.\""
+    "complete": "Rook says, \"Now Cor Noth is one step away, wherever you've got another portal. Touch one in every town you reach: ask the innkeepers, they'll point you to it. Then come and see me. I've got more planned for you.\""
   },
   "steps": [
     {

@@ -1,0 +1,28 @@
+{
+  "id": 362,
+  "key": "barloque-portal",
+  "name": "The Royal Portal",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 60
+  },
+  "text": {
+    "offer": "Pritchett says, \"Welcome to the Royal City. If you mean to come back, and everyone does, touch the city's portal before you leave. It stands at the north-west corner of the north town. Walk into it and it'll know you, and you can step back here from any other portal you've touched.\"",
+    "complete": "Pritchett says, \"There. The Royal City is always a step away now. Stay a night or two next time, won't you?\""
+  },
+  "steps": [
+    {
+      "kind": "attune",
+      "point": 5,
+      "objective": "Attune to Barloque's portal",
+      "brief": "Barloque's travel portal stands at the north-west corner of the north town (a gold \"!\" marks portals you haven't touched). Walk into it to attune yourself to it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}

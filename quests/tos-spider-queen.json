@@ -1,0 +1,33 @@
+{
+  "id": 371,
+  "key": "tos-spider-queen",
+  "name": "The Queen of the Nest",
+  "tier": "main",
+  "giver": {
+    "class": "TosApothecary"
+  },
+  "band": {
+    "min": 80,
+    "max": 165
+  },
+  "text": {
+    "offer": "Frisconar says, \"In the Forests of Meridian there is an old oak smothered in webs, and beneath it the Spider Nest, and in the nest a queen as big as a wagon. Every spider in those woods is her get. Her venom would keep my shop for a year, but I am an old man. Kill her. And take friends: she is far stronger than anything you've met, and her children will swarm you.\"",
+    "progress": "Frisconar says, \"The way into the nest is the hole in a web-covered tree in the Forests of Meridian. Go in a group, and go well fed.\"",
+    "complete": "Frisconar says, \"The queen, dead? Then the forest will be quieter for a while, until another takes her place. Here, you've earned this.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "SpiderQueen",
+      "count": 1,
+      "rooms": [
+        "RID_NEST1"
+      ],
+      "objective": "Slay the queen spider in the Spider Nest"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 5000
+  }
+}

@@ -7,11 +7,11 @@
     "class": "TosInnKeeper"
   },
   "band": {
-    "min": 50,
+    "min": 45,
     "max": 90
   },
   "repeat": {
-    "cooldownHours": 24
+    "cooldownHours": 2
   },
   "text": {
     "offer": "Paddock says, \"The zombies are bad enough, but some nights the skeletons come out with them, and they're worse. Harder to kill and they don't smell any better. Break five of them in the graveyard some night, and I'll pay you for it.\"",

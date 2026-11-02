@@ -10,8 +10,8 @@
     ]
   },
   "band": {
-    "min": 100,
-    "max": 125
+    "min": 70,
+    "max": 120
   },
   "requires": {
     "quests": [
@@ -19,7 +19,7 @@
     ]
   },
   "text": {
-    "offer": "The antechamber before the throne room is held by the tusked dead, Far'Nohl's last guard. Destroy ten of them, and the way to the throne lies open.",
+    "offer": "Drechx says, \"The antechamber before the throne room is held by the tusked dead, Far'Nohl's last guard. They hit far harder than anything in the hall. Destroy ten of them, and the way to the throne lies open.\"",
     "progress": "The tusked skeletons guard the antechamber of Castle Victoria, before the throne room.",
     "complete": "The antechamber is clear. Beyond it, the throne - and the king who sat on it."
   },
@@ -37,6 +37,9 @@
   ],
   "rewards": {
     "xpPoints": 1,
-    "shillings": 3000
+    "shillings": 800
+  },
+  "repeat": {
+    "cooldownHours": 2
   }
 }

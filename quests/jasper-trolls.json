@@ -1,0 +1,36 @@
+{
+  "id": 383,
+  "key": "jasper-trolls",
+  "name": "Trolls in the Crags",
+  "tier": "main",
+  "giver": {
+    "class": "JasperBlacksmith"
+  },
+  "band": {
+    "min": 65,
+    "max": 89
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Quintor says, \"Ants were one thing. Now the trolls are coming down out of the Cragged Mountains, and a troll will eat a miner whole. Kill eight of them, and I'll make it worth your while.\"",
+    "progress": "Quintor says, \"The trolls roam the high slopes of the Cragged Mountains, near Jasper. Don't let them corner you.\"",
+    "complete": "Quintor says, \"Eight trolls. You're tougher than you look. Here's your pay.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Troll",
+      "count": 8,
+      "rooms": [
+        578
+      ],
+      "objective": "Trolls slain in the Cragged Mountains"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 400
+  }
+}

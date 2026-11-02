@@ -16,6 +16,10 @@
   "requires": {
     "quests": [
       13
+    ],
+    "notQuests": [
+      375,
+      378
     ]
   },
   "text": {

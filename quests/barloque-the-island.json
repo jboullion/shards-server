@@ -1,0 +1,55 @@
+{
+  "id": 374,
+  "key": "barloque-the-island",
+  "name": "An Island of Konima's Children",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 80,
+    "max": 100
+  },
+  "requires": {
+    "notQuests": [
+      372,
+      377
+    ]
+  },
+  "text": {
+    "offer": "Pritchett says, \"The Princess sends envoys to an island city past the Orc Caves, west of Tos. Ko'catan, they call it, where the children of Konima's legion live. The envoys come back with silks and stories of war. Go and see it for yourself, and find their captain.\"",
+    "complete": "Cital ko'Manca says, \"A mainlander, through the caves? Then you can fight. The Avars press us from the jungle every day. Stay, and I'll put you to work.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_ORC_CAVE1"
+      ],
+      "auto": true,
+      "objective": "Find a way into the Orc Caves",
+      "brief": "To the west of Tos, in the Twisted Woods, there is a cave. In that cave, ancient mages sealed off the Orc Caves with an illusionary wall. To get through, you must dispel the illusion: another adventurer may help, you might buy a scroll of dispel illusion, or you can learn the spell yourself from the ways of Kraanan."
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_KOCATAN"
+      ],
+      "auto": true,
+      "objective": "Find the island city of Ko'catan",
+      "brief": "Somewhere beyond the Orc Caves, the descendants of the hero Konima live on, in a city on an island. Find your way through the caves to it, and be wary: the orcs are only the start of what lives down there."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "KocatanCaptainGood"
+      },
+      "objective": "Report to Cital ko'Manca",
+      "brief": "You emerge into the light of a beautiful city. Its people are at war with the Avars of the jungle, and their captain, Cital ko'Manca, always needs fighters. Find him in Ko'catan and talk to him."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.75,
+    "shillings": 500
+  }
+}

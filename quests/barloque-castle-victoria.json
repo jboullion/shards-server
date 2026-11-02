@@ -1,0 +1,49 @@
+{
+  "id": 373,
+  "key": "barloque-castle-victoria",
+  "name": "The King's Old Castle",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 45,
+    "max": 60
+  },
+  "requires": {
+    "notQuests": [
+      13,
+      376
+    ]
+  },
+  "text": {
+    "offer": "Pritchett says, \"The crown sat in Castle Victoria once, before Far'Nohl went mad in it. The dead walk its halls now. Drechx of the old council keeps a camp at its gates, watching. If you want honest work fighting the dead, go and find him.\"",
+    "complete": "Drechx says, \"Another one sent to me? Good. That castle needs cleansing, room by room, and I'm too old to do it myself.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_CASTLE1C"
+      ],
+      "auto": true,
+      "objective": "Find Castle Victoria",
+      "brief": "Castle Victoria lies south of Tos, through the Cragged Mountains. You will have to cross Ukgoth, the Holy Land of Trolls, and find the castle in the north-west corner of that land. Run past any trolls or black spiders you are too weak to fight."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "fourCouncilor",
+        "rooms": [
+          2
+        ]
+      },
+      "objective": "Talk to Drechx outside the castle",
+      "brief": "Drechx of the old council keeps watch outside the gates of Castle Victoria. Find him and talk to him."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 150
+  }
+}

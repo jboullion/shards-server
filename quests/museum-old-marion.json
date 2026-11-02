@@ -1,0 +1,53 @@
+{
+  "id": 367,
+  "key": "museum-old-marion",
+  "name": "Marion Before the Temple",
+  "tier": "story",
+  "giver": {
+    "class": "CorNothMuseumGuard"
+  },
+  "band": {
+    "min": 40,
+    "max": 80
+  },
+  "requires": {
+    "quests": [
+      255
+    ]
+  },
+  "text": {
+    "offer": "Mychel says, \"The second portal from the south leads to Marion, when it was hardly more than fishermen and herb-gatherers. An old man named Wenhal kept the village's memory then, as I try to keep everyone's now. Find him and hear him out. I'd dearly like to know what he says.\"",
+    "complete": "Mychel says, \"So the priests were only dreaming of the temple then. Today you can't walk through Marion without hearing its bells. Small places grow into great ones, one stone at a time. Thank you, traveller. That's going in my notes.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_MARION"
+      ],
+      "auto": true,
+      "objective": "Step through to old Marion",
+      "brief": "The second portal from the south on the museum's west wall leads to Marion as it was long ago."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "placed": "old-marion-elder"
+      },
+      "objective": "Hear out Wenhal, Marion's elder",
+      "brief": "Wenhal, the elder of old Marion, waits a few steps from where the portal set you down. Talk to him."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "CorNothMuseumGuard"
+      },
+      "objective": "Tell Mychel what you found",
+      "brief": "Wenhal says, \"A stranger! We don't see many. The priests of Shal'ille talk of raising a temple here one day, a proper one, with bells you'd hear out on the water. I won't live to hear them. Perhaps you will.\" Step back through the portal, return to the Meridian Museum, and tell Mychel what he said."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3,
+    "shillings": 75
+  }
+}

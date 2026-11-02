@@ -10,17 +10,20 @@
     "min": 40,
     "max": 50
   },
-  "requires": {
-    "quests": [
-      252
-    ]
-  },
   "text": {
-    "offer": "Rook says, \"Every skill and spell you know gets better the more you use it. But you can push one along faster, with training points. You earn them from quests and from hard living. Open your Stats and press Train beside your training points, or just type 'train'. Pick something you know and spend a few points on it. Go on, I'm watching.\"",
+    "offer": "Rook says, \"Every skill and spell you know gets better the more you use it. But you can push one along faster, with training points. You earn them from quests and from hard living, and here's a few to start you off. Open your Stats and press Train beside your training points, or just type 'train'. Pick something you know and spend a few points on it. Go on, I'm watching.\"",
     "progress": "Rook says, \"Open your Stats and press Train beside your training points, or type 'train'. Choose a skill or spell, say how many percent, and spend the points.\"",
     "complete": "Rook says, \"Good. Points don't do you any good sitting in your pocket. Spend them on what keeps you alive, and keep using it in the field.\""
   },
   "steps": [
+    {
+      "kind": "health",
+      "amount": 1,
+      "objective": "Take Rook's training points",
+      "rewards": {
+        "trainingPoints": 400
+      }
+    },
     {
       "kind": "train",
       "objective": "Spend training points on a skill or spell",

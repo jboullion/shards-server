@@ -1,0 +1,36 @@
+{
+  "id": 380,
+  "key": "jasper-mutant-ants",
+  "name": "Ants in the Crags",
+  "tier": "main",
+  "giver": {
+    "class": "JasperBlacksmith"
+  },
+  "band": {
+    "min": 45,
+    "max": 64
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Quintor says, \"I get my ore from the Cragged Mountains, or I did, until the mutant ants moved in. Their jaws go through a miner's boot like it's butter. Kill ten of them and the miners will go back up.\"",
+    "progress": "Quintor says, \"The Cragged Mountains are close by Jasper. The ants keep to the slopes.\"",
+    "complete": "Quintor says, \"Good. The ore carts will be rolling again by morning.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "RedAnt",
+      "count": 10,
+      "rooms": [
+        578
+      ],
+      "objective": "Mutant ants slain in the Cragged Mountains"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 250
+  }
+}

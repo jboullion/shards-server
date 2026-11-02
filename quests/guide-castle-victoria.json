@@ -1,7 +1,7 @@
 {
   "id": 13,
   "key": "guide-castle-victoria",
-  "name": "The Mad King of Castle Victoria",
+  "name": "The Road to Castle Victoria",
   "tier": "main",
   "replaces": [
     "HP40_INVESTIGATE_CASTLE_VICTORIA_CHAIN"
@@ -10,40 +10,43 @@
     "class": "TosInnKeeper"
   },
   "band": {
-    "min": 40,
-    "max": 100
+    "min": 45,
+    "max": 60
   },
   "text": {
-    "offer": "Paddock says, \"Castle Victoria was the old seat of the kingdom. Far'Nohl, the King in that era, is said to have gone mad after delving too deeply into dark magics. Hmm... yes. That would be an important place to check. If there are undead walking the halls of Castle Victoria, we'll know for sure.\"",
-    "complete": "The curse has not been lifted. Is it possible that Castle Victoria's undead infestation is still just a symptom of an even greater evil? Darkness calls from deeper in the mountains..."
+    "offer": "Paddock says, \"Castle Victoria was the old seat of the kingdom. Far'Nohl, the King in that era, is said to have gone mad after delving too deeply into dark magics, and folk say the dead walk its halls now. Drechx of the old council keeps a camp outside its gates, watching the place. Go and find him: he knows more about that castle than anyone living.\"",
+    "complete": "Drechx says, \"Paddock sent you? Then you're braver than most. Stay a while. That castle needs cleansing, room by room, and I'm too old to do it myself.\""
   },
   "steps": [
     {
       "kind": "visit",
       "rooms": [
-        "RID_CASTLE1"
+        "RID_CASTLE1C"
       ],
       "auto": true,
       "objective": "Find Castle Victoria",
-      "brief": "Paddock has asked you to find the seat of the old kingdom. It lies directly south from Tos, through the Cragged Mountains. The journey will be very dangerous, and you should run past any trolls or black spiders you encounter if you are too weak to fight them. You will have to trek through Ukgoth, the Holy Land of Trolls, and find Castle Victoria in the northwest corner of that area. This journey is not for the faint of heart. Feel free to practice against enemies your strength before you proceed."
+      "brief": "Castle Victoria lies directly south from Tos, through the Cragged Mountains. You will have to cross Ukgoth, the Holy Land of Trolls, and find the castle in the north-west corner of that land. Run past any trolls or black spiders you are too weak to fight."
     },
     {
-      "kind": "health",
-      "amount": 100,
-      "objective": "Improve Yourself",
-      "brief": "This place reeks of undead. Immediately, you know that Paddock's suspicions were correct. Defend yourself! Castle Victoria has a serious haunting. Upstairs, there are zombies and battered skeletons for you to fight and build your skills fighting undead. The main hall is overrun by stronger skeletons, which can be fought up to 70 health, and the Throne Room has tusked skeletons, which can be fought up to 100 health. Somewhere in this castle lies Far'Nohl himself, kept in this realm by the darkest of magics, and you should avoid him at all costs until you are far stronger. When you reach 100 health, either by fighting in Castle Victoria or elsewhere, only then will putting the Ghost of Far'Nohl to rest become a reasonable goal."
-    },
-    {
-      "kind": "kill",
-      "target": "Ghost",
-      "count": 1,
-      "auto": true,
-      "objective": "Slay the Ghost of Far'Nohl",
-      "brief": "Your mind and your body are both far stronger than when you arrived here. Perhaps it is time to slay the Ghost of Far'Nohl in Castle Victoria and hopefully put the undead problem in this land to rest. You've improved your toughness and skills to an advanced degree. It is time to take on the toughest fight of your adventure so far: end the curse at Castle Victoria by entering the Throne Room and slaying the ghost of the mad king. The ghost can cast fireballs, so bring fire resistance. Against undead, holy magics are also extremely important. Without a properly enchanted weapon, your task may be impossible. Mages of Shal'ille can consecrate your weapon, and Kraanan battle-mages can offer a blessing that still works, but is less effective. Good luck."
+      "kind": "talk",
+      "turnin": {
+        "class": "fourCouncilor",
+        "rooms": [
+          2
+        ]
+      },
+      "objective": "Talk to Drechx outside the castle",
+      "brief": "Drechx of the old council keeps watch outside the gates of Castle Victoria. Find him and talk to him."
     }
   ],
   "rewards": {
-    "xpPoints": 1,
-    "trainingPoints": 1000
+    "xpPoints": 0.5,
+    "shillings": 150
+  },
+  "requires": {
+    "notQuests": [
+      373,
+      376
+    ]
   }
 }

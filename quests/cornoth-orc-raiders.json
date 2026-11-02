@@ -7,7 +7,7 @@
     "class": "CorNothSergeant"
   },
   "band": {
-    "min": 44,
+    "min": 40,
     "max": 54
   },
   "requires": {

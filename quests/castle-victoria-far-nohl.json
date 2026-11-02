@@ -2,7 +2,7 @@
   "tier": "main",
   "id": 223,
   "key": "castle-victoria-far-nohl",
-  "name": "The Ghost of Far'Nohl",
+  "name": "The Mad King of Castle Victoria",
   "giver": {
     "class": "fourCouncilor",
     "rooms": [
@@ -10,7 +10,7 @@
     ]
   },
   "band": {
-    "min": 130,
+    "min": 80,
     "max": 150
   },
   "requires": {
@@ -19,9 +19,9 @@
     ]
   },
   "text": {
-    "offer": "Far'Nohl himself haunts his throne room, mad and powerful beyond anything else in that castle. He comes back, again and again, to take his revenge on trespassers. Destroy him - and bring friends, as many as you can.",
-    "progress": "The ghost of Far'Nohl haunts the throne room of Castle Victoria, beyond the antechamber.",
-    "complete": "The mad king, destroyed - for a while, at least. Castle Victoria has not been this quiet in an age."
+    "offer": "Drechx says, \"Far'Nohl himself haunts his throne room, mad and powerful beyond anything else in that castle. Do not go alone: no one has beaten him alone. Gather a group. He casts fire, so bring fire resistance, and holy magic hurts him most: have a mage of Shal'ille consecrate your weapons, or a Kraanan battle-mage bless them. Destroy him, and end the curse on this place, for a while at least.\"",
+    "progress": "The ghost of Far'Nohl haunts the throne room of Castle Victoria, beyond the antechamber. Bring friends, fire resistance and holy weapons.",
+    "complete": "Drechx says, \"The mad king, destroyed. Castle Victoria has not been this quiet in an age. But the curse runs deeper than one dead king. Darkness calls from deeper in the mountains...\""
   },
   "steps": [
     {
@@ -36,6 +36,9 @@
   ],
   "rewards": {
     "xpPoints": 1,
-    "shillings": 12000
+    "shillings": 2500
+  },
+  "repeat": {
+    "cooldownHours": 2
   }
 }

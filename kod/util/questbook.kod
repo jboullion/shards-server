@@ -1944,17 +1944,27 @@ messages:
 
    PlayerLoggedOn(who = $)
    "User.UserLogon: quests the player knows nothing of any more go (a retired id), and so do "
-   "those whose time ran out; then our client gets the log."
+   "those whose time ran out; one that lost steps the player had reached is at its last; then "
+   "our client gets the log."
    {
-      local i, lGone;
+      local i, lGone, lQuest;
 
       Send(self,@MigrateOld,#who=who);
       lGone = $;
       foreach i in Send(who,@GetQuestLog)
       {
-         if Send(self,@GetQuest,#id=First(i)) = $
+         lQuest = Send(self,@GetQuest,#id=First(i));
+         if lQuest = $
          {
             lGone = Cons(i,lGone);
+         }
+         else
+         {
+            if Nth(i,QBL_STEP) > Length(Nth(lQuest,QB_STEPS))
+            {
+               SetNth(i,QBL_STEP,Length(Nth(lQuest,QB_STEPS)));
+               SetNth(i,QBL_COUNT,0);
+            }
          }
       }
       foreach i in lGone

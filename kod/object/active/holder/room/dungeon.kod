@@ -14,7 +14,9 @@ constants:
 
    include blakston.khd
 
-   HOURS_PER_TOY = 50
+   // The charges of the rings found in the crate: a ring of Far'nohl's casts
+   // without reagents, a ring of invisibility's minutes worn
+   CRATE_RING_CHARGES = 50
 
 resources:
 
@@ -28,6 +30,9 @@ resources:
    dungeon_climb_down_rsc = "You jump down off the crate."
    search_crates_rsc = "You rummage around in an open crate."
    found_in_crate_rsc = "You find something of interest!"
+   crate_looted_rsc = \
+      "You rummage through the crate again, but you have already taken the "
+      "only thing of interest in it."
 
 classvars:
 
@@ -47,30 +52,10 @@ properties:
    piBaseLight = 80
    piOutside_factor = 0
 
-   piHoursCounter = HOURS_PER_TOY
-   poLastFinder = $
-
-   plFind = $
-
 messages:
 
    CreateStandardObjects()
    {
-      if plFind = $
-      {
-         plFind = [ &TrueLute,
-                    &Tanktop,
-                    &ShrunkenHead,
-                    &Book,
-                    &Rose,
-                    &GuildShield,
-                    &AphrodesiacPotion,
-                    &LabeledWand,
-                    &SpiderBaby,
-                    &NarthylWorm,
-                    &Junk ];
-      }
-
       Send(self,@NewHold,#what=Create(&DynamicLight,#iColor=LIGHT_FIRE,#iIntensity=30),
            #new_row=26,#new_col=5,#fine_row=48,#fine_col=62);
       Send(self,@NewHold,#what=Create(&DynamicLight,#iColor=LIGHT_FIRE,#iIntensity=30),
@@ -100,16 +85,9 @@ messages:
       return;
    }
 
-   RecalcLightAndWeather()
-   {
-      --piHoursCounter;
-
-      propagate;
-   }
-
    SomethingTryGo(what = $,row = $,col = $)
    {
-      local find, iNewRow, iNewCol;
+      local find, lFind;
 
       if (row = 10) AND (col = 7)
       {
@@ -119,15 +97,8 @@ messages:
          return TRUE;
       }
 
-      // Rummaging around in the crate.
-      // If it's not the last person who found something, and enough time
-      // has elapsed, "find" (create) something of interest for them.
-      //
-      // The plFind is a list of classes.
-      // We create one instance of a randomly chosen class.
-      // If it's an item, we give it to them.
-      // Some items have special properties, such as random coloring.
-      // If it's a monster, we generate it at their feet.
+      // Rummaging around in the crate. Ours: each character finds one curiosity
+      // in it, the first time they look, and nothing after (PFLAG2_VICTORIA_CRATE).
 
       if (row = 10) AND (col = 6)
       {
@@ -136,81 +107,53 @@ messages:
          // Have to post this here, happens no matter what after the rest.
          Post(self,@RemovePlayerFromCrate,#who=what);
 
-         if what = poLastFinder
+         if NOT IsClass(what,&User)
          {
             return TRUE;
          }
 
-         if piHoursCounter < 0
+         if Send(what,@CheckPlayerFlag,#flag=PFLAG2_VICTORIA_CRATE,#flagset=2)
          {
-            piHoursCounter = HOURS_PER_TOY + Random(0,100) - 50;
+            Send(what,@MsgSendUser,#message_rsc=crate_looted_rsc);
 
-            if plFind = $
-            {
-               return TRUE;
-            }
-
-            if Length(plFind) > 0
-            {
-               find = Nth(plFind,Random(1,Length(plFind)));
-            }
-            else
-            {
-               find = plFind;
-            }
-
-            if find = $
-            {
-               return TRUE;
-            }
-
-            find = Create(find);
-
-            if find = $
-            {
-               return TRUE;
-            }
-
-            Send(what,@MsgSendUser,#message_rsc=found_in_crate_rsc);
-            poLastFinder = what;
-
-            if IsClass(find,&Item)
-            {
-               if IsClass(find,&Tanktop)
-               {
-                  Send(find,@Exotic);
-               }
-               if IsClass(find,&ShirtBase)
-               {
-                  Send(find,@Randomize);
-               }
-               if IsClass(find,&GuildShield)
-               {
-                  Send(find,@Randomize);
-               }
-
-               Send(what,@NewHold,#what=find);
-            }
-
-            if IsClass(find,&Monster)
-            {
-               // Offset the monster a bit so that it appears, instead of
-               // trying to fit two things in the same space.
-               iNewRow = 11;
-               iNewCol = 6;
-
-               if Send(self,@ReqNewHold,#what=find,#new_row=iNewRow,#new_col=iNewCol)
-                  AND Send(self,@ReqSomethingMoved,#what=find,#new_row=iNewRow,#new_col=iNewCol)
-               {
-                  Send(self,@NewHold,#what=find,#new_row=iNewRow,#new_col=iNewCol);
-               }
-               else
-               {
-                  Send(find,@Delete);
-                  find = $;
-               }
-            }
+            return TRUE;
          }
+
+         lFind = [ &Tanktop, &ShrunkenHead, &Rose, &ReagentRing, &RingInvisibility ];
+         find = Nth(lFind,Random(1,Length(lFind)));
+         if find = &ReagentRing
+         {
+            // Far'Nohl's own basement keeps a better copy of his ring
+            find = Create(&ReagentRing,#charges=CRATE_RING_CHARGES);
+         }
+         else
+         {
+            find = Create(find);
+         }
+         if find = $
+         {
+            return TRUE;
+         }
+
+         // And a ring of invisibility as lasting (a charge a minute worn)
+         if IsClass(find,&RingInvisibility)
+         {
+            Send(find,@SetMaxHits,#number=CRATE_RING_CHARGES);
+            Send(find,@SetHits,#number=CRATE_RING_CHARGES);
+         }
+
+         if IsClass(find,&Tanktop)
+         {
+            Send(find,@Exotic);
+         }
+         if IsClass(find,&ShirtBase)
+         {
+            Send(find,@Randomize);
+         }
+
+         Send(what,@SetPlayerFlag,#flag=PFLAG2_VICTORIA_CRATE,#value=TRUE,#flagset=2);
+         Send(what,@MsgSendUser,#message_rsc=found_in_crate_rsc);
+         Send(Send(SYS,@GetQuestBook),@GiveOrDrop,#who=what,#what=find);
 
          return TRUE;
       }

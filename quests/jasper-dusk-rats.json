@@ -1,0 +1,39 @@
+{
+  "id": 384,
+  "key": "jasper-dusk-rats",
+  "name": "Dusk Rats in the Deep Tunnels",
+  "tier": "main",
+  "giver": {
+    "class": "JasperInnKeeper"
+  },
+  "band": {
+    "min": 80,
+    "max": 89
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Widow Qesino says, \"There are worse things than rats under Jasper, dear. Dusk rats, the sewer men call them: black as pitch and fast as a knife, deep in the tunnels. One killed a sewer man last week. Kill ten of them.\"",
+    "progress": "Widow Qesino says, \"The dusk rats haunt the deepest tunnels of the Sewers of Jasper. Bring light.\"",
+    "complete": "Widow Qesino says, \"Ten. The sewer men will thank you, and so do I.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "DuskRat",
+      "count": 10,
+      "rooms": [
+        377,
+        378,
+        379
+      ],
+      "inRooms": true,
+      "objective": "Dusk rats slain in the Sewers of Jasper"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.9,
+    "shillings": 600
+  }
+}

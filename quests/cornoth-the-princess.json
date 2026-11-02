@@ -7,7 +7,7 @@
     "class": "CorNothSergeant"
   },
   "band": {
-    "min": 44,
+    "min": 40,
     "max": 60
   },
   "requires": {
@@ -16,17 +16,11 @@
     ]
   },
   "text": {
-    "offer": "Rook says, \"Meridian's split three ways, and sooner or later you'll have to decide where you stand, or stand with no one. Start with the crown. Princess Kateriina holds the Royal City of Barloque, north-east of here along the river. Those who serve her are holy mages: their Shal'ille and Faren magic runs stronger, their mana comes back faster, and they're harder to hurt. The price is that the Duke's people and Jonas's rebels count you as an enemy. Go and hear her out, touch Barloque's portal while you're there, and come back and tell me what you made of her.\"",
+    "offer": "Rook says, \"Meridian's split three ways, and sooner or later you'll have to decide where you stand, or stand with no one. Start with the crown. Princess Kateriina holds the Royal City of Barloque, north-east of here along the river. Those who serve her are holy mages: their Shal'ille and Faren magic runs stronger, their mana comes back faster, and they're harder to hurt. The price is that the Duke's people and Jonas's rebels count you as an enemy. Go and hear her out, and come back and tell me what you made of her.\"",
     "progress": "Rook says, \"Barloque is north-east of Cor Noth: leave by the north gate and follow the river east. The Princess holds court in her castle.\"",
     "complete": "Rook says, \"Fine words, the Princess has. She means most of them, too. Now you know what the crown offers. Don't decide yet: hear the others first.\""
   },
   "steps": [
-    {
-      "kind": "attune",
-      "point": 5,
-      "objective": "Attune to Barloque's portal",
-      "brief": "Barloque is north-east of Cor Noth: leave by the north gate, then head east along the river. Ants and slimes are fair game on the way, but beware the spiders. Touch the city's travel portal when you arrive."
-    },
     {
       "kind": "talk",
       "turnin": {
@@ -36,7 +30,7 @@
         ]
       },
       "objective": "Hear out Princess Kateriina in Barloque",
-      "brief": "Princess Kateriina holds court in Barloque's castle. Find her and talk to her."
+      "brief": "Barloque is north-east of Cor Noth: leave by the north gate, then head east along the river. Ants and slimes are fair game on the way, but beware the spiders. Princess Kateriina holds court in Barloque's castle. Find her and talk to her."
     },
     {
       "kind": "talk",
@@ -44,7 +38,7 @@
         "class": "CorNothSergeant"
       },
       "objective": "Report back to Rook",
-      "brief": "Princess Kateriina says, \"Thou art welcome in Our court, traveller. Those who serve the crown serve the light, and the light rewards its own. Go with Our blessing, and think on it.\" Step into Barloque's portal to return to Cor Noth, and tell Rook what you made of her."
+      "brief": "Princess Kateriina says, \"Thou art welcome in Our court, traveller. Those who serve the crown serve the light, and the light rewards its own. Go with Our blessing, and think on it.\" Return to Cor Noth, and tell Rook what you made of her."
     }
   ],
   "rewards": {

@@ -1,0 +1,28 @@
+{
+  "id": 363,
+  "key": "jasper-portal",
+  "name": "A Door to Jasper",
+  "tier": "main",
+  "giver": {
+    "class": "JasperInnKeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 60
+  },
+  "text": {
+    "offer": "Widow Qesino says, \"You've come a long way to reach Jasper, dear. Don't do it twice. There's a portal in the west of town. Walk into it and it will remember you, and then Jasper is only a step from any other portal you've touched.\"",
+    "complete": "Widow Qesino says, \"That's it. Now you've no excuse not to visit an old woman now and then.\""
+  },
+  "steps": [
+    {
+      "kind": "attune",
+      "point": 4,
+      "objective": "Attune to Jasper's portal",
+      "brief": "Jasper's travel portal is in the west of town (a gold \"!\" marks portals you haven't touched). Walk into it to attune yourself to it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}

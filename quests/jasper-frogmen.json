@@ -1,0 +1,36 @@
+{
+  "id": 381,
+  "key": "jasper-frogmen",
+  "name": "Frogmen on the King's Way",
+  "tier": "main",
+  "giver": {
+    "class": "JasperInnKeeper"
+  },
+  "band": {
+    "min": 60,
+    "max": 84
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Widow Qesino says, \"Half my guests come down the King's Way from Cor Noth, and lately half of those arrive soaked and bleeding. Frogmen, dear, out of the marshes and onto the road. Kill eight of them, so my guests arrive with their purses.\"",
+    "progress": "Widow Qesino says, \"The King's Way runs south from Cor Noth, on the road to Jasper. The frogmen lurk along it.\"",
+    "complete": "Widow Qesino says, \"Bless you. The road's safer for a while, and so is my trade.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Frogman",
+      "count": 8,
+      "rooms": [
+        576
+      ],
+      "objective": "Frogmen slain on the King's Way"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 300
+  }
+}

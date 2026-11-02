@@ -1,0 +1,54 @@
+{
+  "id": 364,
+  "key": "museum-old-cornoth",
+  "name": "The Young University",
+  "tier": "story",
+  "giver": {
+    "class": "CorNothMuseumGuard"
+  },
+  "band": {
+    "min": 40,
+    "max": 80
+  },
+  "requires": {
+    "quests": [
+      255
+    ]
+  },
+  "text": {
+    "offer": "Mychel says, \"Ah, a visitor who reads the plaques! Then you'll want to see the real thing. The northernmost portal on the west wall leads to Cor Noth as it was when the university was young. The Hall of Genealogy stood even then, though its shelves were half empty. Step through, find the old hall, and come back and tell me how it looked. I've only ever had it described to me.\"",
+    "complete": "Mychel says, \"Half-empty shelves, and a handful of scholars arguing over whose family came first. That was the start of it all. Every history in today's hall began as a quarrel in that room. Thank you. I'll add your account to my notes.\""
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_CORNOTH"
+      ],
+      "auto": true,
+      "objective": "Step through to old Cor Noth",
+      "brief": "The northernmost of the five portals on the museum's west wall leads to Cor Noth as it was long ago."
+    },
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_OLD_COR_UNIV"
+      ],
+      "auto": true,
+      "objective": "Find the old Hall of Genealogy",
+      "brief": "Old Cor Noth's Hall of Genealogy is close to where the portal set you down. Find its doors and step inside."
+    },
+    {
+      "kind": "talk",
+      "turnin": {
+        "class": "CorNothMuseumGuard"
+      },
+      "objective": "Tell Mychel what you found",
+      "brief": "You have stood in the Hall of Genealogy as it was when the university was young. Step back through the portal, return to the Meridian Museum, and tell Mychel what you saw."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.3,
+    "shillings": 75
+  }
+}

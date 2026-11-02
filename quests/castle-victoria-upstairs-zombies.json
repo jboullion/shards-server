@@ -1,0 +1,40 @@
+{
+  "id": 368,
+  "key": "castle-victoria-upstairs-zombies",
+  "name": "The Shambling Court",
+  "tier": "main",
+  "giver": {
+    "class": "fourCouncilor",
+    "rooms": [
+      2
+    ]
+  },
+  "band": {
+    "min": 45,
+    "max": 60
+  },
+  "text": {
+    "offer": "Drechx says, \"Far'Nohl's servants never left him. They shamble about the rooms upstairs still, rotting in their livery. Put ten of those zombies to rest. Start there, before you try the hall: they're slow, and you'll learn how the dead fight.\"",
+    "progress": "The zombies and battered skeletons walk the rooms upstairs in Castle Victoria, up the stairs from the main hall.",
+    "complete": "Drechx says, \"Ten fewer of them. The castle is a little cleaner, and you a little wiser.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Zombie",
+      "count": 10,
+      "rooms": [
+        "RID_CASTLE1B"
+      ],
+      "inRooms": true,
+      "objective": "Zombies put to rest upstairs in Castle Victoria"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 200
+  },
+  "repeat": {
+    "cooldownHours": 2
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": 369,
+  "key": "castle-victoria-battered-skeletons",
+  "name": "Broken Bones",
+  "tier": "main",
+  "giver": {
+    "class": "fourCouncilor",
+    "rooms": [
+      2
+    ]
+  },
+  "band": {
+    "min": 45,
+    "max": 60
+  },
+  "text": {
+    "offer": "Drechx says, \"Upstairs you'll find the bones of the king's guard, battered and broken but still walking. A blunt weapon serves best against them. Break ten, and you'll be ready for what holds the main hall.\"",
+    "progress": "The zombies and battered skeletons walk the rooms upstairs in Castle Victoria, up the stairs from the main hall.",
+    "complete": "Drechx says, \"Ten. Good. Bones break, if you hit them hard enough.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "BatteredSkeleton",
+      "count": 10,
+      "rooms": [
+        "RID_CASTLE1B"
+      ],
+      "inRooms": true,
+      "objective": "Battered skeletons broken upstairs in Castle Victoria"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 200
+  },
+  "repeat": {
+    "cooldownHours": 2
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": 385,
+  "key": "barloque-shore-fungus",
+  "name": "Fungus on the Shore",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueBartender"
+  },
+  "band": {
+    "min": 40,
+    "max": 49
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Meidei says, \"I buy fish from the shore of the Great Ocean, but the fishermen won't go down to their boats for the fungus beasts. Great stinking things. Kill twelve of them and I'll have fish on the menu again.\"",
+    "progress": "Meidei says, \"The fungus beasts are on the sandy shores of the Great Ocean, beyond the outskirts of Barloque.\"",
+    "complete": "Meidei says, \"Fish tonight, then. Here, for your trouble.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "FungusBeast",
+      "count": 12,
+      "rooms": [
+        562
+      ],
+      "objective": "Fungus beasts slain on the shore"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 150
+  }
+}

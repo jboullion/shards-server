@@ -1,0 +1,52 @@
+{
+  "id": 386,
+  "key": "barloque-sewer-king",
+  "name": "The Rats of the Royal Sewers",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 55,
+    "max": 70
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Pritchett says, \"The Royal City's sewers are a disgrace. Rat soldiers the size of hounds, and a king leading them. The court wants them gone and the court pays me, so I'll pay you: fifteen soldiers, and their king.\"",
+    "progress": "Pritchett says, \"The way into the Sewers of Barloque is in the city. The king keeps to the deeper tunnels.\"",
+    "complete": "Pritchett says, \"The king too? The court will be pleased, and so am I. Here.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GiantRatSoldier",
+      "count": 15,
+      "rooms": [
+        108,
+        111,
+        112
+      ],
+      "inRooms": true,
+      "objective": "Rat soldiers slain in the Sewers of Barloque"
+    },
+    {
+      "kind": "kill",
+      "target": "GiantRatKing",
+      "count": 1,
+      "rooms": [
+        108,
+        111,
+        112
+      ],
+      "inRooms": true,
+      "objective": "The rat king of the Sewers of Barloque slain",
+      "brief": "Pritchett says, \"Good. Now their king: he keeps to the deeper tunnels, with his soldiers around him.\""
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 300
+  }
+}

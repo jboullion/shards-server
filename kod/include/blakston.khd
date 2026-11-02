@@ -2893,7 +2893,7 @@ SID_ICEWALL             = 241
 
    // Second set of player flags (in piFlags2)
    // A mask of flags that are unaffected by ResetPlayerFlagList
-   PFLAG2_MASK             = 0x011F00
+   PFLAG2_MASK             = 0x031F00
 
    PFLAG2_HASTED           = 0x000001
    PFLAG2_DANCING          = 0x000002
@@ -2915,6 +2915,8 @@ SID_ICEWALL             = 241
    PFLAG2_SQUELCHED_ALL    = 0x003E00
    // Keep 0x8000 free for future squelch flag.
    PFLAG2_DARENA_DEATH     = 0x010000
+   // Ours: has found the one thing the crate under Castle Victoria gives each character (dungeon.kod)
+   PFLAG2_VICTORIA_CRATE   = 0x020000
 
    // Third set of player flags (in piFlags3)
    // piFlags3 can now be used as a proper bitfield, and no longer

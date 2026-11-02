@@ -1,0 +1,49 @@
+{
+  "id": 370,
+  "key": "cellar-rat-king",
+  "name": "The Rat King",
+  "tier": "story",
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 60,
+    "max": 70
+  },
+  "requires": {
+    "quests": [
+      1
+    ]
+  },
+  "text": {
+    "offer": "Paddock says, \"The little ones were only the start. There's a secret passage out of my cellar into caves under the hills, and they're full of rat soldiers, big as dogs and twice as mean, with something leading them. A king, if you can believe it. This is a real fight, mind: don't go down there until you can take a few bites. Kill fifteen of the soldiers, then find their king.\"",
+    "progress": "Paddock says, \"Through my cellar and the secret passage are the Dark Caves, where the soldiers nest; their king holds the abandoned outpost north of them. They hit hard: bring food and a friend.\"",
+    "complete": "Paddock says, \"The king's dead? Then that's the end of them, I hope. Have a drink on the house, and take this for your trouble.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GiantRatSoldier",
+      "count": 15,
+      "objective": "Rat soldiers slain",
+      "brief": "A secret passage leads out of my cellar into the Dark Caves, and that is where the rat soldiers nest. They are as big as dogs and they fight like them. Kill fifteen of them."
+    },
+    {
+      "kind": "kill",
+      "target": "GiantRatKing",
+      "count": 1,
+      "objective": "The rat king slain",
+      "brief": "Those rats have to be coming from somewhere. North of the Dark Caves lies an abandoned outpost, and their leader, the rat king, holds it. Take him out: that'll put a stop to them."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.6,
+    "shillings": 100,
+    "items": [
+      {
+        "class": "InkyCap",
+        "count": 2
+      }
+    ]
+  }
+}

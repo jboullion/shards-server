@@ -1,0 +1,37 @@
+{
+  "id": 389,
+  "key": "barloque-lupoggs",
+  "name": "The Smugglers' Beasts",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 100,
+    "max": 124
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Pritchett says, \"Smugglers used an old crossing under the city, until something moved into it. Lupoggs: great hunched brutes that tear a man apart. Nobody's come back from the crossing since. Kill six of them.\"",
+    "progress": "Pritchett says, \"The Ancient Smuggler's Crossing is reached through the deepest tunnels of the sewers. Go in a group.\"",
+    "complete": "Pritchett says, \"Six lupoggs? I'd not have believed it. Here, you've earned every coin.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "Lupogg",
+      "count": 6,
+      "rooms": [
+        380,
+        112
+      ],
+      "objective": "Lupoggs slain under Barloque"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 1,
+    "shillings": 1000
+  }
+}

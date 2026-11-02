@@ -1,0 +1,56 @@
+{
+  "id": 375,
+  "key": "barloque-ancient-city",
+  "name": "The City Under the Earth",
+  "tier": "main",
+  "giver": {
+    "class": "BarloqueInnkeeper"
+  },
+  "band": {
+    "min": 100,
+    "max": 130
+  },
+  "requires": {
+    "notQuests": [
+      20,
+      378
+    ]
+  },
+  "text": {
+    "offer": "Pritchett says, \"The priests say the dead that walk this land come from somewhere, and that somewhere is a city that sank into the earth long ago. Brax, the old books call it. The way in is at an ancient place in the mountains, its origin forgotten. If you can face it, go and strike at the dead where they're born.\"",
+    "complete": "You have struck at the heart of the undead threat. The dead of Brax will not rest easy, but neither will their Queen."
+  },
+  "steps": [
+    {
+      "kind": "visit",
+      "rooms": [
+        "RID_NECROAREA1"
+      ],
+      "auto": true,
+      "objective": "Find the Ancient City of Brax",
+      "rewards": {
+        "xp": 500
+      },
+      "brief": "Deep in the mountains lies an ancient city that was buried under the earth due to some sort of catastrophe. At an ancient place, its origin forgotten, find the entrance to the underground city. Within lurks something timeless and evil."
+    },
+    {
+      "kind": "kill",
+      "target": "Skeleton",
+      "count": 12,
+      "rooms": [
+        "RID_NECROAREA1",
+        "RID_NECROAREA2",
+        "RID_NECROAREA3",
+        "RID_NECROAREA4",
+        "RID_NECROAREA5",
+        "RID_NECROAREA6"
+      ],
+      "inRooms": true,
+      "objective": "Undead of Brax destroyed",
+      "brief": "This place holds the source of the undead plaguing the land. The horrors of Brax serve a Queen who doomed this city to sink under the earth. Strike at them: destroy twelve of the undead within the city."
+    }
+  ],
+  "rewards": {
+    "trainingPoints": 2000
+  }
+}

@@ -10,5 +10,27 @@
     "angle": "ANGLE_EAST",
     "desc": "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of shears. For a few hundred shillings he will give you a new cut, or a new colour.",
     "service": "barber"
+  },
+  {
+    "key": "old-jasper-crier",
+    "id": 2,
+    "name": "Tobin the crier",
+    "look": "JasperElder",
+    "rid": "RID_OLD_JASPER",
+    "row": 43,
+    "col": 25,
+    "angle": "ANGLE_NORTH",
+    "desc": "Tobin cried the news in Jasper's square long ago, wrapped against the cold with a bell at his belt. The museum's portal still seems to remember him."
+  },
+  {
+    "key": "old-marion-elder",
+    "id": 3,
+    "name": "Wenhal",
+    "look": "MarionElder",
+    "rid": "RID_OLD_MARION",
+    "row": 60,
+    "col": 35,
+    "angle": "ANGLE_NORTH_EAST",
+    "desc": "Wenhal kept old Marion's memory, back when it was a village of fishermen and herb-gatherers. The museum's portal still seems to remember him."
   }
 ]

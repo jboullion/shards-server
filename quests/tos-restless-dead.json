@@ -7,11 +7,11 @@
     "class": "TosInnKeeper"
   },
   "band": {
-    "min": 50,
+    "min": 45,
     "max": 85
   },
   "repeat": {
-    "cooldownHours": 24
+    "cooldownHours": 2
   },
   "text": {
     "offer": "Paddock says, \"You hear that racket at night? That's the graveyard, right next door. Late at night the zombies climb out of their graves and moan till dawn, and it's driving my customers off. Go over there after dark and put ten of them back in the ground. Come back any night you like: they never stay down.\"",

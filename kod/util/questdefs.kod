@@ -14,10 +14,6 @@ resources:
    qd_1_name = "Rats in the Cellar"
    qd_1_s1 = "Small rats slain"
    qd_1_t1 = "Paddock"
-   qd_1_s2 = "Rat soldiers slain"
-   qd_1_t2 = "Paddock"
-   qd_1_s3 = "The rat king slain"
-   qd_1_t3 = "Paddock"
    qd_10_name = "The Shadow Mummy of Raza"
    qd_10_s1 = "Slay the Shadow Mummy"
    qd_10_t1 = "Rodric d'Stane"
@@ -57,13 +53,11 @@ resources:
    qd_12_t1 = "Ran er'Hoth"
    qd_12_s2 = "Living statues destroyed"
    qd_12_t2 = "Ran er'Hoth"
-   qd_13_name = "The Mad King of Castle Victoria"
+   qd_13_name = "The Road to Castle Victoria"
    qd_13_s1 = "Find Castle Victoria"
    qd_13_t1 = "Paddock"
-   qd_13_s2 = "Improve Yourself"
-   qd_13_t2 = "Paddock"
-   qd_13_s3 = "Slay the Ghost of Far'Nohl"
-   qd_13_t3 = "Paddock"
+   qd_13_s2 = "Talk to Drechx outside the castle"
+   qd_13_t2 = "Drechx"
    qd_14_name = "The Powers of Meridian"
    qd_14_s1 = "Entreat Duke Akardius"
    qd_14_t1 = "Duke Akardius"
@@ -689,7 +683,7 @@ resources:
    qd_215_s2 = "Golems destroyed"
    qd_215_t2 = "Jonas D'Accor"
    qd_220_name = "Bones of the Castle"
-   qd_220_s1 = "Skeletons destroyed in Castle Victoria"
+   qd_220_s1 = "Skeletons destroyed in the main hall of Castle Victoria"
    qd_220_t1 = "Drechx"
    qd_221_name = "Far'Nohl's Knights"
    qd_221_s1 = "Undead knights slain in Far'Nohl's Chambers"
@@ -697,7 +691,7 @@ resources:
    qd_222_name = "The Tusked Guard"
    qd_222_s1 = "Tusked skeletons destroyed in the antechamber"
    qd_222_t1 = "Drechx"
-   qd_223_name = "The Ghost of Far'Nohl"
+   qd_223_name = "The Mad King of Castle Victoria"
    qd_223_s1 = "Destroy the ghost of Far'Nohl"
    qd_223_t1 = "Drechx"
    qd_230_name = "Mollusk Shell"
@@ -722,8 +716,10 @@ resources:
    qd_252_s1 = "Learn a skill from Rook"
    qd_252_t1 = "Rook"
    qd_253_name = "Put It to Practice"
-   qd_253_s1 = "Spend training points on a skill or spell"
+   qd_253_s1 = "Take Rook's training points"
    qd_253_t1 = "Rook"
+   qd_253_s2 = "Spend training points on a skill or spell"
+   qd_253_t2 = "Rook"
    qd_254_name = "Cor Noth's Portal"
    qd_254_s1 = "Attune to Cor Noth's portal"
    qd_254_t1 = "Rook"
@@ -739,26 +735,20 @@ resources:
    qd_257_s1 = "Buy herbs from Solomon"
    qd_257_t1 = "D'Franco"
    qd_258_name = "The Princess of Barloque"
-   qd_258_s1 = "Attune to Barloque's portal"
-   qd_258_t1 = "Rook"
-   qd_258_s2 = "Hear out Princess Kateriina in Barloque"
-   qd_258_t2 = "Princess Kateriina"
-   qd_258_s3 = "Report back to Rook"
-   qd_258_t3 = "Rook"
+   qd_258_s1 = "Hear out Princess Kateriina in Barloque"
+   qd_258_t1 = "Princess Kateriina"
+   qd_258_s2 = "Report back to Rook"
+   qd_258_t2 = "Rook"
    qd_259_name = "Jonas and the Rebels"
-   qd_259_s1 = "Attune to Jasper's portal"
-   qd_259_t1 = "Rook"
-   qd_259_s2 = "Hear out Jonas D'Accor in Jasper"
-   qd_259_t2 = "Jonas D'Accor"
-   qd_259_s3 = "Report back to Rook"
-   qd_259_t3 = "Rook"
+   qd_259_s1 = "Hear out Jonas D'Accor in Jasper"
+   qd_259_t1 = "Jonas D'Accor"
+   qd_259_s2 = "Report back to Rook"
+   qd_259_t2 = "Rook"
    qd_260_name = "The Duke of Tos"
-   qd_260_s1 = "Attune to the portal in Tos"
-   qd_260_t1 = "Rook"
-   qd_260_s2 = "Hear out Duke Akardius in Tos"
-   qd_260_t2 = "Duke Akardius"
-   qd_260_s3 = "Report back to Rook"
-   qd_260_t3 = "Rook"
+   qd_260_s1 = "Hear out Duke Akardius in Tos"
+   qd_260_t1 = "Duke Akardius"
+   qd_260_s2 = "Report back to Rook"
+   qd_260_t2 = "Rook"
    qd_261_name = "Light in the Vale"
    qd_261_s1 = "Cast Detect Evil"
    qd_261_t1 = "Priestess Xiana"
@@ -1081,11 +1071,151 @@ resources:
    qd_359_t1 = "Duke Akardius"
    qd_359_s2 = "Escape and report to Duke Akardius"
    qd_359_t2 = "Duke Akardius"
+   qd_360_name = "Ants in the Flatlands"
+   qd_360_s1 = "Ants slain"
+   qd_360_t1 = "Rook"
+   qd_361_name = "The Gate Home"
+   qd_361_s1 = "Attune to the portal in Tos"
+   qd_361_t1 = "Paddock"
+   qd_362_name = "The Royal Portal"
+   qd_362_s1 = "Attune to Barloque's portal"
+   qd_362_t1 = "Pritchett"
+   qd_363_name = "A Door to Jasper"
+   qd_363_s1 = "Attune to Jasper's portal"
+   qd_363_t1 = "Widow Qesino"
+   qd_364_name = "The Young University"
+   qd_364_s1 = "Step through to old Cor Noth"
+   qd_364_t1 = "Mychel"
+   qd_364_s2 = "Find the old Hall of Genealogy"
+   qd_364_t2 = "Mychel"
+   qd_364_s3 = "Tell Mychel what you found"
+   qd_364_t3 = "Mychel"
+   qd_365_name = "Both Halves of the Crown"
+   qd_365_s1 = "Walk the north town of old Barloque"
+   qd_365_t1 = "Mychel"
+   qd_365_s2 = "Walk the south town of old Barloque"
+   qd_365_t2 = "Mychel"
+   qd_365_s3 = "Tell Mychel what you found"
+   qd_365_t3 = "Mychel"
+   qd_366_name = "Snow on Old Jasper"
+   qd_366_s1 = "Step through to old Jasper"
+   qd_366_t1 = "Mychel"
+   qd_366_s2 = "Hear out Tobin the crier"
+   qd_366_t2 = "Tobin the crier"
+   qd_366_s3 = "Tell Mychel what you found"
+   qd_366_t3 = "Mychel"
+   qd_367_name = "Marion Before the Temple"
+   qd_367_s1 = "Step through to old Marion"
+   qd_367_t1 = "Mychel"
+   qd_367_s2 = "Hear out Wenhal, Marion's elder"
+   qd_367_t2 = "Wenhal"
+   qd_367_s3 = "Tell Mychel what you found"
+   qd_367_t3 = "Mychel"
+   qd_368_name = "The Shambling Court"
+   qd_368_s1 = "Zombies put to rest upstairs in Castle Victoria"
+   qd_368_t1 = "Drechx"
+   qd_369_name = "Broken Bones"
+   qd_369_s1 = "Battered skeletons broken upstairs in Castle Victoria"
+   qd_369_t1 = "Drechx"
+   qd_370_name = "The Rat King"
+   qd_370_s1 = "Rat soldiers slain"
+   qd_370_t1 = "Paddock"
+   qd_370_s2 = "The rat king slain"
+   qd_370_t2 = "Paddock"
+   qd_371_name = "The Queen of the Nest"
+   qd_371_s1 = "Slay the queen spider in the Spider Nest"
+   qd_371_t1 = "Frisconar"
+   qd_372_name = "The Island Beyond the Caves"
+   qd_372_s1 = "Find a way into the Orc Caves"
+   qd_372_t1 = "Paddock"
+   qd_372_s2 = "Find the island city of Ko'catan"
+   qd_372_t2 = "Paddock"
+   qd_372_s3 = "Report to Cital ko'Manca"
+   qd_372_t3 = "Cital ko'Manca"
+   qd_373_name = "The King's Old Castle"
+   qd_373_s1 = "Find Castle Victoria"
+   qd_373_t1 = "Pritchett"
+   qd_373_s2 = "Talk to Drechx outside the castle"
+   qd_373_t2 = "Drechx"
+   qd_374_name = "An Island of Konima's Children"
+   qd_374_s1 = "Find a way into the Orc Caves"
+   qd_374_t1 = "Pritchett"
+   qd_374_s2 = "Find the island city of Ko'catan"
+   qd_374_t2 = "Pritchett"
+   qd_374_s3 = "Report to Cital ko'Manca"
+   qd_374_t3 = "Cital ko'Manca"
+   qd_375_name = "The City Under the Earth"
+   qd_375_s1 = "Find the Ancient City of Brax"
+   qd_375_t1 = "Pritchett"
+   qd_375_s2 = "Undead of Brax destroyed"
+   qd_375_t2 = "Pritchett"
+   qd_376_name = "The Mad King's Castle"
+   qd_376_s1 = "Find Castle Victoria"
+   qd_376_t1 = "Widow Qesino"
+   qd_376_s2 = "Talk to Drechx outside the castle"
+   qd_376_t2 = "Drechx"
+   qd_377_name = "Konima's Lost Legion"
+   qd_377_s1 = "Find a way into the Orc Caves"
+   qd_377_t1 = "Widow Qesino"
+   qd_377_s2 = "Find the island city of Ko'catan"
+   qd_377_t2 = "Widow Qesino"
+   qd_377_s3 = "Report to Cital ko'Manca"
+   qd_377_t3 = "Cital ko'Manca"
+   qd_378_name = "The Sunken City"
+   qd_378_s1 = "Find the Ancient City of Brax"
+   qd_378_t1 = "Widow Qesino"
+   qd_378_s2 = "Undead of Brax destroyed"
+   qd_378_t2 = "Widow Qesino"
+   qd_379_name = "Rats Beneath Jasper"
+   qd_379_s1 = "Rat soldiers slain in the Sewers of Jasper"
+   qd_379_t1 = "Pietro"
+   qd_380_name = "Ants in the Crags"
+   qd_380_s1 = "Mutant ants slain in the Cragged Mountains"
+   qd_380_t1 = "Quintor"
+   qd_381_name = "Frogmen on the King's Way"
+   qd_381_s1 = "Frogmen slain on the King's Way"
+   qd_381_t1 = "Widow Qesino"
+   qd_382_name = "The King Below Jasper"
+   qd_382_s1 = "The rat king of the Sewers of Jasper slain"
+   qd_382_t1 = "Pietro"
+   qd_383_name = "Trolls in the Crags"
+   qd_383_s1 = "Trolls slain in the Cragged Mountains"
+   qd_383_t1 = "Quintor"
+   qd_384_name = "Dusk Rats in the Deep Tunnels"
+   qd_384_s1 = "Dusk rats slain in the Sewers of Jasper"
+   qd_384_t1 = "Widow Qesino"
+   qd_385_name = "Fungus on the Shore"
+   qd_385_s1 = "Fungus beasts slain on the shore"
+   qd_385_t1 = "Meidei"
+   qd_386_name = "The Rats of the Royal Sewers"
+   qd_386_s1 = "Rat soldiers slain in the Sewers of Barloque"
+   qd_386_t1 = "Pritchett"
+   qd_386_s2 = "The rat king of the Sewers of Barloque slain"
+   qd_386_t2 = "Pritchett"
+   qd_387_name = "Dusk Rats Under the Crown"
+   qd_387_s1 = "Dusk rats slain in the Sewers of Barloque"
+   qd_387_t1 = "Meidei"
+   qd_388_name = "Worms Under the Badlands"
+   qd_388_s1 = "Groundworms slain in the Badlands"
+   qd_388_t1 = "Fehr'loi Qan"
+   qd_389_name = "The Smugglers' Beasts"
+   qd_389_s1 = "Lupoggs slain under Barloque"
+   qd_389_t1 = "Pritchett"
    qg_1_name = "Pellam the barber"
    qg_1_desc = \
       "Pellam keeps a chair in the corner of Madelia's shop, and a sharp pair of "
       "shears. For a few hundred shillings he will give you a new cut, or a new colour."
    qg_1_icon = bqclerk.bgf
+   qg_2_name = "Tobin the crier"
+   qg_2_desc = \
+      "Tobin cried the news in Jasper's square long ago, wrapped against the cold with "
+      "a bell at his belt. The museum's portal still seems to remember him."
+   qg_2_icon = jselder.bgf
+   qg_3_name = "Wenhal"
+   qg_3_desc = \
+      "Wenhal kept old Marion's memory, back when it was a village of fishermen and "
+      "herb-gatherers. The museum's portal still seems to remember him."
+   qg_3_icon = mrelder.bgf
 
 classvars:
 
@@ -1096,7 +1226,7 @@ messages:
    GetCatalogHash()
    "Our client's catalogue (dist/assets/quests.json) carries the same number."
    {
-      return 43473008;
+      return 5465392;
    }
 
    GetQuests()
@@ -1104,15 +1234,11 @@ messages:
       return [
          [
          // cellar-rats
-         [ 1, qd_1_name, &TosInnKeeper, 0, 0, 40, $,
+         [ 1, qd_1_name, &TosInnKeeper, 0, 40, 50, $,
            $, $, $, $,
            [ [ 1, &SmallRat, 20, 0, &TosInnKeeper, 0, qd_1_s1, $, $, qd_1_t1,
-               0, $, $, $, 0 ],
-             [ 1, &GiantRatSoldier, 15, 0, &TosInnKeeper, 0, qd_1_s2, $, $, qd_1_t2,
-               0, $, $, $, 0 ],
-             [ 1, &GiantRatKing, 1, 0, &TosInnKeeper, 0, qd_1_s3, $, $, qd_1_t3,
                0, $, $, $, 0 ] ],
-           300, 50, [ [ &InkyCap, 2 ] ], 0, 2, $, $, 0, $, $, $, $ ],
+           672, 50, $, 0, 2, $, $, 0, $, $, $, $ ],
          // guide-raza
          [ 10, qd_10_name, &RazaElder, 0, 0, 30, [ 137 ],
            $, $, $, $,
@@ -1162,15 +1288,13 @@ messages:
                0, $, $, $, 0 ] ],
            2000, 0, $, 0, 1, $, $, 0, $, $, 60, $ ],
          // guide-castle-victoria
-         [ 13, qd_13_name, &TosInnKeeper, 0, 40, 100, $,
+         [ 13, qd_13_name, &TosInnKeeper, 0, 45, 60, $,
            $, $, $, $,
-           [ [ 5, $, 1, 0, &TosInnKeeper, 0, qd_13_s1, [ 38 ], $, qd_13_t1,
+           [ [ 5, $, 1, 0, &TosInnKeeper, 0, qd_13_s1, [ 2 ], $, qd_13_t1,
                1, $, $, $, 0 ],
-             [ 11, $, 1, 0, &TosInnKeeper, 0, qd_13_s2, $, $, qd_13_t2,
-               1, $, $, $, 100 ],
-             [ 1, &Ghost, 1, 0, &TosInnKeeper, 0, qd_13_s3, $, $, qd_13_t3,
-               1, $, $, $, 0 ] ],
-           1681, 0, $, 1000, 1, $, $, 0, $, $, $, $ ],
+             [ 3, $, 1, 0, &fourCouncilor, 0, qd_13_s2, $, $, qd_13_t2,
+               0, $, $, $, 0 ] ],
+           1058, 150, $, 0, 1, $, $, 0, $, [ 373, 376 ], $, $ ],
          // guide-factions
          [ 14, qd_14_name, &PrincessLiege, 0, 50, 80, $,
            $, $, $, $,
@@ -1222,7 +1346,7 @@ messages:
                1, [ 500, 0, 0, $, $, $ ], $, $, 0 ],
              [ 1, &Skeleton, 12, 2, &TosInnKeeper, 0, qd_20_s2, [ 826, 827, 828, 829, 830, 834 ], $, qd_20_t2,
                0, $, $, $, 0 ] ],
-           0, 0, $, 2000, 1, $, $, 0, $, $, $, $ ],
+           0, 0, $, 2000, 1, $, $, 0, $, [ 375, 378 ], $, $ ],
          // kocatan-avar-war
          [ 30, qd_30_name, &KocatanCaptainGood, 0, 80, 150, $,
            $, $, 7200, $,
@@ -1776,7 +1900,7 @@ messages:
          // cornoth-merchant-way
          [ 129, qd_129_name, &CorNothSergeant, 0, 40, 50, $,
            $, $, $, $,
-           [ [ 1, &Spider, 15, 1, &CorNothSergeant, 0, qd_129_s1, $, $, qd_129_t1,
+           [ [ 1, &Spider, 10, 1, &CorNothSergeant, 0, qd_129_s1, $, $, qd_129_t1,
                0, $, $, $, 0 ] ],
            1009, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-river-source
@@ -1786,11 +1910,11 @@ messages:
                0, $, $, $, 0 ] ],
            1109, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-orc-raiders
-         [ 131, qd_131_name, &CorNothSergeant, 0, 44, 54, [ 129 ],
+         [ 131, qd_131_name, &CorNothSergeant, 0, 40, 54, [ 129 ],
            $, $, $, $,
            [ [ 1, &Orc, 12, 1, &CorNothSergeant, 0, qd_131_s1, $, $, qd_131_t1,
                0, $, $, $, 0 ] ],
-           1215, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+           1009, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-red-ants
          [ 132, qd_132_name, &CorNothInnkeeper, 0, 46, 56, [ 130 ],
            $, $, $, $,
@@ -2196,31 +2320,31 @@ messages:
                0, $, $, $, 0 ] ],
            23120, 15000, $, 0, 1, 3, $, 0, [ [ 4, 3 ] ], $, $, $ ],
          // castle-victoria-bones
-         [ 220, qd_220_name, &fourCouncilor, 0, 50, 75, $,
-           $, $, $, $,
-           [ [ 1, &Skeleton, 15, 3, &fourCouncilor, 0, qd_220_s1, [ 38, 39 ], $, qd_220_t1,
+         [ 220, qd_220_name, &fourCouncilor, 0, 50, 75, [ 368, 369 ],
+           $, $, 7200, $,
+           [ [ 1, &Skeleton, 15, 3, &fourCouncilor, 0, qd_220_s1, [ 38 ], $, qd_220_t1,
                0, $, $, $, 0 ] ],
-           1951, 1000, $, 0, 1, $, $, 0, $, $, $, $ ]
+           1951, 500, $, 0, 1, $, $, 0, $, $, $, $ ]
          ],
          [
          // castle-victoria-knights
-         [ 221, qd_221_name, &fourCouncilor, 0, 95, 125, [ 220 ],
-           $, $, $, $,
+         [ 221, qd_221_name, &fourCouncilor, 0, 80, 125, [ 222 ],
+           $, $, 7200, $,
            [ [ 1, &KnightA, 10, 2, &fourCouncilor, 0, qd_221_s1, [ 37 ], $, qd_221_t1,
                0, $, $, $, 0 ] ],
-           9216, 3000, $, 0, 1, $, $, 0, $, $, $, $ ],
+           6561, 800, $, 0, 1, $, $, 0, $, $, $, $ ],
          // castle-victoria-tusked-guard
-         [ 222, qd_222_name, &fourCouncilor, 0, 100, 125, [ 220 ],
-           $, $, $, $,
+         [ 222, qd_222_name, &fourCouncilor, 0, 70, 120, [ 220 ],
+           $, $, 7200, $,
            [ [ 1, &TuskedSkeleton, 10, 2, &fourCouncilor, 0, qd_222_s1, [ 40 ], $, qd_222_t1,
                0, $, $, $, 0 ] ],
-           10201, 3000, $, 0, 1, $, $, 0, $, $, $, $ ],
+           5041, 800, $, 0, 1, $, $, 0, $, $, $, $ ],
          // castle-victoria-far-nohl
-         [ 223, qd_223_name, &fourCouncilor, 0, 130, 150, [ 222 ],
-           $, $, $, $,
+         [ 223, qd_223_name, &fourCouncilor, 0, 80, 150, [ 222 ],
+           $, $, 7200, $,
            [ [ 1, &Ghost, 1, 0, &fourCouncilor, 0, qd_223_s1, $, $, qd_223_t1,
                0, $, $, $, 0 ] ],
-           17161, 12000, $, 0, 1, $, $, 0, $, $, $, $ ],
+           6561, 2500, $, 0, 1, $, $, 0, $, $, $, $ ],
          // barloque-mollusk-daily
          [ 230, qd_230_name, &BarloqueBlacksmith, 0, 130, 150, $,
            $, $, 86400, $,
@@ -2262,15 +2386,17 @@ messages:
            $, $, $, $,
            [ [ 16, $, 1, 0, &CorNothSergeant, 0, qd_252_s1, $, $, qd_252_t1,
                1, $, $, [ &Dodge, &Punch, &Slash, &Brawling, &AxeProficiency, &HammerProficiency, &MaceProficiency, &SwordProficiency, &Parry ], 0 ] ],
-           420, 0, $, 400, 1, $, $, 0, $, $, $, $ ],
+           420, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-put-it-to-practice
-         [ 253, qd_253_name, &CorNothSergeant, 0, 40, 50, [ 252 ],
+         [ 253, qd_253_name, &CorNothSergeant, 0, 40, 50, $,
            $, $, $, $,
-           [ [ 19, $, 1, 0, &CorNothSergeant, 0, qd_253_s1, $, $, qd_253_t1,
+           [ [ 11, $, 1, 0, &CorNothSergeant, 0, qd_253_s1, $, $, qd_253_t1,
+               1, [ 0, 0, 400, $, $, $ ], $, $, 1 ],
+             [ 19, $, 1, 0, &CorNothSergeant, 0, qd_253_s2, $, $, qd_253_t2,
                1, $, $, $, 0 ] ],
            420, 0, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-portal
-         [ 254, qd_254_name, &CorNothSergeant, 0, 40, 50, [ 252 ],
+         [ 254, qd_254_name, &CorNothSergeant, 0, 40, 50, $,
            $, $, $, $,
            [ [ 17, $, 1, 0, &CorNothSergeant, 0, qd_254_s1, $, $, qd_254_t1,
                1, $, $, $, 6 ] ],
@@ -2296,35 +2422,29 @@ messages:
                1, $, &CornothGrocer, $, 0 ] ],
            420, 50, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-the-princess
-         [ 258, qd_258_name, &CorNothSergeant, 0, 44, 60, [ 254 ],
+         [ 258, qd_258_name, &CorNothSergeant, 0, 40, 60, [ 254 ],
            $, $, $, $,
-           [ [ 17, $, 1, 0, &CorNothSergeant, 0, qd_258_s1, $, $, qd_258_t1,
-               1, $, $, $, 5 ],
-             [ 3, $, 1, 0, &PrincessLiege, 0, qd_258_s2, $, $, qd_258_t2,
+           [ [ 3, $, 1, 0, &PrincessLiege, 0, qd_258_s1, $, $, qd_258_t1,
                0, $, $, $, 0 ],
-             [ 3, $, 1, 0, &CorNothSergeant, 0, qd_258_s3, $, $, qd_258_t3,
+             [ 3, $, 1, 0, &CorNothSergeant, 0, qd_258_s2, $, $, qd_258_t2,
                0, $, $, $, 0 ] ],
-           1013, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+           841, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-the-rebels
-         [ 259, qd_259_name, &CorNothSergeant, 0, 44, 60, [ 254 ],
+         [ 259, qd_259_name, &CorNothSergeant, 0, 40, 60, [ 254 ],
            $, $, $, $,
-           [ [ 17, $, 1, 0, &CorNothSergeant, 0, qd_259_s1, $, $, qd_259_t1,
-               1, $, $, $, 4 ],
-             [ 3, $, 1, 0, &RebelLiege, 0, qd_259_s2, $, $, qd_259_t2,
+           [ [ 3, $, 1, 0, &RebelLiege, 0, qd_259_s1, $, $, qd_259_t1,
                0, $, $, $, 0 ],
-             [ 3, $, 1, 0, &CorNothSergeant, 0, qd_259_s3, $, $, qd_259_t3,
+             [ 3, $, 1, 0, &CorNothSergeant, 0, qd_259_s2, $, $, qd_259_t2,
                0, $, $, $, 0 ] ],
-           1013, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+           841, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // cornoth-the-duke
-         [ 260, qd_260_name, &CorNothSergeant, 0, 48, 60, [ 254 ],
+         [ 260, qd_260_name, &CorNothSergeant, 0, 40, 60, [ 254 ],
            $, $, $, $,
-           [ [ 17, $, 1, 0, &CorNothSergeant, 0, qd_260_s1, $, $, qd_260_t1,
-               1, $, $, $, 1 ],
-             [ 3, $, 1, 0, &DukeLiege, 0, qd_260_s2, $, $, qd_260_t2,
+           [ [ 3, $, 1, 0, &DukeLiege, 0, qd_260_s1, $, $, qd_260_t1,
                0, $, $, $, 0 ],
-             [ 3, $, 1, 0, &CorNothSergeant, 0, qd_260_s3, $, $, qd_260_t3,
+             [ 3, $, 1, 0, &CorNothSergeant, 0, qd_260_s2, $, $, qd_260_t2,
                0, $, $, $, 0 ] ],
-           1201, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+           841, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
          // node-vale-of-light
          [ 261, qd_261_name, &ShalillePriestess, 0, 40, 90, $,
            $, $, $, $,
@@ -2422,17 +2542,17 @@ messages:
                1, $, $, $, 16384 ] ],
            7651, 0, $, 450, 2, $, $, 0, $, $, $, $ ],
          // tos-restless-dead
-         [ 276, qd_276_name, &TosInnKeeper, 0, 50, 85, $,
-           $, $, 86400, $,
+         [ 276, qd_276_name, &TosInnKeeper, 0, 45, 85, $,
+           $, $, 7200, $,
            [ [ 1, &Zombie, 10, 2, &TosInnKeeper, 0, qd_276_s1, [ 70 ], $, qd_276_t1,
                0, $, $, $, 0 ] ],
-           1040, 100, $, 0, 1, $, $, 0, $, $, $, $ ],
+           846, 100, $, 0, 1, $, $, 0, $, $, $, $ ],
          // tos-bones-in-the-graveyard
-         [ 277, qd_277_name, &TosInnKeeper, 0, 50, 90, $,
-           $, $, 86400, $,
+         [ 277, qd_277_name, &TosInnKeeper, 0, 45, 90, $,
+           $, $, 7200, $,
            [ [ 1, &Skeleton, 5, 3, &TosInnKeeper, 0, qd_277_s1, [ 70 ], $, qd_277_t1,
                0, $, $, $, 0 ] ],
-           1040, 100, $, 0, 1, $, $, 0, $, $, $, $ ],
+           846, 100, $, 0, 1, $, $, 0, $, $, $, $ ],
          // berg-song-of-jala
          [ 278, qd_278_name, &BergMerchant, 0, 50, 150, $,
            $, $, $, $,
@@ -2878,7 +2998,229 @@ messages:
                1, $, $, $, 1 ],
              [ 3, $, 1, 0, &DukeLiege, 0, qd_359_s2, $, $, qd_359_t2,
                0, $, $, $, 0 ] ],
-           3721, 750, $, 300, 1, 1, $, 0, [ [ 4, 3 ] ], $, $, 25 ]
+           3721, 750, $, 300, 1, 1, $, 0, [ [ 4, 3 ] ], $, $, 25 ],
+         // cornoth-flatland-ants
+         [ 360, qd_360_name, &CorNothSergeant, 0, 40, 45, $,
+           $, $, $, $,
+           [ [ 1, &Ant, 10, 1, &CorNothSergeant, 0, qd_360_s1, $, $, qd_360_t1,
+               0, $, $, $, 0 ] ],
+           1009, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // tos-portal
+         [ 361, qd_361_name, &TosInnKeeper, 0, 40, 60, $,
+           $, $, $, $,
+           [ [ 17, $, 1, 0, &TosInnKeeper, 0, qd_361_s1, $, $, qd_361_t1,
+               1, $, $, $, 1 ] ],
+           420, 0, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // barloque-portal
+         [ 362, qd_362_name, &BarloqueInnkeeper, 0, 40, 60, $,
+           $, $, $, $,
+           [ [ 17, $, 1, 0, &BarloqueInnkeeper, 0, qd_362_s1, $, $, qd_362_t1,
+               1, $, $, $, 5 ] ],
+           420, 0, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // jasper-portal
+         [ 363, qd_363_name, &JasperInnKeeper, 0, 40, 60, $,
+           $, $, $, $,
+           [ [ 17, $, 1, 0, &JasperInnKeeper, 0, qd_363_s1, $, $, qd_363_t1,
+               1, $, $, $, 4 ] ],
+           420, 0, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // museum-old-cornoth
+         [ 364, qd_364_name, &CorNothMuseumGuard, 0, 40, 80, [ 255 ],
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &CorNothMuseumGuard, 0, qd_364_s1, [ 9004 ], $, qd_364_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &CorNothMuseumGuard, 0, qd_364_s2, [ 9005 ], $, qd_364_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &CorNothMuseumGuard, 0, qd_364_s3, $, $, qd_364_t3,
+               0, $, $, $, 0 ] ],
+           504, 75, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // museum-old-barloque
+         [ 365, qd_365_name, &CorNothMuseumGuard, 0, 40, 80, [ 255 ],
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &CorNothMuseumGuard, 0, qd_365_s1, [ 9002 ], $, qd_365_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &CorNothMuseumGuard, 0, qd_365_s2, [ 9003 ], $, qd_365_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &CorNothMuseumGuard, 0, qd_365_s3, $, $, qd_365_t3,
+               0, $, $, $, 0 ] ],
+           504, 75, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // museum-old-jasper
+         [ 366, qd_366_name, &CorNothMuseumGuard, 0, 40, 80, [ 255 ],
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &CorNothMuseumGuard, 0, qd_366_s1, [ 9000 ], $, qd_366_t1,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, $, 2, qd_366_s2, $, $, qd_366_t2,
+               0, $, $, $, 0 ],
+             [ 3, $, 1, 0, &CorNothMuseumGuard, 0, qd_366_s3, $, $, qd_366_t3,
+               0, $, $, $, 0 ] ],
+           504, 75, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // museum-old-marion
+         [ 367, qd_367_name, &CorNothMuseumGuard, 0, 40, 80, [ 255 ],
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &CorNothMuseumGuard, 0, qd_367_s1, [ 9001 ], $, qd_367_t1,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, $, 3, qd_367_s2, $, $, qd_367_t2,
+               0, $, $, $, 0 ],
+             [ 3, $, 1, 0, &CorNothMuseumGuard, 0, qd_367_s3, $, $, qd_367_t3,
+               0, $, $, $, 0 ] ],
+           504, 75, $, 0, 2, $, $, 0, $, $, $, $ ],
+         // castle-victoria-upstairs-zombies
+         [ 368, qd_368_name, &fourCouncilor, 0, 45, 60, $,
+           $, $, 7200, $,
+           [ [ 1, &Zombie, 10, 2, &fourCouncilor, 0, qd_368_s1, [ 39 ], $, qd_368_t1,
+               0, $, $, $, 0 ] ],
+           1270, 200, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // castle-victoria-battered-skeletons
+         [ 369, qd_369_name, &fourCouncilor, 0, 45, 60, $,
+           $, $, 7200, $,
+           [ [ 1, &BatteredSkeleton, 10, 2, &fourCouncilor, 0, qd_369_s1, [ 39 ], $, qd_369_t1,
+               0, $, $, $, 0 ] ],
+           1270, 200, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // cellar-rat-king
+         [ 370, qd_370_name, &TosInnKeeper, 0, 60, 70, [ 1 ],
+           $, $, $, $,
+           [ [ 1, &GiantRatSoldier, 15, 0, &TosInnKeeper, 0, qd_370_s1, $, $, qd_370_t1,
+               0, $, $, $, 0 ],
+             [ 1, &GiantRatKing, 1, 0, &TosInnKeeper, 0, qd_370_s2, $, $, qd_370_t2,
+               0, $, $, $, 0 ] ],
+           2233, 100, [ [ &InkyCap, 2 ] ], 0, 2, $, $, 0, $, $, $, $ ],
+         // tos-spider-queen
+         [ 371, qd_371_name, &TosApothecary, 0, 80, 165, $,
+           $, $, $, $,
+           [ [ 1, &SpiderQueen, 1, 0, &TosApothecary, 0, qd_371_s1, $, $, qd_371_t1,
+               0, $, $, $, 0 ] ],
+           6561, 5000, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // tos-the-island
+         [ 372, qd_372_name, &TosInnKeeper, 0, 80, 100, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &TosInnKeeper, 0, qd_372_s1, [ 2500 ], $, qd_372_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &TosInnKeeper, 0, qd_372_s2, [ 2000 ], $, qd_372_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &KocatanCaptainGood, 0, qd_372_s3, $, $, qd_372_t3,
+               0, $, $, $, 0 ] ],
+           4921, 500, $, 0, 1, $, $, 0, $, [ 374, 377 ], $, $ ],
+         // barloque-castle-victoria
+         [ 373, qd_373_name, &BarloqueInnkeeper, 0, 45, 60, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &BarloqueInnkeeper, 0, qd_373_s1, [ 2 ], $, qd_373_t1,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &fourCouncilor, 0, qd_373_s2, $, $, qd_373_t2,
+               0, $, $, $, 0 ] ],
+           1058, 150, $, 0, 1, $, $, 0, $, [ 13, 376 ], $, $ ],
+         // barloque-the-island
+         [ 374, qd_374_name, &BarloqueInnkeeper, 0, 80, 100, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &BarloqueInnkeeper, 0, qd_374_s1, [ 2500 ], $, qd_374_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &BarloqueInnkeeper, 0, qd_374_s2, [ 2000 ], $, qd_374_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &KocatanCaptainGood, 0, qd_374_s3, $, $, qd_374_t3,
+               0, $, $, $, 0 ] ],
+           4921, 500, $, 0, 1, $, $, 0, $, [ 372, 377 ], $, $ ],
+         // barloque-ancient-city
+         [ 375, qd_375_name, &BarloqueInnkeeper, 0, 100, 130, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &BarloqueInnkeeper, 0, qd_375_s1, [ 826 ], $, qd_375_t1,
+               1, [ 500, 0, 0, $, $, $ ], $, $, 0 ],
+             [ 1, &Skeleton, 12, 2, &BarloqueInnkeeper, 0, qd_375_s2, [ 826, 827, 828, 829, 830, 834 ], $, qd_375_t2,
+               0, $, $, $, 0 ] ],
+           0, 0, $, 2000, 1, $, $, 0, $, [ 20, 378 ], $, $ ],
+         // jasper-castle-victoria
+         [ 376, qd_376_name, &JasperInnKeeper, 0, 45, 60, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &JasperInnKeeper, 0, qd_376_s1, [ 2 ], $, qd_376_t1,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &fourCouncilor, 0, qd_376_s2, $, $, qd_376_t2,
+               0, $, $, $, 0 ] ],
+           1058, 150, $, 0, 1, $, $, 0, $, [ 13, 373 ], $, $ ],
+         // jasper-the-island
+         [ 377, qd_377_name, &JasperInnKeeper, 0, 80, 100, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &JasperInnKeeper, 0, qd_377_s1, [ 2500 ], $, qd_377_t1,
+               1, $, $, $, 0 ],
+             [ 5, $, 1, 0, &JasperInnKeeper, 0, qd_377_s2, [ 2000 ], $, qd_377_t2,
+               1, $, $, $, 0 ],
+             [ 3, $, 1, 0, &KocatanCaptainGood, 0, qd_377_s3, $, $, qd_377_t3,
+               0, $, $, $, 0 ] ],
+           4921, 500, $, 0, 1, $, $, 0, $, [ 372, 374 ], $, $ ],
+         // jasper-ancient-city
+         [ 378, qd_378_name, &JasperInnKeeper, 0, 100, 130, $,
+           $, $, $, $,
+           [ [ 5, $, 1, 0, &JasperInnKeeper, 0, qd_378_s1, [ 826 ], $, qd_378_t1,
+               1, [ 500, 0, 0, $, $, $ ], $, $, 0 ],
+             [ 1, &Skeleton, 12, 2, &JasperInnKeeper, 0, qd_378_s2, [ 826, 827, 828, 829, 830, 834 ], $, qd_378_t2,
+               0, $, $, $, 0 ] ],
+           0, 0, $, 2000, 1, $, $, 0, $, [ 20, 375 ], $, $ ],
+         // jasper-sewer-rats
+         [ 379, qd_379_name, &JasperBartender, 0, 40, 59, $,
+           $, $, 7200, $,
+           [ [ 1, &GiantRatSoldier, 10, 2, &JasperBartender, 0, qd_379_s1, [ 377, 378, 379 ], $, qd_379_t1,
+               0, $, $, $, 0 ] ],
+           841, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // jasper-mutant-ants
+         [ 380, qd_380_name, &JasperBlacksmith, 0, 45, 64, $,
+           $, $, 7200, $,
+           [ [ 1, &RedAnt, 10, 0, &JasperBlacksmith, 0, qd_380_s1, $, $, qd_380_t1,
+               0, $, $, $, 0 ] ],
+           1270, 250, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // jasper-frogmen
+         [ 381, qd_381_name, &JasperInnKeeper, 0, 60, 84, $,
+           $, $, 7200, $,
+           [ [ 1, &Frogman, 8, 0, &JasperInnKeeper, 0, qd_381_s1, $, $, qd_381_t1,
+               0, $, $, $, 0 ] ],
+           2233, 300, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // jasper-sewer-king
+         [ 382, qd_382_name, &JasperBartender, 0, 55, 70, $,
+           $, $, 7200, $,
+           [ [ 1, &GiantRatKing, 1, 2, &JasperBartender, 0, qd_382_s1, [ 377, 378, 379 ], $, qd_382_t1,
+               0, $, $, $, 0 ] ],
+           1882, 300, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // jasper-trolls
+         [ 383, qd_383_name, &JasperBlacksmith, 0, 65, 89, $,
+           $, $, 7200, $,
+           [ [ 1, &Troll, 8, 0, &JasperBlacksmith, 0, qd_383_s1, $, $, qd_383_t1,
+               0, $, $, $, 0 ] ],
+           3267, 400, $, 0, 1, $, $, 0, $, $, $, $ ]
+         ],
+         [
+         // jasper-dusk-rats
+         [ 384, qd_384_name, &JasperInnKeeper, 0, 80, 89, $,
+           $, $, 7200, $,
+           [ [ 1, &DuskRat, 10, 2, &JasperInnKeeper, 0, qd_384_s1, [ 377, 378, 379 ], $, qd_384_t1,
+               0, $, $, $, 0 ] ],
+           5905, 600, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // barloque-shore-fungus
+         [ 385, qd_385_name, &BarloqueBartender, 0, 40, 49, $,
+           $, $, 7200, $,
+           [ [ 1, &FungusBeast, 12, 0, &BarloqueBartender, 0, qd_385_s1, $, $, qd_385_t1,
+               0, $, $, $, 0 ] ],
+           841, 150, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // barloque-sewer-king
+         [ 386, qd_386_name, &BarloqueInnkeeper, 0, 55, 70, $,
+           $, $, 7200, $,
+           [ [ 1, &GiantRatSoldier, 15, 2, &BarloqueInnkeeper, 0, qd_386_s1, [ 108, 111, 112 ], $, qd_386_t1,
+               0, $, $, $, 0 ],
+             [ 1, &GiantRatKing, 1, 2, &BarloqueInnkeeper, 0, qd_386_s2, [ 108, 111, 112 ], $, qd_386_t2,
+               0, $, $, $, 0 ] ],
+           1882, 300, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // barloque-dusk-rats
+         [ 387, qd_387_name, &BarloqueBartender, 0, 80, 89, $,
+           $, $, 7200, $,
+           [ [ 1, &DuskRat, 10, 2, &BarloqueBartender, 0, qd_387_s1, [ 108, 111, 112 ], $, qd_387_t1,
+               0, $, $, $, 0 ] ],
+           5905, 600, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // barloque-badlands-worms
+         [ 388, qd_388_name, &BarloqueBlacksmith, 0, 75, 99, $,
+           $, $, 7200, $,
+           [ [ 1, &GroundWorm, 10, 0, &BarloqueBlacksmith, 0, qd_388_s1, $, $, qd_388_t1,
+               0, $, $, $, 0 ] ],
+           5776, 800, $, 0, 1, $, $, 0, $, $, $, $ ],
+         // barloque-lupoggs
+         [ 389, qd_389_name, &BarloqueInnkeeper, 0, 100, 124, $,
+           $, $, 7200, $,
+           [ [ 1, &Lupogg, 6, 0, &BarloqueInnkeeper, 0, qd_389_s1, $, $, qd_389_t1,
+               0, $, $, $, 0 ] ],
+           10201, 1000, $, 0, 1, $, $, 0, $, $, $, $ ]
          ]
       ];
    }
@@ -2981,7 +3323,9 @@ messages:
    {
       return [
          [
-         [ 1, qg_1_name, qg_1_icon, qg_1_desc, 856, 7, 3, 32, 32, ANGLE_EAST, 2 ]
+         [ 1, qg_1_name, qg_1_icon, qg_1_desc, 856, 7, 3, 32, 32, ANGLE_EAST, 2 ],
+         [ 2, qg_2_name, qg_2_icon, qg_2_desc, 9000, 43, 25, 32, 32, ANGLE_NORTH, 0 ],
+         [ 3, qg_3_name, qg_3_icon, qg_3_desc, 9001, 60, 35, 32, 32, ANGLE_NORTH_EAST, 0 ]
          ]
       ];
    }

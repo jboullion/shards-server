@@ -1,0 +1,39 @@
+{
+  "id": 379,
+  "key": "jasper-sewer-rats",
+  "name": "Rats Beneath Jasper",
+  "tier": "main",
+  "giver": {
+    "class": "JasperBartender"
+  },
+  "band": {
+    "min": 40,
+    "max": 59
+  },
+  "repeat": {
+    "cooldownHours": 2
+  },
+  "text": {
+    "offer": "Pietro says, \"Something big keeps chewing through my casks from below. The sewers under Jasper are full of rat soldiers, big as dogs. Kill ten of them and my ale might last the week.\"",
+    "progress": "Pietro says, \"The way into the sewers is in town. The rat soldiers are in the upper tunnels.\"",
+    "complete": "Pietro says, \"Ten fewer. Here, and have one on the house before the rats get it.\""
+  },
+  "steps": [
+    {
+      "kind": "kill",
+      "target": "GiantRatSoldier",
+      "count": 10,
+      "rooms": [
+        377,
+        378,
+        379
+      ],
+      "inRooms": true,
+      "objective": "Rat soldiers slain in the Sewers of Jasper"
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.5,
+    "shillings": 150
+  }
+}

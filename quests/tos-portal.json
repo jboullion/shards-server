@@ -1,0 +1,28 @@
+{
+  "id": 361,
+  "key": "tos-portal",
+  "name": "The Gate Home",
+  "tier": "main",
+  "giver": {
+    "class": "TosInnKeeper"
+  },
+  "band": {
+    "min": 40,
+    "max": 60
+  },
+  "text": {
+    "offer": "Paddock says, \"First time in Tos? Then before you get your purse cut, learn where the portal is. It stands on the west side of the city, humming away to itself. Walk into it and it'll know you, and Tos will only ever be a step from any other portal you've touched. Handy, in a city where you may want to leave in a hurry.\"",
+    "complete": "Paddock says, \"Good. Now you can come and go as you please. Mind you come back and spend your coin here.\""
+  },
+  "steps": [
+    {
+      "kind": "attune",
+      "point": 1,
+      "objective": "Attune to the portal in Tos",
+      "brief": "The travel portal stands on the west side of Tos (a gold \"!\" marks portals you haven't touched). Walk into it to attune yourself to it."
+    }
+  ],
+  "rewards": {
+    "xpPoints": 0.25
+  }
+}
