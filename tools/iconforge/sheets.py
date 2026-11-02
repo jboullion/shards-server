@@ -4,18 +4,25 @@ Animated sprites (monsters, NPCs): restyle a whole angle at once so animations s
 A creature BGF is a list of poses (groups), each listing one bitmap per viewing angle (8 slots; some
 angles share a bitmap). One "sheet" is every pose of one angle laid out in a grid on magenta: the model
 redraws the sheet in one request, so a walk cycle is drawn together and doesn't flicker. The result
-is sliced back into cells and each frame is fitted into its original frame's box (pixelize), which
-keeps every frame where the animation expects it. A one-bitmap sprite (a corpse) is one plain image.
+is sliced back into cells and each frame is placed where its original frame stands (place): one scale for
+every frame of a sheet, read from how big the model drew the creature against the original, and each frame
+moved so its feet are where the original's are. Then every frame is seated on the ground (ground.seat). A
+one-bitmap sprite (a corpse) is one plain image.
+
+The scale is per sheet, not per frame: fitting each frame into its own box shrank the creature whenever the
+model drew a sword further out, so it changed size as it animated (the knights of batch 021).
 """
 from __future__ import annotations
 
 import math
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
+import ground
 from bgf import BGF, Bitmap
-from pixelize import KEY_COLOR, pixelize
+from pixelize import ALPHA_CUT, KEY_COLOR, background_key, clean_edges, downscale, matte, opaque_box, to_palette
 
 SHEET = 1024
 FILL = 0.84  # of a cell: the margin keeps neighbouring frames apart
@@ -83,9 +90,9 @@ def compose(b: BGF, frames: list, pal) -> Image.Image:
 
 def slice_back(gen: Image.Image, b: BGF, frames: list) -> list:
     """The generated sheet cut into the same cells it was composed with."""
-    gen = gen.convert("RGB").resize((SHEET, SHEET), Image.LANCZOS)
     if len(frames) == 1:
-        return [gen]
+        return [gen.convert("RGB")]  # a whole image, or a cell of a packed sheet: never stretched
+    gen = gen.convert("RGB").resize((SHEET, SHEET), Image.LANCZOS)
     w = max(b.bitmaps[i].w for i in frames)
     h = max(b.bitmaps[i].h for i in frames)
     return [gen.crop(r) for r in cells(len(frames), w / h)]
@@ -113,18 +120,71 @@ def slice_many(gen: Image.Image, items: list) -> list:
     return [gen.crop(r) for r in _many_rects(items)]
 
 
+def cut_out(cell: Image.Image):
+    """The creature in a cell, matted and cropped -> (RGBA image, background key), or None when it's empty."""
+    key = background_key(cell)
+    cut = matte(cell, key=key)
+    box = opaque_box(cut)
+    return None if box is None else (cut.crop(box), key)
+
+
+def sheet_scale(cuts: dict, b: BGF) -> float | None:
+    """Cell pixels per original pixel for a sheet: the median over its frames of how much bigger the model
+    drew each creature than the original (by area, so a sword drawn longer barely moves it)."""
+    ratios = []
+    for i, (cut, _) in cuts.items():
+        orig = int(ground.solid(b.bitmaps[i]).sum())
+        drawn = int((np.asarray(cut)[..., 3] >= 128).sum())
+        if orig and drawn:
+            ratios.append((drawn / orig) ** 0.5)
+    return float(np.median(ratios)) if ratios else None
+
+
+def place(cut: Image.Image, key, original: Bitmap, scale: float, pal) -> Bitmap:
+    """A cut-out creature as a frame, `scale` cell pixels to one of the original's pixels, standing where the
+    original stands: its feet on the original's feet. The frame grows to hold whatever reaches outside the
+    original's (evenly left and right, so xoff still centres it; at the top, moving the hotspots down)."""
+    oa = ground.solid(original)
+    ofoot, ofx = ground.feet_row(oa), ground.feet_x(oa)
+    tw, th = max(1, round(cut.width / scale)), max(1, round(cut.height / scale))
+    small = downscale(cut, tw, th)
+    ga = small[..., 3] >= ALPHA_CUT
+    gfoot, gfx = ground.feet_row(ga), ground.feet_x(ga)
+    if ofoot is None or gfoot is None:
+        raise ValueError("nothing to stand on")
+    x0, y0 = round(ofx - gfx), ofoot - gfoot
+    W, H = original.w, original.h
+    grow = max(0, -x0, x0 + tw - W)
+    top, bottom = max(0, -y0), max(0, y0 + th - H)
+    canvas = np.zeros((H + top + bottom, W + 2 * grow, 4), np.uint8)
+    canvas[y0 + top:y0 + top + th, x0 + grow:x0 + grow + tw] = small
+    canvas = clean_edges(canvas, key)
+    idx = to_palette(canvas, pal)
+    hs = [{"num": h["num"], "x": h["x"] + grow, "y": h["y"] + top} for h in original.hotspots]
+    return Bitmap(canvas.shape[1], canvas.shape[0], original.xoff, original.yoff, hs, idx.tobytes())
+
+
 def rebuild(b: BGF, sheets: list, results: list, pal) -> BGF:
-    """A new BGF: each frame pixelized from its cell into its original box (same size, offsets, hotspots)."""
+    """A new BGF: each frame placed from its cell at its sheet's scale, then every frame seated on the ground."""
     new, missing = {}, []
     for frames, gen in zip(sheets, results):
+        cuts = {}
         for i, cell in zip(frames, slice_back(gen, b, frames)):
+            c = cut_out(cell) if ground.feet_row(ground.solid(b.bitmaps[i])) is not None else None
+            if c is None:
+                if ground.solid(b.bitmaps[i]).any():
+                    missing.append(i)  # the model left this cell empty (or merged it into a neighbour)
+                continue
+            cuts[i] = c
+        scale = sheet_scale(cuts, b)
+        for i, (cut, key) in cuts.items():
             try:
-                new[i] = pixelize(cell, b.bitmaps[i], b.shrink, b.shrink, pal)
-            except ValueError:  # the model left this cell empty (or merged it into a neighbour)
+                new[i] = place(cut, key, b.bitmaps[i], scale, pal)
+            except ValueError:
                 missing.append(i)
     bitmaps = [new.get(i) or b.bitmaps[i] for i in range(len(b.bitmaps))]
-    out = BGF(name=b.name, shrink=b.shrink, groups=[list(g) for g in b.groups], bitmaps=bitmaps)
-    out.missing = missing  # frames kept from the original art; the review should know
+    out = ground.seat(BGF(name=b.name, shrink=b.shrink, groups=[list(g) for g in b.groups], bitmaps=bitmaps))
+    out.missing = sorted(missing)  # frames kept from the original art; the review should know
     return out
 
 

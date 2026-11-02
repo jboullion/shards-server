@@ -3,10 +3,12 @@ iconforge: restyle the fan-art item icons into sprites that match the original M
 
     python tools/iconforge/forge.py inventory                 # 1. find icons, flag fan art, contact sheets
     python tools/iconforge/forge.py select carrot onion       #    add icons to the work set (--off removes)
+    python tools/iconforge/forge.py turnaround knight         #    a creature from every angle; --pick N sets its design
     python tools/iconforge/forge.py batch --provider openai   # 2-5. next 20 icons -> candidates + review page
     python tools/iconforge/forge.py apply decisions-003.json  # 6. record keeps/rejects from the review page
     python tools/iconforge/forge.py accept 003                #    or keep the whole batch as it is
     python tools/iconforge/forge.py install                   # 7. kept icons -> resource/graphics/shards/
+    python tools/iconforge/forge.py ground knight --seat      #    creatures' feet on the ground (report, sheets, fix)
     python tools/iconforge/forge.py status
 
 batch options:
@@ -41,9 +43,11 @@ import webbrowser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import ground  # noqa: E402
 import inventory as inv_mod  # noqa: E402
 import sheets  # noqa: E402
 import providers  # noqa: E402
@@ -236,6 +240,17 @@ MONSTER_SHEET = ("The first image is a sheet of %d animation frames of one creat
 MONSTER_SINGLE = ("Redraw the creature in the first image as %s, in the same pose, position, size and facing. The "
                   "last image is a sheet of original creature sprites from the game: match their rendering style, "
                   "not their subjects.")
+# forge.py turnaround: the creature's standing pose from every angle, drawn in one request, so the views agree.
+# The one you pick is sent with every sheet of the sprite (and of its corpse) as the design to follow.
+TURNAROUND = ("The first image shows one creature standing, seen from %d angles, one view per cell on a magenta "
+              "background. Redraw it as %s, in every cell: the same creature from each angle, so the views agree "
+              "exactly (the same armour, clothing, colours, markings, weapon, shield and proportions). Keep each "
+              "view's pose, facing, position and size, with the feet at the same height in every cell. The last "
+              "image is a sheet of original creature sprites from the game: match their rendering style, not "
+              "their subjects.")
+DESIGN_REF = ("The second image is the approved design of this creature from every angle: draw it exactly as it "
+              "looks there (the same armour, clothing, colours, markings, weapon, shield and proportions), only "
+              "posed as in the first image.")
 MONSTER_PACK = ("The first image is a sheet of %d different creatures, one per cell on a magenta background, in "
                 "reading order (left to right, top to bottom): %s. Redraw each one in its own cell, in the same pose, "
                 "position, size and facing; keep every cell separate. The last image is a sheet of original creature "
@@ -271,15 +286,52 @@ def monster_what(override: dict, classes: list) -> str:
     return override.get("describe") or "the same creature (%s)" % item_words(classes)
 
 
-def monster_prompt(override: dict, classes: list, n_frames: int, notes: list, n_angles: int = 1) -> str:
+def monster_prompt(override: dict, classes: list, n_frames: int, notes: list, n_angles: int = 1,
+                   design: bool = False) -> str:
     what = monster_what(override, classes)
     seen = ("all seen from the same angle" if n_angles == 1 else
             "seen from %d angles, the frames grouped by angle in reading order" % n_angles)
     parts = [MONSTER_SHEET % (n_frames, seen, what) if n_frames > 1 else MONSTER_SINGLE % what]
+    if design:
+        parts.append(DESIGN_REF)
     if notes:
         parts.append("Corrections from the last review: %s." % "; ".join(n.rstrip(".") for n in notes))
     parts.append(monster_style()[0])
     return " ".join(parts)
+
+
+TURNAROUNDS = BUILD / "turnaround"
+
+
+def turnaround_frames(b: BGF) -> list:
+    """The standing pose (the first group) from each of its angles, each distinct bitmap once."""
+    frames = []
+    for i in (b.groups[0] if b.groups else range(len(b.bitmaps))):
+        if i not in frames:
+            frames.append(i)
+    return frames
+
+
+def creature_source(n: str, entry: dict, from_original: bool = False) -> Path:
+    """The art a creature is redrawn from: our installed restyle when there is one (so a redraw keeps the
+    look the game shows), else the original. from_original: always the original."""
+    if not from_original and (INSTALL / n).exists():
+        return INSTALL / n
+    return Path(entry["source"])
+
+
+def design_of(n: str, inv: dict) -> Path | None:
+    """The picked turnaround for a creature: its own, or that of a creature of the same class (a corpse
+    follows its live sprite)."""
+    own = TURNAROUNDS / n.removesuffix(".bgf") / "chosen.png"
+    if own.exists():
+        return own
+    classes = set(inv.get(n, {}).get("classes", []))
+    for m, e in sorted(inv.items()):
+        p = TURNAROUNDS / m.removesuffix(".bgf") / "chosen.png"
+        if m != n and is_monster(e) and classes & set(e.get("classes", [])) and p.exists():
+            return p
+    return None
 
 
 def item_words(classes: list) -> str:
@@ -446,12 +498,15 @@ def cmd_batch(a):
     sources, jobs, inv_fi_of = {}, [], {}
     singles = []  # one-bitmap creatures (corpses): packed several to a request below
     for n in names:
-        b = BGF.read(Path(inv[n]["source"]))
+        b = BGF.read(creature_source(n, inv[n], a.from_original) if is_monster(inv[n]) else Path(inv[n]["source"]))
         if is_monster(inv[n]):
             plan = plans[n] = sheets.plan(b)
             sources[n] = (b, "monster", {})
             inv_fi_of[n] = 1000
-            if len(plan) == 1 and len(plan[0]) == 1 and a.pack_singles > 1:
+            design = design_of(n, inv)
+            if design is None and len(plan) > 1:
+                print("   %s: no turnaround picked, so its angles may not match (forge.py turnaround %s)" % (n, n))
+            if len(plan) == 1 and len(plan[0]) == 1 and a.pack_singles > 1 and design is None:
                 singles.append(n)
                 continue
             # pack whole angles into a sheet until it holds about --sheet-frames frames (at least one angle)
@@ -469,9 +524,9 @@ def cmd_batch(a):
             notes = icon_state(state, n)["notes"]
             texts = {}
             for si, frames in enumerate(plan):
-                text = monster_prompt(ovr.get(n, {}), inv[n]["classes"], len(frames), notes, angles[si])
+                text = monster_prompt(ovr.get(n, {}), inv[n]["classes"], len(frames), notes, angles[si], design is not None)
                 texts[si] = text
-                images = [sheets.compose(b, frames, pal)] + mrefs
+                images = [sheets.compose(b, frames, pal)] + ([Image.open(design).convert("RGB")] if design else []) + mrefs
                 for s in specs:
                     for v in range(a.variants):
                         jobs.append((n, 1000 + si, s, v, images, text,
@@ -577,6 +632,7 @@ def cmd_batch(a):
         else:
             inv_frame = inv_mod.inventory_bitmap(b)
         variant_imgs, variant_labels = [], []
+        warnings, grounds = {}, {}  # creatures: by variant, what the ground check found and the ground sheet
         for s in specs:
             for v in range(a.variants):
                 if (n, inv_fi_of[n], s, v) not in results:
@@ -588,11 +644,18 @@ def cmd_batch(a):
                         print("!! %s %s v%d: %d of %d sheets missing" % (n, s, v, sum(g is None for g in got), len(plan)))
                         continue
                     cand = sheets.rebuild(b, plan, got, pal)
+                    found = ground.check(cand, b)
+                    for w in found:
+                        print("!! %s %s v%d: %s" % (n, s, v, w))
                     if cand.missing:
                         print("!! %s %s v%d: %d of %d frames came back empty and keep the original art: %s"
                               % (n, s, v, len(cand.missing), len(b.bitmaps), cand.missing))
+                        found.insert(0, "%d frames came back empty and keep the original art" % len(cand.missing))
                     path = out / output.removesuffix(".bgf") / ("v%d.bgf" % len(item["variants"]))
                     cand.write(path)
+                    warnings[len(variant_imgs)] = found
+                    grounds[len(variant_imgs)] = ground.sheet(cand, pal, "%s %d" % (s, v + 1), scale=0.12)
+                    grounds[len(variant_imgs)].save(path.with_suffix(".ground.png"))
                     got[0].convert("RGB").resize((512, 512)).save(path.with_suffix(".raw.png"))
                     if cand.groups:
                         for slot in sorted({0, min(2, max(len(g) for g in cand.groups) - 1)}):
@@ -650,7 +713,10 @@ def cmd_batch(a):
                 orig = inv_frame.rgba(pal)
                 orig = [orig.resize(ref_size, Image.LANCZOS) if orig.width > ref_size[0] * 2 else orig]
             review_items.append({"name": n, "classes": inv[n]["classes"], "attempt": icon_state(state, n)["attempts"] + 1,
-                                 "original": orig, "variants": variant_imgs, "labels": variant_labels})
+                                 "original": orig, "variants": variant_imgs, "labels": variant_labels,
+                                 "warnings": [warnings.get(i, []) for i in range(len(variant_imgs))],
+                                 "ground": ([ground.sheet(b, pal, "original", scale=0.12)] +
+                                            [grounds.get(i) for i in range(len(variant_imgs))]) if grounds else []})
             sheet.append((n.removesuffix(".bgf"), [orig[0]] + [vi[0] for vi in variant_imgs]))
             st = icon_state(state, n)
             st["status"] = "review"
@@ -732,6 +798,87 @@ def cmd_install(a):
     print("browser client: its asset build must read this folder first (see tools/iconforge/README.md)")
 
 
+def cmd_turnaround(a):
+    """Draw a creature's standing pose from every angle in one request (--variants of them), or --pick one.
+    The picked one goes with every later batch of that creature as the design its sheets follow."""
+    inv = inventory()
+    names = [normalise(n) for n in a.names]
+    if a.pick is not None:
+        for n in names:
+            d = TURNAROUNDS / n.removesuffix(".bgf")
+            src = d / ("v%d.png" % a.pick)
+            if not src.exists():
+                raise SystemExit("no %s: run forge.py turnaround %s first" % (src.relative_to(REPO), n))
+            shutil.copyfile(src, d / "chosen.png")
+            print("%s: turnaround v%d picked; batches of it (and of its corpse) now follow it" % (n, a.pick))
+        return
+    pal = load_palette()
+    mrefs = [providers.reference_sheet(monster_refs(pal))]
+    ovr = overrides()
+    o = dict(x.split("=", 1) for x in a.opt)
+    for n in names:
+        e = inv.get(n)
+        if not e or not e.get("source") or not is_monster(e):
+            print("!! %s: not a creature in the inventory" % n)
+            continue
+        b = BGF.read(creature_source(n, e, a.from_original))
+        frames = turnaround_frames(b)
+        text = " ".join([TURNAROUND % (len(frames), monster_what(ovr.get(n, {}), e["classes"])), monster_style()[0]])
+        original = sheets.compose(b, frames, pal)
+        images = [original] + mrefs
+        d = TURNAROUNDS / n.removesuffix(".bgf")
+        d.mkdir(parents=True, exist_ok=True)
+        original.save(d / "original.png")
+        got = []
+        with ThreadPoolExecutor(max_workers=a.workers) as pool:
+            futs = {pool.submit(generate, a.provider, images, text, o, v): v for v in range(a.variants)}
+            for f in as_completed(futs):
+                v = futs[f]
+                try:
+                    img = f.result()[0].convert("RGB")
+                except Exception as ex:
+                    print("!! %s v%d: %s" % (n, v, ex))
+                    continue
+                img.save(d / ("v%d.png" % v))
+                got.append((v, img))
+        got.sort(key=lambda t: t[0])
+        tiles = [("original", [original])] + [("v%d" % v, [img]) for v, img in got]
+        contact_sheet(tiles, d / "choices.png", cell=512, cols=len(tiles))
+        print("%s: %d turnarounds in %s (choices.png side by side)" % (n, len(got), d.relative_to(REPO)))
+        print("   pick one: forge.py turnaround %s --pick N" % n)
+
+
+def cmd_ground(a):
+    """Creatures on the ground: report each sprite's feet and frame sizes, draw its ground sheet, and
+    with --seat put the installed (and kept) copy's feet on the ground."""
+    inv = inventory()
+    pal = load_palette()
+    out = BUILD / "ground"
+    out.mkdir(parents=True, exist_ok=True)
+    names = [normalise(n) for n in a.names] or sorted(n for n, e in inv.items() if is_monster(e) and (INSTALL / n).exists())
+    for n in names:
+        src = inv.get(n, {}).get("source")
+        path = INSTALL / n if (INSTALL / n).exists() else Path(src) if src else None
+        if path is None:
+            print("!! %s: not installed and not in the inventory" % n)
+            continue
+        b = BGF.read(path)
+        original = BGF.read(Path(src)) if src and Path(src) != path else None
+        lifts = [v for v in (ground.lift(bm, b.shrink) for bm in b.bitmaps) if v is not None]
+        print("%-16s feet %+5.0f fine (%+.0f to %+.0f)  %s" % (n, float(np.median(lifts)), min(lifts), max(lifts),
+                                                               "; ".join(ground.check(b, original)) or "ok"))
+        stem = n.removesuffix(".bgf")
+        ground.sheet(b, pal, n).save(out / ("%s.png" % stem))
+        if a.seat:
+            seated = ground.seat(b)
+            for dst in (INSTALL / n, KEPT / n):
+                if dst.exists():
+                    seated.write(dst)
+            ground.sheet(seated, pal, n + " (seated)").save(out / ("%s.seated.png" % stem))
+            print("   seated: %s" % ", ".join(str(d.relative_to(REPO)) for d in (INSTALL / n, KEPT / n) if d.exists()))
+    print("ground sheets: %s" % out)
+
+
 def cmd_select(a):
     data = json.loads(INV_FILE.read_text())
     names = {normalise(n) for n in a.names}
@@ -791,6 +938,8 @@ def main():
     p.add_argument("--batch-api", action="store_true",
                    help="OpenAI: send the requests as one Batch API job (half price, may take hours)")
     p.add_argument("--batch-wait", type=float, default=180, help="minutes to wait for a Batch API job (default 180)")
+    p.add_argument("--from-original", action="store_true",
+                   help="redraw creatures from the original art, not our installed restyle")
     p.add_argument("--cached-only", action="store_true",
                    help="no model calls: build the page from results already generated (e.g. after stopping a batch)")
     p = sub.add_parser("apply")
@@ -798,11 +947,22 @@ def main():
     p = sub.add_parser("accept", help="keep every icon of a batch (first candidate) without reviewing")
     p.add_argument("batch", help="batch number, e.g. 010")
     sub.add_parser("install")
+    p = sub.add_parser("turnaround", help="a creature's standing pose from every angle: the design its sheets follow")
+    p.add_argument("names", nargs="+")
+    p.add_argument("--provider", default="openai")
+    p.add_argument("--variants", type=int, default=3)
+    p.add_argument("--opt", action="append", default=[])
+    p.add_argument("--workers", type=int, default=4)
+    p.add_argument("--pick", type=int, help="use this variant (vN.png) as the design")
+    p.add_argument("--from-original", action="store_true", help="draw from the original art, not our installed restyle")
+    p = sub.add_parser("ground", help="creatures' feet on the ground: report, ground sheets, --seat to fix")
+    p.add_argument("names", nargs="*", help="sprites (default: every installed creature)")
+    p.add_argument("--seat", action="store_true", help="put the installed and kept copies' feet on the ground")
     p = sub.add_parser("status")
     p.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args()
     {"inventory": lambda a: inv_mod.run(), "select": cmd_select, "batch": cmd_batch, "apply": cmd_apply, "accept": cmd_accept,
-     "install": cmd_install, "status": cmd_status}[a.cmd](a)
+     "install": cmd_install, "ground": cmd_ground, "turnaround": cmd_turnaround, "status": cmd_status}[a.cmd](a)
 
 
 if __name__ == "__main__":

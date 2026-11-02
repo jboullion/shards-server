@@ -185,6 +185,17 @@ def add_outline(idx: np.ndarray, pal: np.ndarray) -> np.ndarray:
     return out
 
 
+def downscale(obj: Image.Image, tw: int, th: int) -> np.ndarray:
+    """RGBA image -> (th, tw, 4) array, area-averaged. Premultiplied so the background never bleeds into
+    edge colours."""
+    a = np.asarray(obj).astype(np.float32) / 255.0
+    pre = np.dstack([a[..., :3] * a[..., 3:4], a[..., 3:4]])
+    small = np.asarray(Image.fromarray((pre * 255).astype(np.uint8), "RGBA").resize((tw, th), Image.BOX)).astype(np.float32)
+    al = small[..., 3:4] / 255.0
+    rgb = np.where(al > 0, small[..., :3] / np.maximum(al, 1e-6), 0)
+    return np.dstack([np.clip(rgb, 0, 255), small[..., 3]]).astype(np.uint8)
+
+
 def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shrink: int, pal: np.ndarray,
              outline: bool = False, allowed=None, key=None, clean: bool = True, fit_object: bool = False,
              greys: bool = False) -> Bitmap:
@@ -218,13 +229,7 @@ def pixelize(generated: Image.Image, original: Bitmap, orig_shrink: int, new_shr
         bx0, by0, bw, bh = 0, 0, W, H
     s = min(bw / obj.width, bh / obj.height)
     tw, th = max(1, round(obj.width * s)), max(1, round(obj.height * s))
-    # premultiply so the background never bleeds into edge colours, area-average down, unpremultiply
-    a = np.asarray(obj).astype(np.float32) / 255.0
-    pre = np.dstack([a[..., :3] * a[..., 3:4], a[..., 3:4]])
-    small = np.asarray(Image.fromarray((pre * 255).astype(np.uint8), "RGBA").resize((tw, th), Image.BOX)).astype(np.float32)
-    al = small[..., 3:4] / 255.0
-    rgb = np.where(al > 0, small[..., :3] / np.maximum(al, 1e-6), 0)
-    small = np.dstack([np.clip(rgb, 0, 255), small[..., 3]]).astype(np.uint8)
+    small = downscale(obj, tw, th)
 
     canvas = np.zeros((H, W, 4), np.uint8)
     x0 = min(max(0, bx0 + (bw - tw) // 2), max(0, W - tw))

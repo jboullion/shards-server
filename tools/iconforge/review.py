@@ -75,6 +75,11 @@ img.px { image-rendering:pixelated; display:block; }
 .actions input { flex:1; min-width:160px; font:inherit; padding:6px 8px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
 .keep-btn.on { background:var(--keep); color:#fff; border-color:var(--keep); }
 .reject-btn.on { background:var(--reject); color:#fff; border-color:var(--reject); }
+.warn { margin:8px 0 0; padding:0 0 0 18px; color:var(--reject); font-size:12px; }
+details.ground { margin-top:8px; font-size:12px; color:var(--muted); }
+details.ground summary { cursor:pointer; }
+details.ground .sheets { display:flex; flex-direction:column; gap:6px; margin-top:6px; overflow-x:auto; }
+details.ground img { max-width:none; }
 </style></head>
 <body>
 <header>
@@ -111,6 +116,13 @@ function render() {
       row.append(f);
     });
     card.append(row);
+    const warns = (it.warnings || []).flatMap((w, i) => w.map(t => ((it.labels && it.labels[i]) || "variant " + (i + 1)) + ": " + t));
+    if (warns.length) card.append(el("ul", { className: "warn" }, ...warns.map(t => el("li", { textContent: t }))));
+    if (it.ground && it.ground.length) {
+      const sheets = el("div", { className: "sheets" });
+      for (const g of it.ground) if (g) sheets.append(el("img", { className: "px", src: g.src, width: g.w, height: g.h, alt: "ground sheet" }));
+      card.append(el("details", { className: "ground" }, el("summary", { textContent: "Ground check: every pose and angle on the floor line (original first)" }), sheets));
+    }
     const note = el("input", { placeholder: "Note for the next attempt (rejects only)", value: s.note });
     note.oninput = () => { s.note = note.value; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
     const keep = el("button", { className: "keep-btn" + (s.decision === "keep" ? " on" : ""), textContent: "Keep" });
@@ -141,7 +153,9 @@ render();
 
 def review_page(batch: str, items: list, path: Path):
     """items: [{"name", "classes", "attempt", "original": [PIL images], "variants": [[PIL images], ...]}].
-    Each image list is shown at in-game size (1x) and enlarged (3x), pixelated."""
+    Each image list is shown at in-game size (1x) and enlarged (3x), pixelated. Creatures also have
+    "warnings" (per variant, ground.check's sentences) and "ground" (ground sheets: the original's, then
+    each variant's), shown under a fold."""
     def views(imgs):
         out = []
         for im in imgs:
@@ -150,7 +164,9 @@ def review_page(batch: str, items: list, path: Path):
         return out
     data = [{"name": it["name"], "classes": it["classes"], "attempt": it["attempt"],
              "original": views(it["original"]), "variants": [views(v) for v in it["variants"]],
-             "labels": it.get("labels", [])} for it in items]
+             "labels": it.get("labels", []), "warnings": it.get("warnings", []),
+             "ground": [{"src": _data_url(g), "w": g.width, "h": g.height} if g else None for g in it.get("ground", [])]}
+            for it in items]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(PAGE % {"batch": html.escape(batch), "batch_json": json.dumps(batch),
                             "items_json": json.dumps(data)}, encoding="utf-8")

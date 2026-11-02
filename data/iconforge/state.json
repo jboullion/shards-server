@@ -461,26 +461,6 @@
     "bgf": "build\\iconforge\\batches\\011\\flour\\v0.bgf"
    }
   },
-  "frontman.bgf": {
-   "status": "installed",
-   "attempts": 1,
-   "notes": [],
-   "history": [
-    {
-     "batch": "011",
-     "providers": [
-      "openai"
-     ],
-     "decision": "keep"
-    }
-   ],
-   "chosen": {
-    "batch": "011",
-    "spec": "openai",
-    "variant": 0,
-    "bgf": "build\\iconforge\\batches\\011\\frontman\\v0.bgf"
-   }
-  },
   "frozjewl.bgf": {
    "status": "installed",
    "attempts": 1,
@@ -981,26 +961,6 @@
     "bgf": "build\\iconforge\\batches\\012\\maul\\v0.bgf"
    }
   },
-  "mmcarnose.bgf": {
-   "status": "installed",
-   "attempts": 1,
-   "notes": [],
-   "history": [
-    {
-     "batch": "012",
-     "providers": [
-      "openai"
-     ],
-     "decision": "keep"
-    }
-   ],
-   "chosen": {
-    "batch": "012",
-    "spec": "openai",
-    "variant": 0,
-    "bgf": "build\\iconforge\\batches\\012\\mmcarnose\\v0.bgf"
-   }
-  },
   "mmdrat.bgf": {
    "status": "installed",
    "attempts": 1,
@@ -1059,26 +1019,6 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\016\\mmhornskull\\v0.bgf"
-   }
-  },
-  "mmrednose.bgf": {
-   "status": "installed",
-   "attempts": 1,
-   "notes": [],
-   "history": [
-    {
-     "batch": "016",
-     "providers": [
-      "openai"
-     ],
-     "decision": "keep"
-    }
-   ],
-   "chosen": {
-    "batch": "016",
-    "spec": "openai",
-    "variant": 0,
-    "bgf": "build\\iconforge\\batches\\016\\mmrednose\\v0.bgf"
    }
   },
   "neruaxe.bgf": {
@@ -1579,66 +1519,6 @@
     "spec": "openai",
     "variant": 0,
     "bgf": "build\\iconforge\\batches\\016\\spirsword\\v0.bgf"
-   }
-  },
-  "squidc.bgf": {
-   "status": "installed",
-   "attempts": 1,
-   "notes": [],
-   "history": [
-    {
-     "batch": "016",
-     "providers": [
-      "openai"
-     ],
-     "decision": "keep"
-    }
-   ],
-   "chosen": {
-    "batch": "016",
-    "spec": "openai",
-    "variant": 0,
-    "bgf": "build\\iconforge\\batches\\016\\squidc\\v0.bgf"
-   }
-  },
-  "squids.bgf": {
-   "status": "installed",
-   "attempts": 1,
-   "notes": [],
-   "history": [
-    {
-     "batch": "016",
-     "providers": [
-      "openai"
-     ],
-     "decision": "keep"
-    }
-   ],
-   "chosen": {
-    "batch": "016",
-    "spec": "openai",
-    "variant": 0,
-    "bgf": "build\\iconforge\\batches\\016\\squids\\v0.bgf"
-   }
-  },
-  "squidt.bgf": {
-   "status": "installed",
-   "attempts": 1,
-   "notes": [],
-   "history": [
-    {
-     "batch": "016",
-     "providers": [
-      "openai"
-     ],
-     "decision": "keep"
-    }
-   ],
-   "chosen": {
-    "batch": "016",
-    "spec": "openai",
-    "variant": 0,
-    "bgf": "build\\iconforge\\batches\\016\\squidt\\v0.bgf"
    }
   },
   "steakmeal.bgf": {

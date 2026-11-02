@@ -1,11 +1,11 @@
 {
  "counts": {
   "original": 549,
-  "check": 85,
-  "fanart": 204,
+  "check": 84,
+  "fanart": 199,
   "missing": 1
  },
- "selected": 146,
+ "selected": 140,
  "icons": [
   {
    "name": "amulet.bgf",
@@ -1763,25 +1763,6 @@
    "selected": false
   },
   {
-   "name": "frontman.bgf",
-   "kind": "item",
-   "status": "fanart",
-   "classes": [
-    "FrontMask"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\frontman.bgf",
-   "in_classic": false,
-   "restyled": true,
-   "shrink": 45,
-   "bitmaps": 8,
-   "groups": 3,
-   "size": [
-    932,
-    804
-   ],
-   "selected": true
-  },
-  {
    "name": "frozjewl.bgf",
    "kind": "item",
    "status": "check",
@@ -3003,25 +2984,6 @@
    "selected": false
   },
   {
-   "name": "mmcarnose.bgf",
-   "kind": "item",
-   "status": "fanart",
-   "classes": [
-    "CarrotNoseMask"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mmcarnose.bgf",
-   "in_classic": false,
-   "restyled": true,
-   "shrink": 35,
-   "bitmaps": 7,
-   "groups": 3,
-   "size": [
-    188,
-    171
-   ],
-   "selected": true
-  },
-  {
    "name": "mmdrat.bgf",
    "kind": "item",
    "status": "fanart",
@@ -3117,25 +3079,6 @@
    "selected": false
   },
   {
-   "name": "mmrednose.bgf",
-   "kind": "item",
-   "status": "check",
-   "classes": [
-    "RedNoseMask"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mmrednose.bgf",
-   "in_classic": false,
-   "restyled": true,
-   "shrink": 1,
-   "bitmaps": 7,
-   "groups": 3,
-   "size": [
-    200,
-    200
-   ],
-   "selected": true
-  },
-  {
    "name": "mmskl.bgf",
    "kind": "item",
    "status": "original",
@@ -3161,7 +3104,6 @@
    "status": "original",
    "classes": [
     "StoneTrollMask",
-    "SuperStoneTrollMask",
     "TrollMask"
    ],
    "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\mmtrl.bgf",
@@ -5626,63 +5568,6 @@
    "size": [
     400,
     400
-   ],
-   "selected": true
-  },
-  {
-   "name": "squidc.bgf",
-   "kind": "item",
-   "status": "fanart",
-   "classes": [
-    "CircleMask"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\squidC.bgf",
-   "in_classic": false,
-   "restyled": true,
-   "shrink": 45,
-   "bitmaps": 8,
-   "groups": 3,
-   "size": [
-    932,
-    804
-   ],
-   "selected": true
-  },
-  {
-   "name": "squids.bgf",
-   "kind": "item",
-   "status": "fanart",
-   "classes": [
-    "SquareMask"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\squidS.bgf",
-   "in_classic": false,
-   "restyled": true,
-   "shrink": 45,
-   "bitmaps": 8,
-   "groups": 3,
-   "size": [
-    932,
-    804
-   ],
-   "selected": true
-  },
-  {
-   "name": "squidt.bgf",
-   "kind": "item",
-   "status": "fanart",
-   "classes": [
-    "TriangleMask"
-   ],
-   "source": "C:\\Users\\jboul\\AppData\\Local\\Meridian-104\\resource\\squidT.bgf",
-   "in_classic": false,
-   "restyled": true,
-   "shrink": 45,
-   "bitmaps": 8,
-   "groups": 3,
-   "size": [
-    932,
-    804
    ],
    "selected": true
   },

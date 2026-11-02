@@ -32,7 +32,8 @@ Needs Python 3.12+ with Pillow and numpy. Everything else is the standard librar
      - fit the item to its original in-game size at `--shrink 5`
      - area-downscale
      - map to `blakston.pal` with no dithering
-   - Writes candidate BGFs that keep the original's groups, offsets and hotspots.
+   - Writes candidate BGFs that keep the original's groups, offsets and hotspots. Creatures are placed
+     differently: see [Creatures](#creatures).
    - Output: `build/iconforge/batches/NNN/` with `review.html`, `sheet.png` and `manifest.json`.
 4. **Review**: open `review.html`.
    - Click a variant to keep it, or press Reject and type what was wrong ("too dark", "keep the
@@ -61,6 +62,34 @@ Needs Python 3.12+ with Pillow and numpy. Everything else is the standard librar
   - Point the class's Kod at the new file first; `forge.py inventory` then lists it with that source.
   - Example: `minotaurbers.bgf`, the minotaur berserker drawn from the restyled minotaur.
   - Monsters work best with `--sheet-frames 8`: with three angles to a sheet, the model can drift off the grid.
+
+## Creatures
+
+A creature is redrawn from our installed restyle when there is one (`resource/graphics/shards/`), so a redraw keeps the look the game shows; `--from-original` (on `turnaround` and `batch`) starts from the original art instead. A creature's sheets are one angle each (`sheets.py`). Batch 021 (the knights) showed three ways they go
+wrong: the angles didn't match each other, the creature changed size as it animated, and it floated.
+
+1. **Turnaround first**: `forge.py turnaround knight --variants 3` draws the standing pose from every angle
+   in one request, to `build/iconforge/turnaround/knight/` (`choices.png` shows the original and each
+   variant). `forge.py turnaround knight --pick 1` makes v1 the design. Every later batch of that creature
+   sends it as the second image, with a line asking the model to follow it. A corpse of the same class
+   follows its live sprite's design. A creature with several angles and no design gets a warning in the batch.
+   Qwen merges every image after the first into one reference sheet, so the design and the style
+   references arrive together there.
+2. **One scale per sheet**: each frame is no longer fitted into its original's box. The sheet's scale is the
+   median over its frames of how big the model drew the creature against the original (by area), and every
+   frame of the sheet uses it. The frame is placed with its feet where the original's feet are, and grows
+   if the new drawing reaches further.
+3. **On the ground** (`ground.py`): every frame's feet go on its bottom row, 4 fine units into the floor,
+   as in the classic sprites. The feet are the lowest row at least 12% as wide as the widest, so a sword
+   tip doesn't count; whatever is under the feet goes into the floor.
+4. **Checked**: the review page lists frames whose feet are off the ground and frames drawn at a
+   different size from the rest, and has a ground sheet under a fold: every pose and angle on a floor
+   line, the original's first. Each candidate also writes `vN.ground.png`.
+
+`forge.py ground [names] [--seat]` reports any installed creature's feet and frame sizes and writes its
+ground sheet to `build/iconforge/ground/`. With `--seat` it puts the installed and kept copies on the
+ground without redrawing them (how the batch 021 knights were fixed). With no names it checks every
+installed creature.
 
 ## Providers
 
@@ -163,6 +192,8 @@ Hand fixes live in the same folder iconforge installs to. Re-running `forge.py i
 - `inventory.py`: finds icons and classifies them.
 - `providers.py`: the model calls.
 - `pixelize.py`: matte, fit, downscale and palette mapping.
+- `sheets.py`: creature sheets: compose, slice, place each frame at its sheet's scale.
+- `ground.py`: creatures' feet on the ground, the size and ground checks, the ground sheet.
 - `hair.py`, `headrender.ts`: player hairstyles and facial hair.
 - `cloak.ts`: the guild cloak, its icon and its rack.
 - `weapon.py`, `xlats.ts`: one drawing posed into a weapon's icon, in-hand and first-person sprites (`xlats.ts` gives the previews the client's palette translations).
