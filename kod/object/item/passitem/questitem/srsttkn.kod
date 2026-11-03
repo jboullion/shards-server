@@ -134,6 +134,7 @@ messages:
    {
       if pbTemporary
       {
+         Send(self,@FixToken);
          --piDaysRemaining;
 
          if piDaysRemaining <= 0
