@@ -363,6 +363,32 @@ void CheckIPAddress(session_node *s)
 		++num_with_same_ip;
 }
 
+/* Ours: a login to an account already in the game logs the other session off (Override); the
+   character there is told why first, or its player only sees "Disconnected from the server" and
+   can't tell another window of their own from someone else using the account. HangupSession
+   only marks the session, so the message goes out before the connection closes. */
+static void TellReplacedSession(session_node *other)
+{
+   static char text[] = "This account has just logged in somewhere else, so you have been logged off here. If that was not you, change your password.";
+   parm_node parm;
+   val_type v;
+   int message_id;
+
+   if (other->state != STATE_GAME || other->game == NULL || other->game->object_id == INVALID_OBJECT)
+      return;
+   message_id = GetIDByName("AdminSystemMessage");
+   parm.name_id = GetIDByName("string");
+   if (message_id == INVALID_ID || parm.name_id == INVALID_ID)
+      return;
+
+   SetTempString(text, (int) strlen(text));
+   v.v.tag = TAG_TEMP_STRING;
+   v.v.data = 0;
+   parm.type = CONSTANT;
+   parm.value = v.int_val;
+   SendTopLevelBlakodMessage(other->game->object_id, message_id, 1, &parm);
+}
+
 void SynchedAcceptLogin(session_node *s,char *name,char *password)
 {
    session_node *other;
@@ -473,6 +499,7 @@ void SynchedAcceptLogin(session_node *s,char *name,char *password)
          //
          lprintf("ACCOUNT %i (%s) in use; new connection overrides old one.\n",
                  a->account_id, a->name);
+         TellReplacedSession(other);
          HangupSession(other);
       }
       else
