@@ -16,6 +16,9 @@ constants:
 
    PALSY_CHANCE = 10
 
+   // Ours: how much a tree hates a player of the other side (SpecialHatredBehavior)
+   TREE_HATRED = 50
+
 resources:
 
    include evilent.lkod
@@ -51,8 +54,8 @@ classvars:
    viAttack_type = ATCK_WEAP_WHIP
    viSpeed = SPEED_NONE
    viAttributes = MOB_NOMOVE
-   // Ours: karma is gone (Player.GetKarma is 0), so karma aggression never fired; plain aggressive
-   viDefault_behavior = AI_NOMOVE | AI_FIGHT_AGGRESSIVE
+   // Ours: player karma is gone, so whom a tree attacks is SpecialHatredBehavior's call
+   viDefault_behavior = AI_NOMOVE | AI_FIGHT_KARMA_AGGRESSIVE
    viDifficulty = 4
    viVisionDistance = 14
    
@@ -120,6 +123,20 @@ messages:
       plReputationEnemies = [REP_UNDEAD];
 
       propagate;
+   }
+
+   SpecialHatredBehavior(what = $)
+   "Ours: player karma is gone, so the diseased tree attacks every player but Qor's casters "
+   "(anyone who knows a Qor spell), whom it leaves be unless attacked, as the fey dirhai do. "
+   "The living tree is the reverse (Ent)."
+   {
+      if IsClass(what,&User)
+         AND NOT Send(what,@KnowsSpellSchool,#school=SS_QOR)
+      {
+         return TREE_HATRED;
+      }
+
+      return 0;
    }
 
    MonsterAttack(what = $)
